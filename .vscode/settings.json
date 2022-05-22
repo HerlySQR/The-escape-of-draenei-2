@@ -1,0 +1,12 @@
+{
+  "wurst.javaOpts" : [ "-XX:+UseStringDeduplication", "-Xmx1G" ],
+  "files.associations" : {
+    "wurst.build" : "yaml"
+  },
+  "search.useIgnoreFiles" : false,
+  "yaml.schemas" : {
+    "./.vscode/wbschema.json" : "/wurst.build"
+  },
+  "wurst.wurstJar" : "C:\\Users\\SEBAS\\.wurst\\wurstscript.jar",
+  "wurst.wc3path" : "D:\\Warcraft III 1.27"
+}

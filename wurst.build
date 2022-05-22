@@ -1,0 +1,9 @@
+---
+projectName: The escape of draenei 2
+dependencies:
+- https://github.com/wurstscript/wurstStdlib2
+- https://github.com/wurstscript/wurstStdlib2:pre1.29
+buildMapData:
+  name: MyMapName
+  fileName: MyMapFile
+  author: SEBAS
