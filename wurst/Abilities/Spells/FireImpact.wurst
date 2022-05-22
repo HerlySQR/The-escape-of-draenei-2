@@ -1,0 +1,88 @@
+package FireImpact
+
+import AbilityData
+
+public constant FIRE_IMPACT_NL = compiletime(ABIL_ID_GEN.next())
+constant FIRE_IMPACT_BUFF = compiletime(BUFF_ID_GEN.next())
+constant FIRE_IMPACT_STUN = compiletime(ABIL_ID_GEN.next())
+
+// General
+let SLOW = 0.75
+let MAX_DURATION = 10.
+let STUN = 2.
+// Not Leveling
+let CD_NL = 23.
+let MANA_NL = 75
+let DMG_NL = 100.
+// Internal
+let dmgMap = new HashMap<unit, real>()
+let cbMap = new HashMap<unit, CallbackSingle>()
+
+function fireImact(unit source, unit target)
+    source.removeAbility(FIRE_IMPACT_BUFF)
+    InstantDummyCaster.castTarget(target.getOwner() == players[PLAYER_NEUTRAL_AGGRESSIVE] ? source.getOwner() : players[PLAYER_NEUTRAL_AGGRESSIVE] , FIRE_IMPACT_STUN, 1, Orders.creepthunderbolt, target, target.getPos())
+    Damage.deal(source, target, dmgMap.get(source), ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE)
+    dmgMap.remove(source)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == FIRE_IMPACT_NL
+            let caster = GetSpellAbilityUnit()
+            dmgMap.put(caster, DMG_NL)
+            if cbMap.has(caster)
+                destroy cbMap.get(caster)
+            cbMap.put(caster, doAfter(MAX_DURATION, () -> begin
+                fireImact(caster, caster)
+                cbMap.remove(caster)
+            end))
+    end)
+    registerAfterDamageEvent(damage -> begin
+        if damage.source.hasAbility(FIRE_IMPACT_BUFF) and not damage.isSpell
+            and not damage.source.getOwner().isAllyOf(damage.target.getOwner())
+            fireImact(damage.source, damage.target)
+            destroy cbMap.get(damage.source)
+            cbMap.remove(damage.source)
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(FIRE_IMPACT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When this ability is activated, the next target to attack will be stunned by a fireball for " + STUN.toString(0) + " seconds dealing extra damage, if he doesn't attack anyone after " + MAX_DURATION.toString(0) + " seconds, then the damage and stun will go to the caster."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetBuffs(lvl -> int2fourchar(FIRE_IMPACT_BUFF))
+        ..presetDurationHero(lvl -> MAX_DURATION + 1.)
+        ..presetDurationNormal(lvl -> MAX_DURATION + 1.)
+        ..presetDamageTakenIncrease(lvl -> 0.)
+        ..presetAttackSpeedIncrease(lvl -> 0.)
+        ..presetMovementSpeedIncrease(lvl -> 0.)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00E|r] Fire Impact")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..addTooltipProperty("Max. duration", lvl -> MAX_DURATION)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        ..presetIcon(Imports.bTNFireImpact)
+        // Tooltip
+        ..presetHotkey("E")
+        .tooltipStopListen()
+    
+    new BuffDefinition(FIRE_IMPACT_BUFF, 'Bblo')
+        ..setIcon(Imports.bTNFireImpact)
+        ..setArtTarget(1, Abilities.volcanoMissile)
+        ..setTargetAttachmentPoint0(1, "weapon")
+        ..setTargetAttachmentPoint1(1, "weapon")
+        ..setName(1, "Fire Impact")
+        ..setTooltipNormal(1, "Fire Impact")
+        .setTooltipNormalExtended(1, "This unit has Fire impact.")
+    
+    new AbilityDefinitionThunderBoltCreep(FIRE_IMPACT_STUN)
+        ..setMissileArt("")
+        ..setMissileSpeed(0)
+        ..setDamage(1, 0.)
+        ..setDurationHero(1, STUN)
+        ..setDurationNormal(1, STUN)
+        .setDummyAbility()

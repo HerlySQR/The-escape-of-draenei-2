@@ -1,0 +1,133 @@
+package SummonWaterElemental
+
+import AbilityData
+
+public constant SUMMON_WATER_ELEMENTAL_NL = compiletime(ABIL_ID_GEN.next())
+constant ELEM_BASH = compiletime(ABIL_ID_GEN.next())
+constant ELEM_ZEST = compiletime(ABIL_ID_GEN.next())
+constant ZEST_BUFF = compiletime(BUFF_ID_GEN.next())
+constant ZEST_CHARGES = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 35.
+let DURATION = 60.
+let ZEST_LVL = 8
+// Not leveling
+let MANA_NL = 135
+let ELEM_NL = compiletime(UNIT_ID_GEN.next())
+let ELEM_LIFE_NL = 525
+let ELEM_DMG_NL = dice(30, 1, 9)
+// Internal
+let levelMap = new HashMap<unit, int>()
+
+init
+    gg_unit_H00L_0205.addAbility(SUMMON_WATER_ELEMENTAL_NL)
+    // Zest
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SUMMON, () -> begin
+        switch GetSummonedUnit().getTypeId()
+            case ELEM_NL
+                levelMap.put(GetSummonedUnit(), ZEST_LVL)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ATTACKED, () -> begin
+        if GetAttacker().hasAbility(ELEM_ZEST)
+            let attacker = GetAttacker()
+            let level = levelMap.get(attacker)
+            if not attacker.hasAbility(ZEST_CHARGES)
+                attacker.addAbility(ZEST_CHARGES)
+            else if attacker.getAbilityLevel(ZEST_CHARGES) < level
+                attacker.setAbilityLevel(ZEST_CHARGES, attacker.getAbilityLevel(ZEST_CHARGES) + 1)
+    end)
+    code func = () -> begin
+        if GetOrderedUnit().hasAbility(ELEM_ZEST) and (GetIssuedOrderId() == Orders.move or GetIssuedOrderId() == Orders.stop)
+            GetOrderedUnit().removeAbility(ZEST_CHARGES)
+    end
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, func)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, func)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        if GetDyingUnit().getTypeId() == ELEM_NL
+            levelMap.remove(GetDyingUnit())
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. \nLasts 60 seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..presetSummonedUnitType(lvl -> int2fourchar(ELEM_NL))
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Summon Water Elemental")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Element life", lvl -> ELEM_LIFE_NL)
+        ..addTooltipProperty("Element damage", lvl -> ELEM_DMG_NL.toString())
+        ..addTooltipProperty("Zest max. charges", lvl -> ZEST_LVL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNSummonWaterElemental)
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Summon Water Elemental")
+
+    new AbilityDefinitionBashcreep(ELEM_BASH)
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..setName("Mace")
+        ..setEditorSuffix("(Water Elemental)")
+        ..setTooltipNormal(1, "Mace")
+        ..setTooltipNormalExtended(1, "Gives a 10% chance to stun an opponent for 1.0 seconds.")
+        ..setDurationHero(1,  1.)
+        ..setDurationNormal(1,  1.)
+        ..setChancetoBash(1,  10.)
+        ..setDamageBonus(1, 0.)
+    
+    new AbilityDefinitionAuraEnduranceCreep(ELEM_ZEST)
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setArtTarget("")
+        ..setName("Zest")
+        ..setEditorSuffix("(Water Elemental)")
+        ..setBuffs(1, int2fourchar(ZEST_BUFF))
+        ..setTargetsAllowed(1, "")
+        ..setAttackSpeedIncrease(1, 0.)
+        ..setMovementSpeedIncrease(1, 0.)
+        ..setTooltipNormal(1, "Zest")
+        ..setTooltipNormalExtended(1, "Every time you hit the same target, it will do so 10% faster, but if you stop the charges will restart.")
+    
+    new AbilityDefinitionAttackSpeedIncrease(ZEST_CHARGES)
+        ..setLevels(9)
+        ..setItemAbility(false)
+        ..setRace(Race.Naga)
+        ..setName("Zest")
+        ..setEditorSuffix("(Charges)")
+        ..presetAttackSpeedIncrease(lvl -> lvl * 0.1)
+    
+    new BuffDefinition(ZEST_BUFF, 'BOae')
+        ..setArtTarget(1, "")
+        ..setName(1, "Zest")
+        ..setTooltipNormal(1, "Zest")
+        ..setTooltipNormalExtended(1, "The more this unit attacks, the faster it will.")
+
+    new UnitDefinition(ELEM_NL, 'nsel')
+        ..setAttack1Range(500)
+        ..setAttack1DamageBase(ELEM_DMG_NL.base)
+        ..setAttack1DamageNumberofDice(ELEM_DMG_NL.number)
+        ..setAttack1DamageSidesperDie(ELEM_DMG_NL.sides)
+        ..setAttack1CooldownTime(1.55)
+        ..setAttack1AttackType(AttackType.Normal)
+        ..setArmorSoundType(ArmorSoundType.Ethereal)
+        ..setUnitClassification("summoned")
+        ..setLevel(3)
+        ..setHitPointsMaximumBase(ELEM_LIFE_NL)
+        ..setTintingColorRed(255)
+        ..setTintingColorGreen(255)
+        ..setTintingColorBlue(255)
+        ..setScalingValue(1.)
+        ..setNormalAbilities(int2fourchar(ELEM_ZEST) + "," + int2fourchar(ELEM_BASH))
+        ..setSpeedBase(270)
+        ..setName("Water Elemental")
+        .setNameEditorSuffix("(Not leveling / Level 1)")

@@ -1,0 +1,153 @@
+package Killing
+
+import ModeSelection
+import MyBoard
+import ArrayList
+import DamageEngine
+import BountyController
+
+import RegisterEvents
+
+/** First index: attacker, Second index: attacked */
+ArrayList<int> array assistTime
+
+init
+    for i = 1 to 10
+        assistTime[i] = new ArrayList<int>()
+        for j = 1 to 10
+            assistTime[i].add(0)
+    // Kill a hero
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addCondition(Condition(() -> begin
+            return GetDyingUnit().isType(UNIT_TYPE_HERO) and not (GetDyingUnit().getOwner() == DRAENEI or GetDyingUnit().getOwner() == DEMON)
+        end))
+        ..addAction(() -> begin
+            let noKiller = GetKillingUnit() == null
+            player p1 = null
+            let p2 = GetDyingUnit().getOwner()
+            int k = 0
+            let d = p2.getNumber()
+            if not noKiller
+                p1 = GetKillingUnit().getOwner()
+                k = p1.getNumber()
+            
+            deaths[d]++
+            table.setItemValue(4, row[d], deaths[d].toString())
+            if noKiller
+                DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just died")
+            else if p1.isEnemyOf(p2)
+                // Killed by an enemy
+                let oldSpree = spree[d]
+                spree[d] = 0
+
+                if p1 != players[PLAYER_NEUTRAL_AGGRESSIVE]
+                    if whatMode[3] != ONLY_COMSUMIBLES
+                        p1.addLumber(GetRandomInt(1, 2))
+            
+                    p2.setGold((GetRandomReal(0.75, 0.9) * p1.getGold()).toInt())
+            
+                    spree[k]++
+                    kills[k]++
+                    table.setItemValue(3, row[k], kills[k].toString())
+
+                    var killingMsg = ""
+
+                    if oldSpree >= 3
+                        let extra = GetRandomInt(spree[d] * 40, spree[d] * 60)
+                        killingMsg += playerName[k] + " has ended the spree of |cffffcc00" +spree[d].toString() + "|r of " + playerName[d] + " |cffffcc00(+" + extra.toString() + ")|r"
+                        p1.addGold(extra)
+                    else
+                        killingMsg += playerName[k] + " killed " + playerName[d]
+                    
+                    var whoAssisted = ". Assists: "
+                    var howMany = 0
+
+                    for i = 1 to 11
+                        if i != 6 and p1 != players[i]
+                            let aKill = players[i].getNumber()
+                            if assistTime[aKill].get(d) > 0
+                                whoAssisted += playerName[aKill] + "/"
+                                assists[aKill]++
+                                table.setItemValue(5, row[aKill], assists[aKill].toString())
+                                if whatMode[3] != ONLY_COMSUMIBLES
+                                    players[i].addLumber(GetRandomInt(0, 1))
+                                new Bounty().run(GetRandomInt(30, 48), hero[aKill] == null ? circle[aKill] : hero[aKill], players[i], true, false)
+
+                                assistTime[aKill].replace(d, 0)
+                                howMany++
+                    
+                    if howMany > 0
+                        whoAssisted = whoAssisted.subString(1, whoAssisted.length() - 1)
+                        printTimedToPlayer(killingMsg + whoAssisted, 4., localPlayer)
+                    else
+                        printTimedToPlayer(killingMsg, 4., localPlayer)
+                    
+                    if p1 != DRAENEI and p1 != DEMON
+                        if spree[k] >= 3
+                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " has a spree of |cffffcc00" + spree[k].toString() + "|r")
+                        let fk = firstKill[k] <= 0
+                        let dk = doubleKill[k] <= 0
+                        let tk = tripleKill[k] <= 0
+                        let uk = ultraKill[k] <= 0
+                        if fk and dk and tk and uk
+                            firstKill[k] = 10
+                        else if not fk and dk and tk and uk
+                            doubleKill[k] = 10
+                            firstKill[k] = 0
+                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffDouble kill|r!")
+                        else if fk and not dk and tk and uk
+                            tripleKill[k] = 10
+                            doubleKill[k] = 0
+                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffTriple kill|r!")
+                        else if fk and dk and not tk and uk
+                            ultraKill[k] = 10
+                            tripleKill[k] = 0
+                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffUltra kill|r!")
+                        else if fk and dk and tk and not uk
+                            ultraKill[k] = 10
+                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffRampage|r!")
+                else
+                    /*if GetKillingUnit() == udg_Golem_de_carne
+                        printTimedToPlayer(playerName[d] + " was killed by The Monster", 4.00, localPlayer)
+                    else
+                        printTimedToPlayer(playerName[d] + " was killed by the Neutral Creeps", 4.00, localPlayer)*/
+            else
+                // Killed by a ally
+                if p1 == p2
+                    printTimedToPlayer(playerName[d] + " has killed himself.", 4.00, localPlayer)
+                else
+                    printTimedToPlayer(playerName[k] + " killed his teammate " + playerName[d], 4.00, localPlayer)
+
+        end)
+    // Assist time
+    registerAfterDamageEvent(damage -> begin
+        if damage.target.isType(UNIT_TYPE_HERO)
+            let p1 = damage.source.getOwner()
+            let p2 = damage.target.getOwner()
+            if p1.isIngame() and p2.isIngame()
+                if p1.isEnemyOf(p2)
+                    assistTime[p1.getNumber()].replace(p2.getNumber(), 12)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellTargetUnit().isType(UNIT_TYPE_HERO)
+            let p1 = GetSpellAbilityUnit().getOwner()
+            let p2 = GetSpellTargetUnit().getOwner()
+            if p1.isIngame() and p2.isIngame()
+                if p1.isEnemyOf(p2)
+                    assistTime[p1.getNumber()].replace(p2.getNumber(), 12)
+    end)
+    CreateTimer()
+        ..startPeriodic(1.00, () -> begin
+            // Reducing assist
+            for i = 1 to 5
+                for j = 6 to 10
+                    assistTime[i].replace(j, assistTime[i].get(j) - 1)
+                    assistTime[j].replace(i, assistTime[j].get(i) - 1)
+            // Reducing spree
+            for i = 1 to 10
+                firstKill[i]--
+                doubleKill[i]--
+                tripleKill[i]--
+                ultraKill[i]--
+        end)

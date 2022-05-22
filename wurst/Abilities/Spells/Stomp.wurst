@@ -1,0 +1,38 @@
+package Stomp
+
+import AbilityData
+
+public constant STOMP_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 12.
+let TARGETS = "ground,organic"
+let AREA_NL = 325.
+// Not leveling
+let DURATION_NL = 2.5
+let MANA_NL = 80
+let DMG_NL = 70.
+
+@compiletime function gen()
+    new AbilityDefinitionTaurenChieftainWarStomp(STOMP_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground violently, causing damage and stuns nearby enemy land units."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Stomp")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetDurationHero(lvl -> DURATION_NL)
+        ..presetDurationNormal(lvl -> DURATION_NL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Stomp")

@@ -1,0 +1,85 @@
+package LiquidFire
+
+import AbilityData
+
+public constant LIQUID_FIRE_ACT_NL = compiletime(ABIL_ID_GEN.next())
+public constant LIQUID_FIRE_PAS_NL = compiletime(ABIL_ID_GEN.next())
+constant LIQUID_FIRE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 14.
+let DURATION_ACT = 6.
+let DURATION_PAS = 3.
+let TARGETS_ACT = "ground,enemy,neutral,organic,air"
+let TARGETS_PAS = "structure,enemy,neutral"
+let SLOW_MOVE = 0.25
+let AREA = 275.
+let RANGE = 700.
+// Not leveling
+let MANA_NL = 75
+let DMG_ACT_NL = 20.
+let DMG_PAS_NL = 20.
+let SLOW_ATTACK_NL = 0.4
+
+@compiletime function gen()
+    new AbilityDefinitionAlchemistAcidBomb(LIQUID_FIRE_ACT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Slows the attack and the move speed, and make damage per second to the affected units.\nLasts " + DURATION_ACT.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..presetArmorPenalty(lvl -> 0)
+        ..presetPrimaryDamage(lvl -> DMG_ACT_NL)
+        ..presetSecondaryDamage(lvl -> DMG_ACT_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetBuffs(lvl -> int2fourchar(LIQUID_FIRE_BUFF))
+        ..presetAttackSpeedReduction(lvl -> -SLOW_ATTACK_NL) // It should be negative
+        ..presetMovementSpeedReduction(lvl -> -SLOW_MOVE)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Liquid Fire")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_ACT_NL)
+        ..presetDurationHero(lvl -> DURATION_ACT)
+        ..presetDurationNormal(lvl -> DURATION_ACT)
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_NL)
+        ..addTooltipProperty("Movement Speed Reduction", lvl -> SLOW_MOVE)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..setMissileSpeed(900)
+        ..setMissileArc(0.2)
+        ..setMissileArt(Abilities.batTrollMissile)
+        ..presetIcon(Icons.bTNLiquidFire)
+        // Tooltip
+        ..presetHotkey("E")
+        ..setEditorSuffix("(Active)")
+        ..tooltipStopListen()
+        .setName("Liquid Fire")
+    
+    new AbilityDefinitionLiquidFire(LIQUID_FIRE_PAS_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a volatile liquid that causes buildings to gradually take damage. Buildings that are receiving damage from Liquid Fire cannot be repaired and their attack rate is reduced.\nLasts " + DURATION_PAS.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..setName("Liquid Fire")
+        ..presetExtraDamagePerSecond(lvl -> DMG_PAS_NL)
+        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_NL)
+        ..presetDurationHero(lvl -> DURATION_PAS)
+        ..presetDurationNormal(lvl -> DURATION_PAS)
+        // Audiovisual
+        // Tooltip
+        ..setEditorSuffix("(Pasive)")
+        ..tooltipStopListen()
+    
+    new BuffDefinition(LIQUID_FIRE_BUFF, 'BNab')
+        ..setIcon(Icons.bTNLiquidFire)
+        ..setArtTarget(1, "Environment\\NightElfBuildingFire\\ElfLargeBuildingFire1.mdl") // There is not in wurst or yes?
+        ..setTargetAttachmentPoint0(1, "chest")
+        ..setName(1, "Liquid Fire")
+        ..setEditorSuffix(1, "(Active)")
+        ..setTooltipNormal(1, "Liquid Fire")
+        .setTooltipNormalExtended(1, "This unit is slowed: its movement speed and attack rate have been reduced.")

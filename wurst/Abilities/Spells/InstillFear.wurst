@@ -1,0 +1,46 @@
+package InstillFear
+
+import AbilityData
+
+public constant INSTILL_FEAR_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 4.
+let CD = 80.
+let AREA = 900.
+// Not leveling
+let DMG_NL = 140.
+let MANA_NL = 150
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == INSTILL_FEAR_NL
+            let caster = GetSpellAbilityUnit()
+            caster.flashEffect(Abilities.roarCaster, "chest")
+            caster.flashEffect(Abilities.tauntCaster, "chest")
+            caster.flashEffect(Imports.fireNova2, "chest")
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionTaurenChieftainWarStomp(INSTILL_FEAR_NL)
+        ..setLevels(1)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("He gives a loud shout that stuns the enemy units that are still in rank of the Cacique and causing damage."))
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..setArtCaster(Abilities.howlCaster)
+        ..presetTargetsAllowed(lvl -> "air,organic,ground")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Instill Fear")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNBerserk)
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()

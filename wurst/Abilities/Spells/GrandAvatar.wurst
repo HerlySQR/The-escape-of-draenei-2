@@ -1,0 +1,38 @@
+package GrandAvatar
+
+import AbilityData
+
+public constant GRAND_AVATAR_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 75.
+let DURATION = 20.
+let MANA = 125
+// Not leveling
+let LIFE_BONUS_NL = 250.
+let ARMOR_BONUS_NL = 5.
+let DMG_BONUS_NL = 20.
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingAvatar(GRAND_AVATAR_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When the Avatar is activated, it provides the unit with an armor bonus, an life bonus,a damage bonus and immunity to spells.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Active Grand Avatar")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetHitPointBonus(lvl -> LIFE_BONUS_NL)
+        ..presetDefenseBonus(lvl -> ARMOR_BONUS_NL)
+        ..presetDamageBonus(lvl -> DMG_BONUS_NL)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00R|r] Deactive Grand Avatar")
+        ..presetHotkey("R")
+        .tooltipStopListen()

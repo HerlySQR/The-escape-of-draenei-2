@@ -1,0 +1,33 @@
+package Banish
+
+import AbilityData
+
+public constant BANISH = compiletime(ABIL_ID_GEN.next())
+
+let CD = 17.
+let DURATION = 5.
+let MANA = 75
+let RANGE = 550.
+let SPEED = 0.2
+
+@compiletime function gen()
+    new AbilityDefinitionBloodMageBanish(BANISH)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Converts a unit to Ethereal and reduces its movement speed. Ethereal creatures cannot attack but can cast spells, and certain spells cast on them will have a greater effect."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Banish")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetMovementSpeedReduction(lvl -> SPEED)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("F")
+        ..tooltipStopListen()
+        .setName("Banish")

@@ -1,0 +1,95 @@
+package Intangibility
+
+import AbilityData
+import PseudoWindWalk
+import Habitat
+import PlayerData
+import Execute
+
+public constant INTANGIBILITY_NL = compiletime(ABIL_ID_GEN.next())
+constant INTANGIBILITY_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 8.
+let CD = 16.
+let DMG_CD = 3.
+// Not Leveling
+let MANA_NL = 50
+let DMG_NL = 80.
+// Internal
+let cbMap = new HashMap<unit, CallbackCounted>()
+let AREA = 300.
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == INTANGIBILITY_NL
+            let caster = GetSpellAbilityUnit()
+            let damage = DMG_NL
+            let cooldowns = new HashMap<unit, real>()
+            let affected = CreateGroup()
+            if not herosCanByPass and THE_DRAENEI.containsPlayer(caster.getOwner())
+                caster.startWindWalk(INTANGIBILITY_BUFF)
+            else
+                caster.disableCollision()
+                doAfter(DURATION, () -> caster.enableCollision())
+            try(() -> cbMap.get(caster).stop())
+            cbMap.put(caster, doPeriodicallyTimed(INTERVAL, DURATION, cb -> begin
+                if not cb.isLast() and caster.isAlive()
+                    forUnitsInRange(caster.getPos(), AREA, u -> begin
+                        if u.isAlive()
+                            and not u.isType(UNIT_TYPE_STRUCTURE)
+                            and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
+                            and not affected.contains(u) and u.ignoreLocust()
+
+                            cooldowns.put(u, DMG_CD)
+                            affected.addUnit(u)
+                            Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+                            u.flashEffect(Abilities.annihilationMissile, "chest")
+                    end)
+                    for u in affected
+                        if cooldowns.get(u) > 0. and u.isAlive()
+                            cooldowns.put(u, cooldowns.get(u) - INTERVAL)
+                        else
+                            affected.removeUnit(u)
+                else
+                    affected.destr()
+                    destroy cooldowns
+                    if not cb.isLast()
+                        destroy cb
+            end))
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(INTANGIBILITY_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes intangible the hero and causes a damage to the nearby enemy units with a cooldown of " + DMG_CD.toString(0) + " seconds."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetBuffs(lvl -> int2fourchar(INTANGIBILITY_BUFF))
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetDamageTakenIncrease(lvl -> 0.)
+        ..presetAttackSpeedIncrease(lvl -> 0.)
+        ..presetMovementSpeedIncrease(lvl -> 0.)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00E|r] Intangibility")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNWandOfShadowSight)
+        // Tooltip
+        ..presetHotkey("E")
+        .tooltipStopListen()
+    
+    new BuffDefinition(INTANGIBILITY_BUFF, 'Bbsk')
+        ..setIcon(Icons.bTNWandOfShadowSight)
+        ..setArtTarget(1, "")
+        ..setTargetAttachmentPoint0(1, "")
+        ..setTargetAttachmentPoint1(1, "")
+        ..setName(1, "Intangibility")
+        ..setTooltipNormal(1, "Intangibility")
+        .setTooltipNormalExtended(1, "This unit can pass the units and go to elevated floors.")

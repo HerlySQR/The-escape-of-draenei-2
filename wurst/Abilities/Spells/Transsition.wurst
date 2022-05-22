@@ -1,0 +1,127 @@
+package Transsition
+
+import AbilityData
+import PseudoWindWalk
+
+import LinkedList
+
+public constant TRANSSITION_NL = compiletime(ABIL_ID_GEN.next())
+constant TRANSSITION_CANCEL = compiletime(ABIL_ID_GEN.next())
+constant TRANSSITION_SHADE = compiletime(UNIT_ID_GEN.next())
+
+// General
+let DURATION = 7.
+let CD = 16.
+let MANA = 75
+let RANGE = 1000.
+// Not Leveling
+let EXTRA_DMG_NL = 100.
+// Internal
+let SOUND = new SoundDefinition(Sounds.absorbMana, false, true)
+let casterMap = new HashMap<unit, unit>()
+let effMap = new HashMap<unit, LinkedList<effect>>()
+
+init
+    gg_unit_H00L_0205.addAbility(TRANSSITION_NL)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == TRANSSITION_NL
+            let caster = GetSpellAbilityUnit()
+            let shade = createUnit(caster.getOwner(), TRANSSITION_SHADE, caster.getPos(), caster.getFacingAngle())
+            shade.issuePointOrderById(Orders.move, getSpellTargetPos())
+            shade.setTimedLife(DURATION)
+            shade.startWindWalk('BTLF')
+            effMap.put(shade, new LinkedList<effect>()
+                ..add(shade.addEffect(Abilities.avengerMissile, "lefthand"))
+                ..add(shade.addEffect(Abilities.avengerMissile, "righthand"))
+                ..add(shade.addEffect(Abilities.avengerMissile, "leftfeet"))
+                ..add(shade.addEffect(Abilities.avengerMissile, "rightfeet")))
+            casterMap.put(shade, caster)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, () -> begin
+        if GetIssuedOrderId() == Orders.defend and GetOrderedUnit().getTypeId() == TRANSSITION_SHADE
+            let shade = GetOrderedUnit()
+            flashEffect(Imports.blinkPurpleTarget, shade.getPos())
+            casterMap.remove(shade)
+            shade.remove()
+            let list = effMap.get(shade)
+            for eff in list
+                eff.destr()
+            destroy list
+            effMap.remove(shade)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        if GetDyingUnit().getTypeId() == TRANSSITION_SHADE
+            let shade = GetDyingUnit()
+            if GetKillingUnit() == null
+                let caster = casterMap.get(shade)
+                flashEffect(Imports.blinkPurpleTarget, shade.getPos())
+                flashEffect(Imports.blinkPurpleTarget, caster.getPos())
+                casterMap.remove(shade)
+                let pos = shade.getPos()
+                let face = shade.getFacingAngle()
+                if IsUnitSelected(shade, shade.getOwner())
+                    shade.getOwner().selectSingle(caster)
+                shade.remove()
+                caster.setPos(pos)
+                caster.setFacing(face)
+            else
+                flashEffect(Imports.blinkPurpleTarget, shade.getPos())
+                casterMap.remove(shade)
+                shade.remove()
+            let list = effMap.get(shade)
+            for eff in list
+                eff.destr()
+            destroy list
+            effMap.remove(shade)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(TRANSSITION_NL, 1, true, new AbilityTooltipGenerator("Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the wolf teleports to the shade location if is not cancelled."))
+        ..setLevels(2)
+        ..presetBaseOrderID(lvl -> "stampede")
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetFollowThroughTime(lvl -> 0.75)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00Q|r] Transsition")
+        ..presetTargetTypes(Targettype.POINT)
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNQuillSpray)
+        // Tooltip
+        ..setAnimationNames("spell,attack")
+        ..presetHotkey("Q")
+        .tooltipStopListen()
+
+    new AbilityDefinitionDefend(TRANSSITION_CANCEL)
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..setName("Abort")
+        ..setEditorSuffix("Transsition")
+        ..setTooltipNormal(1, "[|cffffcc00Q|r] Abort")
+        ..setTooltipNormalExtended(1, "Cancels the transsition")
+        ..setRequirements("")
+        // Stats
+        ..presetManaCost(lvl -> 0)
+        ..presetCooldown(lvl -> 0.)
+        // Audiovisual
+        ..presetIcon(Icons.bTNQuillSprayOff)
+        // Tooltip
+        ..presetHotkey("Q")
+    
+    new UnitDefinition(TRANSSITION_SHADE, 'osw1')
+        ..setAttacksEnabled(0)
+        ..setDefenseBase(0)
+        ..setUnitClassification("summoned")
+        ..setTintingColorRed(0)
+        ..setTintingColorGreen(0)
+        ..setTintingColorBlue(0)
+        ..setSpeedBase(450)
+        ..setCollisionSize(0.)
+        ..setNormalAbilities(int2fourchar(AbilityIds.invulnerable) + "," + int2fourchar(TRANSSITION_CANCEL))
+        ..setName("Wolf shade")

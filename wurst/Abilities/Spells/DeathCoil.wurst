@@ -1,0 +1,35 @@
+package DeathCoil
+
+import AbilityData
+
+public constant DEATH_COIL_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 5.
+let RANGE = 500.
+let TARGETS = "air,invulnerable,organic,ground,vulnerable"
+// Not leveling
+let MANA_NL = 75
+let HEAL_NL = 200.
+
+@compiletime function gen()
+    new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Holy Light")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetAmountHealedDamaged(lvl -> HEAL_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Holy Light")

@@ -1,0 +1,26 @@
+package BrillianceAura
+
+import AbilityData
+
+public constant BRILLIANCE_AURA_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+// Not leveling
+let MANA_REGEN_NL = 1.
+let AREA_NL = 900.
+
+@compiletime function gen()
+    new AbilityDefinitionAuraBrilliancecreep(BRILLIANCE_AURA_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Gives additional mana regeneration to ally units."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..tooltipStartListen()
+        ..setName("Brilliance Aura")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetManaRegenerationIncrease(lvl -> MANA_REGEN_NL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        // Audiovisual
+        // Tooltips
+        .tooltipStopListen()

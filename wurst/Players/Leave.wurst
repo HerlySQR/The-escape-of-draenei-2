@@ -1,0 +1,35 @@
+package Leave
+
+import MyBoard
+
+int temp
+
+init
+    CreateTrigger()
+        ..registerPlayerEvent(players[1], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[2], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[3], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[4], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[5], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[7], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[8], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[9], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[10], EVENT_PLAYER_LEAVE)
+        ..registerPlayerEvent(players[11], EVENT_PLAYER_LEAVE)
+        ..addAction(() -> begin
+            temp = GetTriggerPlayer().getNumber()
+            // TODO: AFK
+            printTimed(playerName[temp] + " |cffff0000left the game.|r", 10.)
+            for i = 0 to 5
+                hero[temp].itemInSlot(i).setPos(circleRegion[temp].getCenter())
+            hero[temp].remove()
+            // TODO: Courier
+            EnumItemsInRect(bj_mapInitialPlayableArea, null, () -> begin
+                let m = GetManipulatedItem()
+                if GetItemPlayer(m) == GetTriggerPlayer()
+                    m.setPos(circleRegion[temp].getCenter())
+                    SetItemPlayer(m, players[PLAYER_NEUTRAL_PASSIVE], false)
+            end)
+            gg_snd_UpkeepRing.play()
+            playersOrder()
+        end)

@@ -1,0 +1,51 @@
+package Curse
+
+import MoveSpeedX
+import AbilityData
+
+public constant CURSE = compiletime(ABIL_ID_GEN.next())
+constant CURSE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+let CD = 20.
+let DURATION = 3.
+let DMG_PER_SEC = 25.
+let MANA = 75
+let RANGE = 400.
+
+init
+    registerSpellEffectEvent(CURSE, () -> begin
+        let target = GetSpellTargetUnit()
+        target.scaleSpeed("curse", 0.25)
+        doAfter(compiletime(DURATION + 1.)) -> 
+            target.removeSpeedBuff("curse")
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionEntanglingRootscreep(CURSE)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes demonic hands to rise from the ground, immobilizing and disarming the targeted enemy, dealing damage per second, and then slows it for 1 second."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..presetBuffs(lvl -> int2fourchar(CURSE_BUFF))
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Curse")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamageperSecond(lvl -> DMG_PER_SEC)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        ..presetIcon(Icons.bTNScourgeBuild)
+        // Tooltip
+        ..presetHotkey("F")
+        ..tooltipStopListen()
+        .setName("Ext Curse")
+
+    new BuffDefinition(CURSE_BUFF, 'BEer')
+        ..setIcon(Icons.bTNScourgeBuild)
+        ..setArtTarget(1, "Models\\Death Grip.mdl")
+        ..setName(1, "Curse")
+        ..setTooltipNormalExtended(1, "This unit has been hit by Curse: it cannot be moved and takes damage gradually.")

@@ -1,0 +1,92 @@
+package LizzardScales
+
+import AbilityData
+
+import UnitIndexer
+
+public constant LIZZARD_SCALES_NL = compiletime(ABIL_ID_GEN.next())
+public constant LIZZARD_SCALES_L = compiletime(ABIL_ID_GEN.next())
+
+// Not leveling
+let HITS_NL = [6, 4]
+let FACTOR_DMG_NL = [0.4, 0.5]
+// Leveling
+let HITS_L = [6, 5, 4, 3]
+let FACTOR_DMG_L = [0.4, 0.45, 0.5, 0.55]
+
+int array hits
+
+init
+    gg_unit_H00L_0205.addAbility(LIZZARD_SCALES_NL)
+    gg_unit_H00L_0205.setAbilityLevel(LIZZARD_SCALES_NL, 2)
+    gg_unit_Ofar_0285.addAbility(LIZZARD_SCALES_L)
+    gg_unit_Ofar_0285.setAbilityLevel(LIZZARD_SCALES_L, 3)
+    /*gg_unit_Otch_0284.addAbility(RAIN_OF_FIRE_S)
+    gg_unit_Otch_0284.setAbilityLevel(RAIN_OF_FIRE_S, 4)*/
+
+init
+    registerDamageEvent(damage -> begin
+        if not damage.isSpell
+            let data = damage.target.pasAbilityCond(LIZZARD_SCALES_NL, LIZZARD_SCALES_L)
+            if data.check
+                let i = damage.target.getIndex()
+                int hit
+                real factor
+                if data.isNL
+                    hit = HITS_NL[data.lvl]
+                    factor = FACTOR_DMG_NL[data.lvl]
+                else
+                    hit = HITS_L[data.lvl]
+                    factor = FACTOR_DMG_L[data.lvl]
+                hits[i]++
+                if hits[i] mod hit == 0
+                    Damage.deal(damage.target, damage.source, damage.amount * factor, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL)
+                    damage.target.flashEffect(Abilities.devourEffectArt, "origin")
+                    damage.amount = 0.
+                    hits[i] = 0
+    end)
+
+    onUnitDeindex(() -> begin
+        hits[getDeindexedUnit().getIndex()] = 0
+    end)
+
+function AbilityDefinitionHardenedSkin.general()
+    this.presetButtonPosNormal(2, 2)
+    this.presetIgnoredDamage(lvl -> 0.)
+    this.presetMinimumDamage(lvl -> 0.)
+    this.presetChancetoReduceDamage(lvl -> 0.)
+    this.presetIncludeMeleeDamage(lvl -> false)
+    this.presetIncludeRangedDamage(lvl -> false)
+    this.setRequirements("")
+    this.tooltipStartListen()
+    this.setName("Lizzard Scales")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+    // Audiovisual
+    this.setIconNormal(Imports.pASBloodElvenImprovedHides)
+    // Tooltip
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(LIZZARD_SCALES_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Blocks every amount of physical attacks the salamander receive and returns a percentage to the attacker."))
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Hits until block", lvl -> HITS_NL[lvl - 1])
+        ..addTooltipProperty("Damage factor", lvl -> FACTOR_DMG_NL[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionHardenedSkin(LIZZARD_SCALES_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Blocks every amount of physical attacks the salamander receive and returns a percentage to the attacker."))
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(2, 0)
+        ..setIconResearch(Imports.bTNBloodElvenImprovedHides)
+        // Stats
+        ..addTooltipProperty("Hits until block", lvl -> HITS_L[lvl - 1])
+        ..addTooltipProperty("Damage factor", lvl -> FACTOR_DMG_L[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")

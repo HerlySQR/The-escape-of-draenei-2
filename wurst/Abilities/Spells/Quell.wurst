@@ -1,0 +1,141 @@
+package Quell
+
+import AbilityData
+import MoveSpeedX
+
+public constant QUELL_NL = compiletime(ABIL_ID_GEN.next())
+public constant QUELL_L = compiletime(ABIL_ID_GEN.next())
+public constant QUELL_S = compiletime(ABIL_ID_GEN.next())
+constant QUELL_BUFF = compiletime(createDummyBuffObject("Quell", "This unit is quelled: its movement speed has been reduced.", Imports.bTNANA_HolyEnergy))
+
+// General
+let SLOW = 0.71
+let MAX_TIMES = 5
+let RANGE = 500.
+let AREA = 500.
+let TARGETS = "air,ground,enemy,organic,neutral"
+// Not leveling
+let CD_NL = [16., 14.]
+let MANA_NL = [115, 125]
+let DMG_PER_SEC_NL = [35., 55.]
+// Leveling
+let CD_L = [18., 16., 14., 12.]
+let MANA_L = [105, 115, 125, 135]
+let DMG_PER_SEC_L = [30., 45., 60., 75.]
+// Internal
+let extraHeight = vec3(0., 0., 50.)
+
+function quellActions(unit caster, unit target, player owner, real damage)
+    Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC)
+    target.flashEffect(Imports.holyLight, "origin")
+    forUnitsInRange(target.getPos(), AREA, u -> begin
+        if not u.isType(UNIT_TYPE_MECHANICAL) and not u.isType(UNIT_TYPE_STRUCTURE) and owner.isAllyOf(u.getOwner())
+            let m = new Missiles(target.getPos3Real() + extraHeight, u.getPos3Real() + extraHeight)
+            m.setSpeed(900.)
+            m.setArc(8.627.asAngleDegrees())
+            m.setModel(Abilities.faerieDragonMissile)
+            m.damage = damage
+            m.target = u
+            m.onFinish(() -> begin
+                u.addHP(m.damage)
+                return true
+            end)
+            m.launch()
+    end)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(QUELL_NL, QUELL_L, QUELL_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let target = GetSpellTargetUnit()
+            let owner = caster.getOwner()
+            real damage
+            if data.isNL
+                damage = DMG_PER_SEC_NL[data.lvl]
+            else
+                damage = DMG_PER_SEC_L[data.lvl]
+            target.scaleSpeed("quell", SLOW)
+            target.addBuff(QUELL_BUFF, compiletime(MAX_TIMES.toReal()), () -> doAfter(0.5, () -> target.removeSpeedBuff("quell")))
+            quellActions(caster, target, owner, damage)
+            doPeriodicallyCounted(1., MAX_TIMES, cb -> begin
+                quellActions(caster, target, owner, damage)
+            end)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "cripple")
+    this.presetButtonPosNormal(1, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell,channel")
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Quell")
+    this.presetTargetTypes(Targettype.UNIT)
+    this.addTooltipProperty("Max. times", lvl -> MAX_TIMES)
+    this.addTooltipProperty("Slow", lvl -> 1. - SLOW)
+    this.presetCastRange(lvl -> RANGE)
+    this.presetAreaofEffect(lvl -> AREA)
+    // Audiovisual
+    this.presetIcon(Imports.bTNANA_HolyEnergy)
+    // Tooltip
+    this.presetHotkey("W")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(QUELL_NL, 2, true, new AbilityTooltipGenerator("Velen forces his target to repress his bad thoughts causing him to be slowed and this is expelled as a healing for nearby units, but this process causes him a damage, this amount is also the one that heals nearby units."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_NL[lvl - 1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Quell")
+    
+    new ChannelAbilityPreset(QUELL_L, 4, true, new AbilityTooltipGenerator("Velen forces his target to repress his bad thoughts causing him to be slowed and this is expelled as a healing for nearby units, but this process causes him a damage, this amount is also the one that heals nearby units."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(1, 0)
+        // Stats
+        ..presetCooldown(lvl -> CD_L[lvl - 1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Quell")
+    
+    new ChannelAbilityPreset(QUELL_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Quell")
+        ..presetHotkey("F")
+        // Stats
+        ..presetCooldown(lvl -> begin
+            real value
+            if lvl < 3
+                value = CD_NL[lvl - 1]
+            else
+                value = CD_L[lvl - 3]
+            return value
+        end)
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_PER_SEC_NL[lvl - 1]
+            else
+                value = DMG_PER_SEC_L[lvl - 3]
+            return "Velen forces his target to repress his bad thoughts causing him to be slowed by {0}% and this is expelled as a healing for nearby units, but this process causes him a damage of {1} at a time, this amount is also the one that heals nearby units.\nLasts {2} times.".format(((1 - SLOW) * 100.).toString(0), value.toString(0), (MAX_TIMES + 1).toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Quell")

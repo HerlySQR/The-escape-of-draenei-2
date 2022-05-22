@@ -1,0 +1,51 @@
+package ReviveL
+
+import UnitIndexer
+import TimerDialog
+
+import HeroSelection
+import ClosureTimers
+import PlayerData
+
+// Control the resurrection of the dying heros in the leveling mode
+
+public trigger reviveHero = CreateTrigger()..disable()
+
+class Reviver
+    unit hero
+    timer revive
+    timerdialog clock
+
+    construct(unit hero)
+        this.hero = hero
+        let time = 15.00+5.00*R2I(SquareRoot(GetHeroLevel(hero).toReal()))
+        revive = CreateTimer()..start(time, null)
+        clock = CreateTimerDialog(revive)
+        clock.setTitle("You revive in: ")
+        if localPlayer == hero.getOwner()
+            clock.display(true)
+        
+        doAfter(time, () -> destroy this)
+
+    ondestroy
+        clock.destr()
+        revive.destr()
+        if THE_DRAENEI.containsPlayer(hero.getOwner())
+            hero.revive(actDrSpawn.randomPoint(), true)
+        else
+            hero.revive(actDeSpawn.randomPoint(), true)
+
+Reviver array instance
+
+init
+    reviveHero..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+              ..addCondition(Condition(() -> begin
+        return GetDyingUnit().isType(UNIT_TYPE_HERO)
+    end))
+              ..addAction(() -> instance[GetDyingUnit().getIndex()] == new Reviver(GetDyingUnit()))
+    onUnitDeindex(() -> begin
+        let i = getDeindexedUnit().getIndex()
+        if instance[i] != null
+            destroy instance[i]
+            instance[i] = null
+    end)

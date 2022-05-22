@@ -1,0 +1,41 @@
+package ThunderClap
+
+import AbilityData
+
+public constant THUNDER_CLAP_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 8.
+let DURATION = 2.5
+let SLOW = 0.35
+let TARGETS = "ground,neutral,organic"
+// Not leveling
+let AREA_NL = 275.
+let MANA_NL = 90
+let DMG_NL = 100.
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingThunderClap(THUNDER_CLAP_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground causing damage to nearby enemy land units and slowing their movement speed and their attack rate for " + DURATION.toString(1) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetAttackSpeedReduction(lvl -> SLOW)
+        ..presetMovementSpeedReduction(lvl -> SLOW)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00W|r] Thunder Clap")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetAOEDamage(lvl -> DMG_NL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNSeaGiantWarStomp)
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()

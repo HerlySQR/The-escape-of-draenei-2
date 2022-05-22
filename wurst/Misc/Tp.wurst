@@ -1,0 +1,130 @@
+package Tp
+
+import Functions
+import PseudoWindWalk
+import Missions
+import PlayerData
+
+import EventHelper
+
+let receiverPoint = vec2(4736.00, 512.00)
+
+let cond = Condition(() -> begin
+    return not GetEnteringUnit().isType(UNIT_TYPE_FLYING) and not GetEnteringUnit().isNotCollidable()
+end)
+
+class Tp
+    unit portal
+    vec2 target
+    texttag textTag
+    string effEnterUnit
+    string effEnterPortal
+
+    construct(unit portal, vec2 target, string name, string effPortal, string effEnterUnit, string effEnterPortal, rect zone, code actions)
+        this.portal = portal
+        this.target = target
+        this.effEnterUnit = effEnterUnit
+        this.effEnterPortal = effEnterPortal
+
+        addEffect(effPortal, portal.getPos())
+
+        textTag = CreateTextTag()
+            ..setText(name, 10)
+            ..setColor(COLOR_WHITE)
+            ..setVisibility(true)
+        SetTextTagPosUnit(textTag, portal, 0)
+
+        CreateTrigger()
+            ..registerRectEnterEventSource(zone)
+            ..addCondition(cond)
+            ..addAction(actions)
+        
+        doPeriodically(0.016, cb -> begin
+            textTag.setVisibility(IsUnitVisible(portal, localPlayer) and not inCinematic)
+        end)
+    
+    function move(unit enter)
+        enter.flashEffect(effEnterUnit, "origin")
+        portal.flashEffect(effEnterPortal, "origin")
+        enter.setPos(target)
+
+Tp dungeon
+Tp shops
+Tp pavilion
+Tp back1
+Tp cave
+Tp mainHall
+Tp back2
+Tp back3
+Tp back4
+
+public function changeTexts()
+    dungeon.textTag.setColor(0, 255, 230, 255)
+    shops.textTag.setColor(0, 255, 230, 255)
+
+    doAfter(100, () -> begin
+        dungeon.textTag.setColor(255, 255, 255, 255)
+        shops.textTag.setColor(255, 255, 255, 255)
+    end)
+
+init
+    dungeon = new Tp(gg_unit_ncp3_0234, gg_rct_Recibir_1.getCenter(), "Dungeon",
+        "Models\\Void Teleport Teal To.mdl",
+        "Models\\Void Teleport Teal Target.mdl",
+        "Models\\Void Teleport Teal Caster.mdl",
+        gg_rct_Tp1, () -> dungeon.move(GetEnteringUnit()))
+    shops = new Tp(gg_unit_ncp3_0235, gg_rct_Recibir_2.getCenter(), "Shops (Dungeon)",
+        "Models\\Void Teleport Teal To.mdl",
+        "Models\\Void Teleport Teal Target.mdl",
+        "Models\\Void Teleport Teal Caster.mdl",
+        gg_rct_Tp2, () -> shops.move(GetEnteringUnit()))
+    pavilion = new Tp(gg_unit_ncp3_0236, gg_rct_Recibir_3.getCenter(), "Pavilion",
+        "Models\\Void Teleport Blue To.mdl",
+        "Models\\Void Teleport Blue Target.mdl",
+        "Models\\Void Teleport Blue Caster.mdl",
+        gg_rct_Tp3, () -> pavilion.move(GetEnteringUnit()))
+    back1 = new Tp(gg_unit_ncp3_0246, receiverPoint, "Main Hall (Entry)",
+        "Models\\Void Teleport Teal To.mdl",
+        "Models\\Void Teleport Teal Target.mdl",
+        "Models\\Void Teleport Teal Caster.mdl",
+        gg_rct_Tp4, () -> begin
+            if actMission == 1 and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                back1.move(GetEnteringUnit())
+        end)
+    cave = new Tp(gg_unit_ncp3_0070, gg_rct_Recibir_4.getCenter(), "Cave",
+        "Models\\Void Teleport Orange To.mdl",
+        "Models\\Void Teleport Orange Target.mdl",
+        "Models\\Void Teleport Orange Caster.mdl",
+        gg_rct_Tp5, () -> begin
+            if actMission < 4 and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                cave.move(GetEnteringUnit())
+        end)
+    mainHall = new Tp(gg_unit_ncp3_0071, gg_rct_Recibir_5.getCenter(), "Main Hall",
+        "Models\\Void Teleport Red To.mdl",
+        "Models\\Void Teleport Red Target.mdl",
+        "Models\\Void Teleport Red Caster.mdl",
+        gg_rct_Tp6, () -> begin
+            if actMission < 4 and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                mainHall.move(GetEnteringUnit())
+        end)
+    back2 = new Tp(gg_unit_ncp3_0072, receiverPoint, "Main Hall (Entry)",
+        "Models\\Void Teleport Orange To.mdl",
+        "Models\\Void Teleport Orange Target.mdl",
+        "Models\\Void Teleport Orange Caster.mdl",
+        gg_rct_Tp7, () -> back2.move(GetEnteringUnit()))
+    back3 = new Tp(gg_unit_ncp3_0073, receiverPoint, "Main Hall (Entry)",
+        "Models\\Void Teleport Red To.mdl",
+        "Models\\Void Teleport Red Target.mdl",
+        "Models\\Void Teleport Red Caster.mdl",
+        gg_rct_Tp8, () -> back3.move(GetEnteringUnit()))
+    back4 = new Tp(gg_unit_ncp3_0171, receiverPoint, "Main Hall (Entry)",
+        "Models\\Void Teleport Blue To.mdl",
+        "Models\\Void Teleport Blue Target.mdl",
+        "Models\\Void Teleport Blue Caster.mdl",
+        gg_rct_Tp9, () -> back4.move(GetEnteringUnit()))

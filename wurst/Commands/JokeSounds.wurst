@@ -1,0 +1,3 @@
+package JokeSounds
+
+public function jokeSound(string s)

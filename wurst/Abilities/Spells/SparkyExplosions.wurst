@@ -1,0 +1,127 @@
+package SparkyExplosions
+
+import AbilityData
+
+import Fx
+
+public constant SPARKY_EXPLOSIONS_NL = compiletime(ABIL_ID_GEN.next())
+public constant SPARKY_EXPLOSIONS_L = compiletime(ABIL_ID_GEN.next())
+public constant SPARKY_EXPLOSIONS_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 10.
+// Not leveling
+let DMG_NL = [200., 275.]
+let SIZE_NL = [250., 300.]
+let MANA_NL = [100, 120]
+// Leveling
+let DMG_L = [150., 250., 350., 450.]
+let SIZE_L = [175., 225., 275., 325.]
+let MANA_L = [80, 125, 170, 215]
+// Internal
+let N = 8
+let AREA_RATIO = compiletime(Cos(PI * (1/2 - 1/N)))
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(SPARKY_EXPLOSIONS_NL, SPARKY_EXPLOSIONS_L, SPARKY_EXPLOSIONS_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let direction = (-1).pow(GetRandomInt(1, 4))
+            let pos = caster.getPos()
+            let facing = caster.getFacingAngle()
+            var scale = 1.
+            real damage
+            real size
+            if data.check
+                damage = DMG_NL[data.lvl]
+                size = SIZE_NL[data.lvl]
+            else
+                damage = DMG_L[data.lvl]
+                size = SIZE_L[data.lvl]
+            var area = size * AREA_RATIO
+            doPeriodicallyCounted(0.06, compiletime(N + 1), cb -> begin
+                vec2 newPos
+                if not cb.isLast()
+                    newPos = pos.polarOffset(facing + angle(compiletime(PI2/N)*direction*cb.getCount()), size)
+                else
+                    newPos = pos
+                    scale += 0.1
+                    area = size
+                let fx = new Fx(newPos, UNIT_FACING)
+                fx.setScale(scale)
+                fx.flash(Imports.newSparksEX)
+                doAfter(4., () -> destroy fx)
+                forUnitsInRange(newPos, area, u -> begin
+                    if owner.isEnemyOf(u.getOwner())
+                        Damage.deal(caster, u, damage, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_DEMOLITION)
+                end)
+                breakTrees(newPos, area, true)
+            end)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "thunderclap")
+    this.presetOption(Option.VISIBLE, true)
+    this.presetButtonPosNormal(0, 2)
+    this.presetFollowThroughTime(lvl -> 0.25)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Sparky Explosions")
+    this.presetTargetTypes(Targettype.NONE)
+    this.presetCooldown(lvl -> CD)
+    // Audiovisual
+    this.presetIcon(Imports.bTNMagicExplosion)
+    // Tooltip
+    this.presetHotkey("Q")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(SPARKY_EXPLOSIONS_NL, 2, true, new AbilityTooltipGenerator("Create 8 queued explosions around the hero and 1 in their position."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl - 1])
+        ..addTooltipProperty("Size", lvl -> SIZE_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Sparky Explosions")
+    
+    new ChannelAbilityPreset(SPARKY_EXPLOSIONS_L, 4, true, new AbilityTooltipGenerator("Create 8 queued explosions around the hero and 1 in their position."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(0, 0)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
+        ..addTooltipProperty("Size", lvl -> SIZE_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Sparky Explosions")
+    
+    new ChannelAbilityPreset(SPARKY_EXPLOSIONS_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Sparky Explosions")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_NL[lvl - 1]
+            else
+                value = DMG_L[lvl - 3]
+            return "Create 8 queued explosions around the hero and 1 in their position, dealing " + value.toString(0) + " damage."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Sparky Explosions")

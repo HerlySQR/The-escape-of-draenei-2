@@ -1,0 +1,44 @@
+package Illusion
+
+import AbilityData
+
+public constant ILLUSION_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 50.
+let RANGE = 500.
+let DURATION = 60.
+let DMG_TAKEN = 2.
+let DMG_DEALT = 3.
+let TARGETS = "hero"
+// Not leveling
+let MANA_NL = 150
+
+init
+    gg_unit_Ofar_0285.addAbility(ILLUSION_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionItemIllusion(ILLUSION_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates an illusion of a hero.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..setRace(Race.Naga)
+        ..setLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..setItemAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Illusion")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamageDealtofnormal(lvl -> DMG_DEALT)
+        ..presetDamageReceivedMultiplier(lvl -> DMG_TAKEN)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..setArtTarget(Abilities.animateDeadTarget)
+        ..presetIcon(Icons.bTNMassTeleport)
+        // Tooltip
+        ..presetHotkey("R")
+        ..tooltipStopListen()
+        .setName("Illusion")

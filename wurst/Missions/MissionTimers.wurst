@@ -1,0 +1,31 @@
+package MissionTimers
+
+import TimerDialog
+import initlater Missions
+
+let timeMission = [0.00, 600.00, 780.00, 540.00, 600.00, 540.00]
+
+public boolean timeIsOver
+public real handicapVariousTimers
+public real quantityOneTimer
+
+timer actMission = CreateTimer()
+timerdialog windowActMission = CreateTimerDialog(actMission)
+
+init
+    nullTimer(() -> begin
+        windowActMission.setTitle("The demons will win in:")
+        GetTriggeringTrigger().destr()
+    end)
+
+public function startSingleTimer()
+    actMission.start(quantityOneTimer, function demonsWin)
+    windowActMission.display(true)
+
+public function startActTimer(int mission)
+    actMission.start(timeMission[mission] * handicapVariousTimers, function demonsWin)
+    windowActMission.display(true)
+
+public function stopActTimer()
+    actMission.pause()
+    windowActMission.display(false)

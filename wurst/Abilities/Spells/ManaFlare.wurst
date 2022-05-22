@@ -1,0 +1,65 @@
+package ManaFlare
+
+import AbilityData
+
+public constant MANA_FLARE_NL = compiletime(ABIL_ID_GEN.next())
+public constant MANA_FLARE_L = compiletime(ABIL_ID_GEN.next())
+constant MANA_FLARE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let AREA = 900.
+let CHANCE = 0.5
+let DMG = [100., 140., 180., 220.]
+let TARGETS = "air,enemies,ground"
+// Not leveling
+// leveling
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let caster = GetSpellAbilityUnit()
+        if caster.hasAbility(MANA_FLARE_BUFF)
+            forUnitsInRange(caster.getPos(), AREA, u -> begin
+                let data = u.pasAbilityCond(MANA_FLARE_NL, MANA_FLARE_L)
+                if data.check
+                    if GetRandomInt(1, 100) < compiletime((CHANCE*100.).toInt())
+                        new FlashLightning(LIGHTNING_MANA_FLARE, u, caster, 1.)
+                        caster.flashEffect(Abilities.manaFlareBoltImpact, "overhead")
+                        Damage.deal(u, caster, DMG[data.lvl], ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
+            end)
+    end)
+
+function AbilityDefinitionAuraBrilliancecreep.general()
+    this.registerTooltipGenerator(new AbilityTooltipGenerator("Enemy units affected by this aura have a " + (CHANCE*100.).toString(0) + "% of chance that upon casting an ability they will be damaged."))
+    this.presetButtonPosNormal(2, 2)
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.presetBuffs(lvl -> int2fourchar(MANA_FLARE_BUFF))
+    this.tooltipStartListen()
+    this.setName("Mana Flare")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+    // Stats
+    this.addTooltipProperty("Damage", lvl -> DMG[lvl - 1])
+    // Audiovisual
+    this.presetIcon(Imports.pASManaflare)
+    // Tooltips
+    this.presetAreaofEffect(lvl -> AREA)
+
+@compiletime function gen()
+    new AbilityDefinitionAuraBrilliancecreep(MANA_FLARE_NL)
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        ..general()
+        ..tooltipStopListen()
+        .setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionAuraBrilliancecreep(MANA_FLARE_L)
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..general()
+        ..presetButtonPosResearch(0, 2)
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
+    
+    new BuffDefinition(MANA_FLARE_BUFF, 'BOae')
+        ..setIcon(Icons.bTNManaFlare)
+        ..setName(1, "Mana Flare")
+        ..setTooltipNormalExtended(1, "This unit could be affected by Mana Flare if casts a spell")

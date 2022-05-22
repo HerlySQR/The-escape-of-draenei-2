@@ -1,0 +1,45 @@
+package BreathOfFire
+
+import AbilityData
+
+public constant CARRION_SWARM_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 700.
+let DISTANCE = 800.
+let CD = 11.
+let AREA = 150.
+let AREA_FINAL = 150.
+let MAX_DMG = 99999.
+let TARGETS = "air,structure,ground"
+// Not leveling
+let DMG_NL = 160.
+let MANA_NL = 100
+
+@compiletime function gen()
+    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a cone of fire at the enemy units."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..setAnimationNames("spell")
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetMaxDamage(lvl -> MAX_DMG)
+        ..presetBuffs(lvl -> "BNbf")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Breath of Fire")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetFinalArea(lvl -> AREA_FINAL)
+        ..presetDistance(lvl -> DISTANCE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        ..presetIcon(Imports.bTNBreathOfFireNew)
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Breath of Fire")

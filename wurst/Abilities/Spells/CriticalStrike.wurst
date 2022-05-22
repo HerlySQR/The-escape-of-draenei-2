@@ -1,0 +1,27 @@
+package CriticalStrike
+
+import AbilityData
+
+public constant CRITICAL_STRIKE_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+// Not leveling
+let CHANCE_NL = 16.
+let DMG_MULT_NL = 2.
+
+@compiletime function gen()
+    new AbilityDefinitionBladeMasterCriticalStrike(CRITICAL_STRIKE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of multiplying the normal damage of an attack."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..setName("Critical Strike")
+        ..presetChancetoCriticalStrike(lvl -> CHANCE_NL)
+        ..presetDamageMultiplier(lvl -> DMG_MULT_NL)
+        // Audiovisual
+        // Tooltip
+        ..tooltipStopListen()

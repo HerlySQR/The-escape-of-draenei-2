@@ -1,0 +1,39 @@
+package ThunderStorm
+
+import AbilityData
+
+public constant THUNDER_STORM_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 5.
+let MAX_TIMES_NL = 5
+let RANGE = 700.
+let AREA = 500.
+let TARGETS = "air,ground,enemy,neutral,organic"
+// Not Leveling
+let MANA_NL = 90
+let DMG_NL = 90.
+
+@compiletime function gen()
+    new AbilityDefinitionFarseerChainLightning(THUNDER_STORM_NL)
+        ..setLevels(1)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a thunder storm that damage to nearby enemies."))
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..setAnimationNames("spell,channel")
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetDamageReductionperTarget(lvl -> 0.)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00Q|r] Thunder Storm")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamageperTarget(lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        ..presetIcon(Imports.bTNThunderStorm)
+        // Tooltip
+        ..presetHotkey("Q")
+        .tooltipStopListen()

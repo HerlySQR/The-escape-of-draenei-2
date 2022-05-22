@@ -1,0 +1,5 @@
+package Surrender
+
+public boolean theySurrender = false
+
+public function surrender(player p)

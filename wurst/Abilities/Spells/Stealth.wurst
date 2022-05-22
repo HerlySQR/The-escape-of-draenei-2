@@ -1,0 +1,39 @@
+package Stealth
+
+import AbilityData
+
+public constant STEALTH_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+// Not Leveling
+let DURATION_NL = 8.
+let SPEED_BOOST_NL = 0.2
+let CD_NL = 12.
+let MANA_NL = 50
+let EXTRA_DMG_NL = 40.
+
+init
+    gg_unit_H00L_0205.addAbility(STEALTH_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionWindWalk(STEALTH_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It returns invisible to the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION_NL)
+        ..presetDurationNormal(lvl -> DURATION_NL)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00W|r] Stealth")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
+        ..addTooltipProperty("Duration", lvl -> DURATION_NL)
+        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_NL)
+        ..presetBackstabDamage(lvl -> EXTRA_DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()

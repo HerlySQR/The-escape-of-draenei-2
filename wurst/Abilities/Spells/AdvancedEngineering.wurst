@@ -1,0 +1,162 @@
+package AdvancedEngineering
+
+import AbilityData
+
+import LinkedList
+
+public constant ADVANCED_ENGINEERING_NL = compiletime(ABIL_ID_GEN.next())
+public constant ADVANCED_ENGINEERING_L = compiletime(ABIL_ID_GEN.next())
+constant AE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 14
+let TARGETS = "enemy,ally"
+// Not leveling
+let AE_ARMOR_NL = [compiletime(ABIL_ID_GEN.next()), compiletime(ABIL_ID_GEN.next())]
+let MAX_CHARGES_NL = [5, 10]
+let ARMOR_AND_REGEN_INC_NL = [1., 1.3]
+// leveling
+let AE_ARMOR_L = [compiletime(ABIL_ID_GEN.next()), compiletime(ABIL_ID_GEN.next()), compiletime(ABIL_ID_GEN.next()), compiletime(ABIL_ID_GEN.next())]
+let MAX_CHARGES_L = [4, 8, 12, 16]
+let ARMOR_AND_REGEN_INC_L = [1., 1.2, 1.4, 1.6]
+
+let chargeMap = new HashMap<unit, LinkedList<Charge>>()
+
+class Charge
+    static LinkedList<Charge> instances = new LinkedList<Charge>()
+    static timer t = getTimer()
+    unit caster
+    int counter
+    int spell
+    real regen
+    
+    construct(unit caster, int spell, real regen)
+        this.caster = caster
+        this.spell = spell
+        this.regen = regen
+        counter = DURATION
+        instances.add(this)
+        if instances.size() == 1
+            t.startPeriodic(1., function callback)
+
+    ondestroy
+        caster = null
+        spell = 0
+        regen = 0
+        counter = 0
+        instances.remove(this)
+        if instances.size() == 0
+            t.pause()
+
+    static function callback()
+        for ins in instances
+            ins.callbackNS()
+
+    function callbackNS()
+        counter--
+        // For the regeneration
+        caster.addHP(regen)
+        if counter == 0
+            let actCharges = caster.getAbilityLevel(spell)
+            if actCharges == 1
+                caster.removeAbility(spell)
+                destroy chargeMap.get(caster)
+                chargeMap.remove(caster)
+            else
+                caster.setAbilityLevel(spell, actCharges - 1)
+            destroy this
+
+init
+    registerDamageEvent(damage -> begin
+        if not damage.isSpell
+            let data = damage.target.pasAbilityCond(ADVANCED_ENGINEERING_NL, ADVANCED_ENGINEERING_L)
+            if data.check
+                int armor
+                int maxCharges
+                real inc
+                if data.isNL
+                    armor = AE_ARMOR_NL[data.lvl]
+                    maxCharges = MAX_CHARGES_NL[data.lvl]
+                    inc = ARMOR_AND_REGEN_INC_NL[data.lvl]
+                else
+                    armor = AE_ARMOR_L[data.lvl]
+                    maxCharges = MAX_CHARGES_L[data.lvl]
+                    inc = ARMOR_AND_REGEN_INC_L[data.lvl]
+                let caster = damage.target
+                let charges = caster.getAbilityLevel(armor)
+                // Create or get the charges list of the caster
+                var list = chargeMap.get(caster)
+                if list == null
+                    list = new LinkedList<Charge>()
+                    chargeMap.put(caster, list)
+                // Create or refresh the charges
+                if charges < maxCharges
+                    if charges == 0
+                        caster.addAbility(armor)
+                    else
+                        caster.setAbilityLevel(armor, charges + 1)
+                    list.add(new Charge(caster, armor, inc))
+                else
+                    // If the charges are full, refresh the first charge (that have the lowest remaining time)
+                    let ch = list.dequeue()
+                    ch.counter = DURATION
+                    list.add(ch)
+    end)
+
+function AbilityDefinitionHardenedSkin.general()
+    this.registerTooltipGenerator(new AbilityTooltipGenerator("The Demolisher's defense system means that when attacked, it increases its armor and regeneration."))
+    this.presetButtonPosNormal(2, 2)
+    this.setIgnoredDamage(1, 0.)
+    this.setMinimumDamage(1, 0.)
+    this.setChancetoReduceDamage(1, 0.)
+    this.setRequirements("")
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.tooltipStartListen()
+    this.setName("Advanced Engineering")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+    this.addTooltipProperty("Duration", lvl -> DURATION)
+    // Audiovisual
+    this.presetIcon(Icons.pASBTNEngineeringUpgrade)
+    // Tooltips
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(ADVANCED_ENGINEERING_NL)
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        // Stats
+        ..addTooltipProperty("Max. charges", lvl -> MAX_CHARGES_NL[lvl - 1])
+        ..addTooltipProperty("Armor and life regeneration added", lvl -> ARMOR_AND_REGEN_INC_NL[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionHardenedSkin(ADVANCED_ENGINEERING_L)
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        // Stats
+        ..addTooltipProperty("Max. charges", lvl -> MAX_CHARGES_L[lvl - 1])
+        ..addTooltipProperty("Armor and life regeneration added", lvl -> ARMOR_AND_REGEN_INC_L[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
+
+    for i = 0 to 1
+        new AbilityDefinitionDefenseBonusPlus1(AE_ARMOR_NL[i])
+            ..setLevels(MAX_CHARGES_NL[i])
+            ..presetDefenseBonus(lvl -> (lvl * ARMOR_AND_REGEN_INC_NL[i]).toInt())
+            ..setItemAbility(true)
+            ..presetButtonPosNormal(0, -11)
+            ..setIconNormal("")
+            ..setName("Extra armor")
+            ..setEditorSuffix("(Advanced Engineering / Level " + (i + 1).toString() + " / Not leveling)")
+            .setDummyAbility()
+
+    for i = 0 to 3
+        new AbilityDefinitionDefenseBonusPlus1(AE_ARMOR_L[i])
+            ..setLevels(MAX_CHARGES_L[i])
+            ..presetDefenseBonus(lvl -> (lvl * ARMOR_AND_REGEN_INC_L[i]).toInt())
+            ..setItemAbility(true)
+            ..presetButtonPosNormal(0, -11)
+            ..setIconNormal("")
+            ..setName("Extra armor")
+            ..setEditorSuffix("(Advanced Engineering / Level " + (i + 1).toString() + " / Leveling)")
+            .setDummyAbility()

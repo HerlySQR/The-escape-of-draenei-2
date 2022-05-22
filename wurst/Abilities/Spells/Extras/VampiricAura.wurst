@@ -1,0 +1,24 @@
+package VampiricAura
+
+import AbilityData
+
+public constant VAMPIRIC_AURA = compiletime(ABIL_ID_GEN.next())
+
+let LIFE_STEAL = 0.1
+let AREA = 900.
+
+@compiletime function gen()
+    new AbilityDefinitionDreadlordVampiricAura(VAMPIRIC_AURA)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Nearby melee units heal a percentage of their attack damage when they reach enemy units."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..tooltipStartListen()
+        ..setName("Brilliance Aura")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetAttackDamageStolen(lvl -> LIFE_STEAL)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        // Tooltips
+        .tooltipStopListen()

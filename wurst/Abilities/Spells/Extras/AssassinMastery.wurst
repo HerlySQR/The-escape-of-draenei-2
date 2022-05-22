@@ -1,0 +1,51 @@
+package AssassinMastery
+
+import AbilityData
+
+public constant ASSASSIN_MASTERY_ID = compiletime(ABIL_ID_GEN.next())
+constant ASSASSIN_MASTERY_BUFF = compiletime(BUFF_ID_GEN.next())
+constant DUMMY_EVASION = compiletime(ABIL_ID_GEN.next())
+
+let DURATION = 4.
+let CD = 16.
+let MANA = 45
+
+init
+    registerSpellEffectEvent(ASSASSIN_MASTERY_ID, () -> begin
+        let caster = GetSpellAbilityUnit()
+        caster.addAbility(DUMMY_EVASION)
+        doAfter(compiletime(DURATION + 0.01)) -> 
+            if caster.getAbilityLevel(ASSASSIN_MASTERY_BUFF) == 0
+                caster.removeAbility(DUMMY_EVASION)
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(ASSASSIN_MASTERY_ID)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the Assassin's concentration making him evade all physical attacks he receives."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..presetBuffs(lvl -> int2fourchar(ASSASSIN_MASTERY_BUFF))
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00F|r] Assassin Mastery")
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Imports.bTNDranaiHide)
+        // Tooltip
+        ..presetHotkey("F")
+        .tooltipStopListen()
+    
+    new BuffDefinition(ASSASSIN_MASTERY_BUFF, 'Bblo')
+        ..setIcon(Imports.bTNDranaiHide)
+        ..setArtTarget(1, Abilities.tornado_Target + "," + Abilities.tornado_Target)
+        ..setName(1, "Assassin Mastery")
+        ..setTooltipNormalExtended(1, "The assassin evade all physical attacks he receives.")
+    
+    new AbilityDefinitionEvasioncreep100(DUMMY_EVASION)
+        ..setItemAbility(true)
+        ..presetButtonPosNormal(0, -11)
+        ..setIconNormal("")
+        .setDummyAbility()

@@ -1,0 +1,215 @@
+package MoveSpeedX
+
+import LinkedList
+import HashMap
+import HashList
+import UnitIndexer
+import MapBounds
+import Orders
+import Annotations
+
+// Sorry but I don't know who created the original system (I think Jesus4Lyf created the MoveSpeed library)
+
+/**
+    This is the period on which all units will be run.
+    If you lower this value, movement bonuses will be smoother,
+    but will require more processing power (lag more).
+    Also, the lower this is, the higher the move speed can be
+    before it starts bugging on waypoints. The lowest valid
+    period is 0.00125. A period of 0.00625 is very robust.
+*/
+@configurable constant real PERIOD = 0.03125
+/**
+    This is the margin of approximation when comparing reals.
+    You will most likely not need to change this.
+*/
+@configurable constant real MARGIN = 0.01
+
+class MoveSpeed
+    static MoveSpeed array unitIns
+    static LinkedList<MoveSpeed> instances = new LinkedList<MoveSpeed>()
+    static timer t = CreateTimer()
+
+    unit u
+    boolean isHero
+    real speed
+    real totalSpeed
+    vec2 target
+    vec2 prev
+
+    static function aproxEq(vec2 A, vec2 B) returns boolean
+        return A.x >= B.x - MARGIN and A.x <= B.x + MARGIN and A.y >= B.y - MARGIN and A.y <= B.y + MARGIN
+
+    function callbackNS()
+        if not u.isAlive()
+            if not isHero
+                destroy this
+        else
+            let n = u.getPos() // the coordinate after tick
+            if not aproxEq(n, prev)
+                if not u.isPaused() and not u.hasAbility('BSTN') and not u.hasAbility('BPSE')
+                    let order = u.getCurrentOrder()
+                    let d = (n - prev).norm() * speed // Vector direction between the unit and its target with module the value speed
+                    if (order == Orders.move or order == Orders.smart) and n.distanceToSq(target) < speed.squared()
+                        // if the unit is issued a move or smart order and they are near their destination
+                        // then move them there instantly (removes a bit of glitchyness towards the end)
+                        u.setXY(target)
+                        prev = target
+                        u.issueImmediateOrderById(Orders.stop)
+                    else
+                        prev = n + d
+                        u.setXY(prev)
+
+    static function callback()
+        for ins in instances
+            ins.callbackNS()
+    
+    construct(unit u, real speed)
+        this.u = u
+        isHero = u.isType(UNIT_TYPE_HERO)
+        this.speed = (speed - 522) * PERIOD
+        totalSpeed = speed
+        prev = u.getPos()
+        target = boundMax
+
+        unitIns[u.getIndex()] = this
+
+        instances.add(this)
+
+        if instances.size() == 1
+            t.startPeriodic(PERIOD, function MoveSpeed.callback)
+    
+    ondestroy
+        unitIns[u.getIndex()] = null
+        u = null
+        speed = 0
+        instances.remove(this)
+        if instances.size() == 0
+            t.pause()
+    
+    protected static function storeOrderPoint()
+        let curr = unitIns[GetOrderedUnit().getIndex()]
+        if curr != null
+            curr.target = vec2(GetOrderPointX(), GetOrderPointY())
+
+/** Set the move speed of the unit to a quantity even above 522 */
+public function unit.setMoveSpeedX(real speed)
+    var newSpeed = speed
+    let curr = MoveSpeed.unitIns[this.getIndex()]
+    
+    if newSpeed > 522.
+        if curr == null
+            new MoveSpeed(this, newSpeed)
+        else
+            curr.speed = (newSpeed - 522) * PERIOD
+        newSpeed = 522.
+    else
+        if curr != null
+            destroy curr
+    this.setMoveSpeed(newSpeed)
+
+/** Returns the actual move speed */
+public function unit.getMoveSpeedX() returns real
+    let curr = MoveSpeed.unitIns[this.getIndex()]
+    if curr == null
+        return this.getMoveSpeed()
+    else
+        return curr.totalSpeed
+
+// Functions to edit the move speed and this buffs and debuffs being considered
+// to later usages of this functions (not considering spells)
+
+/** All the buffs or debuffs */
+HashMap<string, real> array speeds
+/** If the stored speed multiplies the base speed */
+HashList<string> array sKeys
+/** If the stored speed adds to the default speed */
+HashList<string> array aKeys
+
+function unit.storeSpeed(string key, boolean add, real speed)
+    let i = this.getIndex()
+
+    if speeds[i] == null
+        speeds[i] = new HashMap<string, real>()
+        sKeys[i] = new HashList<string>()
+        aKeys[i] = new HashList<string>()
+    
+    speeds[i].put(key, speed)
+    if add
+        if not aKeys[i].has(key)
+            aKeys[i].add(key)
+        if sKeys[i].has(key)
+            sKeys[i].remove(key)
+    else
+        if not sKeys[i].has(key)
+            sKeys[i].add(key)
+        if aKeys[i].has(key)
+            aKeys[i].remove(key)
+    
+    real endSpeed = this.getDefaultMovespeed()
+
+    for s in aKeys[i]
+        endSpeed += speeds[i].get(s)
+
+    for s in sKeys[i]
+        endSpeed *= speeds[i].get(s)
+    
+    this.setMoveSpeedX(endSpeed)
+
+/** Scales the move speed and stores it with the passed key */
+public function unit.scaleSpeed(string key, real speed)
+    this.storeSpeed(key, false, speed)
+
+/** Increase the move speed and stores it with the passed key (this will be affected by the function scaleSpeed)*/
+public function unit.addBaseSpeed(string key, real speed)
+    this.storeSpeed(key, true, speed)
+
+/** Set the speed and stores it with the passed key (this speed will be affected by the function scaleSpeed)*/
+public function unit.setBaseSpeed(string key, real speed)
+    this.addBaseSpeed(key, speed - this.getDefaultMovespeed())
+
+/** Remove a instance of a buff speed that references the specific key */
+public function unit.removeSpeedBuff(string key)
+    let i = this.getIndex()
+
+    if speeds[i] != null
+        real endSpeed = this.getDefaultMovespeed()
+
+        // No matter if they don't have it stored
+        speeds[i].remove(key)
+        sKeys[i].remove(key)
+        aKeys[i].remove(key)
+
+        if sKeys[i].isEmpty() and aKeys[i].isEmpty()
+            destroy speeds[i]
+            speeds[i] = null
+            destroy sKeys[i]
+            sKeys[i] = null
+            destroy aKeys[i]
+            aKeys[i] = null
+        else
+            for s in aKeys[i]
+                endSpeed += speeds[i].get(s)
+
+            for s in sKeys[i]
+                endSpeed *= speeds[i].get(s)
+    
+        this.setMoveSpeedX(endSpeed)
+
+init
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
+        ..addAction(function MoveSpeed.storeOrderPoint)
+    onUnitDeindex(() -> begin
+        let i = getDeindexedUnit().getIndex()
+        if speeds[i] != null
+            destroy speeds[i]
+            speeds[i] = null
+            destroy sKeys[i]
+            sKeys[i] = null
+            destroy aKeys[i]
+            aKeys[i] = null
+        let curr = MoveSpeed.unitIns[i]
+        if curr != null
+            destroy curr
+    end)

@@ -1,0 +1,44 @@
+package FireRay
+
+import AbilityData
+
+public constant FIRE_RAY_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 14.
+let TARGETS = "air,ground,organic,enemy,neutral"
+// Not leveling
+let RANGE_NL = 600.
+let MANA_NL = 75
+let DURATION_NL = 1.
+let DMG_NL = 90.
+
+init
+    gg_unit_Otch_0284.addAbility(FIRE_RAY_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionFireBoltcreep(FIRE_RAY_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a burning beam that stuns a selected enemy unit causing damage."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Fire Ray")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetDurationHero(lvl -> DURATION_NL)
+        ..presetDurationNormal(lvl -> DURATION_NL)
+        ..presetCastRange(lvl -> RANGE_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..setMissileArc(0.15)
+        ..setMissileArt(Imports.fireboltRoughMinor)
+        ..setAnimationNames("attack")
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Fire Ray")

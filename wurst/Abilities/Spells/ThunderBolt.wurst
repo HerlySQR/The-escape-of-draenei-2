@@ -1,0 +1,38 @@
+package ThunderBolt
+
+import AbilityData
+
+public constant THUNDER_BOLT_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 13.
+let RANGE = 600.
+let DURATION = 2.
+let TARGETS = "air,ground,debris,enemy,neutral,organic"
+// Not leveling
+let MANA_NL = 90
+let DMG_NL = 100.
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Thunder Bolt")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Thunder Bolt")

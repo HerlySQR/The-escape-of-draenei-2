@@ -1,0 +1,16 @@
+package TestPWW
+
+import PseudoWindWalk
+
+import AbilityIds
+import RegisterEvents
+
+init
+    gg_unit_H00L_0205.addAbility(AbilityIds.berserkerRage1)
+    gg_unit_H00L_0205.addAbility(AbilityIds.roar)
+    registerSpellEffectEvent(AbilityIds.berserkerRage1, () -> begin
+        GetSpellAbilityUnit().startWindWalk('Bbsk')
+    end)
+    registerSpellEffectEvent(AbilityIds.roar, () -> begin
+        GetSpellAbilityUnit().startWindWalk('Broa')
+    end)

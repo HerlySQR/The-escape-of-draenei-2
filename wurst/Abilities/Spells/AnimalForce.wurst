@@ -1,0 +1,60 @@
+package AnimalForce
+
+import AbilityData
+import PseudoWindWalk
+import ModeSelection
+
+public constant ANIMAL_FORCE_NL = compiletime(ABIL_ID_GEN.next())
+constant ANIMAL_FORCE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let SPEED = 1.75
+let DURATION = 8.
+let CD = 45.
+let MANA_NL = 100
+// Not Leveling
+let EXTRA_DMG_NL = 100.
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == ANIMAL_FORCE_NL
+            GetSpellAbilityUnit().startWindWalk(ANIMAL_FORCE_BUFF)
+    end)
+    registerDamageEvent(damage -> begin
+        if damage.source.hasAbility(ANIMAL_FORCE_BUFF) and damage.isSpell
+            //if whatMode[5] == NOT_LEVELING
+            damage.amount += EXTRA_DMG_NL
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(ANIMAL_FORCE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetBuffs(lvl -> int2fourchar(ANIMAL_FORCE_BUFF))
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetDamageTakenIncrease(lvl -> 0.)
+        ..presetAttackSpeedIncrease(lvl -> 0.)
+        ..presetMovementSpeedIncrease(lvl -> SPEED)
+        ..setEffectSound("StampedeCast")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Animal Force")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Max. duration", lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNStampede)
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+    
+    new BuffDefinition(ANIMAL_FORCE_BUFF, 'Bspe')
+        ..setIcon(Icons.bTNStampede)
+        ..setArtTarget(1, Abilities.volcanoDeath)
+        ..setName(1, "Animal Force")
+        ..setTooltipNormal(1, "Animal Force")
+        .setTooltipNormalExtended(1, "This animal liberate his hidden powers.")

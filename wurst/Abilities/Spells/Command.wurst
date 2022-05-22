@@ -1,0 +1,87 @@
+package Command
+
+import AbilityData
+
+public constant COMMAND_NL = compiletime(ABIL_ID_GEN.next())
+constant COMMAND_AURA = compiletime(ABIL_ID_GEN.next())
+constant COMMAND_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let AREA = 700.
+let DMG_FACTOR_CHARGE = 0.05
+let CHARGE_DURATION = 10
+// Not leveling
+let MAX_CHARGES_NL = 6
+// Internal
+let chargeMap = new HashMap<unit, int>()
+
+init
+    registerAfterDamageEvent(damage -> begin
+        let lvl = damage.source.getAbilityLevel(COMMAND_NL)
+        if lvl > 0
+            let master = damage.source
+            chargeMap.put(master, CHARGE_DURATION)
+            if not master.hasAbility(COMMAND_AURA)
+                master.addAbility(COMMAND_AURA)
+                doPeriodically(1., cb -> begin
+                    if master.isAlive()
+                        let count = chargeMap.get(master) - 1
+                        if count > 0
+                            chargeMap.put(master, count)
+                        else
+                            if master.getAbilityLevel(COMMAND_AURA) > 1
+                                master.setAbilityLevel(COMMAND_AURA, master.getAbilityLevel(COMMAND_AURA) - 1)
+                            else
+                                master.removeAbility(COMMAND_AURA)
+                                chargeMap.remove(master)
+                                destroy cb
+                    else
+                        master.removeAbility(COMMAND_AURA)
+                        chargeMap.remove(master)
+                        destroy cb
+                end)
+            else if master.getAbilityLevel(COMMAND_AURA) < MAX_CHARGES_NL
+                master.setAbilityLevel(COMMAND_AURA, master.getAbilityLevel(COMMAND_AURA) + 1)
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(COMMAND_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The command of the Axemaster grows when he evidence his power, each time he attacks the Axemaster creates an aura of damage that increases by " + (DMG_FACTOR_CHARGE * 100.).toString(0) + "% with each attack.\nThe charges loses after " + CHARGE_DURATION.toString() + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetIgnoredDamage(lvl -> 0.)
+        ..presetMinimumDamage(lvl -> 0.)
+        ..presetChancetoReduceDamage(lvl -> 0.)
+        ..presetIncludeMeleeDamage(lvl -> false)
+        ..presetIncludeRangedDamage(lvl -> false)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Command")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..addTooltipProperty("Max charges", lvl -> MAX_CHARGES_NL)
+        // Audiovisual
+        ..presetIcon(Imports.pASHellscreamBerserk)
+        // Tooltip
+        .tooltipStopListen()
+    
+    new AbilityDefinitionAuraCommandCreep(COMMAND_AURA)
+        ..setLevels(16)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetAttackDamageIncrease(lvl -> DMG_FACTOR_CHARGE * lvl)
+        ..presetMeleeBonus(lvl -> true)
+        ..presetRangedBonus(lvl -> true)
+        ..presetTargetsAllowed(lvl -> "air,ground,friend,self,vuln,invu")
+        ..presetBuffs(lvl -> int2fourchar(COMMAND_BUFF))
+        ..setItemAbility(true)
+        ..presetButtonPosNormal(0, -11)
+        ..presetIcon(Imports.pASHellscreamBerserk)
+        ..setName("Command")
+        ..setEditorSuffix("(Aura)")
+    
+    new BuffDefinition(COMMAND_BUFF, 'BOac')
+        ..setIcon(Imports.pASHellscreamBerserk)
+        ..setName(1, "Command")
+        ..setTooltipNormal(1, "Command")
+        .setTooltipNormalExtended(1, "This unit is under the effects of Command: it has an increased attack damage.")

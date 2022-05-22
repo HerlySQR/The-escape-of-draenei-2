@@ -1,0 +1,158 @@
+package EndCinematic
+
+import Functions
+import HeroSelection
+import PlayerData
+import Surrender
+
+import Cinematic
+import ClosureForGroups
+import EventHelper
+import Orders
+import ClosureTimers
+
+trigger toLeave = CreateTrigger()..disable()
+trigger toNotSeeThem = CreateTrigger()..disable()
+
+public function draeneiCinematic()
+    ClearSelection()
+    forUnitsInRect(bj_mapInitialPlayableArea , u -> begin
+        if u.isType(UNIT_TYPE_SUMMONED)
+            u.remove()
+        else if u.isType(UNIT_TYPE_HERO)
+            SuspendHeroXP(u, true)
+        else
+            u.removeAbility('A04C')
+            u.removeAbility('A04D')
+    end)
+    for i = 1 to 10
+        hero[i].revive(actDrSpawn.getCenter(), false)
+    for i = 1 to 8
+        createUnit(DRAENEI, 'ndrl', gg_rct_Donde_estaban_los_trabajadores.randomPoint(), UNIT_FACING)
+    for i = 1 to 5
+        hero[i].setPos(gg_rct_Donde_aparecen_los_draeneanos_2.getCenter())
+    if not theySurrender
+        for i = 6 to 10
+            hero[i].setPos(gg_rct_Donde_aparecen_los_demonios.getCenter())
+    else
+        for i = 6 to 10
+            hero[i].hide()
+    StopMusic(true)
+    PlayMusic("VICTORY"/*gg_snd_DarkVictory*/)
+    inCinematic = true
+    new Cinematic(
+        new LinkedList<CineSeq>()
+            ..add(Cinematic.doNothingSeq(0.3.seconds()))
+            ..add(Cinematic.applyCameraSetupSeq(gg_cam_Camera_002))
+            ..add(Cinematic.doNothingSeq(1..seconds()))
+            ..add(() -> begin
+                    toLeave.enable()
+                    toNotSeeThem.enable()
+                    createNUnits(DRAENEI, 4, 'ndrl', gg_rct_Donde_aparecen_los_draeneanos_1.getCenter(), UNIT_FACING)
+                    createNUnits(DRAENEI, 3, 'ndrt', gg_rct_Donde_aparecen_los_draeneanos_2.getCenter(), UNIT_FACING)
+                    forUnitsInRect(gg_rct_Donde_aparecen_los_draeneanos_1, u -> u.issuePointOrderById(Orders.move, gg_rct_Punto_de_salida.getCenter()))
+                    forUnitsInRect(gg_rct_Donde_aparecen_los_draeneanos_2, u -> u.issuePointOrderById(Orders.attack, gg_rct_Punto_de_salida.getCenter()))
+                    if not theySurrender
+                        createNUnits(DEMON, 3, 'nfgb', gg_rct_Donde_aparecen_los_demonios.getCenter(), UNIT_FACING)
+                        forUnitsInRect(gg_rct_Donde_aparecen_los_demonios, u -> u.issuePointOrderById(Orders.attack, gg_rct_Punto_de_salida.getCenter()))
+                    return 12..seconds()
+                end)
+            ..add(Cinematic.fadeOutSeq(9.85.seconds()))
+            ..add(() -> begin
+                    Cinematic.fadeIn(9.85.seconds())
+                    return 4.5.seconds()
+                end),
+        () -> begin
+            inCinematic = false
+            toLeave.disable()
+            toNotSeeThem.disable()
+            // TODO: First person
+            forUnitsInRect(gg_rct_Parte_final, u -> begin
+                if not u.isType(UNIT_TYPE_HERO) and not u.isType(UNIT_TYPE_STRUCTURE)
+                    u.remove()
+            end)
+            ResetToGameCamera(0.)
+            doAfter(14.5) -> 
+                StopMusic(true)
+                PlayMusic("music")
+            return 0..seconds()
+        end
+    )
+
+init
+    toLeave
+        ..registerRectEnterEventSource(gg_rct_Punto_de_salida)
+        .addAction(() -> begin
+            if THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
+                SetUnitPathing(GetEnteringUnit(), false)
+                GetEnteringUnit().issuePointOrderById(Orders.move, gg_rct_Se_va.getCenter())
+        end)
+    toNotSeeThem
+        ..registerRectEnterEventSource(gg_rct_Se_va)
+        .addAction(() -> GetEnteringUnit().hide())
+
+public function demonsCinematic()
+    ClearSelection()
+    forUnitsInRect(bj_mapInitialPlayableArea , u -> begin
+        if u.isType(UNIT_TYPE_SUMMONED)
+            u.remove()
+        else if u.isType(UNIT_TYPE_HERO)
+            SuspendHeroXP(u, true)
+        else
+            u.removeAbility('A04C')
+            u.removeAbility('A04D')
+    end)
+    forUnitsInRect(gg_rct_Mazmorra, u -> begin
+        if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
+            u.remove()
+    end)
+    DestructableRestoreLife(gg_dest_DTg3_0017, GetDestructableMaxLife(gg_dest_DTg3_0017), false)
+    DestructableRestoreLife(gg_dest_DTg1_0000, GetDestructableMaxLife(gg_dest_DTg1_0000), false)
+    DestructableRestoreLife(gg_dest_DTg1_0001, GetDestructableMaxLife(gg_dest_DTg1_0001), false)
+    hero[1]..setPos(gg_rct_Perdi_1.getCenter())..setFacing(180..asAngleDegrees())
+    hero[2]..setPos(gg_rct_Perdi_2.getCenter())..setFacing(180..asAngleDegrees())
+    hero[3]..setPos(gg_rct_Perdi_3.getCenter())..setFacing(180..asAngleDegrees())
+    hero[4]..setPos(gg_rct_Perdi_4.getCenter())..setFacing(180..asAngleDegrees())
+    hero[5]..setPos(gg_rct_Perdi_5.getCenter())..setFacing(180..asAngleDegrees())
+    hero[6]..setPos(gg_rct_Gane_1.getCenter())..setFacing(0..asAngleDegrees())
+    hero[7]..setPos(gg_rct_Gane_2.getCenter())..setFacing(0..asAngleDegrees())
+    hero[8]..setPos(gg_rct_Gane_3.getCenter())..setFacing(0..asAngleDegrees())
+    hero[9]..setPos(gg_rct_Gane_4.getCenter())..setFacing(0..asAngleDegrees())
+    hero[10]..setPos(gg_rct_Gane_5.getCenter())..setFacing(0..asAngleDegrees())
+    for i = 1 to 10
+        hero[i].pause()
+    StopMusic(true)
+    PlayMusic("DEFEAT"/*gg_snd_DarkAgents*/)
+    for i = 1 to 10
+        hero[i].revive(actDrSpawn.getCenter(), false)
+    for i = 1 to 8
+        createUnit(DRAENEI, 'ndrl', gg_rct_Donde_estaban_los_trabajadores.randomPoint(), UNIT_FACING)
+    createUnit(DEMON, 'nbal', gg_rct_Guardia_1.getCenter(), UNIT_FACING).issuePointOrderById(Orders.patrol, gg_rct_Guardia_2.getCenter())
+    createUnit(DEMON, 'nbal', gg_rct_Guardia_3.getCenter(), UNIT_FACING)
+    createUnit(DEMON, 'nbal', gg_rct_Guardia_4.getCenter(), UNIT_FACING)
+    new Cinematic(
+        new LinkedList<CineSeq>()
+            ..add(Cinematic.doNothingSeq(0.3.seconds()))
+            ..add(Cinematic.applyCameraSetupSeq(gg_cam_Camera_004))
+            ..add(() -> begin
+                CameraSetupApplyForceDuration(gg_cam_Camera_005, true, 11.00)
+                return 12..seconds()
+            end)
+            ..add(Cinematic.fadeOutSeq(9.85.seconds()))
+            ..add(() -> begin
+                    Cinematic.fadeIn(9.85.seconds())
+                    return 4.5.seconds()
+                end),
+        () -> begin
+            // TODO: First person
+            forUnitsInRect(gg_rct_Mazmorra, u -> begin
+                if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getTypeId() == 'ndrl' or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
+                    u.remove()
+            end)
+            ResetToGameCamera(0.)
+            doAfter(14.5) -> 
+                StopMusic(true)
+                PlayMusic("music")
+            return 0..seconds()
+        end
+    )

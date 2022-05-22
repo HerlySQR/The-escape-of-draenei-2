@@ -1,0 +1,84 @@
+/** Change the target of the creeps every time enter in a respective region */
+package AttackPoint
+
+import EventHelper
+import UnitIndexer
+import Orders
+
+import DrAndDeSpawn
+import PlayerData
+import Missions
+
+function filt() returns boolean
+    let id = GetEnteringUnit().getTypeId()
+    for i = 1 to 3
+        if id == DRAENEI_WARRIOR[i] or id == CHAOS_GRUNT[i]
+            return true
+    for i = 2 to 3
+        if id == DRAENEI_MAGE[i] or id == CHAOS_WARLOCK[i]
+            return true
+    return false
+
+let cond = Condition(function filt)
+
+init
+    // Attack point 1
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_1)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let enter = GetEnteringUnit()
+            if enter.getOwner() == DRAENEI
+                if actMission == 1
+                    target[enter.getIndex()] = deSpw1
+                else
+                    target[enter.getIndex()] = attackPoint2
+            else
+                target[enter.getIndex()] = drSpw
+            enter.issuePointOrderById(Orders.attack, target[enter.getIndex()])
+        end)
+    // Attack point 2
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_2)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let enter = GetEnteringUnit()
+            if enter.getOwner() == DRAENEI
+                if generatorAlive
+                    target[enter.getIndex()] = attackPoint2
+                else
+                    target[enter.getIndex()] = attackPoint3
+            else
+                target[enter.getIndex()] = attackPoint1
+            enter.issuePointOrderById(Orders.attack, target[enter.getIndex()])
+        end)
+    // Attack point 3
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_3)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let enter = GetEnteringUnit()
+            if enter.getOwner() == DRAENEI
+                if actMission == 2
+                    target[enter.getIndex()] = deSpw2
+                else
+                    target[enter.getIndex()] = attackPoint4
+            else
+                target[enter.getIndex()] = attackPoint2
+            enter.issuePointOrderById(Orders.attack, target[enter.getIndex()])
+        end)
+    // Attack point 4
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_4)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let enter = GetEnteringUnit()
+            if enter.getOwner() == DRAENEI
+                if generatorsDestroyed
+                    target[enter.getIndex()] = deSpw3
+                else
+                    target[enter.getIndex()] = attackPoint4
+            else
+                target[enter.getIndex()] = attackPoint3
+            enter.issuePointOrderById(Orders.attack, target[enter.getIndex()])
+        end)

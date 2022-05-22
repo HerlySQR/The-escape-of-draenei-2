@@ -1,0 +1,37 @@
+package FanOfKnives
+
+import AbilityData
+
+public constant FAN_OF_KNIVES_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 13.
+let AREA = 400.
+let MAX_DMG = 1000.
+let TARGETS = "air,ground,enemy,organic"
+// Not leveling
+let DMG_NL = 140.
+let MANA_NL = 90
+
+@compiletime function gen()
+    new AbilityDefinitionWardenFanofKnives(FAN_OF_KNIVES_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero launches a flurry of blades, dealing damage to nearby enemies. Each blade deals 140 damage."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..setAnimationNames("spell,slam")
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Fan of knives")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetDamagePerTarget(lvl -> DMG_NL)
+        ..presetMaximumTotalDamage(lvl -> MAX_DMG)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Fan of knives")

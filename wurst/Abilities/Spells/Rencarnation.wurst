@@ -1,0 +1,27 @@
+package Rencarnation
+
+import AbilityData
+
+public constant REENCARNATION_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+// Not leveling
+let CD_NL = 16.
+let MANA_NL = 75
+
+@compiletime function gen()
+    new AbilityDefinitionTaurenChieftainReincarnation(REENCARNATION_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When the hero dies, it will be resurrected."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..setName("Rencarnation")
+        ..presetCooldown(lvl -> CD_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        // Audiovisual
+        // Tooltip
+        ..tooltipStopListen()

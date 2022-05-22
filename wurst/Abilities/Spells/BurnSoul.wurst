@@ -1,0 +1,106 @@
+package BurnSoul
+
+import AbilityData
+
+public constant BURN_SOUL_NL = compiletime(ABIL_ID_GEN.next())
+public constant BURN_SOUL_L = compiletime(ABIL_ID_GEN.next())
+public constant BURN_SOUL_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 800.
+let TARGETS = "air,enemies,neutral,nonancient,organic,ground"
+// Not leveling
+let LIFE_FACTOR_NL = 0.6
+let MANA_NL = 185
+let CD_NL = 120.
+// Leveling
+let LIFE_FACTOR_L = [0.7, 0.85]
+let MANA_L = [250, 335]
+let CD_L = 110.
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(BURN_SOUL_NL, BURN_SOUL_L, BURN_SOUL_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let target = GetSpellTargetUnit()
+            real factor
+            if data.isNL
+                factor = LIFE_FACTOR_NL
+            else
+                factor = LIFE_FACTOR_L[data.lvl]
+            doAfter(0.2) -> 
+                let damage = (target.getMaxHP() - target.getHP()) * factor
+                Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                createTTEx(target.getPos3Real(), "+" + damage.toInt().toString(), 10, colorA(255, 0, 0, 255), localPlayer)
+                    ..setSpeed(64., 90.)
+                    ..setPermanent(false)
+                    ..setLifespan(4.)
+                    ..setFadepoint(2.)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "fingerofdeath")
+    this.presetButtonPosNormal(3, 2)
+    this.presetFollowThroughTime(lvl -> 0.25)
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Burn Soul")
+    this.presetTargetTypes(Targettype.UNIT)
+    this.setArtTarget(Abilities.markOfChaosTarget)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNMarkOfFire)
+    // Tooltip
+    this.presetHotkey("R")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(BURN_SOUL_NL, 1, true, new AbilityTooltipGenerator("Burn the soul of the target causing damage depending on the life that he lost."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Life lost factor", lvl -> LIFE_FACTOR_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        ..setEditorSuffix("(Not leveling)")
+        ..tooltipStopListen()
+        .setName("Burn Soul")
+    
+    new ChannelAbilityPreset(BURN_SOUL_L, 2, true, new AbilityTooltipGenerator("Burn the soul of the target causing damage depending on the life that he lost."))
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..setHeroAbility(true)
+        ..general()
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..addTooltipProperty("Life lost factor", lvl -> LIFE_FACTOR_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..setEditorSuffix("(Leveling)")
+        ..tooltipStopListen()
+        .setName("Burn Soul")
+    
+    new ChannelAbilityPreset(BURN_SOUL_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Burn Soul")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = LIFE_FACTOR_NL
+            else
+                value = LIFE_FACTOR_L[lvl - 2]
+            return "Burn the soul of the target causing the " + (value * 100).toString(0) + "% life that he lost of damage."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Burn Soul")

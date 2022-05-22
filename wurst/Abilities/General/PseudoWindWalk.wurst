@@ -1,0 +1,119 @@
+/** This system is to emulate the intangibility of the wind walk */
+package PseudoWindWalk
+
+import UnitIndexer
+import TimerUtils
+
+// Unit collision
+
+int array limit
+
+/** Allows you disable the collision of a unit and even overwrite a previous deactivation */
+public function unit.disableCollision()
+    if limit[this.getIndex()] == 0
+        this.setPathing(false)
+    limit[this.getIndex()]++
+
+/** Only enable the collision if all the deactivation were nullified*/
+public function unit.enableCollision()
+    limit[this.getIndex()]--
+    if limit[this.getIndex()] == 0
+        this.setPathing(true)
+
+public function unit.isNotCollidable() returns boolean
+    return limit[this.getIndex()] > 0
+
+int array instances
+widget array targetWidget
+vec2 array targetPos
+
+class WindWalk
+    /** This is the max. range of the units has to do with the caster */
+    static constant RANGE = 112.00
+    /** This the interval of the timer to check the nearby units */
+    static constant INTERVAL = 0.01
+
+    static group g = CreateGroup()
+
+    unit caster
+    int myBuff
+    timer t
+    boolean intangible
+
+    function unitCond(unit other) returns boolean
+        if caster == other
+            return false
+        else if other.isType(UNIT_TYPE_STRUCTURE)
+            return false
+        else if other.isType(UNIT_TYPE_FLYING)
+            return false
+        else if other.isNotCollidable()
+            return false
+        return true
+
+    function callbackNS()
+        if caster.getAbilityLevel(myBuff) > 0 and caster.isAlive()
+            var b = false
+            g.enumUnitsInRange(caster.getPos(), RANGE)
+            for u from g
+                if unitCond(u)
+                    b = true
+                    break
+            g.clear()
+            if b
+                if not intangible
+                    caster.disableCollision()
+                    intangible = true
+            else
+                if intangible
+                    caster.enableCollision()
+                    intangible = false
+        else
+            destroy this
+
+    static function callback()
+        (GetExpiredTimer().getData() castTo WindWalk).callbackNS()
+
+    construct(unit caster, int myBuff)
+        this.caster = caster
+        this.myBuff = myBuff
+        intangible = false
+        instances[caster.getIndex()]++
+        t = getTimer()..setData(this castTo int)..startPeriodic(INTERVAL, function WindWalk.callback)
+
+    ondestroy
+        instances[caster.getIndex()]--
+        if intangible
+            caster.enableCollision()
+            intangible = false
+        caster = null
+        t.release()
+
+/** Enables the pseudo windwalk while the unit has the buff */
+public function unit.startWindWalk(int myBuff)
+    new WindWalk(this, myBuff)
+
+/** Returns true if at least have one instance of the PseudoWindWalk */
+public function unit.hasWindWalk() returns boolean
+    return instances[this.getIndex()] > 0
+
+// To make the unit don't do strange things
+
+trigger ordering = CreateTrigger()
+
+init
+    ordering
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
+        .addAction(() -> begin
+            let u = GetOrderedUnit()
+            if u.hasWindWalk() and IsTerrainPathable(GetUnitX(u), GetUnitY(u), PATHING_TYPE_WALKABILITY)
+                ordering.disable()
+                u.enableCollision()
+                if GetOrderTarget() == null
+                    u.issuePointOrderById(GetIssuedOrderId(), vec2(GetOrderPointX(), GetOrderPointY()))
+                else
+                    u.issueTargetOrderById(GetIssuedOrderId(), GetOrderTarget())
+                u.disableCollision()
+                ordering.enable()
+        end)

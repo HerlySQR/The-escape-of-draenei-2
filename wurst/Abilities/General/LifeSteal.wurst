@@ -1,0 +1,86 @@
+package LifeSteal
+
+import UnitIndexer
+import LinkedList
+import DamageEngine
+import public Orders
+
+LinkedList<LifeSteal> array instances = [new LinkedList<LifeSteal>()]
+
+public interface LifeStealActions
+    function run()
+
+class LifeSteal
+
+    static constant INTERVAL = 0.03125
+    static timer t = CreateTimer()
+    unit source
+    unit target
+    real amount
+    real interval
+    LifeStealActions actions
+    real counter
+    int order
+
+    function callbackNS()
+        if source.getCurrentOrder() == order
+            counter += INTERVAL
+            if counter >= interval
+                counter -= interval
+                Damage.deal(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+                source.addHP(amount)
+                if actions != null
+                    actions.run()
+        else
+            destroy this
+
+    static function callback()
+        for ins in instances[0]
+            ins.callbackNS()
+
+    construct(unit source, unit target, real amount, real interval, int order, LifeStealActions actions)
+        this.source = source
+        this.target = target
+        this.amount = amount
+        this.interval = interval
+        this.order = order
+        this.actions = actions
+        counter = 0.
+
+        if instances[0].isEmpty()
+            t.startPeriodic(INTERVAL, function LifeSteal.callback)
+        
+        instances[0].add(this)
+    
+    ondestroy
+        let i = source.getIndex()
+        instances[i].remove(this)
+        if instances[i].isEmpty()
+            destroy instances[i]
+            instances[i] = null
+
+        source = null
+        target = null
+        amount = 0.
+        interval = 0.
+        order = 0
+        if actions != null
+            destroy actions
+            actions = null
+        
+        instances[0].remove(this)
+
+        if instances[0].isEmpty()
+            t.pause()
+
+public function unit.lifeSteal(unit target, real amount, real interval, int order, LifeStealActions actions)
+    let i = this.getIndex()
+    if instances[i] == null
+        instances[i] = new LinkedList<LifeSteal>()
+    else
+        for ins in instances[i]
+            if ins.order == order
+                destroy ins
+                break
+    instances[i].add(new LifeSteal(this, target, amount, interval, order, actions))
+

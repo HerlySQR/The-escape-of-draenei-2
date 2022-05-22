@@ -1,0 +1,23 @@
+package Tips
+
+public trigger tipDisplayer = CreateTrigger()..disable()
+public string array tips
+public force whoWannaHelp = CreateForce()
+
+int actTip = 0
+
+init
+    for i = 1 to PLAYER_NEUTRAL_AGGRESSIVE
+        if players[i].isIngame()
+            whoWannaHelp.addPlayer(players[i])
+    
+    tips[4] = "You can buy wards."
+    tips[5] = "If you repick, your items go to your circle."
+    tips[6] = "The enemys are smart, always focus the lowest HP."
+
+    tipDisplayer.addAction(() -> begin
+        actTip++
+        if actTip == 7
+            actTip = 1
+        DisplayTextToForce(whoWannaHelp, "|cff32cd32HELP:|r " + tips[actTip])
+    end)

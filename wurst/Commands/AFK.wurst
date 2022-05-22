@@ -1,0 +1,49 @@
+package AFK
+
+import MyBoard
+
+public force whoAreHere = CreateForce()
+
+public function showAFK(player p)
+    for i = 1 to 10
+        if afkTime[i] >= 30
+            printTimedToPlayer(playerName[i] + " is " + afkTime[i].toString() + " seconds afk.", 10., p)
+
+public int array afkTime
+
+init
+    // To see you are here
+    let t = CreateTrigger()
+    for i = 1 to 11
+        if i != 6
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_SELECTED, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_DESELECTED, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_ISSUED_ORDER, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_PAWN_ITEM, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_PICKUP_ITEM, null)
+            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_SELL_ITEM, null)
+            t.registerPlayerChatEvent(Player(i), "", false)
+            t.registerPlayerEvent(Player(i), EVENT_PLAYER_END_CINEMATIC)
+            t.registerPlayerEvent(Player(i), EVENT_PLAYER_ALLIANCE_CHANGED)
+    t.addAction(() -> begin
+        let p = GetTriggerPlayer()
+        let i = p.getNumber()
+        afkTime[i] = 0
+        if not whoAreHere.containsPlayer(p)
+            whoAreHere.addPlayer(p)
+            table.setItemColor(0, row[i], 255, 255, 255, 255)
+            table.setItemValue(2, row[i], playerName[i])
+    end)
+    // Register
+    CreateTimer().startPeriodic(1., () -> begin
+        for i = 1 to 11
+            let j = players[i].getNumber()
+            if players[i].isIngame()
+                afkTime[j]++
+            if afkTime[j] >= 30
+                whoAreHere.removePlayer(players[i])
+                table.setItemValue(2, row[j], players[i].getName())
+                table.setItemColor(0, row[j], 128, 128, 128, 255)
+    end)

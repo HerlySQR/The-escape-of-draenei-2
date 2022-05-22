@@ -1,0 +1,119 @@
+package WildAttack
+
+import AbilityData
+import LifeSteal
+
+import UnitIndexer
+
+public constant WILD_ATTACK_NL = compiletime(ABIL_ID_GEN.next())
+public constant WILD_ATTACK_L = compiletime(ABIL_ID_GEN.next())
+public constant WILD_ATTACK_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 30.
+let DURATION = 4.
+let RANGE = 100.
+let TARGETS = "air,enemies,organic,notself,ground"
+// Not leveling
+let DMG_NL = 60.
+let MANA_NL = 100
+// Leveling
+let DMG_L = [65., 100.]
+let MANA_L = [100, 150]
+// Internal
+unit array target
+let SOUND = new SoundDefinition(Sounds.impaleLand, false, true)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CHANNEL, () -> begin
+        let data = abilityCond(WILD_ATTACK_NL, WILD_ATTACK_L, WILD_ATTACK_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let i = caster.getIndex()
+            target[i] = GetSpellTargetUnit()
+            target[i].pause(true)
+            real damage
+            if data.isNL
+                damage = DMG_NL
+            else
+                damage = DMG_L[data.lvl]
+            caster.lifeSteal(target[i], damage, 0.5, Orders.drain, () -> begin
+                caster.flashEffect(Objects.beastmasterBlood, "origin")
+                caster.flashEffect(Objects.humanBloodFootman, "origin")
+                target[i].flashEffect(Objects.beastmasterBlood, "origin")
+                target[i].flashEffect(Objects.humanBloodFootman, "origin")
+                SOUND.playOnPoint(caster.getPos3Real())
+            end)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_ENDCAST, () -> begin
+        let data = abilityCond(WILD_ATTACK_NL, WILD_ATTACK_L, WILD_ATTACK_S)
+        if data.check
+            let i = GetSpellAbilityUnit().getIndex()
+            target[i].pause(false)
+            target[i] = null
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "drain")
+    this.presetButtonPosNormal(3, 2)
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.presetFollowThroughTime(lvl -> DURATION)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Wild attack")
+    this.presetTargetTypes(Targettype.UNIT)
+    this.presetCooldown(lvl -> CD)
+    this.addTooltipProperty("Duration", lvl -> DURATION)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNRedDragonDevour)
+    // Tooltip
+    this.setAnimationNames("attack,spell,channel")
+    this.presetHotkey("R")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(WILD_ATTACK_NL, 1, true, new AbilityTooltipGenerator("The wolf attacks a unit and inmovilize it making damage and healing the same quantity the health of the wolf every second."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage and life consumed", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Wild attack")
+    
+    new ChannelAbilityPreset(WILD_ATTACK_L, 2, true, new AbilityTooltipGenerator("The wolf attacks a unit and inmovilize it making damage and healing the same quantity the health of the wolf every second."))
+        ..setHeroAbility(true)
+        ..general()
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..addTooltipProperty("Damage and life consumed", lvl -> DMG_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Wild attack")
+    
+    new ChannelAbilityPreset(WILD_ATTACK_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Wild attack")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl - 2]
+            return "The wolf attacks a unit and inmovilize it making " + value.toString(0) + " of damage and healing the same quantity the health of the wolf every second for " + DURATION.toString(0) + " seconds."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Wild attack")

@@ -1,0 +1,38 @@
+package Berserk
+
+import AbilityData
+
+public constant BERSERK_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 8.
+let EXTRA_DMG = 0.2
+let CD = 24.
+// Not leveling
+let ATTACK_SPEED_NL = 0.35
+let MOVE_SPEED_NL = 0.4
+let MANA_NL = 0
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(BERSERK_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes this unit to attack and move faster for " + DURATION.toString(0) + " seconds, but the hero takes " + (EXTRA_DMG * 100.).toString() + "% extra damage."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetDamageTakenIncrease(lvl -> EXTRA_DMG)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Berserk")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetAttackSpeedIncrease(lvl -> ATTACK_SPEED_NL)
+        ..presetMovementSpeedIncrease(lvl -> MOVE_SPEED_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Berserk")

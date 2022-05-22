@@ -1,0 +1,74 @@
+package DontPlaySmart
+
+import DamageEngine
+import PlayerData
+
+import Orders
+import ClosureForGroups
+import ClosureTimers
+
+// Friendly Fire off
+init
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ATTACKED)
+        ..addAction(() -> begin
+            if GetAttacker().getOwner().isAllyOf(GetTriggerUnit().getOwner()) and GetUnitLifePercent(GetTriggerUnit()) >= 30.
+                GetAttacker().issueTargetOrderById(Orders.smart, GetTriggerUnit())
+        end)
+
+// Don't try pass
+
+public trigger DONT_PASS = CreateTrigger()
+
+init
+    DONT_PASS
+        ..registerTimerEvent(1., true)
+        ..addAction(() -> begin
+            forUnitsInRect(gg_rct_No_pases_1, u -> begin
+                u.setInvulnerable(false)
+                u.removeAbility('BHbn')
+            end)
+            forUnitsInRect(gg_rct_No_pases_2, u -> begin
+                u.setInvulnerable(false)
+                u.removeAbility('BHbn')
+            end)
+        end)
+
+// It's not too easy destroy the generator
+
+let theyNow = CreateForce()
+
+init
+    registerAfterDamageEvent(damage -> begin
+        if damage.source.hasAbility('Bvul') and damage.target.getTypeId() == 'npgr'
+            let u = damage.source
+            let p = u.getOwner()
+            if not theyNow.containsPlayer(p)
+                theyNow.addPlayer(p)
+                DisplayTextToPlayer(u.getOwner(), 0., 0., "To prevent injustice, the buff of invunerability will be remove on 2 seconds.")
+                if p == localPlayer
+                    bj_questHintSound.play()
+            doAfter(2.) -> 
+                u.removeAbility('Bvul')
+    end)
+
+// TODO: Courier, mission items
+
+// You will lose if you do this
+
+function cond() returns boolean
+    let d = GetOrderTargetDestructable()
+    if not (d == gg_dest_ATg3_0002 or d == gg_dest_ATg1_1002 or d == gg_dest_DTg6_0506)
+        return false
+    else if not THE_DEMONS.containsPlayer(GetOrderedUnit().getOwner())
+        return false
+    else if not (GetIssuedOrderId() == Orders.attack or GetIssuedOrderId() == Orders.smart)
+        return false
+    return true
+
+init
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
+        ..addCondition(Condition(function cond))
+        ..addAction(() -> GetOrderedUnit().issuePointOrderById(Orders.move, GetOrderTargetDestructable().getPos()))
+

@@ -1,0 +1,257 @@
+/** Controls everything about the defesive towers (not the normal death towers)*/
+package Towers
+
+import Functions
+import ClosureTimers
+import ClosureForGroups
+import PlayerData
+import Orders
+import Barrels
+import DamageEngine
+
+import LinkedList
+import OnUnitEnterLeave
+
+// Functions and values to use
+
+public rect returnPoint = gg_rct_Donde_estaban_los_trabajadores
+
+let towerCond = Condition(() -> begin
+    let id = GetDyingUnit().getTypeId()
+    return id == 'o00H' or id == 'o00I' or id == 'u00K'
+end)
+
+function filt() returns boolean
+    if GetFilterUnit().getTypeId() != 'ndrl'
+        return false
+    else if GetFilterUnit().getCurrentOrder() == Orders.smart or GetFilterUnit().getCurrentOrder() == 0
+        return true
+    return false
+
+let builderCond = Filter(function filt)
+
+function filt2() returns boolean
+    if GetFilterUnit().getTypeId() != 'u00J'
+        return false
+    else if GetFilterUnit().getCurrentOrder() == Orders.smart or GetFilterUnit().getCurrentOrder() == 0
+        return true
+    return false
+
+let acolyteCond = Filter(function filt2)
+
+let g = CreateGroup()
+let endItsJob = CreateGroup()
+
+function acolyteSpawnPos(vec2 p) returns vec2
+    vec2 pos = ZERO2
+    if gg_rct_Torre_de_los_demonios_1.contains(p)
+        pos = gg_unit_o00C_0081.getPos()
+    else if gg_rct_Torre_de_los_demonios_2.contains(p) or gg_rct_Torres_del_muro.contains(p)
+        pos = gg_unit_o00C_0083.getPos()
+    else if gg_rct_Torre_de_los_demonios_3.contains(p)
+        pos = gg_unit_o00C_0084.getPos()
+    return pos
+
+function unit.issueBuildOrder(int unitToBuild, vec2 pos)
+    IssueBuildOrderById(this, unitToBuild, pos.x, pos.y)
+
+let towerDraeneiPos = [
+    ZERO2/*,
+    gg_rct_Torre_defesiva_1.getCenter(),
+    gg_rct_Torre_defesiva_2.getCenter(),
+    gg_rct_Torre_defesiva_3.getCenter(),
+    gg_rct_Torre_defesiva_4.getCenter(),
+    gg_rct_Torre_defesiva_5.getCenter(),
+    gg_rct_Torre_defesiva_6.getCenter(),
+    gg_rct_Torre_defesiva_7.getCenter(),
+    gg_rct_Torre_defesiva_8.getCenter()*/
+]
+
+// Functions to order to build the towers
+
+public function defensiveTowers1()
+    let builders = CreateGroup()
+    GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[1])
+    new BuildingInstance(towerDraeneiPos[1], 'o00H')
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[2])
+    new BuildingInstance(towerDraeneiPos[2], 'o00H')
+    builders.destr()
+
+public function defensiveTowers2()
+    let builders = CreateGroup()
+    GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[3])
+    new BuildingInstance(towerDraeneiPos[3], 'o00H')
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[4])
+    new BuildingInstance(towerDraeneiPos[4], 'o00H')
+    builders.destr()
+
+public function defensiveTowers3()
+    let builders = CreateGroup()
+    GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[5])
+    new BuildingInstance(towerDraeneiPos[5], 'o00H')
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[6])
+    new BuildingInstance(towerDraeneiPos[6], 'o00H')
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[7])
+    new BuildingInstance(towerDraeneiPos[7], 'o00H')
+    builders.next().issueBuildOrder('o00H', towerDraeneiPos[8])
+    new BuildingInstance(towerDraeneiPos[8], 'o00H')
+    builders.destr()
+
+// Check everytime a tower is correctly builded in less of a 60 seconds
+
+class BuildingInstance
+    static LinkedList<BuildingInstance> instances = new LinkedList<BuildingInstance>()
+    static timer t = CreateTimer()
+
+    vec2 point
+    int tower
+    boolean haveTower
+    int count
+
+    function checkNS()
+        count--
+        if count == 0 and not haveTower
+            unit newBuilder
+            if tower == 'o00H'
+                GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
+                for u in g
+                    if not returnPoint.contains(u.getPos())
+                        u.setPos(returnPoint.randomPoint())
+                        break
+                newBuilder = g.next()
+                g.clear()
+            else
+                GroupEnumUnitsOfPlayer(g, DRAENEI, acolyteCond)
+                for u in g
+                    u.remove()
+                newBuilder = createUnit(DEMON, 'u00J', acolyteSpawnPos(point), UNIT_FACING)
+                g.clear()
+            newBuilder.issueBuildOrder(tower, point)
+            count = 60
+        if haveTower
+            destroy this
+
+    static function check()
+        for curr in instances
+            curr.checkNS()
+
+    construct(vec2 point, int tower)
+        this.point = point
+        this.tower = tower
+        haveTower = false
+        count = 60
+
+        instances.add(this)
+
+        if instances.size() == 1
+            t.startPeriodic(1., function check)
+
+    ondestroy
+        instances.remove(this)
+        if instances.isEmpty()
+            t.pause()
+
+    static function buildTower()
+        let p = GetConstructingStructure().getPos()
+        for curr in instances
+            if curr.point.distanceTo(p) <= 128.
+                curr.haveTower = true
+                break
+
+function disableTower()
+    let u = getEnterLeaveUnit()
+    if u.getTypeId() != 'o00I'
+        return
+    let p = u.getPos()
+    // TODO: Init the destructables
+    if (gg_rct_Torre_de_los_demonios_1.contains(p) and gg_dest_ATg1_1002.getLife() < 0) or
+        (gg_rct_Torre_de_los_demonios_2.contains(p) and gg_dest_DTrc_0239.getLife() < 0) or
+        (gg_rct_Torres_del_muro.contains(p) and not generatorAlive) or
+        (gg_rct_Torre_de_los_demonios_3.contains(p) and gg_dest_DTg6_0506.getLife() < 0)
+        u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+
+init
+    // This towers don't work
+    onEnter(function disableTower)
+    // Run the first
+    defensiveTowers1()
+    // If a tower is destroyed
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addCondition(towerCond)
+        ..addAction(() -> begin
+            let u = GetTriggerUnit()
+            let p = u.getPos()
+            if u.getTypeId() == 'o00H'
+                GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
+                g.next().issueBuildOrder('o00H', p)
+                g.clear()
+                new BuildingInstance(p, 'o00H')
+            else
+                doAfter(3.) ->
+                    createUnit(DEMON, 'u00J', acolyteSpawnPos(p), UNIT_FACING).issueBuildOrder('u00K', p)
+                    new BuildingInstance(p, 'u00K')
+        end)
+    // Tower been constructed
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_START)
+        ..addAction(function BuildingInstance.buildTower)
+    // Return draenei
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_FINISH)
+        ..addCondition(Condition(() -> begin
+            return GetConstructedStructure().getTypeId() == 'o00H'
+        end))
+        ..addAction(() -> begin
+            let p = GetTriggerUnit().getPos()
+            doAfter(0.2) -> 
+                forUnitsInRange(p, 200., u -> begin
+                    if u.getTypeId() == 'ndrl' and u.getCurrentOrder() == 0
+                        u.issuePointOrderById(Orders.smart, returnPoint.randomPoint())
+                end)
+        end)
+    // Return acolyte
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_START)
+        ..addCondition(Condition(() -> begin
+            return GetConstructingStructure().getTypeId() == 'u00K'
+        end))
+        ..addAction(() -> begin
+            let u = GetConstructingStructure()
+            let p = u.getPos()
+            forUnitsInRange(p, 200., u -> begin
+                if u.getTypeId() == 'u00J'
+                    u.issuePointOrderById(Orders.smart, acolyteSpawnPos(p))
+                    endItsJob.addUnit(u)
+            end)
+            doAfter(3.5) -> 
+                let a = createUnit(DEMON, 'u00L', p, UNIT_FACING)
+                u.setVertexColor(0, 255, 255, 127)
+                doAfter(0.6) -> 
+                    let r = 680. - u.getLife()
+                    u.remove()
+                    a.remove()
+                    createUnit(DEMON, 'o00I', p, UNIT_FACING)..addHP(-r)
+        end)
+    // Remove acolyte
+    CreateTrigger()
+        ..registerUnitInRange(gg_unit_o00C_0081, 200., null)
+        ..registerUnitInRange(gg_unit_o00C_0083, 200., null)
+        ..registerUnitInRange(gg_unit_o00C_0084, 200., null)
+        ..addCondition(Condition(() -> begin
+            return endItsJob.contains(GetTriggerUnit())
+        end))
+        ..addAction(() -> begin
+            let u = GetTriggerUnit()
+            endItsJob.removeUnit(u)
+            doAfter(0.33, () -> u.remove())
+        end)
+    // Don't touch the builders
+    registerDamageEvent(damage -> begin
+        let id = damage.target.getTypeId()
+        if id == 'ndrl' or id == 'u00J'
+            damage.amount = 0.
+    end)

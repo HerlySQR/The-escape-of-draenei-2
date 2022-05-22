@@ -1,0 +1,47 @@
+package Track
+
+import AbilityData
+
+public constant TRACK_NL = compiletime(ABIL_ID_GEN.next())
+constant TRACK_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 6.
+let RANGE = 1000.
+let DURATION = 25.
+let TARGETS = "air,ground,enemy,neutral"
+// Not leveling
+let MANA_NL = 25
+let ARMOR_DEC_NL = 10
+
+@compiletime function gen()
+    new AbilityDefinitionFaerieFire(TRACK_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the armor of selected enemy unit and makes them visible.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetBuffs(lvl -> int2fourchar(TRACK_BUFF))
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Track")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDefenseReduction(lvl -> ARMOR_DEC_NL)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("R")
+        ..tooltipStopListen()
+        ..presetTooltipTurnOff(lvl -> "|cffc3dbffClick the right mouse button to activate the automatic action.|r")
+        ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
+        .setName("Track")
+    
+    new BuffDefinition(TRACK_BUFF, 'Bfae')
+        ..setName(1, "Track")
+        ..setTooltipNormal(1, "Track")
+        .setTooltipNormalExtended(1, "This unit is Tracked: its armor has been reduced and can be detected by the enemy.")

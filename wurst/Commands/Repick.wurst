@@ -1,0 +1,70 @@
+package Repick
+
+import DamageEngine
+import ModeSelection
+import HeroSelection
+import MyBoard
+
+import Icons
+
+public boolean yesOrYes = false
+
+int array inCombat
+boolean canRepick = true
+DamageListener noRepick
+trigger reduce = CreateTrigger()
+
+public function enableRepick()
+    canRepick = true
+    noRepick.reconnect()
+    reduce.enable()
+
+public function disableRepick()
+    canRepick = false
+    noRepick.disconnect()
+    reduce.disable()
+
+public function repick(player p)
+    if canRepick or yesOrYes
+        let i = p.getNumber()
+        let repick = hero[i]
+
+        if repick != null
+            if inCombat[i] > 0 and not yesOrYes
+                DisplayTextToPlayer(p, 0., 0., "You cannot repick during combat")
+                return
+            if whatMode[5] == LEVELING
+                heroModel[HeroType.get(repick)].show()
+            // TODO udg_Si_lo_mataste[p.getId()] = false
+            hero[i] = null
+            table.setItemIcon(1, row[i], Icons.bTNSelectHeroOn)
+            if THE_DRAENEI.containsPlayer(p)
+                repick.getItemOfId('I000').remove()
+                repick.setPos(gg_rct_selecionador_draeneanos.getCenter())
+            else
+                repick.setPos(gg_rct_selecionador_demonios.getCenter())
+            p.panCamToTimed(repick, 0.)
+            let pos = circleRegion[i].getCenter()
+            for j = 0 to 5
+                repick.itemInSlot(j).setPos(pos)
+            /* TODO
+            if IsPlayerInForce(p,udg_Ya_te_vi[0])
+                ForceAddPlayer(udg_Sabe_quien_eres[0],p)
+            for j = 1 to 6
+                if IsPlayerInForce(p,udg_Mision[j]) or IsPlayerInForce(p,udg_No_aceptaste_la_mision[j])
+                    ForceAddPlayer(udg_Sabe_quien_eres[j],p)*/
+            canPick.addPlayer(p)
+            repick.remove()
+
+// No during combat
+init
+    noRepick = registerAfterDamageEvent(damage -> begin
+        if damage.target.isType(UNIT_TYPE_HERO)
+            inCombat[damage.target.getOwner().getNumber()] = 3
+    end)
+    reduce
+        ..registerTimerEvent(1, true)
+        .addAction(() -> begin
+            for i = 1 to 10
+                inCombat[i]--
+        end)

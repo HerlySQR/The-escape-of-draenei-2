@@ -1,0 +1,67 @@
+package HammerCrush
+
+import AbilityData
+import MoveSpeedX
+
+public constant HAMMER_CRUSH_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 1.5
+let SLOW = 0.5
+let CD = 20.
+let RANGE = 600.
+// Not leveling
+let MANA_NL = 120
+let DMG_NL = 100.
+// Internal
+let SMASH = new SoundDefinition(Sounds.shockwave, false, true)
+
+function hammerCrushActions(unit caster, vec2 pos, player owner, real damage, angle ang, int count)
+    let newPos = pos.polarOffset(ang, 200. * count)
+    flashEffect(Abilities.thunderclapCaster, newPos)
+    forUnitsInRange(newPos, 200., u -> begin
+        if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
+            Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+            u.scaleSpeed("hammer crush", SLOW)
+            doAfter(DURATION) -> 
+                u.removeSpeedBuff("hammer crush")
+    end)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == HAMMER_CRUSH_NL
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let pos = caster.getPos()
+            let ang = pos.angleTo(getSpellTargetPos())
+            let damage = DMG_NL
+            SMASH.playOnPoint(pos.toVec3())
+            hammerCrushActions(caster, pos, owner, damage, ang, 1)
+            doAfter(0.25) -> 
+                hammerCrushActions(caster, pos, owner, damage, ang, 2)
+                doAfter(0.25) -> 
+                    hammerCrushActions(caster, pos, owner, damage, ang, 3)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(HAMMER_CRUSH_NL, 1, true, new AbilityTooltipGenerator("With the force of his hammer, the Vindicator generates 3 blasts that damage the affected units slow by " + ((1. - SLOW) * 100.).toString(0) + "% for " + DURATION.toString() +" seconds."))
+        ..presetBaseOrderID(lvl -> "holybolt")
+        ..presetOption(Option.PHYSICALSPELL, true)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetFollowThroughTime(lvl -> 0.75)
+        ..setAnimationNames("attack,third")
+        ..presetTargetsAllowed(lvl -> "air,enemies,neutral,nonancient,organic,ground")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00W|r] Hammer Crush")
+        ..presetTargetTypes(Targettype.POINT)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        ..presetIcon(Imports.bTNHammerCrush)
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()

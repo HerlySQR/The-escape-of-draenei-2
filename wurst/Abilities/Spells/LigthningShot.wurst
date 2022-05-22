@@ -1,0 +1,37 @@
+package LigthningShot
+
+import AbilityData
+
+public constant LIGTHNING_SHOT_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 7.
+let RANGE = 400.
+let DURATION = 0.6
+// Not leveling
+let MANA_NL = 90
+let DMG_NL = 125.
+
+@compiletime function gen()
+    new AbilityDefinitionThunderBoltCreep(LIGTHNING_SHOT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons an electric shot that attacks an enemy unit causing damage and stunning the target for " + DURATION.toString(1) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Lightning Shot")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..setMissileArt(Imports.shotIIBlue)
+        ..setIconNormal(Imports.bTNWispMissile)
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Lightning Shot")

@@ -1,0 +1,34 @@
+package FarSight
+
+import AbilityData
+
+public constant FAR_SIGHT = compiletime(ABIL_ID_GEN.next())
+
+let CD = 30.
+let DURATION = 8.
+let MANA = 50
+let MAX_TIMES_NL = 5
+let AREA = 600.
+
+@compiletime function gen()
+    new AbilityDefinitionFarseerFarSight(FAR_SIGHT)
+        ..setLevels(1)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Shows the area of the map on which it is cast for " + DURATION.toString(0) + " seconds. It also shows invisible units."))
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Far Sight")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        ..presetIcon(Imports.bTNThunderStorm)
+        // Tooltip
+        ..presetHotkey("F")
+        ..tooltipStopListen()
+        .setName("Ext Far Sight")

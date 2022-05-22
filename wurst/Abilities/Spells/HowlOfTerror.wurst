@@ -1,0 +1,42 @@
+package HowlOfTerror
+
+import AbilityData
+
+public constant HOWL_OF_TERROR_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 20.
+let DURATION = 15.
+let AREA = 800.
+let TARGETS = "air,ground,enemy,neutral"
+// Not leveling
+let ARMOR_DEC_NL = 4
+let DMG_DEC_NL = 0.35
+let MANA_NL = 100
+
+@compiletime function gen()
+    new AbilityDefinitionPitLordHowlofTerror(HOWL_OF_TERROR_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It emits a terrifying howl that reduces the attack damage of nearby enemy units and armor for " + DURATION.toString(0) + " seconds."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetDefenseIncrease(lvl -> ARMOR_DEC_NL)
+        ..presetDamageIncrease(lvl -> DMG_DEC_NL)
+        ..presetBuffs(lvl -> "BNht")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Howl of terror")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..addTooltipProperty("Defense decrease", lvl -> ARMOR_DEC_NL)
+        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_NL)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Howl of terror")

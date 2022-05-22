@@ -1,0 +1,39 @@
+package Dungeon
+
+import initlater Missions
+import Towers
+import HeroSelection
+import PlayerData
+
+public boolean doorDestroyed = false
+public trigger destroyDoor = CreateTrigger()
+
+init
+    destroyDoor
+        ..registerDeathEvent(gg_dest_ATg1_1002)
+        ..addAction(() -> begin
+            doorDestroyed = true
+            if whatMode[1] == VARIOUS_TIMERS
+                stopActTimer()
+            seeDrSpawn[2].start()
+            defensiveTowers2()
+            moveCircles1()
+            forUnitsInRect(gg_rct_Torre_de_los_demonios_1, u -> begin
+                if u.getTypeId() == 'o00I'
+                    u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+            end)
+            QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")
+            QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")
+            mission[1].setState(QuestState.COMPLETED)
+            actDrSpawn = gg_rct_spw2
+            forUnitsInRect(gg_rct_Tiendas_1, u -> begin
+                if u.isType(UNIT_TYPE_STRUCTURE)
+                    u.setOwner(DRAENEI, true)
+            end)
+            forDestructablesInRect(gg_rct_Objetivo_1, d -> begin
+                if d.getTypeId() == 'B00E'
+                    d.kill()
+            end)
+            SetDestructableInvulnerable(gg_dest_B000_1722, false)
+            doAfter(5., () -> startMission2())
+        end)

@@ -1,0 +1,39 @@
+package UnholyFrenzy
+
+import AbilityData
+
+public constant UNHOLY_FRENZY_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 1.
+let RANGE = 500.
+let TARGETS = "air,ground,organic"
+let DURATION = 20.
+// Not leveling
+let SPEED = 0.6
+let MANA_NL = 50
+let LIFE_DRAIN_NL = 4.
+
+@compiletime function gen()
+    new AbilityDefinitionUnholyFrenzy(UNHOLY_FRENZY_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the attack rate of a selected unit, but drains hit points per second. \nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..presetBuffs(lvl -> "BUhf")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Unholy Frenzy")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetAttackSpeedBonus(lvl -> SPEED)
+        ..presetDamageperSecond(lvl -> LIFE_DRAIN_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Unholy Frenzy")

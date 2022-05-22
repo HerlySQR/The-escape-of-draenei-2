@@ -1,0 +1,29 @@
+package CleavingAttack
+
+import AbilityData
+
+public constant CLEAVE_ATTACK_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let AREA = 400.
+let TARGETS = "ground,enemy,neutral"
+// Not leveling
+let SPLASH_NL = 0.25
+
+@compiletime function gen()
+    new AbilityDefinitionPitLordCleavingAttack(CLEAVE_ATTACK_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The creature hits so hard that a percentage of its attack hits enemies near the attacked primary unit."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..tooltipStartListen()
+        ..setName("Cleaving Attack")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetDistributedDamageFactor(lvl -> SPLASH_NL)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        ..presetIcon(Imports.pASAxeOfAshes)
+        // Tooltips
+        .tooltipStopListen()

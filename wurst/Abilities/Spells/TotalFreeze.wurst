@@ -1,0 +1,176 @@
+package TotalFreeze
+
+import AbilityData
+
+public constant TOTAL_FREEZE_NL = compiletime(ABIL_ID_GEN.next())
+public constant TOTAL_FREEZE_L = compiletime(ABIL_ID_GEN.next())
+public constant TOTAL_FREEZE_S = compiletime(ABIL_ID_GEN.next())
+constant TOTAL_FREEZE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 10.
+let AREA = 99999.
+let TARGETS = "air,allies,friend,ancient,enemies,structure,hero,invulnerable,mechanical,dead,neutral,nonhero,nonancient,nonsapper,organic,notself,sapper,ground,ward,player,alive,vulnerable"
+// Not leveling
+let CD_NL = 210.
+let CHANNEL_TIME_NL = 2.5
+let MANA_NL = 200
+// Leveling
+let CD_L = [210., 140.]
+let CHANNEL_TIME_L = [2.5, 1.5]
+let MANA_L = [190, 230]
+// Internal
+let diedFreezed = CreateGroup()
+let stopTime = new SoundDefinition(Imports.stopTime, false)
+var timeFreeze = false
+let INTERVAL = 0.1
+let COUNTER = compiletime((DURATION/INTERVAL).toInt())
+var duration = 0
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CHANNEL, () -> begin
+        if abilityCond(TOTAL_FREEZE_NL, TOTAL_FREEZE_L, TOTAL_FREEZE_S).check
+            gg_snd_CreepAggroWhat1.play()
+            DisplayTextToPlayer(localPlayer, 0., 0., "|cffae0000The Dark Wizard will cast Total Freeze|r")
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if abilityCond(TOTAL_FREEZE_NL, TOTAL_FREEZE_L, TOTAL_FREEZE_S).check
+            let caster = GetSpellAbilityUnit()
+            stopTime.play()
+            duration = COUNTER
+            if not timeFreeze
+                timeFreeze = true
+                fadeOut(Textures.hazeAndFogFilter_Mask, 0.50)
+                forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                    if u != caster and u.getTypeId() != 'ncop'
+                        u.pause(true)
+                end)
+                var count1 = 0
+                var count2 = 0
+                doPeriodically(INTERVAL, cb -> begin
+                    duration--
+                    if duration > 0
+                        if count1 < 5
+                            count1++
+                            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                                if u != caster
+                                    u.setTimeScale(1. - 0.2*count1)
+                            end)
+                    else
+                        if count2 < 5
+                            count2++
+                            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                                if u != caster
+                                    u.setTimeScale(0.2*count2)
+                            end)
+                        else
+                            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                                if u != caster and u.getTypeId() != 'ncop'
+                                    u.removeAbility(TOTAL_FREEZE_BUFF)
+                                    u.pause(false)
+                            end)
+                            fadeIn(Textures.hazeAndFogFilter_Mask, 0.50)
+                            timeFreeze = false
+                            destroy cb
+                end)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        if timeFreeze and GetDyingUnit().isType(UNIT_TYPE_HERO)
+            diedFreezed.addUnit(GetDyingUnit())
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_HERO_REVIVE_FINISH, () -> begin
+        if diedFreezed.contains(GetRevivingUnit())
+            GetRevivingUnit().setTimeScale(1.)
+            diedFreezed.removeUnit(GetRevivingUnit())
+    end)
+
+function AbilityDefinitionPitLordHowlofTerror.general()
+    this.presetButtonPosNormal(3, 2)
+    this.setAnimationNames("spell")
+    this.setArtCaster("")
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.presetBuffs(lvl -> int2fourchar(TOTAL_FREEZE_BUFF))
+    this.presetDamageIncrease(lvl -> 0.)
+    this.presetAreaofEffect(lvl -> AREA)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Total Freeze")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+    this.presetDurationHero(lvl -> DURATION)
+    this.presetDurationNormal(lvl -> DURATION)
+    // Audiovisual
+    this.presetIcon(Imports.bTNTimeEclipse3)
+    // Tooltip
+    this.presetHotkey("R")
+
+@compiletime function gen()
+    new AbilityDefinitionPitLordHowlofTerror(TOTAL_FREEZE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Freeze all units on the map except the hero."))
+        ..setLevels(1)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_NL)
+        ..presetCastingTime(lvl -> CHANNEL_TIME_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Total Freeze")
+    
+    new AbilityDefinitionPitLordHowlofTerror(TOTAL_FREEZE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Freeze all units on the map except the hero."))
+        ..setLevels(2)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..presetCooldown(lvl -> CD_L[lvl - 1])
+        ..presetCastingTime(lvl -> CHANNEL_TIME_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Total Freeze")
+    
+    new AbilityDefinitionPitLordHowlofTerror(TOTAL_FREEZE_S)
+        ..setLevels(3)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Total Freeze")
+        ..presetHotkey("F")
+        // Stats
+        ..presetCooldown(lvl -> begin
+            real value
+            if lvl < 2
+                value = CD_NL
+            else
+                value = CD_L[lvl - 2]
+            return value
+        end)
+        ..presetCastingTime(lvl -> begin
+            real value
+            if lvl < 2
+                value = CHANNEL_TIME_NL
+            else
+                value = CHANNEL_TIME_L[lvl - 2]
+            return value
+        end)
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> "Freeze all units on the map except the hero for {0} seconds.".format(DURATION.toString(0)))
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Total Freeze")
+    
+    new BuffDefinition(TOTAL_FREEZE_BUFF, 'BNht')
+        ..setArtTarget(1, "")
+        ..setIcon(Imports.bTNTimeEclipse3)
+        ..setName(1, "Total Freeze")
+        ..setTooltipNormal(1, "Total Freeze")
+        .setTooltipNormalExtended(1, "This unit is frozen until the effect passes.")

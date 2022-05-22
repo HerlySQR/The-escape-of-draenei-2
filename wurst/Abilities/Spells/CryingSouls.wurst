@@ -1,0 +1,51 @@
+package CryingSouls
+
+import AbilityData
+
+public constant CRYING_SOULS_NL = compiletime(ABIL_ID_GEN.next())
+constant CRYING_SOULS_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let AREA = 325.
+let MANA = 15
+let MANA_PER_SEC = 31.
+let TARGETS = "air,ground,enemy,neutral,organic"
+// Not leveling
+let DMG_NL = 70.
+
+@compiletime function gen()
+    new AbilityDefinitionDemonHunterImmolation(CRYING_SOULS_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("While activated, approaching souls will receive damage per second."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosTurnOff(3, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetBufferManaRequired(lvl -> 0.)
+        ..presetBuffs(lvl -> int2fourchar(CRYING_SOULS_BUFF))
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Crying Souls")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetDamageperInterval(lvl -> DMG_NL)
+        ..presetManaDrainedperSecond(lvl -> MANA_PER_SEC)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA)
+        // Audiovisual
+        ..presetIcon(Icons.bTNDoom)
+        ..setIconTurnOff(Icons.bTNCancel)
+        // Tooltip
+        ..presetHotkey("R")
+        ..tooltipStopListen()
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00Q|r] Disable Crying Souls")
+        ..presetTooltipTurnOffExtended(lvl -> "Deactivate the Wailing of souls to stop mana consumption.")
+        .setName("Crying Souls")
+    
+    new BuffDefinition(CRYING_SOULS_BUFF, 'BPSE')
+        ..setArtSpecial(1, Abilities.doomDeath)
+        ..setArtTarget(1, "")
+        ..setSpecialAttachmentPoint(1, "origin")
+        ..setIcon(Icons.bTNDoom)
+        ..setName(1, "Crying Souls")
+        ..setTooltipNormal(1, "Crying Souls")
+        ..setTooltipNormalExtended(1, "When a unit approaches, it will take damage.")

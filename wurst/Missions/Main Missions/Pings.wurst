@@ -1,0 +1,45 @@
+package Pings
+
+import Functions
+import initlater Missions
+import PlayerData
+
+public trigger pings = CreateTrigger()..disable()
+
+let mission1Objective = gg_rct_Objetivo_1.getCenter()
+
+let mission2Objective1 = gg_rct_Colocar_barril.getCenter()
+let mission2Objective2 = gg_rct_Techies.getCenter()
+
+let mission3Objective = gg_rct_Salida_2.getCenter()
+
+let mission4Objective1 = gg_rct_Generador_1.getCenter()
+let mission4Objective2 = gg_rct_Generador_2.getCenter()
+
+let mission5Objective = gg_rct_Objetivo_final.getCenter()
+
+init
+    pings
+        ..registerTimerEvent(5., true)
+        ..addAction(() -> begin
+            switch actMission
+                case 1
+                    pingMinimap(mission1Objective, 1.)
+                case 2
+                    for i = 1 to 5
+                        if heroWithBarrel[i] == null
+                            pingMinimap(heroWithBarrel[i].getOwner(), mission2Objective2, 1.)
+                        else
+                            pingMinimap(heroWithBarrel[i].getOwner(), mission2Objective1, 1.)
+                            pingMinimap(THE_DEMONS, heroWithBarrel[i].getPos(), 1., color(255, 0, 0), false)
+                    pingMinimap(THE_DEMONS, mission2Objective1, 1.)
+                case 3
+                    pingMinimap(mission3Objective, 1.)
+                case 4
+                    if generator1IsAlive
+                        pingMinimap(mission4Objective1, 1.)
+                    if generator2IsAlive
+                        pingMinimap(mission4Objective2, 1.)
+                case 5
+                    pingMinimap(mission5Objective, 1.)
+        end)

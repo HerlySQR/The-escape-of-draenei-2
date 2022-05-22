@@ -1,0 +1,40 @@
+package ScorchingHeat
+
+import AbilityData
+
+public constant SCORCHING_HEAT_NL = compiletime(ABIL_ID_GEN.next())
+constant SCORCHING_HEAT_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 1.
+let TARGETS = "ground,enemy,neutral,organic"
+// Not leveling
+let DMG_PER_SEC_NL = 15.
+let AREA_NL = 300.
+
+@compiletime function gen()
+    new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetBuffs(lvl -> int2fourchar(SCORCHING_HEAT_BUFF))
+        ..tooltipStartListen()
+        ..setName("Scorching Heat")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetDamageperInterval(lvl -> DMG_PER_SEC_NL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        // Audiovisual
+        ..presetIcon(Imports.pASHellfirePossession)
+        // Tooltip
+        .tooltipStopListen()
+    
+    new BuffDefinition(SCORCHING_HEAT_BUFF, 'Bpig')
+        ..setArtSpecial(1, Abilities.incinerateBuff)
+        ..setArtTarget(1, "")
+        ..setTargetAttachmentPoint0(1, "")
+        ..setName(1, "Scorching Heat")

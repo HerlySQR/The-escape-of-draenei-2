@@ -1,0 +1,151 @@
+package Circles
+
+import ArrayList
+
+import AbilityData
+import GeneratedValues
+
+public constant CIRCLE = compiletime(UNIT_ID_GEN.next())
+
+public rect itemDraenei = Rects.items1
+public rect itemDemons = Rects.items2
+public unit array circle
+public rect array circleRegion
+
+vec2 temp
+
+public function moveCircles1()
+    for i = 1 to 5
+        temp = pointCircle[3].get(i).getCenter()
+        forUnitsInRect(circleRegion[i], u -> u.setPos(temp))
+        EnumItemsInRect(circleRegion[i], null, () -> GetEnumItem().setPos(temp))
+    itemDraenei = gg_rct_Items_3
+    circleRegion[1] = gg_rct_cdr21
+    circleRegion[2] = gg_rct_cdr22
+    circleRegion[3] = gg_rct_cdr23
+    circleRegion[4] = gg_rct_cdr24
+    circleRegion[5] = gg_rct_cdr25
+
+public function moveCircles2()
+    for i = 1 to 5
+        temp = pointCircle[4].get(i).getCenter()
+        forUnitsInRect(circleRegion[i], u -> u.setPos(temp))
+        EnumItemsInRect(circleRegion[i], null, () -> GetEnumItem().setPos(temp))
+        temp = pointCircle[5].get(i).getCenter()
+        forUnitsInRect(circleRegion[i + 5], u -> u.setPos(temp))
+        EnumItemsInRect(circleRegion[i + 5], null, () -> GetEnumItem().setPos(temp))
+    itemDraenei = gg_rct_Items_4
+    circleRegion[1] = gg_rct_cdr31
+    circleRegion[2] = gg_rct_cdr32
+    circleRegion[3] = gg_rct_cdr33
+    circleRegion[4] = gg_rct_cdr34
+    circleRegion[5] = gg_rct_cdr35
+    itemDemons = gg_rct_Items_5
+    circleRegion[6] = gg_rct_c41
+    circleRegion[7] = gg_rct_c42
+    circleRegion[8] = gg_rct_c43
+    circleRegion[9] = gg_rct_c44
+    circleRegion[10] = gg_rct_c45
+
+public function moveCircles3()
+    for i = 6 to 10
+        temp = pointCircle[6].get(i - 5).getCenter()
+        forUnitsInRect(circleRegion[i], u -> u.setPos(temp))
+        EnumItemsInRect(circleRegion[i], null, () -> GetEnumItem().setPos(temp))
+    doAfter(0.1) -> 
+        for i = 1 to 5
+            temp = pointCircle[5].get(i).getCenter()
+            forUnitsInRect(circleRegion[i], u -> u.setPos(temp))
+            EnumItemsInRect(circleRegion[i], null, () -> GetEnumItem().setPos(temp))
+        itemDraenei = gg_rct_Items_5
+        circleRegion[1] = gg_rct_c41
+        circleRegion[2] = gg_rct_c42
+        circleRegion[3] = gg_rct_c43
+        circleRegion[4] = gg_rct_c44
+        circleRegion[5] = gg_rct_c45
+        itemDemons = gg_rct_Items_6
+        circleRegion[6] = gg_rct_cde31
+        circleRegion[7] = gg_rct_cde32
+        circleRegion[8] = gg_rct_cde33
+        circleRegion[9] = gg_rct_cde34
+        circleRegion[10] = gg_rct_cde35
+
+function vec2.toInt() returns int
+    return new Vec2(this) castTo int
+
+function int.getCenter() returns vec2
+    let v = this castTo Vec2
+    return vec2(v.x, v.y)
+
+class Vec2
+    real x
+    real y
+
+    construct(vec2 vec)
+        x = vec.x
+        y = vec.y
+
+ArrayList<rect> array pointCircle
+
+init
+    circleRegion[1] = Rects.circleDr11
+    circleRegion[2] = Rects.circleDr12
+    circleRegion[3] = Rects.circleDr13
+    circleRegion[4] = Rects.circleDr14
+    circleRegion[5] = Rects.circleDr15
+    circleRegion[6] = Rects.circleDe11
+    circleRegion[7] = Rects.circleDe12
+    circleRegion[8] = Rects.circleDe13
+    circleRegion[9] = Rects.circleDe14
+    circleRegion[10] = Rects.circleDe15
+
+    circle[1] = createUnit(players[1], CIRCLE, circleRegion[1].getCenter(), UNIT_FACING)
+    circle[2] = createUnit(players[2], CIRCLE, circleRegion[2].getCenter(), UNIT_FACING)
+    circle[3] = createUnit(players[3], CIRCLE, circleRegion[3].getCenter(), UNIT_FACING)
+    circle[4] = createUnit(players[4], CIRCLE, circleRegion[4].getCenter(), UNIT_FACING)
+    circle[5] = createUnit(players[5], CIRCLE, circleRegion[5].getCenter(), UNIT_FACING)
+    circle[6] = createUnit(players[7], CIRCLE, circleRegion[6].getCenter(), UNIT_FACING)
+    circle[7] = createUnit(players[8], CIRCLE, circleRegion[7].getCenter(), UNIT_FACING)
+    circle[8] = createUnit(players[9], CIRCLE, circleRegion[8].getCenter(), UNIT_FACING)
+    circle[9] = createUnit(players[10], CIRCLE, circleRegion[9].getCenter(), UNIT_FACING)
+    circle[10] = createUnit(players[11], CIRCLE, circleRegion[10].getCenter(), UNIT_FACING)
+
+    for i = 1 to 6
+        pointCircle[i] = new ArrayList<rect>()
+    
+    pointCircle[1].add(Rects.circleDr11)
+    pointCircle[1].add(Rects.circleDr12)
+    pointCircle[1].add(Rects.circleDr13)
+    pointCircle[1].add(Rects.circleDr14)
+    pointCircle[1].add(Rects.circleDr15)
+    pointCircle[2].add(Rects.circleDe11)
+    pointCircle[2].add(Rects.circleDe12)
+    pointCircle[2].add(Rects.circleDe13)
+    pointCircle[2].add(Rects.circleDe14)
+    pointCircle[2].add(Rects.circleDe15)
+    pointCircle[3].add(gg_rct_cdr21)
+    pointCircle[3].add(gg_rct_cdr22)
+    pointCircle[3].add(gg_rct_cdr23)
+    pointCircle[3].add(gg_rct_cdr24)
+    pointCircle[3].add(gg_rct_cdr25)
+    pointCircle[4].add(gg_rct_cdr31)
+    pointCircle[4].add(gg_rct_cdr32)
+    pointCircle[4].add(gg_rct_cdr33)
+    pointCircle[4].add(gg_rct_cdr34)
+    pointCircle[4].add(gg_rct_cdr35)
+    pointCircle[5].add(gg_rct_c41)
+    pointCircle[5].add(gg_rct_c42)
+    pointCircle[5].add(gg_rct_c43)
+    pointCircle[5].add(gg_rct_c44)
+    pointCircle[5].add(gg_rct_c45)
+    pointCircle[6].add(gg_rct_cde31)
+    pointCircle[6].add(gg_rct_cde32)
+    pointCircle[6].add(gg_rct_cde33)
+    pointCircle[6].add(gg_rct_cde34)
+    pointCircle[6].add(gg_rct_cde35)
+
+@compiletime function gen()
+    new UnitDefinition(CIRCLE, 'ncop')
+        ..setFoodProduced(5) // 5 missions
+        ..setNormalAbilities(int2fourchar(AbilityIds.invulnerable))
+        ..setName("Circle of power")

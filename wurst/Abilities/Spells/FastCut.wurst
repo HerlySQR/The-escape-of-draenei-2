@@ -1,0 +1,85 @@
+package FastCut
+
+import AbilityData
+
+public constant FAST_CUT_NL = compiletime(ABIL_ID_GEN.next())
+constant SLOW_DUMMY_ID = compiletime(ABIL_ID_GEN.next())
+constant SLOW_DUMMY_BUFF_ID = compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 2.25
+let RANGE = 500.
+let CD = 9.
+// Not leveling
+let DMG_NL = [0., 90., 140.]
+let MANA_NL = [0, 90, 95]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == FAST_CUT_NL
+            let caster = GetSpellAbilityUnit()
+            let target = getSpellTargetPos()
+            let pos = caster.getPos()
+            let face = pos.angleTo(target)
+            let damage = DMG_NL[caster.getAbilityLevel(GetSpellAbilityId())]
+            let owner = caster.getOwner()
+            let point = pos.polarOffset(face, -100.)
+            forUnitsInRange(point, 800., u -> begin
+                if (point.angleTo(u.getPos()) - face).radians().abs() <= compiletime(PI/5)
+                        and owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE)
+                    Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED)
+                    InstantDummyCaster.castTarget(owner, SLOW_DUMMY_ID, 1, Orders.slow, u)
+                    u.flashEffect(Abilities.stampedeMissileDeath, "origin")
+            end)
+            caster.flashEffect(Imports.cullingCleaveSilver, "origin")
+
+            let cuts0 = DummyRecycler.get(pos, face)..setScale(1.4)
+            let cuts1 = DummyRecycler.get(pos, face)..setScale(1.5)
+            cuts0.flashEffect(Imports.cullingCleaveSilver, "origin")
+            cuts1.flashEffect(Imports.cullingCleaveSilver, "origin")
+            doPeriodicallyCounted(0.02, 6, cb -> begin
+                cuts0.setPos(cuts0.getPos() + face.toVec(50.))
+                cuts1.setPos(cuts1.getPos() + face.toVec(100.))
+                if cb.isLast()
+                    doAfter(0.15) -> 
+                        DummyRecycler.recycle(cuts0)
+                        DummyRecycler.recycle(cuts1)
+            end)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(FAST_CUT_NL, 1, true, new AbilityTooltipGenerator("The Cacique does a fast cut that damage units in a max distance of 700 and slows them."))
+        ..setLevels(2)
+        ..presetBaseOrderID(lvl -> "thunderclap")
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetFollowThroughTime(lvl -> 0.7)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00Q|r] Fast cut")
+        ..presetTargetTypes(Targettype.POINT)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl])
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL[lvl])
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Imports.bTNWBurstv3)
+        // Tooltip
+        ..setAnimationNames("attack,second")
+        ..presetHotkey("Q")
+        .tooltipStopListen()
+    
+    new BuffDefinition(SLOW_DUMMY_BUFF_ID, 'Bhtc')
+        ..setIcon(Imports.bTNWBurstv3)
+        ..setName(1, "Fast Cut")
+        ..setTooltipNormal(1, "Fast Cut")
+        .setTooltipNormalExtended(1, "This unit was cutted, its move speed and attack rate have been reducted.")
+
+    new AbilityDefinitionSlow(SLOW_DUMMY_ID)
+        ..setName("Dummy slow")
+        ..setEditorSuffix("(Fast Cut)")
+        ..setDurationHero(1, DURATION)
+        ..setDurationNormal(1, DURATION)
+        ..setBuffs(1, int2fourchar(SLOW_DUMMY_BUFF_ID))
+        .setDummyAbility()

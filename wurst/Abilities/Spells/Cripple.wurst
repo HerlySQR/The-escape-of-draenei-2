@@ -1,0 +1,42 @@
+package Cripple
+
+import AbilityData
+
+public constant CRIPPLE_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 600.
+let TARGETS = "air,ground,enemy,organic,neutral"
+let DURATION = 8.
+// Not leveling
+let ATTACK_SPEED = 0.4
+let MOVE_SPEED = 0.65
+let CD_NL = 17.
+let MANA_NL = 100
+
+@compiletime function gen()
+    new AbilityDefinitionCripple(CRIPPLE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the movement speed of an enemy unit and its attack rate. \nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetBuffs(lvl -> "Bcri")
+        ..setRequirements("")
+        ..presetDamageReduction(lvl -> 0.)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Cripple")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetAttackSpeedReduction(lvl -> ATTACK_SPEED)
+        ..presetMovementSpeedReduction(lvl -> MOVE_SPEED)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+        .setName("Cripple")

@@ -1,0 +1,43 @@
+package Whirlwind
+
+import AbilityData
+
+public constant WHIRLWIND_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let TARGETS = "ground,structure,debris,enemy,neutral"
+let AREA = 200.
+let DURATION = 5.
+let MANA = 105
+// Not leveling
+let CD_NL = 30.
+let DMG_PER_SEC_NL = 100.
+
+init
+    gg_unit_Otch_0284.addAbility(WHIRLWIND_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing damage per second to nearby enemy ground units. \nLast " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Whirlwind")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetDamagePerSecond(lvl -> DMG_PER_SEC_NL)
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        ..presetIcon(Imports.bTNFlamingWhirlwind)
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Whirlwind")

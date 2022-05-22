@@ -1,0 +1,154 @@
+package HeroType
+
+import Imports
+
+import Table
+import Icons
+
+// More easy to remember
+
+public constant int N_DEMOLISHER = 'O003'
+public constant int N_DARK_ASSASSIN = 'O005'
+public constant int N_ELDER_SAGE = 'O002'
+public constant int N_SEER = 'O006'
+public constant int N_HERALD = 'O001'
+public constant int N_SALAMANDER = 'O004'
+public constant int N_SPIRIT_WOLF = 'O00F'
+public constant int N_ANCHORITE = 'H00N'
+public constant int N_VINDICATOR = 'H00X'
+public constant int N_ZEALOT = 'O00J'
+public constant int N_PROPHET = 'U00M'
+public constant int N_BLOOD_DEMON = 'U001'
+public constant int N_CACIQUE = 'U008'
+public constant int N_DARK_SPECTRE = 'U00A'
+public constant int N_DOOM_GUARD = 'U004'
+public constant int N_ERECT_SORCERER = 'U005'
+public constant int N_INFERNAL_MACHINE = 'U007'
+public constant int N_MAIDEN_OF_PAIN = 'U006'
+public constant int N_TEMPTING_MALEFICENT = 'U009'
+public constant int N_PIT_LORD = 'N00E'
+public constant int N_DARK_WIZARD = 'E008'
+public constant int N_AXEMASTER = 'O00N'
+public constant int N_LAVA_ELEMENTAL = 'N01C'
+
+public constant int L_DEMOLISHER = 'O007'
+public constant int L_DARK_ASSASSIN = 'O000'
+public constant int L_ELDER_SAGE = 'O008'
+public constant int L_SEER = 'O009'
+public constant int L_HERALD = 'O00A'
+public constant int L_SALAMANDER = 'O00B'
+public constant int L_SPIRIT_WOLF = 'O00G'
+public constant int L_ANCHORITE = 'H00M'
+public constant int L_VINDICATOR = 'H00W'
+public constant int L_ZEALOT = 'O00K'
+public constant int L_PROPHET = 'U00N'
+public constant int L_BLOOD_DEMON = 'U000'
+public constant int L_CACIQUE = 'U002'
+public constant int L_DARK_SPECTRE = 'U003'
+public constant int L_DOOM_GUARD = 'U00B'
+public constant int L_ERECT_SORCERER = 'U00C'
+public constant int L_INFERNAL_MACHINE = 'U00D'
+public constant int L_MAIDEN_OF_PAIN = 'U00E'
+public constant int L_TEMPTING_MALEFICENT = 'U00F'
+public constant int L_PIT_LORD = 'N00P'
+public constant int L_DARK_WIZARD = 'E009'
+public constant int L_AXEMASTER = 'O00M'
+public constant int L_LAVA_ELEMENTAL = 'N01B'
+
+public constant int array N_HEROS = [0,
+    N_DEMOLISHER,
+    N_DARK_ASSASSIN,
+    N_ELDER_SAGE,
+    N_SEER,
+    N_HERALD,
+    N_SALAMANDER,
+    N_SPIRIT_WOLF,
+    N_ANCHORITE,
+    N_VINDICATOR,
+    N_ZEALOT,
+    N_PROPHET,
+    N_BLOOD_DEMON,
+    N_CACIQUE,
+    N_DARK_SPECTRE,
+    N_DOOM_GUARD,
+    N_ERECT_SORCERER,
+    N_INFERNAL_MACHINE,
+    N_MAIDEN_OF_PAIN,
+    N_MAIDEN_OF_PAIN,
+    N_TEMPTING_MALEFICENT,
+    N_PIT_LORD,
+    N_DARK_WIZARD,
+    N_AXEMASTER,
+    N_LAVA_ELEMENTAL
+]
+
+public constant int array L_HEROS = [0,
+    L_DEMOLISHER,
+    L_DARK_ASSASSIN,
+    L_ELDER_SAGE,
+    L_SEER,
+    L_HERALD,
+    L_SALAMANDER,
+    L_SPIRIT_WOLF,
+    L_ANCHORITE,
+    L_VINDICATOR,
+    L_ZEALOT,
+    L_PROPHET,
+    L_BLOOD_DEMON,
+    L_CACIQUE,
+    L_DARK_SPECTRE,
+    L_DOOM_GUARD,
+    L_ERECT_SORCERER,
+    L_INFERNAL_MACHINE,
+    L_MAIDEN_OF_PAIN,
+    L_TEMPTING_MALEFICENT,
+    L_PIT_LORD,
+    L_DARK_WIZARD,
+    L_AXEMASTER,
+    L_LAVA_ELEMENTAL
+]
+
+public class HeroType
+    static constant int MAX = 23
+    static boolean level
+    static Table valuesN
+    static Table valuesL
+    static string array roots
+
+    static function get(unit u) returns int
+        if level
+            return valuesL.loadInt(u.getTypeId())
+        else
+            return valuesN.loadInt(u.getTypeId())
+
+init
+    HeroType.valuesN = new Table()
+    HeroType.valuesL = new Table()
+
+    for i = 1 to 23
+        HeroType.valuesN.saveInt(N_HEROS[i], i)
+        HeroType.valuesL.saveInt(L_HEROS[i], i)
+    
+    HeroType.roots[1] = Icons.bTNDemolisher
+    HeroType.roots[2] = Icons.bTNDranai
+    HeroType.roots[3] = Icons.bTNAkama
+    HeroType.roots[4] = Icons.bTNDranaiMage
+    HeroType.roots[5] = Icons.bTNDranaiAkama
+    HeroType.roots[6] = Icons.bTNThunderLizardSalamander
+    HeroType.roots[7] = Icons.bTNSpiritWolf
+    HeroType.roots[8] = Imports.bTNDraeneiFemaleHuntress
+    HeroType.roots[9] = Imports.bTNDraeneiDestroyer2
+    HeroType.roots[10] = Imports.bTNZealot
+    HeroType.roots[11] = Imports.bTNVelen
+    HeroType.roots[12] = Icons.bTNFelGuard
+    HeroType.roots[13] = Icons.bTNFelGuardBlue
+    HeroType.roots[14] = Icons.bTNVoidWalker
+    HeroType.roots[15] = Icons.bTNDoomGuard
+    HeroType.roots[16] = Icons.bTNEredarWarlockPurple
+    HeroType.roots[17] = Icons.bTNInfernalFlameCannon
+    HeroType.roots[18] = Icons.bTNBlueDemoness
+    HeroType.roots[19] = Icons.bTNDemoness
+    HeroType.roots[20] = Icons.bTNPitLord
+    HeroType.roots[21] = Imports.bTNPlateOfPlaneswalker
+    HeroType.roots[22] = Icons.bTNChaosGrom
+    HeroType.roots[23] = Icons.bTNLavaSpawn

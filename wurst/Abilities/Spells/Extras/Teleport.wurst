@@ -1,0 +1,38 @@
+package Teleport
+
+import AbilityData
+
+public constant TELEPORT = compiletime(ABIL_ID_GEN.next())
+
+let CD = 35.
+let MANA = 50
+let DELAY = 4.5
+let DURATION = 60.
+let TARGETS = "allies,structure,invulnerable,neutral,nonhero,ground,player,vulnerable"
+
+init
+    gg_unit_Ofar_0285.addAbility(TELEPORT)
+
+@compiletime function gen()
+    new AbilityDefinitionStaffoTeleportation(TELEPORT)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Teleports the hero to a ally unit."))
+        ..setRace(Race.Naga)
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 1)
+        ..setHeroAbility(false)
+        ..setItemAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00D|r] Teleport")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetCastingDelay(lvl -> DELAY)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNScrollUber)
+        // Tooltip
+        ..presetHotkey("D")
+        ..tooltipStopListen()
+        ..setName("Teleport")
+        .setEditorSuffix("(Long)")

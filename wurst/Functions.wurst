@@ -1,0 +1,612 @@
+package Functions
+
+import UnitIndexer
+import ErrorHandling
+import ClosureForGroups
+import LinkedList
+import ClosureTimers
+import TimerUtils
+import BuffObjEditing
+import HashMap
+
+// Values
+
+public tuple dice(int base, int number, int sides)
+
+public function dice.toString() returns string
+    return (this.base + this.number).toString() + " - " + (this.base + this.number * this.sides).toString()
+
+public boolean inCinematic = false
+public constant real INTERVAL = 0.03125
+
+public boolexpr notFlying = Condition(() -> not GetEnteringUnit().isType(UNIT_TYPE_FLYING) and GetEnteringUnit().ignoreLocust())
+
+public constant angle UNIT_FACING = bj_UNIT_FACING.asAngleDegrees()
+
+// String
+
+public function string.subString(int min, int max) returns string
+    if min > max or max > this.length() or this == "" or this == null
+        return null
+    else
+        return this.substring(IMaxBJ(min, 1) - 1, IMinBJ(max, this.length()))
+
+public function string.subString(int start) returns string
+    return this.subString(start, this.length())
+
+public function string.char(int pos) returns string
+    return this.subString(pos, pos)
+
+public function string.concat(string other) returns string
+    return this + other
+
+// Order group
+
+function unit.filter() returns boolean
+    let id = this.getTypeId()
+    if id == 'ndrl' or id == 'u00J'
+        return false
+    return true
+
+public function group.issueTargetOrder(int order, widget target)
+    let vase = CreateGroup()
+
+    for u in this
+        if u.filter()
+            vase.addUnit(u)
+
+    while not vase.isEmpty()
+        let vase2 = GetRandomSubGroup(12, vase)
+        GroupTargetOrderById(vase2, order, target)
+        GroupRemoveGroup(vase2, vase)
+        vase2.destr()
+
+    vase.destr()
+
+public function group.issuePointOrder(int order, vec2 target)
+    let vase = CreateGroup()
+
+    for u in this
+        if u.filter()
+            vase.addUnit(u)
+
+    while not vase.isEmpty()
+        let vase2 = GetRandomSubGroup(12, vase)
+        GroupPointOrderById(vase2, order, target.x, target.y)
+        GroupRemoveGroup(vase2, vase)
+        vase2.destr()
+
+    vase.destr()
+
+public function group.issueImmediateOrder(int order)
+    for u in this
+        if u.filter()
+            u.issueImmediateOrderById(order)
+
+// Error message
+
+sound errorSound
+sound warningSound
+
+public function message(string what, string message, player whatPlayer)
+    sound whatSound = null
+    if what == "error"
+        if errorSound == null
+            errorSound = CreateSoundFromLabel("InterfaceError", false, false, false, 10, 10)
+        whatSound = errorSound
+    else if what == "warning"
+        if warningSound == null
+            warningSound = CreateSoundFromLabel("InterfaceWarning", false, false, false, 10, 10)
+        whatSound = warningSound
+    else
+        error("Invalid type")
+
+    let m = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n|cffffcc00" + message + "|r"
+    if localPlayer == whatPlayer
+        ClearTextMessages()
+        DisplayTimedTextToPlayer(whatPlayer, 0.52, 0.96, 2, m)
+        whatSound.play()
+
+// Destroy trees
+
+public function breakTrees(vec2 pos, real area, boolean alsoJails)
+    forNearestDestructable(pos, area, d -> begin
+        if d.getTypeId() == 'KTtw' or (alsoJails and d.getTypeId() == 'LOcg')
+            d.kill()
+    end)
+
+// Units
+
+public function createNUnits(player p, int quantity, int id, vec2 pos, angle facing)
+    for i = 1 to quantity
+        createUnit(p, id, pos, facing)
+
+int array paused
+
+public function unit.pause(boolean flag)
+    let i = this.getIndex()
+    if flag
+        if paused[i] == 0
+            this.pause()
+        paused[i]++
+    else
+        paused[i]--
+        if paused[i] == 0
+            this.unpause()
+
+public function widget.flashEffect(string path, string attachment)
+    AddSpecialEffectTarget(path, this, attachment).destr()
+
+public function unit.ignoreLocust() returns boolean
+    return not this.hasAbility(LOCUST_ID)
+
+public function unit.isSelected(player p) returns boolean
+    return IsUnitSelected(this, p)
+
+//Items
+
+public function unit.getInventoryIndexOfId(int itemId) returns int
+    item indexItem
+    for i = 0 to bj_MAX_INVENTORY
+        indexItem = UnitItemInSlot(this, i)
+        if indexItem != null and indexItem.getTypeId() == itemId
+            return i
+    return -1
+
+public function unit.getItemOfId(int itemId) returns item
+    let index = this.getInventoryIndexOfId(itemId)
+    if index == -1
+        return null
+    else
+        return UnitItemInSlot(this, index)
+
+// Change player color
+
+public function player.setColor(playercolor color, boolean changeExisting)
+    this.setColor(color)
+    if changeExisting
+        forUnitsOfPlayer(this, u -> u.setColor(color))
+
+// Multiboard
+
+public function multiboard.setItemValue(int col, int row, string val)
+    if row-1 > this.getRowCount() or col-1 > this.getColumnCount() or row < 0 or col < 0
+        return
+
+    int initRow
+    int initCol
+    int numRows
+    int numCols
+    multiboarditem mbitem
+
+    if row == 0
+        numRows = this.getRowCount()
+        initRow = 0
+    else
+        numRows = row - 1
+        initRow = numRows
+    
+    if col == 0
+        numCols = this.getColumnCount()
+        initCol = 0
+    else
+        numCols = col - 1
+        initCol = numCols
+        
+    for i = initRow to numRows
+        for j = initCol to numCols
+            mbitem = this.getItem(i, j)
+            mbitem.setValue(val)
+            mbitem.release()
+
+public function multiboard.setItemIcon(int col, int row, string val)
+    if row-1 > this.getRowCount() or col-1 > this.getColumnCount() or row < 0 or col < 0
+        return
+
+    int initRow
+    int initCol
+    int numRows
+    int numCols
+    multiboarditem mbitem
+
+    if row == 0
+        numRows = this.getRowCount()
+        initRow = 0
+    else
+        numRows = row - 1
+        initRow = numRows
+    
+    if col == 0
+        numCols = this.getColumnCount()
+        initCol = 0
+    else
+        numCols = col - 1
+        initCol = numCols
+        
+    for i = initRow to numRows
+        for j = initCol to numCols
+            mbitem = this.getItem(i, j)
+            mbitem.setIcon(val)
+            mbitem.release()
+
+public function multiboard.setItemStyle(int col, int row, boolean showValue, boolean showIcon)
+    if row-1 > this.getRowCount() or col-1 > this.getColumnCount() or row < 0 or col < 0
+        return
+
+    int initRow
+    int initCol
+    int numRows
+    int numCols
+    multiboarditem mbitem
+
+    if row == 0
+        numRows = this.getRowCount()
+        initRow = 0
+    else
+        numRows = row - 1
+        initRow = numRows
+    
+    if col == 0
+        numCols = this.getColumnCount()
+        initCol = 0
+    else
+        numCols = col - 1
+        initCol = numCols
+        
+    for i = initRow to numRows
+        for j = initCol to numCols
+            mbitem = this.getItem(i, j)
+            mbitem.setStyle(showValue, showIcon)
+            mbitem.release()
+
+public function multiboard.setItemColor(int col, int row, int red, int green, int blue, int alpha)
+    if row-1 > this.getRowCount() or col-1 > this.getColumnCount() or row < 0 or col < 0
+        return
+
+    int initRow
+    int initCol
+    int numRows
+    int numCols
+    multiboarditem mbitem
+
+    if row == 0
+        numRows = this.getRowCount()
+        initRow = 0
+    else
+        numRows = row - 1
+        initRow = numRows
+    
+    if col == 0
+        numCols = this.getColumnCount()
+        initCol = 0
+    else
+        numCols = col - 1
+        initCol = numCols
+        
+    for i = initRow to numRows
+        for j = initCol to numCols
+            mbitem = this.getItem(i, j)
+            mbitem.setValueColor(red, green, blue, alpha)
+            mbitem.release()
+
+public function multiboard.setItemWidth(int col, int row, real width)
+    if row-1 > this.getRowCount() or col-1 > this.getColumnCount() or row < 0 or col < 0
+        return
+
+    int initRow
+    int initCol
+    int numRows
+    int numCols
+    multiboarditem mbitem
+
+    if row == 0
+        numRows = this.getRowCount()
+        initRow = 0
+    else
+        numRows = row - 1
+        initRow = numRows
+    
+    if col == 0
+        numCols = this.getColumnCount()
+        initCol = 0
+    else
+        numCols = col - 1
+        initCol = numCols
+        
+    for i = initRow to numRows
+        for j = initCol to numCols
+            mbitem = this.getItem(i, j)
+            mbitem.setWidth(width)
+            mbitem.release()
+
+// Text tag
+
+public function texttag.setSpeed(real vel, real dir)
+    let newVel = vel * 0.071 / 128
+    let newDir = dir.asAngleDegrees()
+    this.setVelocity(newVel * newDir.cos(), newVel * newDir.sin())
+
+public function texttag.setUnitPos(unit whatUnit)
+    SetTextTagPosUnit(this, whatUnit, 0.)
+
+// Effects
+
+public function effect.destroyAfter(real delay)
+    doAfter(delay, () -> this.destr())
+
+// Elevators
+
+public enum ElevatorWallType
+    EAST
+    NORTH
+    SOUTH
+    WEST
+    ALL
+
+public function destructable.changeHeight(int height)
+    ChangeElevatorHeight(this, height)
+
+function rect.nudgeObjects()
+    forUnitsInRect(this, u -> u.setPos(u.getPos()))
+    EnumItemsInRect(this, null, () -> GetEnumItem().setPos(GetEnumItem().getPos()))
+
+destructable blocker
+
+function changeWallBlocker(real x, real y, real facing, boolean open)
+    let findThreshold = 32
+    let nudgeLength   = 4.25 * bj_CELLWIDTH
+    let nudgeWidth    = 1.25 * bj_CELLWIDTH
+    // Search for the pathing blocker within the general area.
+    var r = Rect(x - findThreshold, y - findThreshold, x + findThreshold, y + findThreshold)
+    blocker = null
+    forDestructablesInRect(r, d -> begin
+        blocker = d
+    end)
+    r.remove()
+
+    // Ensure that the blocker exists.
+    if (blocker == null)
+        blocker = CreateDeadDestructable(bj_ELEVATOR_BLOCKER_CODE, x, y, facing, 1, 0)
+    else if blocker.getTypeId() != bj_ELEVATOR_BLOCKER_CODE and blocker.getTypeId() != 'B007' // This is just for me
+        // If a different destructible exists in the blocker's spot, ignore
+        // the request.  (Two destructibles cannot occupy the same location
+        // on the map, so we cannot create an elevator blocker here.)
+        return
+
+    if open
+        // Ensure that the blocker is dead.
+        if blocker.getLife() > 0
+            blocker.kill()
+    else
+        // Ensure that the blocker is alive.
+        if blocker.getLife() <= 0
+            DestructableRestoreLife(blocker, GetDestructableMaxLife(blocker), false)
+
+        // Nudge any objects standing in the blocker's way.
+        if facing == 0
+            r = Rect(x - nudgeWidth/2, y - nudgeLength/2, x + nudgeWidth/2, y + nudgeLength/2)
+            NudgeObjectsInRect(r)
+            r.remove()
+        else if facing == 90
+            r = Rect(x - nudgeLength/2, y - nudgeWidth/2, x + nudgeLength/2, y + nudgeWidth/2)
+            NudgeObjectsInRect(r)
+            r.remove()
+
+destructable elevatorNeighbor
+
+function nearbyElevatorExists(real x, real y) returns boolean
+    let findThreshold = 32
+    // If another elevator is overlapping this one, ignore the wall.
+    let r = Rect(x - findThreshold, y - findThreshold, x + findThreshold, y + findThreshold)
+    elevatorNeighbor = null
+    forDestructablesInRect(r, d -> begin
+        let dType = d.getTypeId()
+        if dType == bj_ELEVATOR_CODE01 or dType == bj_ELEVATOR_CODE02
+            elevatorNeighbor = d
+    end)
+    r.remove()
+    return elevatorNeighbor != null
+
+public function destructable.changeWalls(boolean open, ElevatorWallType walls)
+    let x = this.getX()
+    let y = this.getY()
+    let distToBlocker = 192
+    let distToNeighbor = 256
+
+    let b = [
+        walls == ALL,
+        walls == EAST,
+        walls == NORTH,
+        walls == SOUTH,
+        walls == WEST
+    ]
+
+    if b[0] or b[1]
+        if not nearbyElevatorExists(x + distToNeighbor, y)
+            changeWallBlocker(x + distToBlocker, y, 0, open)
+
+    if b[0] or b[2]
+        if not nearbyElevatorExists(x, y + distToNeighbor)
+            changeWallBlocker(x, y + distToBlocker, 90, open)
+
+    if b[0] or b[3]
+        if not nearbyElevatorExists(x, y - distToNeighbor)
+            changeWallBlocker(x, y - distToBlocker, 90, open)
+
+    if b[0] or b[4]
+        if not nearbyElevatorExists(x - distToNeighbor, y)
+            changeWallBlocker(x - distToBlocker, y, 0, open)
+
+// Force
+
+int count
+public function force.count() returns int
+    count = 0
+    this.forEach(() -> begin
+        count++
+    end)
+    return count
+
+// Pings
+
+public function pingMinimap(vec2 pos, real time)
+    PingMinimap(pos.x, pos.y, time)
+
+public function pingMinimap(player p, vec2 pos, real time)
+    if p == localPlayer
+        pingMinimap(pos, time)
+
+public function pingMinimap(force f, vec2 pos, real time)
+    if f.containsPlayer(localPlayer)
+        pingMinimap(pos, time)
+
+public function pingMinimap(vec2 pos, real duration, color whatColor, boolean specialEffs)
+    PingMinimapEx(pos.x, pos.y, duration, whatColor.red, whatColor.green, whatColor.blue, specialEffs)
+
+public function pingMinimap(player p, vec2 pos, real duration, color whatColor, boolean specialEffs)
+    if p == localPlayer
+        pingMinimap(pos, duration, whatColor, specialEffs)
+
+public function pingMinimap(force f, vec2 pos, real duration, color whatColor, boolean specialEffs)
+    if f.containsPlayer(localPlayer)
+        pingMinimap(pos, duration, whatColor, specialEffs)
+
+// Lightning
+
+public function colorA.op_plus(colorA other) returns colorA
+    return colorA(min(255, this.red + other.red), min(255, this.blue + other.blue), min(255, this.green + other.green), min(255, this.alpha + other.alpha))
+
+public function colorA.op_minus(colorA other) returns colorA
+    return colorA(max(0, this.red - other.red), max(0, this.blue - other.blue), max(0, this.green - other.green), max(0, this.alpha - other.alpha))
+
+public class FlashLightning
+
+    static constant real INTERVAL = 0.03125
+    static constant real HEIGHT = 32.
+    unit head
+    unit rear
+    real duration
+    lightning root
+    timer t
+
+    ondestroy
+        head = null
+        rear = null
+        duration = 0.
+        root.destr()
+        root = null
+        t.release()
+        t = null
+
+    function callbackNS()
+        duration -= INTERVAL
+        root.move(true, head.getPos3Real() + vec3(0., 0., HEIGHT), rear.getPos3Real() + vec3(0., 0., HEIGHT))
+        if duration <= 0.5
+            root.setColor(root.getColorWithA() - colorA(0, 0, 0, 16))
+        if duration <= 0.
+            destroy this
+
+    static function callback()
+        (GetExpiredTimer().getData() castTo FlashLightning).callbackNS()
+
+    construct(string ltype, unit head, unit rear, real duration)
+        this.head = head
+        this.rear = rear
+        this.duration = max(duration, compiletime(0.5 + INTERVAL))
+        root = addLightning(ltype, true, head.getPos3Real() + vec3(0., 0., HEIGHT), rear.getPos3Real() + vec3(0., 0., HEIGHT))
+        t = getTimer()..setData(this castTo int)..startPeriodic(INTERVAL, function callback)
+
+// Camera
+
+public function fadeOut(string fadetype, real duration)
+    SetCineFilterTexture(fadetype)
+    SetCineFilterBlendMode(BLEND_MODE_BLEND)
+    SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
+    SetCineFilterStartUV(0, 0, 1, 1)
+    SetCineFilterEndUV(0, 0, 1, 1)
+    SetCineFilterStartColor(255, 255, 255, 0)
+    SetCineFilterEndColor(255, 255, 255, 255)
+    SetCineFilterDuration(duration)
+    DisplayCineFilter(true)
+
+public function fadeIn(string fadetype, real duration)
+    SetCineFilterTexture(fadetype)
+    SetCineFilterBlendMode(BLEND_MODE_BLEND)
+    SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
+    SetCineFilterStartUV(0, 0, 1, 1)
+    SetCineFilterEndUV(0, 0, 1, 1)
+    SetCineFilterStartColor(255, 255, 255, 255)
+    SetCineFilterEndColor(255, 255, 255, 0)
+    SetCineFilterDuration(duration)
+    DisplayCineFilter(true)
+
+// Buff
+
+interface BuffRemoved
+    function run()
+
+HashMap<int, real> array durationMaps
+
+/** Adds a buff to a unit*/
+public function unit.addBuff(buffTuple whatbuff)
+    this.addBuff(whatbuff, REAL_MAX, null)
+
+/** Adds a buff to a unit for an specific duration */
+public function unit.addBuff(buffTuple whatbuff, real duration)
+    this.addBuff(whatbuff, duration, null)
+
+/** Adds a buff to a unit for an specific duration and do actions when is removed */
+public function unit.addBuff(buffTuple whatbuff, real duration, BuffRemoved br)
+    let i = this.getIndex()
+    if durationMaps[i] == null
+        durationMaps[i] = new HashMap<int, real>()
+    if not durationMaps[i].has(whatbuff.buffId)
+        this.addAbility(whatbuff.abilId)
+        doPeriodically(INTERVAL, cb -> begin
+            let remain = durationMaps[i].get(whatbuff.buffId) - INTERVAL
+            if remain > 0. and this.isAlive()
+                durationMaps[i].put(whatbuff.buffId, remain)
+            else
+                if br != null
+                    br.run()
+                    destroy br
+                if this.isAlive()
+                    this.removeAbility(whatbuff.abilId)
+                    this.removeAbility(whatbuff.buffId)
+                durationMaps[i].remove(whatbuff.buffId)
+                destroy cb
+        end)
+    // If the unit already has the buff, just refresh the duration
+    // (I'm not sure if is preferable use the max between the new duration
+    // and the remaining or just use the remaining)
+    durationMaps[i].put(whatbuff.buffId, duration)
+
+/** Removes a buff from a unit */
+public function unit.removeBuff(buffTuple whatbuff)
+    if this.hasAbility(whatbuff.buffId)
+        let i = this.getIndex()
+        if durationMaps[i] != null
+            durationMaps[i].put(whatbuff.buffId, 0.)
+
+init
+    onUnitDeindex(() -> begin
+        let i = getDeindexedUnit().getIndex()
+        if durationMaps[i] != null
+            destroy durationMaps[i]
+            durationMaps[i] = null
+    end)
+
+// Terrain deformation
+
+public function createRipple(real duration, boolean limitNeg, vec2 where, real startRadius, real endRadius, real depth, real wavePeriod, real waveWidth) returns terraindeformation
+    if endRadius <= 0 or waveWidth <= 0 or wavePeriod <= 0
+        return null
+
+    let timeWave = 2.0 * duration / wavePeriod
+    let spaceWave = 2.0 * endRadius / waveWidth
+    let radiusRatio = startRadius / endRadius
+
+    return TerrainDeformRipple(where.x, where.y, endRadius, depth, R2I(duration * 1000), 1, spaceWave, timeWave, radiusRatio, limitNeg)
+
+public function createCrater(real duration, boolean permanent, vec2 where, real radius, real depth) returns terraindeformation
+    return TerrainDeformCrater(where.x, where.y, radius, depth, R2I(duration * 1000), permanent)

@@ -1,0 +1,38 @@
+package FingerOfDeath
+
+import AbilityData
+
+public constant FINGER_OF_DEATH_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 25.
+let RANGE = 800.
+let DURATION = 0.6
+let DMG = 200.
+let TARGETS = "air,ground,enemy,organic,neutral"
+// Not leveling
+let MANA_NL = 125
+
+@compiletime function gen()
+    new AbilityDefinitionFingerofDeath(FINGER_OF_DEATH_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw lightning that causes damage."))
+        ..setRace(Race.Naga)
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetGraphicDuration(lvl -> 1.)
+        ..presetGraphicDelay(lvl -> 0.25)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Finger of death")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Finger of death")

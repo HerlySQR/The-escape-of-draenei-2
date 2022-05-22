@@ -1,0 +1,34 @@
+package HolyLight
+
+import AbilityData
+
+public constant HOLY_LIGHT_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 10.
+let RANGE = 600.
+let TARGETS = "air,invulnerable,organic,ground,vulnerable"
+// Not leveling
+let MANA_NL = 80
+let HEAL_NL = 175.
+
+@compiletime function gen()
+    new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("A sacred light that can heal a living friendly unit or cause half damage to an enemy demon unit."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00Q|r] Holy Light")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetAmountHealedDamaged(lvl -> HEAL_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        .tooltipStopListen()

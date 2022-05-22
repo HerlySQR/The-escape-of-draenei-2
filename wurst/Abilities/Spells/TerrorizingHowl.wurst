@@ -1,0 +1,42 @@
+package TerrorizingHowl
+
+import AbilityData
+
+public constant TERRORIZING_HOWL_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 8.
+let DURATION = 4.5
+let SLOW = 0.4
+let TARGETS = "air,neutral,organic,ground"
+// Not leveling
+let AREA_NL = 450.
+let MANA_NL = 90
+let DMG_NL = 80.
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetAttackSpeedReduction(lvl -> SLOW)
+        ..presetMovementSpeedReduction(lvl -> SLOW)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00W|r] Terrorizing Howl")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetAOEDamage(lvl -> DMG_NL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..setArtCaster(Abilities.roarCaster)
+        ..presetIcon(Icons.bTNBattleRoar)
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()

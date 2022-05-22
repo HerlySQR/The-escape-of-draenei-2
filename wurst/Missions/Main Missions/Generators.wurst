@@ -1,0 +1,62 @@
+package Generators
+
+import Functions
+import initlater Missions
+import PlayerData
+import Towers
+
+public unit generator1 = gg_unit_npgr_0017
+public unit generator2 = gg_unit_npgr_0018
+public boolean generator1IsAlive = true
+public boolean generator2IsAlive = true
+public boolean generatorsDestroyed = false
+public int generatorsLeft
+public trigger destroyGenerators = CreateTrigger()
+
+function defineGenerators()
+    if generator1 == null
+        generator1 = createUnit(DEMON, 'npgr', gg_rct_Generador_1.getCenter(), UNIT_FACING)
+    if generator2 == null
+        generator2 = createUnit(DEMON, 'npgr', gg_rct_Generador_2.getCenter(), UNIT_FACING)
+    generator1.setInvulnerable(true)
+    generator2.setInvulnerable(true)
+    generatorsLeft = 2
+
+init
+    defineGenerators()
+    destroyGenerators
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addCondition(Condition(() -> begin
+            return GetDyingUnit().getTypeId() == 'npgr'
+        end))
+        .addAction(() -> begin
+            generatorsLeft--
+            if GetDyingUnit() == generator1
+                generator1 = null
+                generator1IsAlive = false
+            else if GetDyingUnit() == generator2
+                generator2 = null
+                generator2IsAlive = false
+            
+            if generatorsLeft == 1
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_UPDATED, "A generator was destroyed.")
+            else if generatorsLeft == 0
+                generatorsDestroyed = true
+                if whatMode[1] == VARIOUS_TIMERS
+                    stopActTimer()
+                defensiveTowers3()
+                forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                    if u.getTypeId() == 'n00J'
+                        u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+                    // TODO: wall generator
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofw_0851)
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofw_0850)
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofw_0855)
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofw_0852)
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofv_0849)
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofv_0087)
+                    ModifyGateBJ(bj_GATEOPERATION_OPEN ,gg_dest_Dofv_0088)
+                end)
+                startMission5()
+        end)
+

@@ -1,0 +1,25 @@
+package GeneratedValues
+
+// Here I store the generated variables on the map to use them in the Wurst script
+
+public class Units
+
+public class Dests
+
+public class Rects
+    
+    // Circles of power
+    static constant circleDr11 = gg_rct_Circle_dr_11
+    static constant circleDr12 = gg_rct_Circle_dr_12
+    static constant circleDr13 = gg_rct_Circle_dr_13
+    static constant circleDr14 = gg_rct_Circle_dr_14
+    static constant circleDr15 = gg_rct_Circle_dr_15
+    static constant circleDe11 = gg_rct_Circle_de_11
+    static constant circleDe12 = gg_rct_Circle_de_12
+    static constant circleDe13 = gg_rct_Circle_de_13
+    static constant circleDe14 = gg_rct_Circle_de_14
+    static constant circleDe15 = gg_rct_Circle_de_15
+
+    // Items
+    static constant items1 = gg_rct_Items_1
+    static constant items2 = gg_rct_Items_2

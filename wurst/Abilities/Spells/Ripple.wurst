@@ -1,0 +1,148 @@
+package Ripple
+
+import AbilityData
+
+import Simulate3dSound
+import Sound3DUtils
+
+public constant RIPLE_NL = compiletime(ABIL_ID_GEN.next())
+public constant RIPLE_L = compiletime(ABIL_ID_GEN.next())
+public constant RIPLE_S = compiletime(ABIL_ID_GEN.next())
+constant DUMMY_STUN = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 80.
+let RADIUS = 400.
+let OFFSET = compiletime(RADIUS * INTERVAL)
+// Not leveling
+let DMG_NL = 40.
+let DURATION_NL = 4.
+let MANA_NL = 200
+// Leveling
+let DMG_L = [45., 65.]
+let DURATION_L = [4., 5.]
+let MANA_L = [225, 250]
+
+function playSound(string name, vec2 pos)
+    bindSoundToPoint(CreateSound("Sound\\Units\\Combat\\" + name + ".wav", false, false, false, 10, 10, "DefaultEAXON")..setVolume(90), pos.x, pos.y, 0., 10000., 3000.)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(RIPLE_NL, RIPLE_L, RIPLE_S)
+        if data.check
+            real damage
+            real duration
+            if data.isNL
+                damage = DMG_NL * INTERVAL
+                duration = DURATION_NL
+            else
+                damage = DMG_L[data.lvl] * INTERVAL
+                duration = DURATION_L[data.lvl]
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let pos = caster.getPos()
+            let offset = OFFSET / duration
+            let myeffect = addEffect("Models\\LavaEarthquakeTarget.mdl", pos)
+            let r = pos + caster.getFacingAngle().toVec(100.)
+            playSound("MetalMediumBashStone1", r)
+            playSound("MetalMediumBashStone2", r)
+            playSound("MetalMediumBashStone3", r)
+            let mysound = CreateSoundFromLabel("EarthquakeLoop", true, true, true, 10, 10)..play(127, pos)
+            let td = createCrater(duration, false, pos, RADIUS, 96)
+            doPeriodically(INTERVAL, cb -> begin
+                duration -= INTERVAL
+                if duration >= 0
+                    forUnitsInRange(pos, RADIUS, u -> begin
+                        if not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_FLYING)
+                            u.setXY(u.getPos().moveTowards(pos, offset))
+                            if owner.isEnemyOf(u.getOwner())
+                                if u.getAbilityLevel('BPSE') == 0
+                                    InstantDummyCaster.castTarget(owner, DUMMY_STUN, 1, Orders.firebolt, u)
+                                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+                    end)
+                else
+                    myeffect.destr()
+                    mysound.stop(true, true)
+                    TerrainDeformStop(td, 2000)
+                    destroy cb
+            end)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "stomp")
+    this.presetOption(Option.VISIBLE, true)
+    this.presetButtonPosNormal(3, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Ripple")
+    this.presetTargetTypes(Targettype.NONE)
+    this.presetCooldown(lvl -> CD)
+    // Audiovisual
+    this.presetIcon(Icons.bTNCleavingAttack)
+    // Tooltip
+    this.setAnimationNames("spell,slam")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(RIPLE_NL, 1, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..addTooltipProperty("Duration", lvl -> DURATION_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Ripple")
+    
+    new ChannelAbilityPreset(RIPLE_L, 2, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        ..presetButtonPosNormal(0, 2)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Ripple")
+
+    new ChannelAbilityPreset(RIPLE_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Ripple")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 2
+                value1 = DMG_NL
+                value2 = DURATION_NL
+            else
+                value1 = DMG_L[lvl - 2]
+                value2 = DURATION_L[lvl - 2]
+            return "The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and dealing them " + value1.toString(0) + " of damage per second for " + value2.toString(0) + " seconds."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ripple")
+    
+    new AbilityDefinitionFireBolt(DUMMY_STUN)
+        ..setDamage(1, 0.)
+        ..setDurationHero(1, 1.)
+        ..setDurationNormal(1, 1.)
+        ..setBuffs(1, "BPSE")
+        ..setMissileArt("")
+        ..setName("Dummy stun")
+        ..setEditorSuffix("(Ripple)")
+        .setDummyAbility()

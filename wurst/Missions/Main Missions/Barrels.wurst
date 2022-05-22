@@ -1,0 +1,165 @@
+package Barrels
+
+import Functions
+import PlayerData
+import initlater Missions
+import HeroSelection
+
+import EventHelper
+import RegisterEvents
+import UnitIndexer
+import SoundUtils
+
+public boolean generatorAlive = true
+public trigger placeBarrel = CreateTrigger()
+public unit array heroWithBarrel
+
+rect place = gg_rct_Barril_1
+int barrelNumber = 1
+effect array barrelEffect
+let earthquake = new SoundDefinition(Sounds.earthquake, false, true)
+
+let dustPoint = [
+    vec2(-4368.00, -608.00),
+    vec2(-4192.00, -1248.00),
+    vec2(-3360.00, -1504.00)
+]
+
+init
+    // Get barrel
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        return GetManipulatedItem().getTypeId() == 'I000' and GetTriggerUnit().isType(UNIT_TYPE_HERO)
+    end, () -> begin
+        let u = GetTriggerUnit()
+        let m = GetManipulatedItem()
+        let p = u.getOwner()
+        if THE_DRAENEI.containsPlayer(p)
+            var b = false
+            for i = 0 to 5
+                if u.itemInSlot(i) != m and u.itemInSlot(i).getTypeId() == 'I000'
+                    b = true
+                    break
+            if b
+                m.remove()
+                message("warning", "You cannot have more than one at a time.", p)
+                // TODO
+                doAfter(2.) () ->
+                    TransmissionFromUnitTypeWithNameBJ(GetForceOfPlayer(p), Player(PLAYER_NEUTRAL_PASSIVE), 'n001', "Goblin Sapper", GetRectCenter(gg_rct_Miren_al_goblin), null, "Hey, you have one in your hand, wait for leaving it.", bj_TIMETYPE_ADD, 2.50, true)
+            else
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_ITEMACQUIRED, "Someone got a barrel.")
+                let i = p.getNumber()
+                barrelEffect[i] = u.addEffect("Models\\TNTBarrel.mdl", "hand")
+                heroWithBarrel[i] = u
+        else
+            m.remove()
+            message("error", "Why do you need this?", p)
+    end)
+    // Die with barrel
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        return GetDyingUnit().hasItemById('I000')
+    end, () -> begin
+        let u = GetDyingUnit()
+        u.getItemOfId('I000').remove()
+        for i = 1 to 5
+            if u == heroWithBarrel[i]
+                barrelEffect[i].destr()
+                heroWithBarrel[i] = null
+                u.addEffect("Units\\Other\\TNTBarrel\\TNTBarrel.mdl", "hand").destr()
+                break
+    end)
+    onUnitDeindex(() -> begin
+        if getDeindexedUnit().isType(UNIT_TYPE_HERO)
+            let u = getDeindexedUnit()
+            for i = 1 to 5
+                if u == heroWithBarrel[i]
+                    barrelEffect[i].destr()
+                    heroWithBarrel[i] = null
+                    break
+    end)
+    // Place barrel
+    placeBarrel
+        ..registerRectEnterEventSource(gg_rct_Colocar_barril)
+        ..registerRectEnterEventSource(gg_rct_Colocar_barril_2)
+        ..registerRectEnterEventSource(gg_rct_Colocar_barril_3)
+        ..addCondition(Condition(() -> begin
+            return GetEnteringUnit().hasItemById('I000')
+        end))
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            u.getItemOfId('I000').remove()
+            SetDestructableInvulnerable(createDestructable('LTex', place.getCenter(), GetRandomDirectionDeg().asAngleDegrees(), 1., 0), true)
+            switch barrelNumber
+                case 1
+                    QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_WARNING, "The first barrel has been placed")
+                    place = gg_rct_Barril_2
+                case 2
+                    QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_WARNING, "The second barrel has been placed")
+                    place = gg_rct_Barril_3
+                case 3
+                    QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_WARNING, "The third barrel has been placed\nThe wall is going to be destroyed")
+                    destroyWall()
+            barrelNumber++
+            let i = u.getOwner().getNumber()
+            heroWithBarrel[i] = null
+            barrelEffect[i].destr()
+            barrelEffect[i] = null
+        end)
+
+function destroyWall()
+    if whatMode[1] == VARIOUS_TIMERS
+        stopActTimer()
+    exitCave.enable()
+    let fire1 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", gg_rct_Barril_1.getCenter())
+    let fire2 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", gg_rct_Barril_2.getCenter())
+    let fire3 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", gg_rct_Barril_3.getCenter())
+    seeDrSpawn[3].start()
+    seeDeSpawn[2].start()
+    forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+        if u.getTypeId() == 'n001'
+            u.remove()
+        if u.hasItemById('I000')
+            u.getItemOfId('I000').remove()
+    end)
+    forUnitsInRect(gg_rct_Torre_de_los_demonios_2, u -> begin
+        if u.getTypeId() == 'o00I'
+            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+    end)
+    actDrSpawn = gg_rct_spw3
+    actDeSpawn = gg_rct_Salida_2
+    mission[2].setState(QuestState.COMPLETED)
+    forUnitsInRect(gg_rct_Tiendas_2, u -> begin
+        if u.isType(UNIT_TYPE_STRUCTURE)
+            u.setOwner(DRAENEI, true)
+    end)
+    ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_B004_1391)
+    /* TODO
+    gg_trg_Viajero_del_vacio.enable()
+    gg_trg_Para_ser_justos.disable()
+    gg_trg_Y_aun_asi_vienes.destr()*/
+
+    doAfter(3.) -> 
+        // Destroy the barrels
+        forDestructablesInRect(gg_rct_Barril_1, d -> d.kill())
+        forDestructablesInRect(gg_rct_Barril_2, d -> d.kill())
+        forDestructablesInRect(gg_rct_Barril_3, d -> d.kill())
+        for i = 1 to 11
+            CameraSetEQNoiseForPlayer(players[i], 20.)
+        doAfter(0.2) ->
+            forDestructablesInRect(gg_rct_Rompanse, d -> d.kill())
+            fire1.destr()
+            fire2.destr()
+            fire3.destr()
+            earthquake.playOnPoint(gg_rct_Colocar_barril.getCenter().withZ(0.))
+            doAfter(0.4) ->
+                addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[0]).destroyAfter(3.)
+                addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[1]).destroyAfter(3.)
+                addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[2]).destroyAfter(3.)
+                doAfter(0.35) -> 
+                    for i = 1 to 11
+                        CameraClearNoiseForPlayer(players[i])
+
+        pings.disable()
+        startMission3()
+        doAfter(0.2) ->
+            moveCircles2()
+            

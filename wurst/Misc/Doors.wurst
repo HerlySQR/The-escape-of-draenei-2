@@ -1,0 +1,242 @@
+package Doors
+
+import Functions
+import PlayerData
+
+import EventHelper
+import ClosureTimers
+import Simulate3dSound
+
+function playButtonSound(vec2 pos)
+    bindSoundToPoint(CreateSound("Sound\\Interface\\BattleNetDoorsStereo2.wav", false, false, false, 10, 10, "DefaultEAXON")..setVolume(86), pos.x, pos.y, 0., 10000., 3000.)
+
+function playLeverSound(vec2 pos)
+    bindSoundToPoint(CreateSound("Doodads\\Cinematic\\DungeonLever\\Lever.wav", false, false, false, 10, 10, "DefaultEAXON")..setVolume(86), pos.x, pos.y, 0., 10000., 3000.)
+
+function playDoorSound(vec2 pos)
+    bindSoundToPoint(CreateSound("Sound\\Ambient\\DoodadEffects\\LargeCityGateOpen1.wav", false, false, false, 10, 10, "DefaultEAXON")..setVolume(86), pos.x, pos.y, 0., 10000., 3000.)
+
+function playCloseSound(vec2 pos)
+    bindSoundToPoint(CreateSound("Sound\\Interface\\BattleNetDeath1.wav", false, false, false, 10, 10, "DefaultEAXON")..setVolume(86), pos.x, pos.y, 0., 10000., 3000.)
+
+init
+    // Door 1
+    SetDestructableInvulnerable(gg_dest_B003_1374, true)
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Interruptor_1)
+        ..registerRectEnterEventSource(gg_rct_Interruptor_2)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            gg_dest_DTfx_0188.kill()
+            gg_dest_DTfx_0190.kill()
+            playButtonSound(gg_dest_B003_1374.getPos())
+            playButtonSound(gg_rct_Interruptor_1.getCenter())
+            playButtonSound(gg_rct_Interruptor_2.getCenter())
+            doAfter(0.5) -> 
+                ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_B003_1374)
+                doAfter(5.) -> 
+                    ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_B003_1374)
+                    DestructableRestoreLife(gg_dest_DTfx_0188, 500.00, true)
+                    DestructableRestoreLife(gg_dest_DTfx_0190, 500.00, true)
+                    t.enable()
+        end)
+    // Door 2
+    SetDestructableInvulnerable(gg_dest_B004_1373, true)
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Interruptor_3)
+        ..registerRectEnterEventSource(gg_rct_Interruptor_4)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            gg_dest_DTfx_0216.kill()
+            gg_dest_DTfx_0198.kill()
+            playButtonSound(gg_dest_B004_1373.getPos())
+            playButtonSound(gg_rct_Interruptor_3.getCenter())
+            playButtonSound(gg_rct_Interruptor_4.getCenter())
+            doAfter(0.5) -> 
+                ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_B004_1373)
+                doAfter(5.) -> 
+                    ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_B004_1373)
+                    DestructableRestoreLife(gg_dest_DTfx_0216, 500.00, true)
+                    DestructableRestoreLife(gg_dest_DTfx_0198, 500.00, true)
+                    t.enable()
+        end)
+    // Door 3
+    SetDestructableInvulnerable(gg_dest_DTg2_0401, true)
+    CreateTrigger()
+        ..registerDeathEvent(gg_dest_DTlv_0919)
+        ..registerDeathEvent(gg_dest_DTlv_0920)
+        ..addAction(() -> begin
+            if gg_dest_DTg2_0401.getLife() <= 0
+                ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_DTg2_0401)
+            else
+                ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_DTg2_0401)
+            playLeverSound(gg_dest_DTg2_0401.getPos())
+            let d = GetTriggerDestructable()
+            doAfter(0.2) -> 
+                DestructableRestoreLife(d, 500., true)
+        end)
+    // Door 4
+    SetDestructableInvulnerable(gg_dest_LTg1_0095, true)
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Puerta_automatica_2)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_LTg1_0095)
+            playDoorSound(gg_dest_LTg1_0095.getPos())
+            doPeriodically(0.5, cb -> begin
+                var b = true
+                let g = CreateGroup()..enumUnitsInRect(gg_rct_Puerta_automatica_2)
+                for u from g
+                    if u.isAlive() and not u.isType(UNIT_TYPE_FLYING)
+                        b = false
+                        break
+                g.destr()
+                if b
+                    ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_LTg1_0095)
+                    t.enable()
+                    destroy cb
+            end)
+        end)
+    // Door 5
+    SetDestructableInvulnerable(gg_dest_LTg1_0924, true)
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Puerta_automatica_1)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_LTg1_0924)
+            playDoorSound(gg_dest_LTg1_0924.getPos())
+            doPeriodically(0.5, cb -> begin
+                var b = true
+                let g = CreateGroup()..enumUnitsInRect(gg_rct_Puerta_automatica_1)
+                for u from g
+                    if u.isAlive() and not u.isType(UNIT_TYPE_FLYING)
+                        b = false
+                        break
+                g.destr()
+                if b
+                    ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_LTg1_0924)
+                    t.enable()
+                    destroy cb
+            end)
+        end)
+
+// Door 6
+
+var doorOpen1 = true
+init
+    SetDestructableInvulnerable(gg_dest_YTcx_0808, true)
+    ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_YTcx_0808)
+    // Enter
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Abrir_Puerta_1)
+        ..addCondition(Condition(() -> begin
+            let u = GetEnteringUnit()
+            return THE_DEMONS.containsPlayer(u.getOwner()) and not u.isType(UNIT_TYPE_FLYING) and not doorOpen1
+        end))
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_YTcx_0808)
+            doPeriodically(0.5, cb -> begin
+                var b = true
+                let g = CreateGroup()..enumUnitsInRect(gg_rct_Abrir_Puerta_1)
+                for u from g
+                    if u.isAlive() and not u.isType(UNIT_TYPE_FLYING) and not u.isType(UNIT_TYPE_HERO)
+                        b = false
+                        break
+                g.destr()
+                if b
+                    if not doorOpen1
+                        ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_YTcx_0808)
+                    playCloseSound(gg_dest_YTcx_0808.getPos())
+                    t.enable()
+                    destroy cb
+            end)
+        end)
+    // Lock - unlock
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Interruptor_5)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            gg_dest_DTfx_0814.kill()
+            if doorOpen1
+                doorOpen1 = false
+                ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_YTcx_0808)
+                playButtonSound(gg_dest_YTcx_0808.getPos())
+                playButtonSound(gg_rct_Interruptor_5.getCenter())
+            else
+                doorOpen1 = true
+                ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_YTcx_0808)
+                playCloseSound(gg_dest_YTcx_0808.getPos())
+                playCloseSound(gg_rct_Interruptor_5.getCenter())
+            doAfter(3.) -> 
+                DestructableRestoreLife(gg_dest_DTfx_0814, 500., true)
+                t.enable()
+        end)
+
+// Door 7
+
+var doorOpen2 = true
+init
+    SetDestructableInvulnerable(gg_dest_YTce_0810, true)
+    ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_YTce_0810)
+    // Enter
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Abrir_Puerta_2)
+        ..addCondition(Condition(() -> begin
+            let u = GetEnteringUnit()
+            return THE_DEMONS.containsPlayer(u.getOwner()) and not u.isType(UNIT_TYPE_FLYING) and not doorOpen2
+        end))
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_YTce_0810)
+            doPeriodically(0.5, cb -> begin
+                var b = true
+                let g = CreateGroup()..enumUnitsInRect(gg_rct_Abrir_Puerta_2)
+                for u from g
+                    if u.isAlive() and not u.isType(UNIT_TYPE_FLYING) and not u.isType(UNIT_TYPE_HERO)
+                        b = false
+                        break
+                g.destr()
+                if b
+                    if not doorOpen2
+                        ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_YTce_0810)
+                    playCloseSound(gg_dest_YTce_0810.getPos())
+                    t.enable()
+                    destroy cb
+            end)
+        end)
+    // Lock - unlock
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Interruptor_6)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            gg_dest_DTfx_0811.kill()
+            if doorOpen2
+                doorOpen2 = false
+                ModifyGateBJ(bj_GATEOPERATION_CLOSE, gg_dest_YTce_0810)
+                playButtonSound(gg_dest_YTce_0810.getPos())
+                playButtonSound(gg_rct_Interruptor_6.getCenter())
+            else
+                doorOpen2 = true
+                ModifyGateBJ(bj_GATEOPERATION_OPEN, gg_dest_YTce_0810)
+                playCloseSound(gg_dest_YTce_0810.getPos())
+                playCloseSound(gg_rct_Interruptor_6.getCenter())
+            doAfter(3.) -> 
+                DestructableRestoreLife(gg_dest_DTfx_0811, 500., true)
+                t.enable()
+        end)
+

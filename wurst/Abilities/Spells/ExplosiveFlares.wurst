@@ -1,0 +1,160 @@
+package ExplosiveFlares
+
+import AbilityData
+import DummyDamager
+
+public constant EXPLOSIVE_FLARES_NL = compiletime(ABIL_ID_GEN.next())
+public constant EXPLOSIVE_FLARES_L = compiletime(ABIL_ID_GEN.next())
+public constant EXPLOSIVE_FLARES_S = compiletime(ABIL_ID_GEN.next())
+constant EXPLOSIVE_FLARES_FIRE = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 9.
+let RANGE = 700.
+// Not leveling
+let DMG_INIT_NL = 150.
+let DMG_PER_SEC_NL = 100.
+let MANA_NL = 150
+let CD_NL = 60.
+// Leveling
+let DMG_INIT_L = [150., 300.]
+let DMG_PER_SEC_L = [100., 200.]
+let MANA_L = [150, 200]
+let CD_L = 50.
+// Internal
+let AREA_PER_EXPLOSIONS = 250.
+let MAX_EXPLOSIONS = 5
+let TICKS_BEFORE_NEXT = 7
+let TOTAL_TIME_OF_TICKS = INTERVAL * TICKS_BEFORE_NEXT
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == EXPLOSIVE_FLARES_NL
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            var pos = caster.getPos()
+            let angl = pos.angleTo(getSpellTargetPos())
+            // Shake the camera for the players those units are nearby
+            let f = CreateForce()
+            forUnitsInRange(pos, 1000., u -> begin
+                f.addPlayer(u.getOwner())
+            end)
+            if f.containsPlayer(localPlayer)
+                CameraSetTargetNoiseEx(20., 1000000., true)
+                CameraSetSourceNoiseEx(20., 1000000., true)
+            f.destr()
+
+            let dummy = DummyRecycler.get(pos, angl)
+            DummyRecycler.recycle(dummy, compiletime(DURATION + 2.))
+            dummy.addAbility(EXPLOSIVE_FLARES_FIRE)
+            caster.dummyDamage(dummy, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_MAGIC)
+
+            let damage = DMG_INIT_NL / TICKS_BEFORE_NEXT
+            var explosions = 0
+            var ticks = 0
+            pos = pos.polarOffset(angl, compiletime(AREA_PER_EXPLOSIONS * 0.8))
+            doPeriodically(INTERVAL, cb -> begin
+                if explosions < MAX_EXPLOSIONS
+                    ticks++
+                    forUnitsInRange(pos, AREA_PER_EXPLOSIONS, u -> begin
+                        if owner.isEnemyOf(u.getOwner())
+                            Damage.deal(caster, u, damage, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_MAGIC)
+                    end)
+                    if ticks > TICKS_BEFORE_NEXT
+                        ticks = 0
+                        flashEffect(Objects.neutralBuildingExplosion, pos)
+                        dummy.issuePointOrderById(Orders.flamestrike, pos)
+                        pos = pos.polarOffset(angl, compiletime(AREA_PER_EXPLOSIONS * 0.8))
+                        explosions++
+                else
+                    dummy.removeAbility(EXPLOSIVE_FLARES_FIRE)
+                    DummyRecycler.recycle(dummy, DURATION)
+                    CameraSetTargetNoise(0., 0.)
+                    CameraSetSourceNoise(0., 0.)
+                    destroy cb
+            end)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "shockwave")
+    this.presetButtonPosNormal(3, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("attack,slam")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Explosive Flares")
+    this.presetTargetTypes(Targettype.POINT)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNDizzy)
+    // Tooltip
+    this.presetHotkey("F")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(EXPLOSIVE_FLARES_NL, 1, true, new AbilityTooltipGenerator("Create 5 explosions that causes initial damage, and they leave a flare deals damage per second."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_NL)
+        ..addTooltipProperty("Initial damage", lvl -> DMG_INIT_NL)
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Explosive Flares")
+    
+    new ChannelAbilityPreset(EXPLOSIVE_FLARES_L, 2, true, new AbilityTooltipGenerator("Create 5 explosions that causes initial damage, and they leave a flare deals damage per second."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_NL)
+        ..addTooltipProperty("Initial damage", lvl -> DMG_INIT_NL)
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Explosive Flares")
+    
+    new ChannelAbilityPreset(EXPLOSIVE_FLARES_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..setLevels(3)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Explosive Flares")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 2
+                value1 = DMG_INIT_NL
+                value2 = DMG_PER_SEC_NL
+            else
+                value1 = DMG_INIT_L[lvl - 2]
+                value2 = DMG_PER_SEC_L[lvl - 2]
+            return "Create 5 explosions that causes a max. initial damage of " + value1.toString(0) + " each one, and they leave a flare for " + DURATION.toString(0) + " seconds that deals " + value2.toString(0) + " damage per second."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Explosive Flares")
+    
+    new AbilityDefinitionFlameStrikeCreep(EXPLOSIVE_FLARES_FIRE)
+        ..setLevels(2)
+        ..setArtEffect("")
+        ..presetCastingTime(lvl -> 0.)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetFullDamageInterval(lvl -> 0.5)
+        ..presetHalfDamageInterval(lvl -> 0.5)
+        ..presetTargetsAllowed(lvl -> "air,enemies,structure,neutral,ground,tree")
+        ..presetAreaofEffect(lvl -> AREA_PER_EXPLOSIONS)
+        ..presetMaximumDamage(lvl -> 99999.)
+        ..presetFullDamageDealt(lvl -> compiletime(DMG_PER_SEC_NL * 0.5))
+        .setDummyAbility()

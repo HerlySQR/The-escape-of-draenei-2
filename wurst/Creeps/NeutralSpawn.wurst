@@ -1,0 +1,88 @@
+package NeutralSpawn
+
+import Functions
+
+constant OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
+
+let spawning = CreateTrigger()..disable()
+let camp = CreateGroup()
+let filt = Filter(() -> begin
+    return GetFilterUnit().isAlive()
+end)
+
+public function enableNeutralSpawn()
+    spawning.enable()
+
+public function disableNeutralSpawn()
+    spawning.disable()
+
+init
+    spawning
+        ..registerTimerEvent(60.00, false)
+        ..addAction(() -> begin
+            camp.enumUnitsInRect(gg_rct_Campamento_1_2, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_1.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_2_2, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, 'ners', gg_rct_Campamento_2.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, 'nfel', gg_rct_Campamento_2.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_3_2, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'nfgu', gg_rct_Campamento_3.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_5_2, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'nele', gg_rct_Campamento_5.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_6, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'npfl', gg_rct_Campamento_6.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_7, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'nfgu', gg_rct_Campamento_7.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_8_2, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'nfgu', gg_rct_Campamento_8.getCenter(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_9, filt)
+            if camp.isEmpty()
+                for i = 1 to 3
+                    createUnit(OWNER, 'n00O', gg_rct_Campamento_9.randomPoint(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_10, filt)
+            if camp.isEmpty()
+                for i = 1 to 3
+                    createUnit(OWNER, 'n00O', gg_rct_Campamento_10.randomPoint(), UNIT_FACING)
+            camp.clear()
+
+            camp.enumUnitsInRect(gg_rct_Campamento_11_2, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, 'ners', gg_rct_Campamento_11.randomPoint(), 270.00.asAngleDegrees())
+                createUnit(OWNER, 'nfgu', gg_rct_Campamento_11.randomPoint(), 225.00.asAngleDegrees())
+                createUnit(OWNER, 'nfgu', gg_rct_Campamento_11.randomPoint(), 270.00.asAngleDegrees())
+                createUnit(OWNER, 'nfgu', gg_rct_Campamento_11.randomPoint(), 315.00.asAngleDegrees())
+            camp.clear()
+            
+            camp.enumUnitsInRect(gg_rct_Campamento_12_2, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_12.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(gg_rct_Campamento_13, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_13.getCenter(), UNIT_FACING)
+            camp.clear()
+    end)

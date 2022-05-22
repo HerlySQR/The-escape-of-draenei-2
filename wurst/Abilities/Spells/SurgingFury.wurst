@@ -1,0 +1,245 @@
+package SurgingFury
+
+import AbilityData
+import PlayerData
+
+import UnitIndexer
+
+public constant SURGING_FURY_NL = compiletime(ABIL_ID_GEN.next())
+public constant SURGING_FURY_L = compiletime(ABIL_ID_GEN.next())
+public constant SURGING_FURY_S = compiletime(ABIL_ID_GEN.next())
+constant SURGING_FURY_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 0.5
+let RANGE = 600.
+let CD = 10.
+// Not leveling
+let BASE_DMG_NL = [30., 60]
+let DMG_PER_CH_NL = [15., 30.]
+let MAX_CH_NL = [5, 8]
+let MANA_NL = [40, 70]
+// Leveling
+let BASE_DMG_L = [30., 60., 90., 120.]
+let DMG_PER_CH_L = [15., 25., 35., 45.]
+let MAX_CH_L = [4, 6, 8, 10]
+let MANA_L = [40, 60, 80, 100]
+
+class SurgingFury
+
+    static SurgingFury array instances
+    unit caster
+    int charges
+    string col
+    string txtCharges
+    int maxCharges
+    texttag ttCharges
+    int counter
+    int lvl
+    bool isNL
+    timer reduce
+    timer move
+
+    construct(unit caster, bool isNL)
+        this.caster = caster
+        instances[caster.getIndex()] = this
+        col = colorId[caster.getOwner().getNumber()]
+        ttCharges = CreateTextTag()
+        ttCharges.setColor(COLOR_WHITE)
+        reduce = getTimer()..setData(this castTo int)..startPeriodic(1., function SurgingFury.decrease)
+        move = getTimer()..setData(this castTo int)..startPeriodic(0.03125, function SurgingFury.movement)
+        charges = 0
+        update(0, isNL)
+
+    function update()
+        update(lvl, isNL)
+    
+    function update(int lvl, bool isNL)
+        if isNL
+            maxCharges = MAX_CH_NL[lvl]
+        else
+            maxCharges = MAX_CH_L[lvl]
+        this.lvl = lvl
+        this.isNL = isNL
+        txtCharges = ""
+        for i = 1 to charges
+            txtCharges += col + "I|r"
+        for i = 1 to maxCharges - charges
+            txtCharges += "I"
+        ttCharges.setText(txtCharges, 8.)
+    
+    function movementNS()
+        ttCharges.setUnitPos(caster)
+        ttCharges.setVisibility(localPlayer == caster.getOwner() and caster.isAlive() and not IsUnitHidden(caster))
+
+    static function movement()
+        (GetExpiredTimer().getData() castTo SurgingFury).movementNS()
+
+    function decreaseNS()
+        if counter > 0
+            counter--
+        else
+            if charges > 0
+                charges--
+                update()
+
+    static function decrease()
+        (GetExpiredTimer().getData() castTo SurgingFury).decreaseNS()
+    
+    ondestroy
+        instances[caster.getIndex()] = null
+        caster = null
+        col = null
+        ttCharges.destr()
+        ttCharges = null
+        reduce.release()
+        reduce = null
+        move.release()
+        move = null
+        charges = 0
+    
+    static function getInstance(unit whatUnit) returns SurgingFury
+        let curr = SurgingFury.instances[whatUnit.getIndex()]
+        assertNotNull(curr)
+        return curr
+    
+init
+    onUnitIndex(() -> begin
+        if getIndexedUnit().hasAbility(SURGING_FURY_NL)
+            new SurgingFury(getIndexedUnit(), false)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_HERO_SKILL, () -> begin
+        if GetLearnedSkill() == SURGING_FURY_L
+            if GetLearnedSkillLevel() == 1
+                new SurgingFury(GetLearningUnit(), true)
+            else
+                SurgingFury.getInstance(GetLearningUnit()).update(GetLearnedSkillLevel() - 1, true)
+    end)
+    registerAfterDamageEvent(damage -> begin
+        if not damage.isSpell
+            let curr = SurgingFury.getInstance(damage.source)
+            if curr != null
+                curr.counter = 6
+                if curr.charges < curr.maxCharges
+                    curr.charges++
+                    curr.update()
+    end)
+    onUnitDeindex(() -> begin
+        let curr = SurgingFury.getInstance(getDeindexedUnit())
+        if curr != null
+            destroy curr
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(SURGING_FURY_NL, SURGING_FURY_L, SURGING_FURY_S)
+        if data.check
+            real baseDmg
+            real dmgPerCh
+            if data.isNL
+                baseDmg = BASE_DMG_NL[data.lvl]
+                dmgPerCh = DMG_PER_CH_NL[data.lvl]
+            else
+                baseDmg = BASE_DMG_L[data.lvl]
+                dmgPerCh = DMG_PER_CH_L[data.lvl]
+            let curr = SurgingFury.getInstance(GetSpellAbilityUnit())
+            let target = GetSpellTargetUnit()
+            let damage = baseDmg + curr.charges * dmgPerCh
+            Damage.deal(curr.caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+            CreateTextTag()
+                ..setText(damage.toInt().toString() + "!", 10.)
+                ..setUnitPos(target)
+                ..setPermanent(false)
+                ..setColor(204, 64, 10, 255)
+                ..setSpeed(64., 90.)
+                ..setLifespan(4.)
+            curr.charges = 0
+            curr.update()
+    end)
+
+function AbilityDefinitionThunderBoltCreep.general()
+    this.presetButtonPosNormal(0, 2)
+    this.setMissileSpeed(0)
+    this.setMissileArt("")
+    this.presetDamage(lvl -> 0.)
+    this.presetBuffs(lvl -> int2fourchar(SURGING_FURY_BUFF))
+    this.setArtTarget(Abilities.demonBoltImpact + "," + Abilities.markOfChaosDone)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Surging Fury")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+    this.presetDurationNormal(lvl -> DURATION)
+    this.presetDurationHero(lvl -> DURATION)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNSoulBurn)
+    // Tooltip
+    this.presetHotkey("Q")
+
+@compiletime function gen()
+    new AbilityDefinitionThunderBoltCreep(SURGING_FURY_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Every time the Doom Guard attacks increase its number of charges and deals damage for each charge when is casted plus an extra damage and also stunning the target.\nThe charges will disappear after 6 seconds of attacking."))
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_NL[lvl - 1])
+        ..addTooltipProperty("Damage per charge", lvl -> DMG_PER_CH_NL[lvl - 1])
+        ..addTooltipProperty("Max. charges", lvl -> MAX_CH_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Surging Fury")
+    
+    new AbilityDefinitionThunderBoltCreep(SURGING_FURY_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Every time the Doom Guard attacks increase its number of charges and deals damage for each charge when is casted plus an extra damage and also stunning the target.\nThe charges will disappear after 6 seconds of attacking."))
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosNormal(0, 0)
+        // Stats
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_L[lvl - 1])
+        ..addTooltipProperty("Damage per charge", lvl -> DMG_PER_CH_L[lvl - 1])
+        ..addTooltipProperty("Max. charges", lvl -> MAX_CH_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Surging Fury")
+    
+    new AbilityDefinitionThunderBoltCreep(SURGING_FURY_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Surging Fury")
+        ..presetHotkey("F")
+        // Stats
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_L[lvl - 1])
+        ..addTooltipProperty("Damage per charge", lvl -> DMG_PER_CH_L[lvl - 1])
+        ..addTooltipProperty("Max. charges", lvl -> MAX_CH_L[lvl - 1])
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = BASE_DMG_NL[lvl - 1]
+                value2 = DMG_PER_CH_NL[lvl - 1]
+            else
+                value1 = BASE_DMG_L[lvl - 3]
+                value2 = DMG_PER_CH_L[lvl - 3]
+            return "Every time the Doom Guard attacks increase its number of charges and for each charge deals " + value2.toString(0) + " damage, and when the skill is cast throw an attack at enemy unit causing " + value1.toString(0) + " plus that damage and stunning the target for 0.5 seconds.\nThe charges will disappear after 6 seconds of attacking."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Surging Fury")
+    
+    new BuffDefinition(SURGING_FURY_BUFF, 'BPSE')
+        ..setIcon(Icons.bTNSoulBurn)
+        ..setArtTarget(1, "")
+        ..setName(1, "Surging Fury")
+        ..setTooltipNormalExtended(1, "This unit is stunned by Surging Fury")

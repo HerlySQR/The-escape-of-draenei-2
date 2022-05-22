@@ -1,0 +1,117 @@
+package LightningSkirt
+
+import AbilityData
+
+public constant LIGHTNING_SKIRT_NL = compiletime(ABIL_ID_GEN.next())
+public constant LIGHTNING_SKIRT_L = compiletime(ABIL_ID_GEN.next())
+public constant LIGHTNING_SKIRT_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 4.
+let AREA = 500.
+// Not leveling
+let DMG_NL = [130., 180.]
+let MAX_TARGETS_NL = [8, 12]
+let MANA_NL = [80, 90]
+// Leveling
+let DMG_L = [100., 160., 220., 280.]
+let MAX_TARGETS_L = [8, 11, 14, 17]
+let MANA_L = [75, 100, 125, 150]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(LIGHTNING_SKIRT_NL, LIGHTNING_SKIRT_L, LIGHTNING_SKIRT_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let pos = caster.getPos()
+            let g = CreateGroup()
+            forUnitsInRange(pos, AREA, u -> begin
+                if u.isAlive() and owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
+                    g.addUnit(u)
+            end)
+            real damage
+            int counter
+            if data.isNL
+                damage = DMG_NL[data.lvl]
+                counter = MAX_TARGETS_NL[data.lvl]
+            else
+                damage = DMG_L[data.lvl]
+                counter = MAX_TARGETS_L[data.lvl]
+            for u from g
+                new FlashLightning(LIGHTNING_FORKED_LIGHTNING, caster, u, 1.)
+                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
+                counter--
+                if counter == 0
+                    break
+            g.destr()
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "thunderclap")
+    this.presetOption(Option.VISIBLE, true)
+    this.presetButtonPosNormal(0, 2)
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Lightning Skirt")
+    this.presetFollowThroughTime(lvl -> 0.25)
+    this.tooltipStartListen()
+    this.presetTargetTypes(Targettype.NONE)
+    this.presetCooldown(lvl -> CD)
+    this.presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+    this.presetIcon(Icons.bTNMonsoon)
+        // Tooltip
+    this.presetHotkey("Q")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(LIGHTNING_SKIRT_NL, 2, true, new AbilityTooltipGenerator("Throws lightning to the nearby enemy units."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl - 1])
+        ..addTooltipProperty("Max. targets", lvl -> MAX_TARGETS_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Lightning Skirt")
+
+    new ChannelAbilityPreset(LIGHTNING_SKIRT_L, 4, true, new AbilityTooltipGenerator("Throws lightning to the nearby enemy units."))
+        ..setHeroAbility(true)
+        ..general()
+        ..presetButtonPosNormal(0, 0)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
+        ..addTooltipProperty("Max. targets", lvl -> MAX_TARGETS_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Lightning Skirt")
+    
+    new ChannelAbilityPreset(LIGHTNING_SKIRT_S, 6, true)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Lightning Skirt")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            int value2
+            if lvl < 3
+                value1 = DMG_NL[lvl - 1]
+                value2 = MAX_TARGETS_NL[lvl - 1]
+            else
+                value1 = DMG_L[lvl - 3]
+                value2 = MAX_TARGETS_L[lvl - 3]
+            return "Throws lightning at all enemy units within a radius of " + AREA.toString(0) + " causing " + value1.toString(0) + " damage to max " + value2.toString() + " units."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Lightning Skirt")

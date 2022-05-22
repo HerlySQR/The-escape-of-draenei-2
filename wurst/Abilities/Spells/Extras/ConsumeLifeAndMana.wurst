@@ -1,0 +1,75 @@
+package ConsumeLifeAndMana
+
+import AbilityData
+import LifeSteal
+
+public constant CONSUME_LIFE_AND_MANA_ID = compiletime(ABIL_ID_GEN.next())
+
+let MANA = 100
+let LIFE_STEAL = 50.
+let MANA_STEAL = 30.
+let DURATION = 8.
+let RANGE = 500.
+let CD = 12.
+
+let INTERVAL = 0.03125
+let extraHeight1 = vec3(0., 0., 90.)
+let extraHeight2 = vec3(0., 0., 110.)
+
+init
+    registerSpellEffectEvent(CONSUME_LIFE_AND_MANA_ID, () -> begin
+        let caster = GetSpellAbilityUnit()
+        let target = GetSpellTargetUnit()
+        let eff1 = caster.addEffect(Abilities.drainCaster, "overhead")
+        let eff2 = caster.addEffect(Abilities.manaDrainCaster, "overhead")
+        let eff3 = target.addEffect(Abilities.drainTarget, "overhead")
+        let eff4 = target.addEffect(Abilities.manaDrainTarget, "overhead")
+        let lifeLight = addLightning(LIGHTNING_DRAIN_LIFE, true, caster.getPos3Real() + extraHeight1, target.getPos3Real() + extraHeight1)
+        let manaLight = addLightning(LIGHTNING_DRAIN_MANA, true, caster.getPos3Real() + extraHeight2, target.getPos3Real() + extraHeight2)
+        caster.lifeSteal(target, LIFE_STEAL, 1., Orders.drain, () -> begin
+            if target.getMana() < MANA_STEAL
+                caster.addMana(target.getMana())
+            else
+                caster.addMana(MANA_STEAL)
+            target.addMana(-MANA_STEAL)
+            if not target.isAlive()
+                caster.abortOrder()
+        end)
+        doPeriodicallyTimed(INTERVAL, DURATION, cb -> begin
+            if caster.getCurrentOrder() == Orders.drain and not cb.isLast()
+                caster.setFacing(caster.getPos().angleTo(target.getPos()))
+                lifeLight.move(true, caster.getPos3Real() + extraHeight1, target.getPos3Real() + extraHeight1)
+                manaLight.move(true, caster.getPos3Real() + extraHeight2, target.getPos3Real() + extraHeight2)
+            else
+                eff1.destr()
+                eff2.destr()
+                eff3.destr()
+                eff4.destr()
+                lifeLight.destr()
+                manaLight.destr()
+                if not cb.isLast()
+                    destroy cb
+        end)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(CONSUME_LIFE_AND_MANA_ID, 1, true, new AbilityTooltipGenerator("Absorbs the life essence and its mana from a targeted enemy unit by removing 50 hit points and 30 mana per second and giving them to the spellcaster."))
+        ..presetBaseOrderID(lvl -> "drain")
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..setAnimationNames("stand,channel")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00F|r] Consume life and mana")
+        ..presetTargetTypes(Targettype.UNIT)
+        // Stats
+        ..presetFollowThroughTime(lvl -> DURATION)
+        ..addTooltipProperty("Life drain", lvl -> LIFE_STEAL)
+        ..addTooltipProperty("Mana drain", lvl -> MANA_STEAL)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        ..presetIcon(Icons.bTNDrain)
+        // Tooltip
+        ..presetHotkey("F")
+        .tooltipStopListen()

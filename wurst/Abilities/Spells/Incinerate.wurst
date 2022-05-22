@@ -1,0 +1,49 @@
+package Incinerate
+
+import AbilityData
+
+public constant INCINERATE_NL = compiletime(ABIL_ID_GEN.next())
+constant INCINERATE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let SLOW = 0.71
+let MAX_TIMES = 5
+let RANGE = 700.
+let MANA_NL = 85
+let TARGETS = "air,ground,enemy,neutral,organic"
+// Not Leveling
+let DURATION_HERO_NL = 2.
+let DURATION_NORMAL_NL = 10.
+let CD_NL = 16.
+let DMG_NL = 15.
+
+@compiletime function gen()
+    new AbilityDefinitionFirelordSoulBurn(INCINERATE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Velen forces his target to repress his bad thoughts causing him to be slowed and this is expelled as a healing for nearby units, but this process causes him a damage, this amount is also the one that heals nearby units."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetBuffs(lvl -> int2fourchar(INCINERATE_BUFF))
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Incinerate")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDamageAmount(lvl -> DMG_NL)
+        ..presetDurationHero(lvl -> DURATION_HERO_NL)
+        ..presetDurationNormal(lvl -> DURATION_NORMAL_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        ..presetIcon(Icons.bTNIncinerate)
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Incinerate")
+    
+    new BuffDefinition(INCINERATE_BUFF, 'BNso')
+        ..setIcon(Icons.bTNIncinerate)
+        ..setName(1, "Incinerate")
+        ..setTooltipNormal(1, "Incinerate")
+        ..setTooltipNormalExtended(1, "This unit is under the effects of Incinerate. He cannot cast spells, his attacks deal less damage and he takes damage gradually.")

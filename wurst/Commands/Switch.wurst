@@ -1,0 +1,216 @@
+package Switch
+
+import AFK
+import Repick
+import MyBoard
+
+import Dialog
+import ClosureForGroups
+import ClosureTimers
+
+boolean youCantNow = false
+player whoWantSwitch
+timer endSwitch = CreateTimer()
+dialog switchWindow = createDialog()
+button array switchButton
+force whoVoted = CreateForce()
+int howManyVoted = 1
+boolean switchSuccesful
+boolean okEnabled = false
+
+public function switchPlayer(player p)
+    if not whoAreHere.containsPlayer(p)
+        DisplayTextToPlayer(p, 0., 0., "Please select a unit if you wanna switch (it's to know you're here).")
+    else if youCantNow
+        DisplayTextToPlayer(p, 0., 0., "Someone is doing switch, you have to wait.")
+    else
+        print("Someone wanna switch (Only has 60 seconds).")
+        youCantNow = true
+        switchWindow.setMessage("What player do you want to change with?")
+        if THE_DEMONS.containsPlayer(p)
+            for i = 1 to 5
+                switchButton[i] = switchWindow.addButton(playerName[i])
+        else
+            for i = 6 to 10
+                switchButton[i] = switchWindow.addButton(playerName[i])
+        switchWindow.display(p, true)
+        whoWantSwitch = p
+        switchSuccesful = false
+        endSwitch.start(60., function youCantVote)
+
+function youCantVote()
+    howManyVoted = 1
+    whoVoted.clear()
+    if not switchSuccesful
+        print("|cffff0000The time limit for switch has finished.|r")
+    switchWindow.display(whoWantSwitch, false)
+    switchWindow.clear()
+    youCantNow = false
+
+public function ok(player p)
+    if okEnabled
+        if whoVoted.containsPlayer(p)
+            return
+        howManyVoted++
+        if howManyVoted < whoAreHere.count()
+            print(p.getName() + " typed ok (" + howManyVoted.toString() + "/" + whoAreHere.count().toString() + ")")
+            whoVoted.addPlayer(p)
+        else
+            changePlayers()
+            whoVoted.clear()
+            print("The switch has been succesful.")
+            switchSuccesful = true
+            endSwitch.pause()
+            youCantVote()
+
+player swp1
+player swp2
+vec2 swc1
+vec2 swc2
+vec2 vase
+
+init
+    CreateTrigger()
+        ..registerDialogEvent(switchWindow)
+        ..addAction(() -> begin
+            let p = GetTriggerPlayer()
+            var j = 0
+            for i = 1 to 10
+                if p.getNumber() == i
+                    swp1 = p
+                if GetClickedButton() == switchButton[i]
+                    swp2 = playerM(i)
+                if players[i].isIngame()
+                    j++
+            if j == 1
+                changePlayers()
+            else
+                whoVoted.addPlayer(p)
+                print("|cff879cdc" + swp1.getName() + " wants switch with " + swp2.getName() + "|r")
+                print("Type -ok for switch")
+                okEnabled = true
+        end)
+
+function changePlayers()
+    let i1 = swp1.getNumber()
+    let i2 = swp2.getNumber()
+    // Return items to their owners
+    forUnitsOfType("Courier", u -> begin
+        if u.getOwner() == swp1 or u.getOwner() == swp2
+            for i = 1 to 10
+                for j = 0 to 5
+                    if GetItemPlayer(u.itemInSlot(j)).getNumber() == i
+                        u.itemInSlot(j).setPos(circleRegion[i].getCenter())
+    end)
+    // Change the players
+    swc1 = circleRegion[i1].getCenter()
+    swc2 = circleRegion[i2].getCenter()
+    vase = gg_rct_Index.getCenter()
+    for i = 0 to 5
+        hero[i1].itemInSlot(i).setPos(swc1)
+        hero[i2].itemInSlot(i).setPos(swc2)
+        circle[i1].removeItem(circle[i1].itemInSlot(i))
+        circle[i2].removeItem(circle[i2].itemInSlot(i))
+    EnumItemsInRect(circleRegion[i1], null, () -> begin
+        let m = GetEnumItem()
+        if GetItemPlayer(m) == swp1
+            m.setPos(vase)
+    end)
+    EnumItemsInRect(circleRegion[i2], null, () -> begin
+        let m = GetEnumItem()
+        if GetItemPlayer(m) == swp2
+            m.setPos(swc1)
+    end)
+    EnumItemsInRect(gg_rct_Index, null, () -> begin
+        GetEnumItem().setPos(swc1)
+    end)
+    vec2 where
+    yesOrYes = true
+    where = vec2(GetCameraTargetPositionX(), GetCameraTargetPositionY())
+    repick(swp1)
+    PanCameraToTimedForPlayer(swp1, where.x, where.y, 0.)
+    where = vec2(GetCameraTargetPositionX(), GetCameraTargetPositionY())
+    repick(swp2)
+    PanCameraToTimedForPlayer(swp2, where.x, where.y, 0.)
+    yesOrYes = false
+    switchMembers(swp1, swp2)
+    /* TODO
+    udg_Si_lo_mataste[GetPlayerId(udg_swp1)+1] = false
+    udg_Si_lo_mataste[GetPlayerId(udg_swp2)+1] = false
+    
+    // They remember you
+    if IsPlayerInForce(udg_swp1,udg_Ya_te_vi[0])
+        ForceAddPlayer(udg_Sabe_quien_eres[0],udg_swp1)
+    if IsPlayerInForce(udg_swp2,udg_Ya_te_vi[0])
+        ForceAddPlayer(udg_Sabe_quien_eres[0],udg_swp2)
+    for j = 1 to 6
+        if IsPlayerInForce(udg_swp1,udg_Mision[j]) or IsPlayerInForce(udg_swp1, udg_No_aceptaste_la_mision[j])
+            ForceAddPlayer(udg_Sabe_quien_eres[j],udg_swp1)
+        if IsPlayerInForce(udg_swp2,udg_Mision[j]) or IsPlayerInForce(udg_swp2, udg_No_aceptaste_la_mision[j])
+            ForceAddPlayer(udg_Sabe_quien_eres[j],udg_swp2)
+    // Remove them the mission
+    for j = 4 to 5
+        if IsPlayerInForce(udg_swp1, udg_Mision[j])
+            DisplayTextToForce(bj_FORCE_ALL_PLAYERS,GetPlayerName(udg_swp1)+" has lost the mission: |cffffcc00Proving yourself|r")
+            ForceRemovePlayer(udg_Mision[j],udg_swp1)
+            if j==4
+                udg_kills_prisionero=0
+                EnableTrigger(gg_trg_El_prisionero)
+                DisableTrigger(gg_trg_Dialogo_prisionero_si_lo_visita_un_draeneano)
+            else if j==5
+                udg_kills_senor_del_fuego = 0
+                EnableTrigger(gg_trg_Senor_del_fuego)
+                DisableTrigger(gg_trg_Dialogo_Senor_del_fuego_si_lo_visita_un_demonio)
+        if IsPlayerInForce(udg_swp2,udg_Mision[j])
+            DisplayTextToForce(bj_FORCE_ALL_PLAYERS,GetPlayerName(udg_swp2)+" has lost the mission: |cffffcc00Proving yourself|r")
+            ForceRemovePlayer(udg_Mision[j],udg_swp2)
+            if j==4
+                udg_kills_prisionero=0
+                EnableTrigger(gg_trg_El_prisionero)
+                DisableTrigger(gg_trg_Dialogo_prisionero_si_lo_visita_un_draeneano)
+            else if j==5
+                udg_kills_senor_del_fuego = 0
+                EnableTrigger(gg_trg_Senor_del_fuego)
+                DisableTrigger(gg_trg_Dialogo_Senor_del_fuego_si_lo_visita_un_demonio)*/
+    // TODO Returns them the levels
+    // Change the alliances
+    changeAlliance(swp1)
+    changeAlliance(swp2)
+    // Last details
+    circle[i1].setOwner(swp2, true)
+    circle[i2].setOwner(swp1, true)
+    swp1.setColor(playerColor[i2], true)
+    swp2.setColor(playerColor[i1], true)
+
+function changeAlliance(player p)
+    vec2 where
+    if THE_DRAENEI.containsPlayer(p)
+        THE_DRAENEI.removePlayer(p)
+        for i = 0 to 11
+            if THE_DRAENEI.containsPlayer(players[i])
+                noAllies(p, players[i])
+            else if THE_DEMONS.containsPlayer(players[i])
+                yesAllies(p, players[i])
+        THE_DEMONS.addPlayer(p)
+        where = gg_rct_selecionador_demonios.getCenter()
+    else
+        THE_DEMONS.removePlayer(p)
+        for i = 0 to 11
+            if THE_DRAENEI.containsPlayer(players[i])
+                yesAllies(p, players[i])
+            else if THE_DEMONS.containsPlayer(players[i])
+                noAllies(p, players[i])
+        THE_DRAENEI.addPlayer(p)
+        where = gg_rct_selecionador_draeneanos.getCenter()
+    doAfter(0.1) -> 
+        playersOrder()
+        PanCameraToTimedForPlayer(p, where.x, where.y, 0.)
+        // TODO udg_Listo=true
+
+function noAllies(player p1, player p2)
+    SetPlayerAllianceStateBJ(p1, p2, bj_ALLIANCE_UNALLIED)
+    SetPlayerAllianceStateBJ(p2, p1, bj_ALLIANCE_UNALLIED)
+
+function yesAllies(player p1, player p2)
+    SetPlayerAllianceStateBJ(p1, p2, bj_ALLIANCE_ALLIED_VISION)
+    SetPlayerAllianceStateBJ(p2, p1, bj_ALLIANCE_ALLIED_VISION)

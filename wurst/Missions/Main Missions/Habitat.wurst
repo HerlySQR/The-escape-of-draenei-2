@@ -1,0 +1,118 @@
+package Habitat
+
+import Functions
+import initlater Missions
+import PlayerData
+import HeroSelection
+import DontPlaySmart
+
+import EventHelper
+import Orders
+import ObjectIdGenerator
+import AbilityObjEditing
+import DummyRecycler
+import Annotations
+
+public boolean herosCanByPass = false
+public trigger exitCave = CreateTrigger()
+
+init
+    exitCave
+        ..registerRectEnterEventSource(gg_rct_Salida1)
+        ..registerRectEnterEventSource(gg_rct_Salida_2)
+        ..registerRectEnterEventSource(gg_rct_Salida_3)
+        ..addCondition(Condition(() -> GetEnteringUnit().isType(UNIT_TYPE_HERO) and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())))
+        .addAction(() -> begin
+            if whatMode[1] == VARIOUS_TIMERS
+                stopActTimer()
+                doAfter(2., () -> freeHeros())
+                seeDeSpawn[2].stop()
+                seeDrSpawn[4].start()
+                moveCircles3()
+                actDrSpawn = gg_rct_Salida_2
+                actDeSpawn = gg_rct_spw6
+                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETED|r\nYou managed to get out of the cave.")
+                QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00MISSION FAILED|r\nThey managed to get out of the cave.")
+                mission[3].setState(QuestState.COMPLETED)
+                forUnitsInRect(gg_rct_Tiendas_3, u -> begin
+                    if u.isType(UNIT_TYPE_STRUCTURE)
+                        u.setOwner(DRAENEI, true)
+                end)
+                gg_unit_nhhr_0207.show()
+                generator1.setInvulnerable(false)
+                generator2.setInvulnerable(false)
+                DONT_PASS.disable()
+                exitCave.disable()
+                doAfter(5.) -> 
+                    startMission4()
+        end)
+
+// Obstacles in the habitat
+
+boolean actived = false
+unit caster
+trigger holding = CreateTrigger()..disable()  // Cast the slowing ability
+trigger deformation = CreateTrigger()..disable()  // Creates the deformation
+terraindeformation earthQuake
+
+constant EARTHQUAKE_SPELL_ID = compiletime(ABIL_ID_GEN.next())
+
+@compiletime function gen()
+    new AbilityDefinitionThunderClapThunderLizard(EARTHQUAKE_SPELL_ID)
+        ..setManaCost(1, 0)
+        ..setCooldown(1, 0.)
+        ..setDamage(1, 0.)
+        ..setDurationNormal(1, 1.)
+        ..setDurationHero(1, 1.)
+        ..setAreaofEffect(1, 480.)
+        ..setArtCaster("")
+        .setBuffs(1, "Bchd")
+
+init
+    caster = createUnit(players[PLAYER_NEUTRAL_AGGRESSIVE], DUMMY_UNIT_ID, gg_rct_Temblor.getCenter(), UNIT_FACING)..addAbility(EARTHQUAKE_SPELL_ID)..setInvulnerable(true)
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Activar_terremoto)
+        ..addCondition(notFlying)
+        .addAction(() -> begin
+            if not actived
+                actived = true
+                gg_unit_n00X_0251.setColor(PLAYER_COLOR_GREEN)
+                holding.enable()
+                deformation.enable()
+                earthQuake = createRipple(5., false, gg_rct_Temblor.getCenter(), 592.00, 592.00, 64, 1, 512)
+            else
+                actived = false
+                gg_unit_n00X_0251.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+                holding.disable()
+                deformation.disable()
+                TerrainDeformStop(earthQuake, 1000)
+        end)
+    holding
+        ..registerTimerEvent(1., true)
+        ..addAction(() -> caster.issueImmediateOrderById(Orders.creepthunderclap))
+    deformation
+        ..registerTimerEvent(4., true)
+        ..addAction(-> begin
+            TerrainDeformStop(earthQuake, 1000)
+            earthQuake = createRipple(5., false, gg_rct_Temblor.getCenter(), 592.00, 592.00, 64, 1, 512)
+        end)
+
+// Remove the restrictions to the heros
+
+function freeHeros()
+    herosCanByPass = true
+    for i = 1 to 5
+        var b = false
+        let id = hero[i].getTypeId()
+        if id == 'U006' or id == 'U008'
+            b = true
+            hero[i].removeAbility('A022')
+            hero[i].addAbility('A00F')
+            if hero[i].hasItemById('I01I')
+                hero[i].setAbilityLevel('A00F', 2)
+        else if id == 'U00E' or id == 'U002'
+            b = true
+            hero[i].removeAbility('A06B')
+
+        if b
+            DisplayTextToPlayer(hero[i].getOwner(), 0., 0., "|cff00ffd8There is no longer any risk of evading missions, so you can have Teleport instead of Speed increase.|r")

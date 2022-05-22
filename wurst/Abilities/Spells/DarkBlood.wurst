@@ -1,0 +1,67 @@
+package DarkBlood
+
+import AbilityData
+
+public constant DARK_BLOOD_NL = compiletime(ABIL_ID_GEN.next())
+public constant DARK_BLOOD_L = compiletime(ABIL_ID_GEN.next())
+
+// General
+let LIFE_UNIT = 0.1
+let TARGETS = "enemy,ally"
+// Not leveling
+let LIFE_LOST_FACTOR_NL = [0.1, 0.2]
+// Leveling
+let LIFE_LOST_FACTOR_L = [0.1, 0.15, 0.2, 0.25]
+
+init
+    registerDamageEvent(damage -> begin
+        if not damage.isSpell
+            let data = damage.target.pasAbilityCond(DARK_BLOOD_NL, DARK_BLOOD_L)
+            if data.check
+                real factor
+                if data.isNL
+                    factor = LIFE_LOST_FACTOR_NL[data.lvl]
+                else
+                    factor = LIFE_LOST_FACTOR_L[data.lvl]
+                damage.amount *= (1. - factor).pow((1. - damage.target.getHP()/damage.target.getMaxHP())/LIFE_UNIT)
+    end)
+
+function AbilityDefinitionHardenedSkin.general()
+    this.registerTooltipGenerator(new AbilityTooltipGenerator("Pit lord feels each one of his wounds and channels the pain increasing his resistance, for every " + (LIFE_UNIT * 100.).toString(0) + "% of his life lost physical attacks received are reduced."))
+    this.presetButtonPosNormal(2, 2)
+    this.setHeroAbility(false)
+    this.presetIgnoredDamage(lvl -> 0.)
+    this.presetMinimumDamage(lvl -> 0.)
+    this.presetChancetoReduceDamage(lvl -> 0.)
+    this.presetIncludeMeleeDamage(lvl -> false)
+    this.presetIncludeRangedDamage(lvl -> false)
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.setRequirements("")
+    this.tooltipStartListen()
+    this.setName("Dark Blood")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+    // Audiovisual
+    this.setIconNormal(Imports.pASElderBlood)
+    // Tooltips
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(DARK_BLOOD_NL)
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosResearch(2, 0)
+        // Stats
+        ..addTooltipProperty("Life lost factor", lvl -> LIFE_LOST_FACTOR_NL[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionHardenedSkin(DARK_BLOOD_L)
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..setIconResearch(Imports.bTNElderBlood)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Life lost factor", lvl -> LIFE_LOST_FACTOR_L[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")

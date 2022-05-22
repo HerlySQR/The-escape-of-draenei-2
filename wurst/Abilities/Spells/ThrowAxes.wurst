@@ -1,0 +1,129 @@
+package ThrowAxes
+
+import AbilityData
+
+import LinkedList
+import Fx
+
+public constant THROW_AXES_NL = compiletime(ABIL_ID_GEN.next())
+public constant THROW_AXES_L = compiletime(ABIL_ID_GEN.next())
+public constant THROW_AXES_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 7.
+// Not leveling
+let DMG_PER_SEC_NL = [375., 500.]
+let MANA_NL = [50, 75]
+// Leveling
+let DMG_PER_SEC_L = [250., 325., 400., 475.]
+let MANA_L = [60, 70, 80, 90]
+// Internal
+let INTERVAL = 0.04
+let AREA = 110.
+
+class Axe extends Fx
+    angle dir
+
+    construct(vec3 pos, angle facing, string fxpath)
+        super(pos, facing, fxpath)
+        dir = facing
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(THROW_AXES_NL, THROW_AXES_L, THROW_AXES_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let pos = caster.getPos().withZ(50.)
+            let face = caster.getFacing()
+            var speed = 60.
+            real damage
+            if data.isNL
+                damage = DMG_PER_SEC_NL[data.lvl] * INTERVAL
+            else
+                damage = DMG_PER_SEC_L[data.lvl] * INTERVAL
+            let axes = new LinkedList<Axe>()
+            for i = 1 to 3
+                axes.add(new Axe(pos, (face - 60. + 30.*i).asAngleDegrees(), Abilities.rexxarMissile))
+            doPeriodically(INTERVAL, cb -> begin
+                speed -= 3.
+                if speed > -60.
+                    for axe in axes
+                        let newPos = axe.getPos3().offset2d(axe.dir, speed)
+                        axe.setXYZ(newPos, true)
+                        forUnitsInRange(newPos.toVec2(), AREA, u -> begin
+                            if u.isAlive() and owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE)
+                                u.flashEffect(Abilities.stampedeMissileDeath, "chest")
+                                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+                        end)
+                        breakTrees(newPos.toVec2(), AREA, true)
+                else
+                    for axe in axes
+                        destroy axe
+                    destroy axes
+                    destroy cb
+            end)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "thunderclap")
+    this.presetButtonPosNormal(1, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell,attack")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Throw axes")
+    this.presetTargetTypes(Targettype.NONE)
+    this.presetCooldown(lvl -> CD)
+    // Audiovisual
+    this.presetIcon(Imports.bTNThrowingAxe)
+    // Tooltip
+    this.presetHotkey("W")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(THROW_AXES_NL, 2, true, new AbilityTooltipGenerator("Throw 3 axes those go and return in the direction the hero is looking at causing damage per second of type physical to the affected units."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Throw axes")
+    
+    new ChannelAbilityPreset(THROW_AXES_L, 4, true, new AbilityTooltipGenerator("Throw 3 axes those go and return in the direction the hero is looking at causing damage per second of type physical to the affected units."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(1, 0)
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Throw axes")
+    
+    new ChannelAbilityPreset(THROW_AXES_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Throw axes")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_PER_SEC_NL[lvl - 1]
+            else
+                value = DMG_PER_SEC_L[lvl - 3]
+            return "Throw 3 axes that goes and returns in the direction the hero is looking at causing {0} damage per second to the affected units.".format(value.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Throw axes")

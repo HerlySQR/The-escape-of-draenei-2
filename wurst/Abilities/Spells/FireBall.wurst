@@ -1,0 +1,136 @@
+package FireBall
+
+import AbilityData
+
+public constant FIRE_BALL_NL = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_BALL_L = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_BALL_S = compiletime(ABIL_ID_GEN.next())
+constant FIRE_BALL_SLOW = compiletime(ABIL_ID_GEN.next())
+constant FIRE_BALL_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let AREA = 300.
+let RANGE = 900.
+let SLOW = 0.3
+let DURATION = 3.
+let CD = 70.
+// Not leveling
+let DMG_NL = 350.
+let MANA_NL = 150
+// Leveling
+let DMG_L = [475., 650.]
+let MANA_L = [180, 240]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(FIRE_BALL_NL, FIRE_BALL_L, FIRE_BALL_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let target = getSpellTargetPos()
+            let m = new Missiles(caster.getPos3Fly().polarProject(50., caster.getFacingAngle(), angle(PIHALF)), target.toVec3())
+            m.setModel(Abilities.redDragonMissile)
+            m.setArc(45..asAngleDegrees())
+            m.setSpeed(1650.)
+            m.owner = caster.getOwner()
+            if data.isNL
+                m.damage = DMG_NL
+            else
+                m.damage = DMG_L[data.lvl]
+            m.source = caster
+            m.onFinish(() -> begin
+                let pos2 = m.getPos().toVec2()
+                flashEffect(Objects.neutralBuildingExplosion, pos2)
+                InstantDummyCaster.castImmediate(m.owner, FIRE_BALL_SLOW, 1, Orders.creepthunderclap, pos2)
+                forUnitsInRange(pos2, AREA, u -> begin
+                    if m.owner.isEnemyOf(u.getOwner())
+                        Damage.deal(m.source, u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                end)
+                breakTrees(pos2, AREA, true)
+                return true
+            end)
+            m.launch()
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "inferno")
+    this.presetOption(Option.TARGETIMAGE, true)
+    this.presetButtonPosNormal(3, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("attack")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Fire Ball")
+    this.presetTargetTypes(Targettype.POINT)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> RANGE)
+    this.presetAreaofEffect(lvl -> AREA)
+    this.addTooltipProperty("Duration", lvl -> DURATION)
+    this.addTooltipProperty("Slowness", lvl -> SLOW)
+    // Audiovisual
+    this.presetIcon(Icons.bTNFlare)
+    // Tooltip
+    this.presetHotkey("F")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(FIRE_BALL_NL, 1, true, new AbilityTooltipGenerator("Throw a fireball that causes damage to an area to enemy units and slow them."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Fire Ball")
+    
+    new ChannelAbilityPreset(FIRE_BALL_L, 2, true, new AbilityTooltipGenerator("Throw a fireball that causes damage to an area to enemy units and slow them."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Fire Ball")
+    
+    new ChannelAbilityPreset(FIRE_BALL_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fire Ball")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl - 2]
+            return "Throw a fireball that causes {0} damage to an area of {1} to enemy units and slow them a {2}% for {3} seconds.".format(value.toString(0), AREA.toString(0), (SLOW * 100).toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Fire Ball")
+
+    new AbilityDefinitionThunderClapThunderLizard(FIRE_BALL_SLOW)
+        ..setDamage(1, 0.)
+        ..setDurationNormal(1, DURATION)
+        ..setDurationHero(1, DURATION)
+        ..setAreaofEffect(1, AREA)
+        ..setArtCaster("")
+        ..setBuffs(1, int2fourchar(FIRE_BALL_BUFF))
+        .setDummyAbility()
+    
+    new BuffDefinition(FIRE_BALL_BUFF, 'Bhtc')
+        ..setIcon(Icons.bTNFlare)
+        ..setName(1, "Fire Ball")
+        ..setTooltipNormal(1, "Fire Ball")
+        .setTooltipNormalExtended(1, "This unit has been hit by a Fireball: its movement speed and attack rating have been reduced.")

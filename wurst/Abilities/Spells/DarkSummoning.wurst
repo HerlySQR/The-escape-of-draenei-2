@@ -1,0 +1,84 @@
+package DarkSummoning
+
+import AbilityData
+
+import HeroSelection
+import PlayerData
+
+public constant DARK_SUMMONING_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let AREA = 700.
+let MANA_NL = 100
+// Not leveling
+let DELAY_NL = 5.
+let CD_NL = 100.
+// Internal
+let SOUND_1 = new SoundDefinition(Sounds.possessionMissileLaunch1, false, true)
+let SOUND_2 = new SoundDefinition(Sounds.possessionMissileHit1, false, true)
+
+init
+    gg_unit_Otch_0284.addAbility(AbilityIds.invulnerable)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == DARK_SUMMONING_NL
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let vase = CreateGroup()
+            let delay = DELAY_NL
+            let where = THE_DRAENEI.containsPlayer(owner)? actDrSpawn : actDeSpawn
+            forUnitsInRange(getSpellTargetPos(), AREA, u -> begin
+                if owner.isAllyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
+                    u.addEffect(Abilities.darkSummonTarget, "origin").destroyAfter(delay)
+                    vase.addUnit(u)
+            end)
+            doAfter(delay) -> 
+                for u from vase
+                    let pos = where.randomPoint()
+                    let pos3 = pos.withZ(50.)
+                    let myeffect = addEffect(Abilities.darkSummonTarget, pos)
+                    let selected = u.isSelected(u.getOwner())
+                    let m = new Missiles(u.getPos3with(50.), pos3)
+                    m.setModel(Abilities.darkSummonMissile)
+                    m.source = u
+                    m.setArc(10..asAngleDegrees())
+                    m.setSpeed(1500.)
+                    m.onFinish(() -> begin
+                        m.source.setPos(pos)
+                        m.source.show()
+                        m.source.pause(false)
+                        if selected
+                            m.source.getOwner().selectSingle(m.source)
+                        myeffect.destr()
+                        SOUND_2.playOnPoint(pos3)
+                        return true
+                    end)
+                    m.launch()
+                    u.hide()
+                    SOUND_1.playOnPoint(pos3)
+                    u.pause(true)
+                vase.destr()
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(DARK_SUMMONING_NL, 1, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
+        ..setLevels(2)
+        ..presetOption(Option.TARGETIMAGE, true)
+        ..presetBaseOrderID(lvl -> "inferno")
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetFollowThroughTime(lvl -> 0.75)
+        ..presetCastRange(lvl -> 99999.)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Vortex")
+        ..presetTargetTypes(Targettype.POINT)
+        // Stats
+        ..addTooltipProperty("Delay", lvl -> DELAY_NL)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        ..presetIcon(Icons.bTNDarkSummoning)
+        // Tooltip
+        ..setAnimationNames("spell")
+        ..presetHotkey("R")
+        .tooltipStopListen()

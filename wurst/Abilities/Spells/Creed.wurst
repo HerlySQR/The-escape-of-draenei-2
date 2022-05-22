@@ -1,0 +1,90 @@
+package Creed
+
+import AbilityData
+import MoveSpeedX
+import UnitIndexer
+
+public constant CREED_NL = compiletime(ABIL_ID_GEN.next())
+constant CREED_BUFF = compiletime(createDummyBuffObject("Creed", "This unit is slowed: its movement speed has been reduced.", Imports.bTNSickle))
+
+// General
+let SLOW = 0.75
+let DURATION = 3.
+// Not Leveling
+let CD_NL = 20.
+let EXTRA_DMG_NL = 75.
+// Internal
+let believers = CreateGroup()
+let availableMap = new HashMap<unit, boolean>()
+let effMap = new HashMap<unit, effect>()
+let cbMap = new HashMap<unit, CallbackSingle>()
+
+function addCreed(unit caster)
+    availableMap.put(caster, false)
+    cbMap.put(caster, doAfter(CD_NL, () -> begin
+        availableMap.put(caster, true)
+        effMap.put(caster, caster.addEffect(Abilities.illidanMissile, "weapon"))
+        cbMap.remove(caster)
+    end))
+
+init
+    nullTimer() ->
+        gg_unit_H00L_0205.addAbility(CREED_NL)
+        addCreed(gg_unit_H00L_0205)
+        believers.addUnit(gg_unit_H00L_0205)
+    registerDamageEvent(damage -> begin
+        if believers.contains(damage.source)
+            and availableMap.get(damage.source)
+            and not damage.target.isType(UNIT_TYPE_STRUCTURE)
+            and not damage.target.isType(UNIT_TYPE_MECHANICAL)
+            and not damage.target.isType(UNIT_TYPE_MAGIC_IMMUNE)
+            and not damage.isSpell
+            let caster = damage.source
+            let target = damage.target
+            target.scaleSpeed("creed", SLOW)
+            target.addBuff(CREED_BUFF, DURATION, () -> target.removeSpeedBuff("creed"))
+            target.flashEffect(Objects.bloodElfSpellThiefBlood, "chest")
+            effMap.get(caster).destr()
+            effMap.remove(caster)
+            damage.amount += EXTRA_DMG_NL
+            addCreed(caster)
+    end)
+    onUnitIndex(() -> begin
+        if getIndexedUnit().hasAbility(CREED_NL)
+            addCreed(getIndexedUnit())
+    end)
+    onUnitDeindex(() -> begin
+        if believers.contains(getDeindexedUnit())
+            let d = getDeindexedUnit()
+            believers.removeUnit(d)
+            availableMap.remove(d)
+            if effMap.has(d)
+                effMap.get(d).destr()
+                effMap.remove(d)
+            if cbMap.has(d)
+                destroy cbMap.get(d)
+                cbMap.remove(d)
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(CREED_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Zealot's faith makes it capable of an attack that deals extra damage and slows the enemy by " + (1. - SLOW).toString(0) + " for " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetIgnoredDamage(lvl -> 0.)
+        ..presetMinimumDamage(lvl -> 0.)
+        ..presetChancetoReduceDamage(lvl -> 0.)
+        ..presetIncludeMeleeDamage(lvl -> false)
+        ..presetIncludeRangedDamage(lvl -> false)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Creed")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        ..presetIcon(Imports.pASSickle)
+        // Tooltip
+        .tooltipStopListen()

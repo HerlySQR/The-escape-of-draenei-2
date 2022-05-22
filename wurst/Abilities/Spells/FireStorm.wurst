@@ -1,0 +1,85 @@
+package FireStorm
+
+import AbilityData
+
+public constant FIRE_STORM_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 20.
+let CD = 120.
+let RANGE = 300.
+// Not leveling
+let DMG_NL = 60.
+let MANA_NL = 150
+// Internal
+let AREA = 1000.
+let COLLISION = 48.
+let AREA_DMG = 150.
+let INTERVAL = 0.05
+let SPEED = 500.
+let MAX_DIST = compiletime(2*AREA)
+let MODEL = Imports.fireballMinor
+
+function check(Missiles m, unit u) returns boolean
+    return m.owner.isEnemyOf(u.getOwner()) and u.isAlive() and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
+
+function onHitActions(Missiles m, unit hit) returns boolean
+    if check(m, hit)
+        forUnitsInRange(m.getPos().toVec2(), AREA_DMG, u -> begin
+            if check(m, u)
+                Damage.deal(m.source, u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
+        end)
+        return true
+    return false
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == FIRE_STORM_NL
+            let caster = GetSpellAbilityUnit()
+            let owner = caster.getOwner()
+            let damage = DMG_NL
+            let center = caster.getPos()
+            let face = center.angleTo(getSpellTargetPos())
+            let faceComp = face - angle(PIHALF)
+            let offset = center.polarOffset(face, -AREA)
+            doPeriodically(INTERVAL, cb -> begin
+                if caster.getCurrentOrder() == Orders.stampede
+                    let delta = GetRandomReal(-AREA, AREA)
+                    let fromPos = offset.polarOffset(faceComp, delta)
+                    let toPos = fromPos.polarOffset(face, MAX_DIST)
+                    let m = new Missiles(fromPos.withZ(50.), toPos.withZ(50.))
+                    m.source = caster
+                    m.owner = owner
+                    m.setModel(MODEL)
+                    m.setScale(0.25)
+                    m.setSpeed(SPEED)
+                    m.collision = COLLISION
+                    m.damage = damage
+                    m.onHit(hit -> onHitActions(m, hit))
+                    m.launch()
+                else
+                    destroy cb
+            end)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(FIRE_STORM_NL, 1, true, new AbilityTooltipGenerator("Summons a firestorm to explode on enemies.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(2)
+        ..presetBaseOrderID(lvl -> "stampede")
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Fire storm")
+        ..presetTargetTypes(Targettype.POINT)
+        // Stats
+        ..presetFollowThroughTime(lvl -> DURATION)
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Imports.bTNRainOfFire)
+        // Tooltip
+        ..setAnimationNames("morph,looping")
+        ..presetHotkey("R")
+        .tooltipStopListen()

@@ -1,0 +1,43 @@
+package BoilingOil
+
+import AbilityData
+
+public constant BOILING_OIL_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION_HERO = 1.01
+let DURATION_NORMAL = 2.51
+let TARGETS = "ground,enemy,neutral,friend,structure,self"
+// Not leveling
+let AREA_NL = 150.
+let HALF_DMG_NL = 3.
+let FULL_DMG_NL = 6.
+
+init
+    gg_unit_Ofar_0285.addAbility(AbilityIds.invulnerable)
+
+@compiletime function gen()
+    new AbilityDefinitionBallsofFire(BOILING_OIL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Soak the demolition's ammunition in boiling oil, causing it to burn the land and enemy units on it.\n\n|cffff0000Orb effects don't stack.|r"))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..presetHalfDamageInterval(lvl -> 1.)
+        ..presetFullDamageInterval(lvl -> 0.5)
+        ..presetBuildingReduction(lvl -> 1.)
+        ..presetBuffs(lvl -> "Bbof")
+        ..presetEffects(lvl -> "Xbof")
+        ..tooltipStartListen()
+        ..setName("Boiling oil")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetHalfDamageDealt(lvl -> HALF_DMG_NL)
+        ..presetFullDamageDealt(lvl -> FULL_DMG_NL)
+        ..presetDurationHero(lvl -> DURATION_HERO)
+        ..presetDurationNormal(lvl -> DURATION_NORMAL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        // Audiovisual
+        // Tooltip
+        .tooltipStopListen()

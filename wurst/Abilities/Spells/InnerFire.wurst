@@ -1,0 +1,44 @@
+package InnerFire
+
+import AbilityData
+
+public constant INNER_FIRE_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 5.
+let RANGE = 600.
+let TARGETS = "air,ground,friend,neutral,self"
+// Not leveling
+let MANA_NL = 40
+let DURATION_NL = 30.
+let ARMOR_INC_NL = 3
+let DMG_INC_NL = 0.25
+
+@compiletime function gen()
+    new AbilityDefinitionInnerFire(INNER_FIRE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the damage infringed by the selected friendly unit and its armor.\nLasts " + DURATION_NL.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION_NL)
+        ..presetDurationNormal(lvl -> DURATION_NL)
+        ..presetAutocastRange(lvl -> RANGE)
+        ..presetBuffs(lvl -> "Binf")
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Inner Fire")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDefenseIncrease(lvl -> ARMOR_INC_NL)
+        ..presetDamageIncrease(lvl -> DMG_INC_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+        ..presetTooltipTurnOff(lvl -> "|cffc3dbffClick the right mouse button to activate the automatic action.|r")
+        ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
+        .setName("Inner Fire")

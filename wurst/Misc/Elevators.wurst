@@ -1,0 +1,237 @@
+package Elevators
+
+import Functions
+
+import EventHelper
+import ClosureTimers
+import ClosureForGroups
+
+init
+    // Cave exit
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Ascensor1)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            doAfter(2.5) -> 
+                gg_dest_DTrf_0752.changeHeight(2)
+                doAfter(0.5) -> 
+                    gg_dest_DTrf_0752.changeWalls(false, ElevatorWallType.ALL)
+                    gg_dest_DTrf_0752.changeWalls(true, ElevatorWallType.EAST)
+                    doAfter(2.5) -> 
+                        gg_dest_DTrf_0752.changeHeight(1)
+                        gg_dest_DTrf_0752.changeWalls(false, ElevatorWallType.EAST)
+                        doAfter(0.5) -> 
+                            gg_dest_DTrf_0752.changeWalls(true, ElevatorWallType.SOUTH)
+                            gg_dest_DTrf_0752.changeWalls(true, ElevatorWallType.NORTH)
+                            gg_dest_DTrf_0752.changeWalls(true, ElevatorWallType.WEST)
+                            t.enable()
+        end)
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Ascensor2)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            doAfter(2.5) -> 
+                gg_dest_DTrf_0751.changeHeight(2)
+                doAfter(0.5) -> 
+                    gg_dest_DTrf_0751.changeWalls(false, ElevatorWallType.ALL)
+                    gg_dest_DTrf_0751.changeWalls(true, ElevatorWallType.SOUTH)
+                    doAfter(2.5) -> 
+                        gg_dest_DTrf_0751.changeHeight(1)
+                        gg_dest_DTrf_0751.changeWalls(false, ElevatorWallType.SOUTH)
+                        doAfter(0.5) -> 
+                            gg_dest_DTrf_0751.changeWalls(true, ElevatorWallType.EAST)
+                            gg_dest_DTrf_0751.changeWalls(true, ElevatorWallType.NORTH)
+                            gg_dest_DTrf_0751.changeWalls(true, ElevatorWallType.WEST)
+                            t.enable()
+        end)
+    // To the generator 1
+    CreateTrigger()
+        ..registerDeathEvent(gg_dest_B000_0332)
+        ..addAction(() -> print("The elevator near the generator was activated"))
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Ascensor_del_generador)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            if gg_dest_B000_0332.getLife() > 0
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "The elevator is deactivated, to activate it you have to operate the lever that is to the north.")
+            else
+                let t = GetTriggeringTrigger()
+                t.disable()
+                doAfter(2.5) -> 
+                    gg_dest_DTrx_0418.changeHeight(3)
+                    doAfter(0.7) -> 
+                        gg_dest_DTrx_0418.changeWalls(false, ElevatorWallType.ALL)
+                        gg_dest_DTrx_0418.changeWalls(true, ElevatorWallType.SOUTH)
+                        doAfter(2.5) -> 
+                            gg_dest_DTrx_0418.changeHeight(1)
+                            gg_dest_DTrx_0418.changeWalls(false, ElevatorWallType.SOUTH)
+                            doAfter(0.7) -> 
+                                gg_dest_DTrx_0418.changeWalls(true, ElevatorWallType.EAST)
+                                gg_dest_DTrx_0418.changeWalls(true, ElevatorWallType.NORTH)
+                                gg_dest_DTrx_0418.changeWalls(true, ElevatorWallType.WEST)
+                                t.enable()
+        end)
+    // To the generator 2
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Ascensor_del_generador_2)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            doAfter(2.5) -> 
+                gg_dest_DTrx_0096.changeHeight(2)
+                doAfter(0.5) -> 
+                    gg_dest_DTrx_0096.changeWalls(false, ElevatorWallType.ALL)
+                    gg_dest_DTrx_0096.changeWalls(true, ElevatorWallType.NORTH)
+                    doAfter(2.5) -> 
+                        gg_dest_DTrx_0096.changeHeight(1)
+                        gg_dest_DTrx_0096.changeWalls(false, ElevatorWallType.NORTH)
+                        doAfter(0.5) -> 
+                            gg_dest_DTrx_0096.changeWalls(true, ElevatorWallType.EAST)
+                            gg_dest_DTrx_0096.changeWalls(true, ElevatorWallType.SOUTH)
+                            gg_dest_DTrx_0096.changeWalls(true, ElevatorWallType.WEST)
+                            t.enable()
+        end)
+
+// Secret passage
+
+function blockPassage()
+    SetDestructableInvulnerable(gg_dest_B000_1722, true)
+    gg_dest_DTrx_0418.changeWalls(false, ElevatorWallType.SOUTH)
+    gg_dest_DTrf_0752.changeWalls(false, ElevatorWallType.EAST)
+    gg_dest_DTrf_0751.changeWalls(false, ElevatorWallType.SOUTH)
+    gg_dest_DTrx_0096.changeWalls(false, ElevatorWallType.NORTH)
+    gg_dest_DTrx_1712.changeWalls(false, ElevatorWallType.SOUTH)
+    gg_dest_DTrx_1723.changeWalls(false, ElevatorWallType.NORTH)
+    gg_dest_DTrx_1723.changeHeight(2)
+    gg_dest_DTrx_1713.changeWalls(false, ElevatorWallType.SOUTH)
+    gg_dest_DTrx_1713.changeHeight(2)
+    gg_dest_DTrx_1725.changeWalls(false, ElevatorWallType.NORTH)
+    gg_dest_DTrx_1725.changeWalls(false, ElevatorWallType.EAST)
+    gg_dest_DTrx_1725.changeHeight(3)
+    gg_dest_DTrx_1724.changeWalls(false, ElevatorWallType.EAST)
+    gg_dest_DTrx_1724.changeWalls(false, ElevatorWallType.SOUTH)
+    gg_dest_DTrx_1724.changeHeight(3)
+    gg_dest_B007_1729.changeHeight(2)
+    gg_dest_B007_1728.changeHeight(2)
+
+init
+    blockPassage()
+
+    CreateTrigger()
+        ..registerDeathEvent(gg_dest_B000_1722)
+        ..addAction(() -> begin
+            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The secret route in the dungeon has been open.")
+            forDestructablesInRect(gg_rct_Bajen, d -> d.changeHeight(1))
+            doAfter(0.5) -> 
+                forDestructablesInRect(gg_rct_Bajen, d -> d.changeWalls(true, ElevatorWallType.ALL))
+        end)
+    
+    // Elevator
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Ascensor_Secreto)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            t.disable()
+            doAfter(2.5) -> 
+                gg_dest_DTrx_1712.changeHeight(3)
+                doAfter(0.7) -> 
+                    gg_dest_DTrx_1712.changeWalls(false, ElevatorWallType.WEST)
+                    gg_dest_DTrx_1712.changeWalls(true, ElevatorWallType.SOUTH)
+                    doAfter(2.5) -> 
+                        gg_dest_DTrx_1712.changeHeight(1)
+                        gg_dest_DTrx_1712.changeWalls(false, ElevatorWallType.SOUTH)
+                        doAfter(0.7) -> 
+                            gg_dest_DTrx_1712.changeWalls(true, ElevatorWallType.WEST)
+                            t.enable()
+        end)
+
+    // Hide dungeon walls
+    CreateTrigger()
+        ..registerDeathEvent(gg_dest_B002_0035)
+        ..registerDeathEvent(gg_dest_B002_0241)
+        ..registerDeathEvent(gg_dest_B002_1062)
+        ..registerDeathEvent(gg_dest_B002_1060)
+        ..registerDeathEvent(gg_dest_B002_0012)
+        ..registerDeathEvent(gg_dest_B002_0009)
+        ..addAction(() -> ShowDestructable(GetTriggerDestructable(), false))
+
+// YOU SHALL NOT PASS
+
+boolean actived1 = false
+
+init
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Activar_Plataformas)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            if not actived1
+                forDestructablesInRect(gg_rct_Plataformas, d -> begin
+                    d.changeHeight(3)
+                    d.changeWalls(false, ElevatorWallType.ALL)
+                end)
+                gg_unit_n00X_0259.setColor(PLAYER_COLOR_GREEN)
+            else
+                forDestructablesInRect(gg_rct_Plataformas, d -> begin
+                    d.changeHeight(1)
+                    d.changeWalls(true, ElevatorWallType.ALL)
+                end)
+                gg_unit_n00X_0259.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+        end)
+
+// Water platforms
+
+boolean actived2 = false
+trigger getDrowned = CreateTrigger()..disable()
+force ded = CreateForce()
+
+init
+    forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> d.changeWalls(false, ElevatorWallType.ALL))
+    CreateTrigger()
+        ..registerRectEnterEventSource(gg_rct_Levantar_Plataformas)
+        ..addCondition(notFlying)
+        ..addAction(() -> begin
+            if not actived2
+                actived2 = true
+                gg_unit_n00X_0232.setColor(PLAYER_COLOR_GREEN)
+                DisplayTextToPlayer(GetTriggerUnit().getOwner(), 0., 0., "I wonder what this will do.")
+                forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> begin
+                    d.changeHeight(3)
+                    d.changeWalls(true, ElevatorWallType.ALL)
+                end)
+                doAfter(0.7) -> 
+                    getDrowned.disable()
+            else
+                actived2 = false
+                gg_unit_n00X_0232.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+                DisplayTextToPlayer(GetTriggerUnit().getOwner(), 0., 0., "Yes, better leave it at that.")
+                forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> begin
+                    d.changeHeight(1)
+                    d.changeWalls(false, ElevatorWallType.EAST)
+                    d.changeWalls(false, ElevatorWallType.WEST)
+                end)
+                gg_dest_DTrx_1735.changeWalls(false, ElevatorWallType.NORTH)
+                gg_dest_DTrx_1737.changeWalls(false, ElevatorWallType.SOUTH)
+                forUnitsInRect(gg_rct_Plataformas_del_agua, u -> begin
+                    if u.isType(UNIT_TYPE_GROUND)
+                        ded.addPlayer(u.getOwner())
+                end)
+                DisplayTextToForce(ded, "Oh no, that doesn't look good.")
+                ded.clear()
+                doAfter(0.7) -> 
+                    getDrowned.enable()
+                    
+        end)
+    getDrowned
+        ..registerTimerEvent(1., true)
+        ..addAction(() -> begin
+            forUnitsInRect(gg_rct_Plataformas_del_agua, u -> begin
+                if u.isType(UNIT_TYPE_GROUND)
+                    u.addHP(-50)
+            end)
+        end)

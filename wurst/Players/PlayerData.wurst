@@ -1,0 +1,189 @@
+package PlayerData
+
+import public Circles
+
+public constant player DRAENEI = players[0]
+public constant player DEMON = players[6]
+
+public constant force THE_DRAENEI = CreateForce()
+public constant force THE_DEMONS = CreateForce()
+
+// Members
+public unit array hero
+public int array row = [100]
+public int array kills
+public int array deaths
+public int array assists
+public int array spree
+
+public int array firstKill
+public int array doubleKill
+public int array tripleKill
+public int array ultraKill
+
+public function switchMembers(player p1, player p2)
+    let i1 = p1.getNumber()
+    let i2 = p2.getNumber()
+
+    let swh = hero[i1]
+    hero[i1] = hero[i2]
+    hero[i2] = swh
+
+    var sw = row[i1]
+    row[i1] = row[i2]
+    row[i2] = sw
+
+    sw = kills[i1]
+    kills[i1] = kills[i2]
+    kills[i2] = sw
+
+    sw = deaths[i1]
+    deaths[i1] = deaths[i2]
+    deaths[i2] = sw
+
+    sw = assists[i1]
+    assists[i1] = assists[i2]
+    assists[i2] = sw
+
+    sw = spree[i1]
+    spree[i1] = spree[i2]
+    spree[i2] = sw
+
+    sw = firstKill[i1]
+    firstKill[i1] = firstKill[i2]
+    firstKill[i2] = sw
+
+    sw = doubleKill[i1]
+    doubleKill[i1] = doubleKill[i2]
+    doubleKill[i2] = sw
+
+    sw = tripleKill[i1]
+    tripleKill[i1] = tripleKill[i2]
+    tripleKill[i2] = sw
+
+    sw = ultraKill[i1]
+    ultraKill[i1] = ultraKill[i2]
+    ultraKill[i2] = sw
+
+    playerName[i1] = colorId[i1] + p2.getName() + "|r"
+    playerName[i2] = colorId[i2] + p1.getName() + "|r"
+    
+    p1.setNumber(i2)
+    p2.setNumber(i1)
+
+public trigger giveGold = CreateTrigger()..disable()
+
+init
+    THE_DRAENEI.addPlayer(players[0])
+    THE_DRAENEI.addPlayer(players[1])
+    THE_DRAENEI.addPlayer(players[2])
+    THE_DRAENEI.addPlayer(players[3])
+    THE_DRAENEI.addPlayer(players[4])
+    THE_DRAENEI.addPlayer(players[5])
+    THE_DEMONS.addPlayer(players[6])
+    THE_DEMONS.addPlayer(players[7])
+    THE_DEMONS.addPlayer(players[8])
+    THE_DEMONS.addPlayer(players[9])
+    THE_DEMONS.addPlayer(players[10])
+    THE_DEMONS.addPlayer(players[11])
+
+// Number
+
+int array numb
+
+public function playerM(int n) returns player
+    for i = 1 to 11
+        if numb[i] == n
+            return players[i]
+    return null
+
+public function player.setNumber(int n)
+    numb[this.getId()] = n
+
+public function player.getNumber() returns int
+    return numb[this.getId()]
+
+init
+    players[1].setNumber(1)
+    players[2].setNumber(2)
+    players[3].setNumber(3)
+    players[4].setNumber(4)
+    players[5].setNumber(5)
+    players[7].setNumber(6)
+    players[8].setNumber(7)
+    players[9].setNumber(8)
+    players[10].setNumber(9)
+    players[11].setNumber(10)
+    players[0].setNumber(11)
+    players[6].setNumber(12)
+
+    for i = 1 to 10
+        kills[i] = 0
+        deaths[i] = 0
+        assists[i] = 0
+        spree[i] = 0
+
+// Names and Colors
+
+public string array playerName
+public string array colorId
+public playercolor array playerColor
+
+init
+    numb[0] = 11
+    numb[6] = 12
+
+    colorId[1] = playercolors[1].toColorString()
+    colorId[2] = playercolors[2].toColorString()
+    colorId[3] = playercolors[3].toColorString()
+    colorId[4] = playercolors[4].toColorString()
+    colorId[5] = playercolors[5].toColorString()
+    colorId[6] = playercolors[7].toColorString()
+    colorId[7] = playercolors[8].toColorString()
+    colorId[8] = playercolors[9].toColorString()
+    colorId[9] = playercolors[10].toColorString()
+    colorId[10] = playercolors[11].toColorString()
+    colorId[11] = playercolors[0].toColorString()
+    colorId[12] = playercolors[6].toColorString()
+
+    playerName[1] = colorId[1] + players[1].getName() + "|r"
+    playerName[2] = colorId[2] + players[2].getName() + "|r"
+    playerName[3] = colorId[3] + players[3].getName() + "|r"
+    playerName[4] = colorId[4] + players[4].getName() + "|r"
+    playerName[5] = colorId[5] + players[5].getName() + "|r"
+    playerName[6] = colorId[6] + players[7].getName() + "|r"
+    playerName[7] = colorId[7] + players[8].getName() + "|r"
+    playerName[8] = colorId[8] + players[9].getName() + "|r"
+    playerName[9] = colorId[9] + players[10].getName() + "|r"
+    playerName[10] = colorId[10] + players[11].getName() + "|r"
+    playerName[11] = colorId[11] + "Draenei" + "|r"
+    playerName[12] = colorId[12] + "Demons" + "|r"
+
+    DRAENEI.setName("Draenei")
+    DEMON.setName("Demons")
+
+    playerColor[1] = PLAYER_COLOR_BLUE
+    playerColor[2] = PLAYER_COLOR_CYAN
+    playerColor[3] = PLAYER_COLOR_PURPLE
+    playerColor[4] = PLAYER_COLOR_YELLOW
+    playerColor[5] = PLAYER_COLOR_ORANGE
+    playerColor[6] = PLAYER_COLOR_PINK
+    playerColor[7] = PLAYER_COLOR_LIGHT_GRAY
+    playerColor[8] = PLAYER_COLOR_LIGHT_BLUE
+    playerColor[9] = PLAYER_COLOR_AQUA
+    playerColor[10] = PLAYER_COLOR_BROWN
+
+    giveGold
+        ..registerTimerEvent(0.8, true)
+        .addAction(() -> begin
+            players[1].addGold(1)
+            players[2].addGold(1)
+            players[3].addGold(1)
+            players[4].addGold(1)
+            players[5].addGold(1)
+            players[7].addGold(1)
+            players[8].addGold(1)
+            players[9].addGold(1)
+            players[10].addGold(1)
+            players[11].addGold(1)
+        end)

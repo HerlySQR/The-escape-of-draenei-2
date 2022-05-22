@@ -1,0 +1,239 @@
+package Missions
+
+import public ClosureTimers
+import public ClosureForGroups
+import Orders
+import FogModifier
+
+import public DefineMissions
+import public MissionTimers
+import public Dungeon
+import public Barrels
+import public Generators
+import public Habitat
+import public Pings
+import EndCinematic
+import MyBoard
+import public initlater ModeSelection
+import DrAndDeSpawn
+import NeutralSpawn
+import Surrender
+
+public int actMission = 0
+
+public fogmodifier array seeDrSpawn
+public fogmodifier array seeDeSpawn
+
+boolean timeIsOver = false
+
+init
+    seeDrSpawn[1] = createVision(DRAENEI, gg_rct_Items_1, true)..start()
+    seeDrSpawn[2] = createVision(DRAENEI, gg_rct_Items_3, true)
+    seeDrSpawn[3] = createVision(DRAENEI, gg_rct_Items_4, true)
+    seeDrSpawn[4] = createVision(DRAENEI, gg_rct_Items_5, true)
+    seeDeSpawn[1] = createVision(DEMON, gg_rct_Items_2, true)..start()
+    seeDeSpawn[2] = createVision(DEMON, gg_rct_Items_5, true)..start()
+    seeDeSpawn[3] = createVision(DEMON, gg_rct_Items_6, true)..start()
+
+// Mission 1
+
+public function startMission1()
+    actMission = 1
+    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+    doAfter(10.) () ->
+        giveGold.enable()
+        if whatMode[1] == SINGLE_TIMER
+            startSingleTimer()
+        else if whatMode[1] == VARIOUS_TIMERS
+            startActTimer(1)
+
+        pings.enable()
+
+        mission[1].setState(QuestState.DISCOVERED)
+        QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 1:|r The door")
+
+        table.display(true)
+        table.minimalize(false)
+        forUnitsInRect(gg_rct_Spawneo_de_draeneanos, u -> begin
+            if u.getOwner() == DRAENEI
+                u.issueTargetOrderById(Orders.attack, gg_dest_DTg3_0017)
+        end)
+        if whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_DE_AND_DR
+            doAfter(5, () -> begin
+                spawnRun = true
+            end)
+
+// Mission 2
+
+public function startMission2()
+    if timeIsOver
+        return
+    actMission = 2
+    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+    
+    pings.disable()
+
+    if whatMode[1] == VARIOUS_TIMERS
+        doAfter(5., () -> startActTimer(actMission))
+    doAfter(2.) -> 
+        DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
+        doAfter(5.) ->
+            pings.enable()
+
+            mission[2].setState(QuestState.DISCOVERED)
+            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 2:|r The wall")
+            doAfter(5.) -> 
+                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cffffce33The telepoter to the entry of the Main Hall has been unlocked.|r")
+                doAfter(15.) -> 
+                    if whatMode[5] == NOT_LEVELING
+                        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
+                    doAfter(40.) -> 
+                        gg_unit_h002_0151.removeAbility('A04C')
+                        gg_unit_h002_0151.removeAbility('A04D')
+
+// Mission 3
+
+public function startMission3()
+    if timeIsOver
+        return
+
+    pings.enable()
+
+    doAfter(5.) -> 
+        actMission = 3
+        bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+        // Move all the Draenei units
+        forUnitsOfPlayer(DRAENEI, u -> begin
+            vec2 target
+            if u.getTypeId() == 'ndrl'
+                target = gg_rct_No_se_que_le_ven_a_este_lugar.getCenter()
+            else
+                target = gg_rct_Punto_de_ataque_4.getCenter()
+            u.issuePointOrderById(Orders.attack, target)
+        end)
+        if whatMode[1] == VARIOUS_TIMERS
+            doAfter(5., () -> startActTimer(actMission))
+        doAfter(2.) -> 
+            DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
+            DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
+            doAfter(5.) -> 
+                mission[3].setState(QuestState.DISCOVERED)
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 3:|r The habitat")
+
+// Mission 4
+
+public function startMission4()
+    if timeIsOver
+        return
+    actMission = 4
+    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+    
+    pings.disable()
+
+    if whatMode[1] == VARIOUS_TIMERS
+        stopActTimer()
+        doAfter(5., () -> startActTimer(actMission))
+    doAfter(2.) -> 
+        DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
+        DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
+        doAfter(5.) -> 
+            mission[4].setState(QuestState.DISCOVERED)
+            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 4:|r The generators")
+            
+            pings.enable()
+
+            doAfter(10.) -> 
+                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cffffce33All the telepoters have been unlocked.|r")
+
+// Mission 5
+
+public function startMission5()
+    if timeIsOver
+        return
+
+    pings.disable()
+
+    SetDestructableInvulnerable(gg_dest_DTg6_0506, false)
+    mission[4].setState(QuestState.COMPLETED)
+    QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
+    QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
+    // Order all draenei attack the demons
+    let pos = gg_rct_Spawneo_de_Grunts_3.getCenter()
+    forUnitsOfPlayer(DRAENEI, u -> begin
+        if not u.isType(UNIT_TYPE_HERO) and not u.getTypeId() == 'ndrl'
+            u.issuePointOrderById(Orders.attack, pos)
+    end)
+    doAfter(5.) -> 
+        actMission = 5
+        bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+        if whatMode[1] == VARIOUS_TIMERS
+            startActTimer(actMission)
+        doAfter(5.) -> 
+            mission[5].setState(QuestState.DISCOVERED)
+            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 5:|r The exit")
+
+            pings.enable()
+
+// Draenei Win
+
+public function draeneiWin()
+    if timeIsOver
+        return
+    ForceUICancel()
+    stopSpawn()
+    stopActTimer()
+    disableNeutralSpawn()
+    pings.disable()
+    // TODO: surrender
+    if theySurrender
+        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
+        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
+    else
+        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DEMONS SURRENDERED|r\nDraenei have won")
+        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DEMONS SURRENDERED|r\nDraenei have won")
+    
+    forUnitsInRect(gg_rct_Torre_de_los_demonios_3, u -> begin
+        if u.getTypeId() == 'o00I'
+            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+    end)
+
+    for i = 1 to 10
+        hero[i].setInvulnerable(true)
+    
+    doAfter(5.) -> 
+        draeneiCinematic()
+
+trigger mainExit = CreateTrigger()
+
+init
+    mainExit
+        ..registerDeathEvent(gg_dest_DTg6_0506)
+        .addAction(function draeneiWin)
+
+// Demons Win
+
+public function demonsWin()
+    timeIsOver = true
+    ForceUICancel()
+    stopSpawn()
+    stopActTimer()
+    disableNeutralSpawn()
+    pings.disable()
+    destroyDoor.disable()
+    placeBarrel.disable()
+    exitCave.disable()
+    destroyGenerators.disable()
+    mainExit.disable()
+    // TODO: surrender
+    if theySurrender
+        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_FAILED, "|cffffcc00TIME IS OVER|r\nDemons have won")
+        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00TIME IS OVER|r\nDemons have won")
+    else
+        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DRAENEI SURRENDERED|r\nDemons have won")
+        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DRAENEI SURRENDERED|r\nDemons have won")
+
+    for i = 1 to 10
+        hero[i].setInvulnerable(true)
+    
+    doAfter(5.) -> 
+        demonsCinematic()

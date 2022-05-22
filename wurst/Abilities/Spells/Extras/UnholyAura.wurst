@@ -1,0 +1,26 @@
+package UnholyAura
+
+import AbilityData
+
+public constant UNHOLY_AURA = compiletime(ABIL_ID_GEN.next())
+
+let LIFE_REGEN = 1.
+let SPEED = 0.1
+let AREA = 900.
+
+@compiletime function gen()
+    new AbilityDefinitionDeathKnightUnholyAura(UNHOLY_AURA)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the movement speed of nearby friendly units and the rate of life regeneration."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 1)
+        ..setHeroAbility(false)
+        ..tooltipStartListen()
+        ..setName("Brilliance Aura")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetLifeRegenerationIncrease(lvl -> LIFE_REGEN)
+        ..presetMovementSpeedIncrease(lvl -> SPEED)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        // Tooltips
+        .tooltipStopListen()

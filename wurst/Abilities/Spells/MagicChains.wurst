@@ -1,0 +1,249 @@
+package MagicChains
+
+import AbilityData
+import PseudoWindWalk
+
+import TerrainUtils
+
+public constant MAGIC_CHAINS_PULL_NL = compiletime(ABIL_ID_GEN.next())
+public constant MAGIC_CHAINS_GRASP_NL = compiletime(ABIL_ID_GEN.next())
+public constant MAGIC_CHAINS_PULL_L = compiletime(ABIL_ID_GEN.next())
+public constant MAGIC_CHAINS_GRASP_L = compiletime(ABIL_ID_GEN.next())
+public constant MAGIC_CHAINS_PULL_S = compiletime(ABIL_ID_GEN.next())
+public constant MAGIC_CHAINS_GRASP_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let TARGETS_PULL = "air,friend,enemies,neutral,nonancient,ground"
+let TARGETS_GRASP = "air,friend,enemies,structure,invulnerable,neutral,ground,vulnerable"
+// Not leveling
+let MANA_NL = [60, 50]
+let CD_NL = [15., 11.]
+let RANGE_NL = [700., 900.]
+// Leveling
+let MANA_L = [70, 65, 60, 55]
+let CD_L = [17., 15., 13., 11.]
+let RANGE_L = [600., 750., 900., 1050.]
+
+// Internal
+
+function unit.getPos3RealPlus50() returns vec3
+    return vec3(this.getX(), this.getY(), getTerrainZ(this.getX(), this.getY()) + this.getFlyHeight() + 50)
+
+let INTERVAL = 0.02
+let MAX_ITERATIONS = 150
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_HERO_SKILL, () -> begin
+        if GetLearnedSkill() == MAGIC_CHAINS_PULL_L
+            let lvl = GetLearnedSkillLevel()
+            if lvl == 1
+                GetLearningUnit().addAbility(MAGIC_CHAINS_GRASP_L)
+            else
+                GetLearningUnit().setAbilityLevel(MAGIC_CHAINS_GRASP_L, lvl)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let dataPull = abilityCond(MAGIC_CHAINS_PULL_NL, MAGIC_CHAINS_PULL_L, MAGIC_CHAINS_PULL_S)
+        let dataGrasp = abilityCond(MAGIC_CHAINS_GRASP_NL, MAGIC_CHAINS_GRASP_L, MAGIC_CHAINS_GRASP_S)
+        if dataPull.check or dataGrasp.check
+            let caster = GetSpellAbilityUnit()
+            let target = GetSpellTargetUnit()
+            let pos = caster.getPos3RealPlus50()
+            colorA col
+            string typ
+            string light
+            if dataPull.check
+                col = colorA(0, 255, 255, 255)
+                typ = "pull"
+                light = LIGHTNING_CHAIN_LIGHTNING_PRIMARY
+            else
+                col = colorA(191, 255, 0, 255)
+                typ = "grasp"
+                light = LIGHTNING_CHAIN_LIGHTNING_SECONDARY
+            let chain = addLightning(light, true, pos, pos)
+            chain.setColor(col)
+
+            var coming = true
+            doPeriodicallyCounted(INTERVAL, MAX_ITERATIONS, cb -> begin
+                let targetPos = target.getPos()
+                let casterPos = caster.getPos3RealPlus50()
+                if coming
+                    let length = MAX_ITERATIONS - cb.getCount()
+                    var lightHead = casterPos.offset2d(casterPos.angleTo2d(targetPos), 30.*length)
+                    let d = casterPos.distanceTo2d(targetPos)
+                    let h = (lightHead.z - casterPos.z)*30.*length/d
+                    lightHead.z += h
+                    chain.move(true, casterPos, lightHead)
+                    // If reach the target
+                    if lightHead.distanceTo2d(targetPos) <= 130.
+                        target.flashEffect(Abilities.boltImpact, "chest")
+                        if typ == "grasp"
+                            caster.disableCollision()
+                        else
+                            target.disableCollision()
+                        coming = false
+                else
+                    vec3 pulledPos 
+                    if typ == "pull"
+                        pulledPos = targetPos.polarOffset(targetPos.angleTo(casterPos.toVec2()), 30.).withRealZ(target)
+                        pulledPos.z += 50.
+                        target.setPos(pulledPos.toVec2())
+                        chain.move(true, casterPos, pulledPos)
+                    else
+                        pulledPos = casterPos.offset2d(casterPos.angleTo2d(targetPos), 30.)
+                        caster.setPos(pulledPos.toVec2())
+                        chain.move(true, pulledPos, target.getPos3RealPlus50())
+                // It brokes or end
+                if casterPos.distanceTo2d(targetPos) <= 130. or cb.isLast()
+                    target.flashEffect(Abilities.boltImpact, "chest")
+                    chain.destr()
+                    if typ == "pull"
+                        target.enableCollision()
+                    else
+                        caster.enableCollision()
+                    if not cb.isLast()
+                        destroy cb
+            end)
+    end)
+
+function ChannelAbilityPreset.generalPull()
+    this.presetBaseOrderID(lvl -> "fingerofdeath")
+    this.presetButtonPosNormal(2, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell")
+    this.presetTargetsAllowed(lvl -> TARGETS_PULL)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Magic Chains (|cff00ffc5Pull|r)")
+    this.presetTargetTypes(Targettype.UNIT)
+    // Audiovisual
+    this.presetIcon(Imports.bTNLightning_bolt_contest)
+    // Tooltip
+    this.presetHotkey("E")
+
+function ChannelAbilityPreset.generalGrasp()
+    this.presetBaseOrderID(lvl -> "chainlightning")
+    this.presetButtonPosNormal(2, 1)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell")
+    this.presetTargetsAllowed(lvl -> TARGETS_GRASP)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Magic Chains (|cffc5ff00Grasp|r)")
+    this.presetTargetTypes(Targettype.UNIT)
+    // Audiovisual
+    this.presetIcon(Imports.bTNLightning_bolt_contest)
+    // Tooltip
+    this.presetHotkey("F")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_NL, 2, true, new AbilityTooltipGenerator("Pull the selected unit toward the Hero."))
+        ..setHeroAbility(false)
+        ..generalPull()
+        // Stats
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..presetCooldown(lvl -> CD_NL[lvl - 1])
+        ..presetCastRange(lvl -> RANGE_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Magic Chains (Pull)")
+
+    new ChannelAbilityPreset(MAGIC_CHAINS_GRASP_NL, 2, true, new AbilityTooltipGenerator("Pull the Hero towards the selected unit."))
+        ..setHeroAbility(false)
+        ..generalGrasp()
+        // Stats
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..presetCooldown(lvl -> CD_NL[lvl - 1])
+        ..presetCastRange(lvl -> RANGE_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Magic Chains (Grasp)")
+    
+    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_L, 4, true, new AbilityTooltipGenerator("Pull the selected unit toward the Hero."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..generalPull()
+        ..presetButtonPosResearch(2, 0)
+        // Stats
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..presetCooldown(lvl -> CD_L[lvl - 1])
+        ..presetCastRange(lvl -> RANGE_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Magic Chains (Pull)")
+
+    new ChannelAbilityPreset(MAGIC_CHAINS_GRASP_L, 4, true, new AbilityTooltipGenerator("Pull the Hero towards the selected unit."))
+        ..setHeroAbility(true)
+        ..generalGrasp()
+        // Stats
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..presetCooldown(lvl -> CD_L[lvl - 1])
+        ..presetCastRange(lvl -> RANGE_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Magic Chains (Grasp)")
+    
+    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_S, 6, true)
+        ..setHeroAbility(false)
+        ..generalPull()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00E|r] Magic Chains (|cff00ffc5Pull|r)")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetCooldown(lvl -> begin
+            real value
+            if lvl < 3
+                value = CD_NL[lvl - 1]
+            else
+                value = CD_L[lvl - 3]
+            return value
+        end)
+        ..presetCastRange(lvl -> begin
+            real value
+            if lvl < 3
+                value = RANGE_NL[lvl - 1]
+            else
+                value = RANGE_L[lvl - 3]
+            return value
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Magic Chains (Pull)")
+
+    new ChannelAbilityPreset(MAGIC_CHAINS_GRASP_S, 6, true)
+        ..setHeroAbility(false)
+        ..generalGrasp()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Magic Chains (|cffc5ff00Grasp|r)")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetCooldown(lvl -> begin
+            real value
+            if lvl < 3
+                value = CD_NL[lvl - 1]
+            else
+                value = CD_L[lvl - 3]
+            return value
+        end)
+        ..presetCastRange(lvl -> begin
+            real value
+            if lvl < 3
+                value = RANGE_NL[lvl - 1]
+            else
+                value = RANGE_L[lvl - 3]
+            return value
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Magic Chains (Grasp)")

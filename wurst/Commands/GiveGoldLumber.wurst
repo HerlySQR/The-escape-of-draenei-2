@@ -1,0 +1,35 @@
+package GiveGoldLumber
+
+import Functions
+import PlayerData
+
+public function give(player p, string whatType, string chat)
+    let quantity = (chat.subString(4, 11).toReal() * 1.5).toInt()
+    let state = whatType == "gg" ? PLAYER_STATE_RESOURCE_GOLD : PLAYER_STATE_RESOURCE_LUMBER
+    let giveTo = yesGive[p.getId()]
+    if giveTo == null
+        DisplayTextToPlayer(p, 0., 0., "You don't even have selected a player, ayyyy.")
+    else if p.isEnemyOf(giveTo)
+        DisplayTextToPlayer(p, 0., 0., "Do you wanna give it to your enemies?, Are you crazy?")
+    else if p == giveTo
+        DisplayTextToPlayer(p, 0., 0., "Give gold to yourself? That's not work the economy.")
+    else if giveTo == DRAENEI or giveTo == DEMON or giveTo == players[PLAYER_NEUTRAL_PASSIVE]
+        DisplayTextToPlayer(p, 0., 0., "Not valid player.")
+    else if quantity > p.getState(state)
+        DisplayTextToPlayer(p, 0., 0., "You don't have enough (you need to pay 50% to taxes).")
+    else
+        let col = whatType == "gg" ? "|cffffcc00" : "|cff32cd32"
+        let text = whatType == "gg" ? "gold" : "lumber"
+        giveTo.addState(state, quantity)
+        p.addState(state, -quantity)
+        DisplayTextToPlayer(p, 0., 0., "You give " + col + quantity.toString() + " of "+ text +"|r to " + giveTo.getName() + ".")
+        DisplayTextToPlayer(giveTo, 0., 0., p.getName() + " give you "+ col + quantity.toString() + " of " + text + "|r.")
+
+player array yesGive
+
+init
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_SELECTED)
+        ..addAction(() -> begin
+            yesGive[GetTriggerPlayer().getId()] = GetTriggerUnit().getOwner()
+        end)

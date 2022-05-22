@@ -1,0 +1,115 @@
+package FireBlast
+
+import AbilityData
+
+public constant FIRE_BLAST_NL = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_BLAST_L = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_BLAST_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 1.5
+let CD = 12.
+let CAST_RANGE = 600.
+let TARGETS = "air,enemies,debris,neutral,nonancient,organic,ground"
+// Not leveling
+let BASE_DMG_NL = [50., 75.]
+let EXTRA_DMG_FACTOR_NL = [0.1, 0.2]
+let MANA_NL = [75, 90]
+// Leveling
+let BASE_DMG_L = [50., 75., 100., 125.]
+let EXTRA_DMG_FACTOR_L = [0.1, 0.15, 0.2, 0.25]
+let MANA_L = [75, 90, 105, 120]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(FIRE_BLAST_NL, FIRE_BLAST_L, FIRE_BLAST_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let target = GetSpellTargetUnit()
+            target.flashEffect(Abilities.fireLordDeathExplode, "origin")
+            real baseDmg
+            real extraDmg
+            if data.isNL
+                baseDmg = BASE_DMG_NL[data.lvl]
+                extraDmg = EXTRA_DMG_FACTOR_NL[data.lvl]
+            else
+                baseDmg = BASE_DMG_L[data.lvl]
+                extraDmg = EXTRA_DMG_FACTOR_L[data.lvl]
+            Damage.deal(caster, target, baseDmg + (target.getMaxHP() - target.getLife()) * extraDmg, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+    end)
+
+function AbilityDefinitionThunderBoltCreep.general()
+    this.registerTooltipGenerator(new AbilityTooltipGenerator("He throws a fireball towards his enemy that is more dangerous the more weakened the target is. Deals a damage plus other depending on the missing health and stuns."))
+    this.presetButtonPosNormal(1, 2)
+    this.setMissileSpeed(0)
+    this.setMissileArt("")
+    this.presetDamage(lvl -> 0.)
+    this.presetTargetsAllowed(lvl -> TARGETS)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Fire Blast")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+    this.presetDurationNormal(lvl -> DURATION)
+    this.presetDurationHero(lvl -> DURATION)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> CAST_RANGE)
+    // Audiovisual
+    this.presetIcon(Imports.bTNSpellFireFireBolt02)
+    // Tooltip
+    this.presetHotkey("W")
+
+@compiletime function gen()
+    new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_NL)
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_NL[lvl - 1])
+        ..addTooltipProperty("Extra damage factor", lvl -> EXTRA_DMG_FACTOR_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Fire Blast")
+    
+    new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_L)
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(1, 0)
+        // Stats
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_L[lvl - 1])
+        ..addTooltipProperty("Extra damage factor", lvl -> EXTRA_DMG_FACTOR_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Fire Blast")
+    
+    new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fire Blast")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = BASE_DMG_NL[lvl - 1]
+                value2 = EXTRA_DMG_FACTOR_NL[lvl - 1]
+            else
+                value1 = BASE_DMG_L[lvl - 3]
+                value2 = EXTRA_DMG_FACTOR_L[lvl - 3]
+            return "He throws a fireball towards his enemy that is more dangerous the more weakened the target is. Deals " + value1.toString(0) + " + " + (value2 * 100.).toString(0) + "% damage to missing health and stuns for " + DURATION.toString(0) + " seconds"
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Fire Blast")

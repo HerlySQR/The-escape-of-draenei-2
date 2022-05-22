@@ -1,0 +1,121 @@
+package PurgeSoul
+
+import AbilityData
+
+public constant PURGE_SOUL_NL = compiletime(ABIL_ID_GEN.next())
+public constant PURGE_SOUL_L = compiletime(ABIL_ID_GEN.next())
+public constant PURGE_SOUL_S = compiletime(ABIL_ID_GEN.next())
+constant PURGE_SOUL_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 40.
+let DURATION = 10.
+let CAST_RANGE = 700.
+// Not leveling
+let DMG_NL = 65.
+let MANA_NL = 150
+// Leveling
+let DMG_L = [75., 125.]
+let MANA_L = [150, 200]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(PURGE_SOUL_NL, PURGE_SOUL_L, PURGE_SOUL_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let owner1 = caster.getOwner()
+            let target = GetSpellTargetUnit()
+            let owner2 = target.getOwner()
+            real damage
+            if data.isNL
+                damage = DMG_NL
+            else
+                damage = DMG_L[data.lvl]
+            doPeriodicallyCounted(1., 4, cb -> begin
+                target.addEffect(Abilities.purgeBuffTarget, "origin").destroyAfter(1.)
+                UnitRemoveBuffs(target, true, true)
+                if owner1.isEnemyOf(owner2)
+                    Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
+            end)
+    end)
+    registerDamageEvent(damage -> begin
+        if damage.isSpell and damage.source.hasAbility(PURGE_SOUL_BUFF)
+            damage.amount *= 1.25
+    end)
+
+function AbilityDefinitionPurge.general()
+    this.presetButtonPosNormal(1, 2)
+    this.presetBuffs(lvl -> int2fourchar(PURGE_SOUL_BUFF))
+    this.presetMovementUpdateFrequency(lvl -> 5)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Purge Soul")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> CAST_RANGE)
+    this.presetDurationNormal(lvl -> DURATION)
+    this.presetDurationHero(lvl -> DURATION)
+    // Audiovisual
+    this.presetIcon(Icons.bTNPurge)
+    // Tooltip
+    this.presetHotkey("R")
+
+@compiletime function gen()
+    new AbilityDefinitionPurge(PURGE_SOUL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes damage and reduces its velocity but recovers it gradually, and reduces the magic resistance in 25%."))
+        ..setLevels(1)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage per shock", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Purge Soul")
+    
+    new AbilityDefinitionPurge(PURGE_SOUL_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes damage and reduces its velocity but recovers it gradually, and reduces the magic resistance in 25%."))
+        ..setLevels(2)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        ..presetButtonPosResearch(1, 0)
+        // Stats
+        ..addTooltipProperty("Damage per shock", lvl -> DMG_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Purge Soul")
+    
+    new AbilityDefinitionPurge(PURGE_SOUL_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes damage and reduces its velocity but recovers it gradually, and reduces the magic resistance in 25%."))
+        ..setLevels(3)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Purge Soul")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl - 2]
+            return "Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes " + value.toString(0) + " damage and reduces its velocity but recovers it gradually.\nLasts " + DURATION.toString(0) + " seconds."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Purge Soul")
+    
+    new BuffDefinition(PURGE_SOUL_BUFF, 'Bprg')
+        ..setIcon(Icons.bTNPurge)
+        ..setName(1, "Purge Soul")
+        ..setTooltipNormal(1, "Purge Soul")

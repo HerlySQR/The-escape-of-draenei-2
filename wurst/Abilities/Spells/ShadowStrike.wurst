@@ -1,0 +1,40 @@
+package ShadowStrike
+
+import AbilityData
+
+public constant SHADOW_STRIKE_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 400.
+let TARGETS = "ground,air,enemy,neutral,organic"
+let DURATION = 15.
+// Not leveling
+let INIT_DMG = 100.
+let DECAY_DMG = 10.
+let CD_NL = 8.
+let MANA_NL = 75
+
+@compiletime function gen()
+    new AbilityDefinitionWardenShadowStrike(SHADOW_STRIKE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a poisoned dagger at a selected enemy unit causing an initial damage and damage of every 3 seconds for " + DURATION.toString(0) + " seconds. The poison slows the movement speed of the selected unit for a short period of time."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Shadow Strike")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetInitialDamage(lvl -> INIT_DMG)
+        ..presetDecayingDamage(lvl -> DECAY_DMG)
+        ..presetDurationHero(lvl -> DURATION + 0.1)
+        ..presetDurationNormal(lvl -> DURATION + 0.1)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+        .setName("Shadow Strike")

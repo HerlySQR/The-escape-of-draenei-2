@@ -1,0 +1,62 @@
+package ChatEnter
+
+import Functions
+import Tips
+import Repick
+import Switch
+import GiveGoldLumber
+import AFK
+import PlayerCamera
+import Surrender
+import JokeSounds
+
+function commands()
+    let c = GetEventPlayerChatString().subString(2)
+    let p = GetTriggerPlayer()
+    switch c
+        case "clear"
+            if p == localPlayer
+                ClearTextMessages()
+        case "yestip"
+            if not whoWannaHelp.containsPlayer(p)
+                whoWannaHelp.addPlayer(p)
+                DisplayTextToPlayer(p, 0., 0., "The tips are enabled.")
+        case "notip"
+            if whoWannaHelp.containsPlayer(p)
+                whoWannaHelp.removePlayer(p)
+                DisplayTextToPlayer(p, 0., 0., "The tips are disabled.")
+        case "repick"
+            repick(p)
+        case "switch"
+            switchPlayer(p)
+        case "ok"
+            ok(p)
+        case "afk"
+            showAFK(p)
+        case "defcam"
+            defaultCamera(p)
+        case "surrender"
+            surrender(p)
+        default
+            let s = c.subString(1, 3)
+            if s == "gl " or s == "gg "
+                give(p, s, c)
+            else
+                jokeSound(c)
+
+init
+    CreateTrigger()
+        ..registerPlayerChatEvent(players[1], "-", false)
+        ..registerPlayerChatEvent(players[2], "-", false)
+        ..registerPlayerChatEvent(players[3], "-", false)
+        ..registerPlayerChatEvent(players[4], "-", false)
+        ..registerPlayerChatEvent(players[5], "-", false)
+        ..registerPlayerChatEvent(players[7], "-", false)
+        ..registerPlayerChatEvent(players[8], "-", false)
+        ..registerPlayerChatEvent(players[9], "-", false)
+        ..registerPlayerChatEvent(players[10], "-", false)
+        ..registerPlayerChatEvent(players[11], "-", false)
+        ..addCondition(Condition(() -> begin
+            return GetEventPlayerChatString().subString(1, 1) == "-"
+        end))
+        .addAction(function commands)

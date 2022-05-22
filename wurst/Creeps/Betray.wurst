@@ -1,0 +1,19 @@
+package Betray
+
+import Functions
+import PlayerData
+
+init
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addCondition(Condition(() -> begin
+            return GetKillingUnit().getOwner().isAllyOf(GetDyingUnit().getOwner())
+        end))
+        ..addAction(() -> begin
+            createTTEx(GetDyingUnit().getPos3Zero(), colorId[GetDyingUnit().getOwner().getNumber()] + "!|r", 10)
+                ..setSpeed(64., 90.)
+                ..setPermanent(false)
+                ..setLifespan(4.)
+                ..setFadepoint(2.)
+            // TODO: Demon kills a draenei
+        end)

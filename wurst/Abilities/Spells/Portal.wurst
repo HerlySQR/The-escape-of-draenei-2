@@ -1,0 +1,101 @@
+package Portal
+
+import AbilityData
+
+public constant PORTAL_NL = compiletime(ABIL_ID_GEN.next())
+constant PORTAL_BUFF = compiletime(BUFF_ID_GEN.next())
+constant DURATION_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 45.
+let DURATION = 40.
+let LIFE_SPAN = 18.
+let INTERVAL_SPW = 3.2
+let PORTAL = compiletime(UNIT_ID_GEN.next())
+let PORTAL_LIFE = 500
+// Not leveling
+let MANA_NL = 125
+let STRANGE_CREATURE_NL = compiletime(UNIT_ID_GEN.next())
+let STRANGE_CREATURE_DMG_NL = dice(24, 1, 4)
+let STRANGE_CREATURE_LIFE_NL = 200
+
+init
+    gg_unit_H00L_0205.addAbility(PORTAL_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionTinkererSummonFactoryLevel0(PORTAL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Create a portal from which summons creatures to help you in combat.\nThe portal lasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..presetFactoryUnitID(lvl -> int2fourchar(PORTAL))
+        ..presetSpawnUnitID(lvl -> int2fourchar(STRANGE_CREATURE_NL))
+        ..presetLeashRange(lvl -> 99999.)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetBuffs(lvl -> int2fourchar(PORTAL_BUFF) + "," + int2fourchar(DURATION_BUFF))
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Portal")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..addTooltipProperty("Portal life", lvl -> PORTAL_LIFE)
+        ..addTooltipProperty("Creature life", lvl -> STRANGE_CREATURE_LIFE_NL)
+        ..addTooltipProperty("Creature damage", lvl -> STRANGE_CREATURE_DMG_NL.toString())
+        ..presetSpawnUnitDuration(lvl -> LIFE_SPAN)
+        ..presetSpawnInterval(lvl -> INTERVAL_SPW)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..setMissileArt("")
+        ..presetIcon(Icons.bTNPortal)
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Portal")
+    
+    new BuffDefinition(PORTAL_BUFF, 'BNfy')
+        ..setName(1, "Portal")
+        ..setTooltipNormal(1, "Portal.")
+    
+    new BuffDefinition(DURATION_BUFF, 'BNcg')
+        ..setName(1, "Duration")
+        ..setTooltipNormal(1, "Duration.")
+
+    new UnitDefinition(PORTAL, 'nfac')
+        ..setArmorSoundType(ArmorSoundType.Ethereal)
+        ..setArmorType(ArmorType.Fortified)
+        ..setUnitClassification("summoned,mechanical")
+        ..setFoodCost(0)
+        ..setGoldCost(0)
+        ..setLevel(4)
+        ..setHitPointsMaximumBase(PORTAL_LIFE)
+        ..setModelFile(Doodads.shimmeringPortal)
+        ..setIconGameInterface(Icons.bTNPortal)
+        ..setShadowTextureBuilding("")
+        ..setScalingValue(0.5)
+        ..setAIPlacementRadius(6.)
+        ..setCollisionSize(30.)
+        //..setUnitSoundSet(data)
+        ..setName("Portal")
+        .setNameEditorSuffix("(Level 1)")
+
+    new UnitDefinition(STRANGE_CREATURE_NL, 'zzrg')
+        ..setAttack1DamageBase(STRANGE_CREATURE_DMG_NL.base)
+        ..setAttack1DamageNumberofDice(STRANGE_CREATURE_DMG_NL.number)
+        ..setAttack1DamageSidesperDie(STRANGE_CREATURE_DMG_NL.sides)
+        ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward")
+        ..setAttack1CooldownTime(1.35)
+        ..setUnitClassification("summoned")
+        ..setFoodCost(0)
+        ..setGoldCost(0)
+        ..setLevel(1)
+        ..setHitPointsMaximumBase(STRANGE_CREATURE_LIFE_NL)
+        ..setTintingColorRed(255)
+        ..setTintingColorGreen(255)
+        ..setTintingColorBlue(255)
+        ..setScalingValue(0.9)
+        ..setSpeedBase(350)
+        ..setCollisionSize(18.)
+        ..setName("Strange Creature")
+        .setNameEditorSuffix("(Not leveling / Level 1)")

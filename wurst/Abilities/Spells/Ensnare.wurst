@@ -1,0 +1,43 @@
+package Ensnare
+
+import AbilityData
+
+public constant ENSNARE_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 500.
+let DURATION = 3.
+let TARGETS = "ground,air,enemy,neutral"
+// Not leveling
+let CD_NL = 8.5
+let MANA_NL = 40
+
+init
+    gg_unit_Ofar_0285.addAbility(ENSNARE_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionEnsnare(ENSNARE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes the targeted enemy unit stuck to the ground and unable to move for " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..presetAirUnitHeight(lvl -> 200.)
+        ..presetAirUnitLowerDuration(lvl -> 0.6)
+        ..presetMeleeAttackRange(lvl -> 128.)
+        ..presetBuffs(lvl -> "Bena,Beng")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Ensnare")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Ensnare")

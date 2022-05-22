@@ -1,0 +1,120 @@
+package HeroSelection
+
+import ClosureTimers
+import ClosureForGroups
+import FogModifier
+import Camera
+
+import ModeSelection
+import public HeroType
+import initlater MyBoard
+
+public fogmodifier seeDraenei
+public fogmodifier seeDemons
+
+public rect actDrSpawn
+public rect actDeSpawn
+
+public force canPick = CreateForce()
+public group herosToPick = CreateGroup()
+
+public unit array heroModel
+
+int array clicks
+boolean array youSelected
+unit array arrow
+
+init
+    forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+        if gg_rct_selecionador_draeneanos.contains(u.getPos()) or gg_rct_selecionador_demonios.contains(u.getPos())
+            u.setInvulnerable(true)
+    end)
+
+    createVision(DRAENEI, gg_rct_selecionador_draeneanos, true).start()
+    createVision(DEMON, gg_rct_selecionador_demonios, true).start()
+        
+    // If you select
+    trigger t = CreateTrigger()
+    for i = 1 to 11
+        t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_SELECTED, null)
+    t..addCondition(Condition(() -> begin
+        return canPick.containsPlayer(GetTriggerPlayer()) and herosToPick.contains(GetTriggerUnit())
+    end))
+     ..addAction(() -> begin
+        let heroSelected = GetTriggerUnit()
+        let playerSelector = GetTriggerPlayer()
+        if not (whatMode[4] == NORMAL_PICK and playerSelector.isEnemyOf(heroSelected.getOwner()))
+            let id = playerSelector.getId()
+
+            if clicks[id] == 2
+                let c = playerSelector.getNumber()
+                let temp = heroSelected.getTypeId()
+
+                hero[c] = createUnit(playerSelector, temp, heroSelected.getPos(), UNIT_FACING)
+                if whatMode[5] == NOT_LEVELING
+                    SuspendHeroXP(hero[c], true)
+                /* TODO
+                if udg_Sky_Gem_Power.containsPlayer(playerSelector)
+                    hero[c].addAbility('A02J')
+                    udg_Sky_Gem_Ability = hero[c]
+                    udg_Sky_Gem_Visibilidad = createVision(playerSelector, udg_Sky_Gem_Ability.getPos(), 1800, true)..start()*/
+                if whatMode[5] == LEVELING
+                    if (temp == L_CACIQUE or temp == L_MAIDEN_OF_PAIN) and THE_DRAENEI.containsPlayer(playerSelector) //TODO and not udg_Ya_pueden
+                        hero[c].addAbility('A06B')
+                        DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
+                        if localPlayer == playerSelector
+                            bj_questHintSound.play()
+                else
+                    if (temp == N_CACIQUE or temp == N_MAIDEN_OF_PAIN) and THE_DRAENEI.containsPlayer(playerSelector) //TODO and not udg_Ya_pueden
+                        hero[c].removeAbility('A00F')
+                        hero[c].addAbility('A022')
+                        DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
+                        if localPlayer == playerSelector
+                            bj_questHintSound.play()
+                table.setItemIcon(1, row[c], HeroType.roots[HeroType.get(hero[c])])
+                /* TODO
+                if udg_Primera_persona
+                    udg_Unidad_que_sigo[c] = hero[c]
+                    udg_Distancia_al_objetivo[c] = 1024.00*/
+
+                canPick.removePlayer(playerSelector)
+
+                vec2 pos
+                if THE_DRAENEI.containsPlayer(playerSelector)
+                    pos = actDrSpawn.randomPoint()
+                else
+                    pos = actDeSpawn.randomPoint()
+                hero[c].setPos(pos)
+                if localPlayer == playerSelector
+                    panCameraToTimed(pos, 0.00)
+                playerSelector.selectSingle(hero[c])
+                if whatMode[5] == LEVELING
+                    heroSelected.hide()
+            else
+                clicks[id]++
+            
+            if not youSelected[id]
+                youSelected[id] = true
+                arrow[id] = createUnit(playerSelector, 'ufro', heroSelected.getPos(), UNIT_FACING)
+            
+            doAfter(0.95, () -> begin
+                if clicks[id] > 0
+                    clicks[id]--
+            end)
+    end)
+
+    // If you deselect
+    t = CreateTrigger()
+    for i = 1 to 11
+        t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_DESELECTED, null)
+    t..addCondition(Condition(() -> begin
+        return herosToPick.contains(GetTriggerUnit())
+    end))
+    t..addAction(() -> begin
+        let id = GetTriggerPlayer().getId()
+        youSelected[id] = false
+        if arrow[id] != null
+            arrow[id].remove()
+        clicks[id] = 0
+    end)
+    

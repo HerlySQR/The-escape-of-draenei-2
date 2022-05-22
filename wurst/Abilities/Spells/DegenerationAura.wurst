@@ -1,0 +1,40 @@
+package DegenerationAura
+
+import AbilityData
+
+public constant DEGENERATION_AURA_NL = compiletime(ABIL_ID_GEN.next())
+constant DEGENERATION_AURA_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let TARGETS = "air,enemies,invulnerable,ground,vulnerable"
+let AREA = 300.
+// Not leveling
+let SPEED_NL = -0.1
+
+@compiletime function gen()
+    new AbilityDefinitionAuraEnduranceCreep(DEGENERATION_AURA_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Vindicator will not let the culprits escape, reducing their movement speeds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetAttackSpeedIncrease(lvl -> 0.)
+        ..presetMovementSpeedIncrease(lvl -> SPEED_NL)
+        ..presetBuffs(lvl -> int2fourchar(DEGENERATION_AURA_BUFF))
+        ..tooltipStartListen()
+        ..setName("Degeneration Aura")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..addTooltipProperty("Movement Speed Decrease", lvl -> -SPEED_NL)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        ..setArtTarget(Imports.shockAura)
+        ..presetIcon(Imports.pASSparkle)
+        // Tooltips
+        .tooltipStopListen()
+    
+    new BuffDefinition(DEGENERATION_AURA_BUFF, 'BOae')
+        ..setIcon(Imports.pASSparkle)
+        ..setName(1, "Degeneration Aura")
+        ..setTooltipNormal(1, "Degeneration Aura")
+        .setTooltipNormalExtended(1, "This unit is under the effects of Resistance Aura: it has a movement speed reduction.")

@@ -1,0 +1,139 @@
+package PulseNova
+
+import AbilityData
+
+import Fx
+
+public constant PULSE_NOVA_NL = compiletime(ABIL_ID_GEN.next())
+public constant PULSE_NOVA_L = compiletime(ABIL_ID_GEN.next())
+public constant PULSE_NOVA_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 18.
+let RANGE = 600.
+let AREA = 350.
+// Not leveling
+let MANA_NL = [100, 145]
+let MAX_DMG_NL = [150., 300.]
+// Leveling
+let MANA_L = [90, 115, 140, 165]
+let MAX_DMG_L = [160., 240., 320., 400.]
+// Internal
+let MAX_COUNTER_1 = 38
+let MAX_COUNTER_2 = 25
+let AREA_PER_TICK = compiletime(AREA / MAX_COUNTER_2)
+let PUSH_DIST = compiletime(AREA_PER_TICK + 1.)
+let EXPLOSION = new SoundDefinition(Imports.pulseNova3, false, true)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(PULSE_NOVA_NL, PULSE_NOVA_L, PULSE_NOVA_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let target = getSpellTargetPos()
+            let m = new Missiles(caster.getPos3with(75.), target.withZ(75.))
+            m.setSpeed(800.)
+            m.setModel(Imports.holySmiteMissileNew)
+            m.source = caster
+            m.owner = caster.getOwner()
+            if data.isNL
+                m.damage = MAX_DMG_NL[data.lvl]
+            else
+                m.damage = MAX_DMG_L[data.lvl]
+            doPeriodicallyCounted(0.27, MAX_COUNTER_1, cb -> begin
+                let pos = m.getPos()
+                if pos.distanceTo2d(target) <= 201. or cb.isLast()
+                    destroy new Fx(pos, Imports.theHolyBomb)..setScale(1.5)
+                    if not cb.isLast()
+                        destroy cb
+                    doAfter(0.32) ->
+                        EXPLOSION.playOnPoint(pos)
+            end)
+            m.onFinish(() -> begin
+                let affected = CreateGroup()
+                var damage = m.damage
+                let pos = m.getPos().toVec2()
+                let owner = m.owner
+                doPeriodicallyCounted(0.01, MAX_COUNTER_2, cb -> begin
+                    let counter = MAX_COUNTER_2 - cb.getCount() + 1
+                    forUnitsInRange(pos, AREA_PER_TICK * counter, u -> begin
+                        if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
+                            u.setPos(u.getPos().moveTowards(pos, -PUSH_DIST))
+                            if not affected.contains(u)
+                                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+                                affected.addUnit(u)
+                    end)
+                    damage -= 2.
+                    if cb.isLast()
+                        affected.destr()
+                end)
+                return true
+            end)
+            m.launch()
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "creepheal")
+    this.presetOption(Option.TARGETIMAGE, true)
+    this.presetButtonPosNormal(2, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell,channel")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Pulse Nova")
+    this.presetTargetTypes(Targettype.POINT)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> RANGE)
+    this.presetAreaofEffect(lvl -> AREA)
+    // Audiovisual
+    this.presetIcon(Imports.bTNHolyLance)
+    // Tooltip
+    this.presetHotkey("E")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(PULSE_NOVA_NL, 2, true, new AbilityTooltipGenerator("Launches a powerful ball of energy that knocks back units deemed hostile by the prophet. \nThe damage is bigger while the units are closer of the center of the explosion."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Max. damage", lvl -> MAX_DMG_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Pulse Nova")
+    
+    new ChannelAbilityPreset(PULSE_NOVA_L, 4, true, new AbilityTooltipGenerator("Launches a powerful ball of energy that knocks back units deemed hostile by the prophet. \nThe damage is bigger while the units are closer of the center of the explosion."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(2, 0)
+        // Stats
+        ..addTooltipProperty("Max. damage", lvl -> MAX_DMG_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Pulse Nova")
+    
+    new ChannelAbilityPreset(PULSE_NOVA_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Pulse Nova")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = MAX_DMG_NL[lvl - 1]
+            else
+                value = MAX_DMG_L[lvl - 3]
+            return "Launches a powerful ball of energy that knocks back units deemed hostile by the prophet, knocking them back and dealing a max damage of {0}.".format(value.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Pulse Nova")

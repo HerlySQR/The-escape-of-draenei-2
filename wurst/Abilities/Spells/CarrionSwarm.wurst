@@ -1,0 +1,43 @@
+package CarrionSwarm
+
+import AbilityData
+
+public constant CARRION_SWARM_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 700.
+let DISTANCE = 800.
+let CD = 9.
+let AREA = 200.
+let AREA_FINAL = 300.
+let MAX_DMG = 1000.
+let TARGETS = "ground,air,organic"
+// Not leveling
+let DMG_NL = 150.
+let MANA_NL = 90
+
+@compiletime function gen()
+    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Send a horde of bats that cause damage to each enemy unit in a cone."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..setAnimationNames("spell")
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Carrion Swarm")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetMaxDamage(lvl -> MAX_DMG)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetFinalArea(lvl -> AREA_FINAL)
+        ..presetDistance(lvl -> DISTANCE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+        .setName("Carrion Swarm")

@@ -1,0 +1,147 @@
+package PowerOfLight
+
+import AbilityData
+
+public constant POWER_OF_LIGHT_NL = compiletime(ABIL_ID_GEN.next())
+public constant POWER_OF_LIGHT_L = compiletime(ABIL_ID_GEN.next())
+public constant POWER_OF_LIGHT_S = compiletime(ABIL_ID_GEN.next())
+constant POWER_OF_LIGHT_ARMOR = compiletime(ABIL_ID_GEN.next())
+constant POWER_OF_LIGHT_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 80.
+let RANGE = 99999.
+let DURATION = 10
+// Not leveling
+let MANA_NL = 150
+let ARMOR_AND_HP_REGEN_NL = 50.
+// Leveling
+let MANA_L = [200, 300]
+let ARMOR_AND_HP_REGEN_L = [50., 100.]
+// Internal
+let counterMap = new HashMap<unit, int>()
+let healMap = new HashMap<unit, real>()
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(POWER_OF_LIGHT_NL, POWER_OF_LIGHT_L, POWER_OF_LIGHT_S)
+        if data.check
+            let target = GetSpellTargetUnit()
+            if not counterMap.has(target)
+                target.addAbility(POWER_OF_LIGHT_ARMOR)
+                doPeriodically(1., cb -> begin
+                    let counter = counterMap.get(target) - 1
+                    target.addHP(healMap.get(target))
+                    if counter > 0
+                        counterMap.put(target, counter)
+                    else
+                        target.removeAbility(POWER_OF_LIGHT_ARMOR)
+                        counterMap.remove(target)
+                        healMap.remove(target)
+                        destroy cb
+                end)
+            counterMap.put(target, DURATION)
+            real heal
+            if data.isNL
+                heal = ARMOR_AND_HP_REGEN_NL
+                target.setAbilityLevel(POWER_OF_LIGHT_ARMOR, data.lvl + 1)
+            else
+                heal = ARMOR_AND_HP_REGEN_L[data.lvl]
+                target.setAbilityLevel(POWER_OF_LIGHT_ARMOR, data.lvl + 2)
+            healMap.put(target, max(healMap.get(target), heal))
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "innerfireon")
+    this.presetOption(Option.UNIVERSALSPELL, true)
+    this.presetButtonPosNormal(3, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell,channel")
+    this.presetTargetsAllowed(lvl -> "air,ground,friend,neutral,self")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Power of light")
+    this.presetTargetTypes(Targettype.UNIT)
+    this.presetCooldown(lvl -> CD)
+    this.addTooltipProperty("Duration", lvl -> DURATION)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNResurrection)
+    // Tooltip
+    this.presetHotkey("R")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(POWER_OF_LIGHT_NL, 1, true, new AbilityTooltipGenerator("With the help of light, the prophet grants an ally great power by increasing their armor and regeneration."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Armor and hp regeneration added", lvl -> ARMOR_AND_HP_REGEN_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Power of light")
+    
+    new ChannelAbilityPreset(POWER_OF_LIGHT_L, 2, true, new AbilityTooltipGenerator("With the help of light, the prophet grants an ally great power by increasing their armor and regeneration."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..addTooltipProperty("Armor and hp regeneration added", lvl -> ARMOR_AND_HP_REGEN_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Power of light")
+    
+    new ChannelAbilityPreset(POWER_OF_LIGHT_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Power of light")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = ARMOR_AND_HP_REGEN_NL
+            else
+                value = ARMOR_AND_HP_REGEN_L[lvl - 2]
+            return "With the help of light, the prophet grants an ally great power by increasing their armor and regeneration by {0} for {1} seconds.".format(value.toString(0), DURATION.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Power of light")
+
+    new AbilityDefinitionAuraDevotionCreep(POWER_OF_LIGHT_ARMOR)
+        ..setLevels(3)
+        ..setArtTarget("")
+        ..presetArmorBonus(lvl -> begin
+            real value
+            if lvl < 2
+                value = ARMOR_AND_HP_REGEN_NL
+            else
+                value = ARMOR_AND_HP_REGEN_L[lvl - 2]
+            return value
+        end)
+        ..presetBuffs(lvl -> int2fourchar(POWER_OF_LIGHT_BUFF))
+        ..presetTargetsAllowed(lvl -> "self")
+        ..setItemAbility(true)
+        ..presetButtonPosNormal(0, -11)
+        ..setIconNormal("")
+        ..setName("Extra armor")
+        ..setEditorSuffix("(Power of light)")
+        .setDummyAbility()
+    
+    new BuffDefinition(POWER_OF_LIGHT_BUFF, 'BHad')
+        ..setIcon(Icons.bTNResurrection)
+        ..setArtTarget(1, "")
+        ..setName(1, "Power of light")
+        ..setTooltipNormal(1, "Power of light")
+        .setTooltipNormalExtended(1, "This unit has Power of light: it has a huge  increase in armor and regeneration.")

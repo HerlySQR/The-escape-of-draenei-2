@@ -1,0 +1,210 @@
+package DamageEngine
+
+import OnUnitEnterLeave
+import DamageDetection
+import LinkedList
+import ErrorHandling
+import ClosureTimers
+import ClosureForGroups
+import AbilityObjEditing
+import ObjectIdGenerator
+import Annotations
+
+/** The damage events can be used to deal other damage, so here is a limit of how many are allowed per instance*/
+@configurable constant LIMIT_RECURSION = 48
+/** The ID used for the health bonus Ability */
+constant DAMAGE_ABIL_ID = compiletime(ABIL_ID_GEN.next())
+/** The amount of HP restored by the Ability */
+constant MAX_HP_GAINED = 500000
+// ConvertAttackType(7) is a hidden attack type with some unique properties. For
+// more information see goo.gl/9k8tn .
+constant ATTACK_TYPE_UNIVERSAL = ConvertAttackType(7)
+constant DAMAGE_TYPE_CHECK_ID  = compiletime(ABIL_ID_GEN.next())
+
+/** To register and broadcast damage events */
+public abstract class DamageListener
+    DamageEvent whatEvent
+    
+    abstract function run(Damage damage)
+
+    /** Make the listener can't run anymore */
+    function disconnect()
+        whatEvent.removeListener(this)
+
+    /** Make the listener can run again */
+    function reconnect()
+        whatEvent.addListener(this)
+
+class DamageEvent
+    LinkedList<DamageListener> listeners
+
+    construct()
+        listeners = new LinkedList<DamageListener>()
+
+    function addListener(DamageListener dl) returns DamageListener
+        listeners.add(dl)
+        dl.whatEvent = this
+        return dl
+
+    function removeListener(DamageListener dl)
+        listeners.remove(dl)
+    
+    function broadcast(Damage damage)
+        listeners.forEach(dl -> dl.run(damage))
+
+let damageEvent = new DamageEvent()
+let zeroDamageEvent = new DamageEvent()
+let afterDamageEvent = new DamageEvent()
+
+/** Register a listener that runs before the damage is taken */
+public function registerDamageEvent(DamageListener dl) returns DamageListener
+    return damageEvent.addListener(dl)
+
+/** Register a listener that runs before the damage is taken and is 0.00 */
+public function registerZeroDamageEvent(DamageListener dl) returns DamageListener
+    return zeroDamageEvent.addListener(dl)
+
+/** Register a listener that runs after the damage is taken */
+public function registerAfterDamageEvent(DamageListener dl) returns DamageListener
+    return afterDamageEvent.addListener(dl)
+
+/** This class stores the source, the target, the amount and the type of every taken damage*/
+public class Damage
+    /** Who deals the damage
+     *  READ-ONLY*/
+    unit source = null
+    /** Who takes the damage
+     *  READ-ONLY*/
+    unit target = null
+    /** The damage taken */
+    real amount = 0.00
+    /** If the damage is from an spell (or is ATTACK_TYPE_NORMAL)
+     *  READ-ONLY*/
+    boolean isSpell = false
+    /** If the damage was dealt with the function Damage.deal
+     *  READ-ONLY*/
+    boolean isCode = false
+
+    private construct()
+
+    private real lastDamageHP = 0.00
+
+    private static LinkedList<Damage> damageList = new LinkedList<Damage>()
+    private static trigger dmgTrg = null
+    private static int recursion = 0
+    private static boolean nextDamageTypeCode = false
+
+    /** Deals a damage that will be consider as CODE */
+    static function deal(unit source, unit target, real amount, attacktype at, damagetype dt)
+        nextDamageTypeCode = true
+        UnitDamageTarget(source, target, amount, true, false, at, dt, null)
+
+    /** Deals a damage that will be consider as CODE */
+    static function deal(unit source, unit target, real amount, attacktype at, damagetype dt, weapontype wt)
+        nextDamageTypeCode = true
+        UnitDamageTarget(source, target, amount, true, false, at, dt, wt)
+
+    protected static function onUnitDamage()
+        let curr = new Damage()
+        curr.source = GetEventDamageSource()
+        curr.target = GetTriggerUnit()
+        curr.amount = GetEventDamage()
+
+        if nextDamageTypeCode
+            curr.isCode = true
+            nextDamageTypeCode = false
+
+        if curr.amount < 0.
+            curr.amount *= -1
+            curr.isSpell = true
+
+        if curr.amount == 0.00
+            zeroDamageEvent.broadcast(curr)
+            destroy curr
+            return
+
+        if recursion > LIMIT_RECURSION
+            error("There is an infinite loop with the Damage Engine")
+        
+        recursion++
+        let prevAmt = curr.amount
+    
+        let u = curr.target
+
+        damageEvent.broadcast(curr)
+        
+        // All events have run and the damage amount is finalized.
+        var life = u.getLife()
+        let maxHP = u.getMaxHP()
+        if curr.isSpell
+            if dmgTrg == null
+                dmgTrg = CreateTrigger()..addAction(function onTrg)
+            damageList.add(curr)
+
+            let prevLife = life
+            if life + prevAmt*0.75 > maxHP
+                life = max(maxHP - prevAmt/2.00, 1.00)
+                u.setLife(life)
+                life = (life + maxHP)/2.00
+            else
+                life += prevAmt*0.50
+            curr.lastDamageHP = prevLife - curr.amount
+
+            dmgTrg.registerUnitStateEvent(u, UNIT_STATE_LIFE, GREATER_THAN, life)
+        else
+            if curr.amount != prevAmt
+                life += prevAmt - curr.amount
+                if maxHP < life
+                    curr.lastDamageHP = life - prevAmt
+                    u.addAbility(DAMAGE_ABIL_ID)
+                u.setLife(max(life, 0.42))
+        
+            nullTimer(() -> curr.finish())
+    
+    private static function onTrg()
+        for damage in damageList
+            if damage.target == GetTriggerUnit()
+                damage.finish()
+                damageList.remove(damage)
+        dmgTrg.clearActions()
+        dmgTrg.destr()
+        dmgTrg = null
+
+    private function finish()
+        if isSpell
+            target.setLife(max(lastDamageHP, 1.00))
+            if lastDamageHP < 0.405
+                disableDamageDetect()
+                UnitDamageTarget(source, target, 10000, true, false, ATTACK_TYPE_UNIVERSAL, DAMAGE_TYPE_UNIVERSAL, null)
+                enableDamageDetect()
+        if target.getAbilityLevel(DAMAGE_ABIL_ID) > 0
+            target.removeAbility(DAMAGE_ABIL_ID)
+            target.setLife(lastDamageHP)
+        if amount != 0.00
+            afterDamageEvent.broadcast(this)
+
+        destroy this
+        recursion--
+
+/** Generates the Health-Bonus Ability */
+@compiletime function generateObject()
+    new AbilityDefinitionMaxLifeBonusGreater(DAMAGE_ABIL_ID)
+        ..setMaxLifeGained(1, MAX_HP_GAINED)
+    
+/** Generates the Spell-Bonus Ability */
+@compiletime function generateAbility()
+    new AbilityDefinitionRunedBracers(DAMAGE_TYPE_CHECK_ID)
+        ..setName("Runed Bracer Dummy")
+        ..setEditorSuffix("(DamageType)")
+        ..setItemAbility(false)
+        ..setDamageReduction(1, 2.)
+
+init
+    addOnDamageFunc(Condition(function Damage.onUnitDamage))
+    onEnter() ->
+        GetTriggerUnit()..addAbility(DAMAGE_TYPE_CHECK_ID)..makeAbilityPermanent(DAMAGE_TYPE_CHECK_ID, true)
+
+    forUnitsInRect(bj_mapInitialPlayableArea, iter -> begin
+        iter..addAbility(DAMAGE_TYPE_CHECK_ID)
+            ..makeAbilityPermanent(DAMAGE_TYPE_CHECK_ID, true)
+    end)

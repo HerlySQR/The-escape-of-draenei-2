@@ -1,0 +1,46 @@
+package ReviveN
+
+import TimerDialog
+
+import PlayerData
+import HeroSelection
+
+// Control the resurrection of the dying heros in the not leveling mode
+
+public boolean reviveNRun = false
+
+public timer revive = CreateTimer()
+public timerdialog reviveWindow = CreateTimerDialog(revive)
+
+public trigger ifDie = CreateTrigger()..disable()
+public trigger ifRevive = CreateTrigger()..disable()
+
+public function reviveStart()
+    revive.startPeriodic(20, () -> begin
+        for i = 1 to 5
+            if hero[i] != null and not hero[i].isAlive()
+                hero[i].revive(actDrSpawn.randomPoint(), true)
+        for i = 6 to 10
+            if hero[i] != null and not hero[i].isAlive()
+                hero[i].revive(actDeSpawn.randomPoint(), true)
+    end)
+    reviveWindow..setTitle("You revive in:")
+                ..display(false)
+
+init
+    ifRevive..registerAnyUnitEvent(EVENT_PLAYER_HERO_REVIVE_START)
+            ..addCondition(Condition(() -> begin
+        return GetTriggerUnit().isType(UNIT_TYPE_HERO)
+    end))
+            ..addAction(() -> begin
+        if localPlayer == GetTriggerUnit().getOwner()
+            reviveWindow.display(false)
+    end)
+    ifDie..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+            ..addCondition(Condition(() -> begin
+        return GetDyingUnit().isType(UNIT_TYPE_HERO)
+    end))
+            ..addAction(() -> begin
+        if localPlayer == GetDyingUnit().getOwner()
+            reviveWindow.display(true)
+    end)

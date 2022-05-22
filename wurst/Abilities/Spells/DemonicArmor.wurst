@@ -1,0 +1,86 @@
+package DemonicArmor
+
+import AbilityData
+
+public constant DEMONIC_ARMOR_NL = compiletime(ABIL_ID_GEN.next())
+public constant DEMONIC_ARMOR_L = compiletime(ABIL_ID_GEN.next())
+
+// General
+let AREA = 1000.
+// Not leveling
+let DMG_REFLECT_NL = [0.12, 0.24]
+// Leveling
+let DMG_REFLECT_L = [0.08, 0.14, 0.2, 0.26]
+// Internal
+let delayMap = new HashMap<unit, real>()
+let DELAY_EFF = 0.5
+
+init
+    registerDamageEvent(damage -> begin
+        if not damage.isSpell
+            let data = damage.target.pasAbilityCond(DEMONIC_ARMOR_NL, DEMONIC_ARMOR_L)
+            if data.check
+                real reflect
+                if data.isNL
+                    reflect = DMG_REFLECT_NL[data.lvl]
+                else
+                    reflect = DMG_REFLECT_L[data.lvl]
+                let caster = damage.target
+                let dmg = reflect * damage.amount
+                let owner = damage.target.getOwner()
+                let showEff = delayMap.get(caster) <= 0.
+                forUnitsInRange(caster.getPos(), AREA, u -> begin
+                    if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and u.isAlive()
+                        Damage.deal(caster, u, dmg, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                        if showEff
+                            u.flashEffect(Abilities.spiritOfVengeanceMissile, "origin")
+                end)
+                damage.amount =- dmg
+                if showEff
+                    delayMap.put(caster, DELAY_EFF)
+                    doPeriodically(INTERVAL, cb -> begin
+                        let delay = delayMap.get(caster) - INTERVAL
+                        delayMap.put(caster, delay)
+                        if delay <= 0.
+                            destroy cb
+                    end)
+    end)
+
+function AbilityDefinitionHardenedSkin.general()
+    this.registerTooltipGenerator(new AbilityTooltipGenerator("The armor of this demon has the ability to reflect part of the damage taken to enemies at a range of " + AREA.toString(0) + "."))
+    this.presetButtonPosNormal(2, 2)
+    this.setHeroAbility(false)
+    this.presetIgnoredDamage(lvl -> 0.)
+    this.presetMinimumDamage(lvl -> 0.)
+    this.presetChancetoReduceDamage(lvl -> 0.)
+    this.presetIncludeMeleeDamage(lvl -> false)
+    this.presetIncludeRangedDamage(lvl -> false)
+    this.setRequirements("")
+    this.tooltipStartListen()
+    this.setName("Demonic Armor")
+    this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+    // Audiovisual
+    this.setIconNormal(Icons.pASBTNThickFur)
+    // Tooltip
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(DEMONIC_ARMOR_NL)
+        ..setLevels(2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage reflected", lvl -> DMG_REFLECT_NL[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionHardenedSkin(DEMONIC_ARMOR_L)
+        ..setLevels(4)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..setIconResearch(Icons.bTNThickFur)
+        ..general()
+        ..presetButtonPosResearch(2, 0)
+        // Stats
+        ..addTooltipProperty("Damage reflected", lvl -> DMG_REFLECT_L[lvl - 1])
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")

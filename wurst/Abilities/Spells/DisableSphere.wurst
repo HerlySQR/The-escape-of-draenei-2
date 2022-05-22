@@ -1,0 +1,83 @@
+package DisableSphere
+
+import AbilityData
+
+public constant DISABLE_SPHERE_NL = compiletime(ABIL_ID_GEN.next())
+constant DISABLE_SPHERE_SILENCE = compiletime(ABIL_ID_GEN.next())
+constant DISABLE_SPHERE_BUFF = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 35.
+let AREA = 300.
+let RANGE = 800.
+let DURATION = 5.
+// Not leveling
+let MANA_NL = 130
+let DMG_NL = 200.
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == DISABLE_SPHERE_NL
+            let caster = GetSpellAbilityUnit()
+            let target = getSpellTargetPos()
+            let m = new Missiles(caster.getPos3with(50.), target.withZ(50.))
+            m.setModel(Imports.orbDragonX)
+            m.source = caster
+            m.owner = caster.getOwner()
+            m.setSpeed(1250.)
+            m.setScale(3.5)
+            m.damage = DMG_NL
+            m.onFinish(() -> begin
+                InstantDummyCaster.castPoint(m.owner, DISABLE_SPHERE_SILENCE, 1, Orders.silence, target, target)
+                forUnitsInRange(target, AREA, u -> begin
+                    if m.owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
+                        Damage.deal(m.source, u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FORCE)
+                end)
+                return true
+            end)
+            doAfter(1.) -> 
+                m.launch()
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(DISABLE_SPHERE_NL, 1, true, new AbilityTooltipGenerator("The zealot creates an orb that when colides with the floor causes a damage and disarm and silence the affected enemy units.|nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetBaseOrderID(lvl -> "silence")
+        ..presetOption(Option.TARGETIMAGE, true)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..presetFollowThroughTime(lvl -> 0.75)
+        ..setAnimationNames("spell,channel")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Disable Sphere")
+        ..presetTargetTypes(Targettype.POINT)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetAreaofEffect(lvl -> AREA)
+        // Audiovisual
+        ..presetIcon(Imports.bTNStormSphere)
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+
+    new AbilityDefinitionSilenceCreep(DISABLE_SPHERE_SILENCE)
+        ..setLevels(1)
+        ..setAttacksPrevented(1, 0)
+        ..setAttacksPrevented(1, 1)
+        ..setAttacksPrevented(1, 2)
+        ..setAttacksPrevented(1, 3)
+        ..setDurationHero(1, DURATION)
+        ..setDurationNormal(1, DURATION)
+        ..setBuffs(1, int2fourchar(DISABLE_SPHERE_BUFF))
+        ..setName("Silence")
+        ..setEditorSuffix("(Disable Sphere)")
+        .setDummyAbility()
+    
+    new BuffDefinition(DISABLE_SPHERE_BUFF, 'BHad')
+        ..setIcon(Imports.bTNStormSphere)
+        ..setArtTarget(1, "")
+        ..setName(1, "Disable Sphere")
+        ..setTooltipNormal(1, "Disable Sphere")
+        .setTooltipNormalExtended(1, "This unit has Power of light: it has a huge  increase in armor and regeneration.")

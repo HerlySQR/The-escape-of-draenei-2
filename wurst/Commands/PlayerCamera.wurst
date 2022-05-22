@@ -1,0 +1,35 @@
+package PlayerCamera
+
+import Functions
+
+import Orders
+
+real array distanceToTarget
+
+public function defaultCamera(player p)
+    distanceToTarget[p.getId()] = 1650.
+
+init
+    for i = 0 to bj_MAX_PLAYER_SLOTS
+        distanceToTarget[i] = 1650.
+    // Keeping the camera
+    CreateTimer().startPeriodic(0.125, () -> begin
+        if not inCinematic
+            SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, distanceToTarget[localPlayer.getId()], 0.00)
+                        
+    end)
+    // Edit the camera
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
+        ..addAction(() -> begin
+            if (GetIssuedOrderId() == Orders.defend or GetIssuedOrderId() == Orders.undefend) and GetOrderedUnit().getTypeId() == 'ncop'
+                if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) >= 300.
+                    distanceToTarget[GetOrderedUnit().getOwner().getId()] -= 100.
+        end)
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
+        ..addAction(() -> begin
+            if (GetIssuedOrderId() == Orders.magicdefense or GetIssuedOrderId() == Orders.magicundefense) and GetOrderedUnit().getTypeId() == 'ncop'
+                if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) <= 3000.
+                    distanceToTarget[GetOrderedUnit().getOwner().getId()] += 100.
+        end)

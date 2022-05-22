@@ -1,0 +1,14 @@
+package Example
+
+import CustomEvents
+import MoveSpeedX
+
+public constant unitCastSpell = new Event2<unit, int>()
+
+init
+    /*CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST)
+        ..addAction(() -> unitCastSpell.broadcast(GetSpellAbilityUnit(), GetSpellAbilityId()))
+    
+    unitCastSpell.register((caster, spell) -> print(caster.getName() + " casted " + GetAbilityName(spell)))*/
+    gg_unit_H00L_0205.setMoveSpeedX(1500)

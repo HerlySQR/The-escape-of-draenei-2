@@ -1,0 +1,39 @@
+/** This package allows you do stuff with 3D sounds*/
+package Sound3DUtils
+
+/** Create a 3D sound (Only if the source allows it) */
+public function create3DSound(string root, boolean looping, int fadeInRate, int fadeOutRate, real minDist, real maxDist, real cutoff) returns sound
+    let s = CreateSound(root, looping, true, false, fadeInRate, fadeOutRate, "DefaultEAXON")
+    SetSoundDistanceCutoff(s, cutoff)
+    SetSoundDistances(s, minDist, maxDist)
+    return s
+
+public function sound.setDistances(real minDist, real maxDist)
+    SetSoundDistances(this, minDist, maxDist)
+
+public function sound.setPos(vec2 pos)
+    this.setPos(pos.toVec3())
+
+public function sound.setPos(vec3 pos)
+    SetSoundPosition(this, pos.x, pos.y, pos.z)
+
+/** The sound will follow the unit */
+public function sound.attachToUnit(unit whichUnit)
+    AttachSoundToUnit(this, whichUnit)
+
+public function sound.play(int volume, vec2 pos)
+    this.play(volume, pos.toVec3())
+
+public function sound.play(int volume, vec3 pos)
+    this..setPos(pos)
+        ..setVolume(volume)
+        ..play()
+
+/** Play a sound that will follow the unit */
+public function sound.play(int volume, unit whichUnit)
+    this..attachToUnit(whichUnit)
+        ..setVolume(volume)
+        ..play()
+
+public function sound.killWhenDone()
+    KillSoundWhenDone(this)

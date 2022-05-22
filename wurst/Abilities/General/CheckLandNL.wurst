@@ -1,0 +1,46 @@
+package CheckLandNL
+
+/** This data stores if is the correct spell, if is from leveling or not leveling and its level */
+public tuple spellData(bool check, bool isNL, int lvl)
+
+/** Checks when an ability is casted, if is some of this abilities and what */
+public function abilityCond(int abilityNL, int abilityL, int abilityS) returns spellData
+    let abilId = GetSpellAbilityId()
+    var isNL = false
+    var check = false
+    var lvl = GetSpellAbilityUnit().getAbilityLevel(abilId)
+    if abilId == abilityNL
+        check = true
+        isNL = true
+    else if abilId == abilityL
+        check = true
+        isNL = false
+    else if abilId == abilityS
+        check = true
+        if GetAbilityName(abilId).startsWith("Ult ")
+            if lvl < 2
+                isNL = true
+            else
+                isNL = false
+                lvl -= 1
+        else
+            if lvl < 3
+                isNL = true
+            else
+                isNL = false
+                lvl -= 2
+    return spellData(check, isNL, lvl - 1)
+
+/** Checks if the unit has some of this abilities and what */
+public function unit.pasAbilityCond(int abilityNL, int abilityL) returns spellData
+    var check = false
+    var isNL = false
+    var lvl = this.getAbilityLevel(abilityNL)
+    if lvl == 0
+        lvl = this.getAbilityLevel(abilityL)
+        if lvl > 0
+            check = true
+    else
+        check = true
+        isNL = true
+    return spellData(check, isNL, lvl - 1)

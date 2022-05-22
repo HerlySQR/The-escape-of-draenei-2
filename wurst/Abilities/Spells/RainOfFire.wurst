@@ -1,0 +1,168 @@
+package RainOfFire
+
+import AbilityData
+
+import DummyDamager
+
+public constant RAIN_OF_FIRE_NL = compiletime(ABIL_ID_GEN.next())
+public constant RAIN_OF_FIRE_L = compiletime(ABIL_ID_GEN.next())
+public constant RAIN_OF_FIRE_S = compiletime(ABIL_ID_GEN.next())
+constant DUMMY_RAIN_OF_FIRE = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = 3.
+let RANGE = 1000.
+let CD = 12.
+// Not leveling
+let DMG_NL = [50., 65.]
+let DMG_PER_SEC_NL = [20., 30.]
+let AREA_NL = [325., 375.]
+let MANA_NL = 100
+// Leveling
+let DMG_L = [50., 55., 60., 65.]
+let DMG_PER_SEC_L = [20., 30., 40., 50.]
+let AREA_L = [325., 350., 375., 400.]
+let MANA_L = [100, 120, 140, 160]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(RAIN_OF_FIRE_NL, RAIN_OF_FIRE_L, RAIN_OF_FIRE_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let dummy = DummyRecycler.get(caster.getPos(), caster.getFacingAngle())
+            dummy.setOwner(caster.getOwner(), false)
+            dummy.addAbility(DUMMY_RAIN_OF_FIRE)
+            if data.isNL
+                dummy.setAbilityLevel(DUMMY_RAIN_OF_FIRE, data.lvl + 1)
+            else
+                dummy.setAbilityLevel(DUMMY_RAIN_OF_FIRE, data.lvl + 3)
+            dummy.issuePointOrderById(Orders.rainoffire, getSpellTargetPos())
+            caster.dummyDamage(dummy, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
+            doAfter(9.) ->
+                dummy.removeAbility(DUMMY_RAIN_OF_FIRE)
+                DummyRecycler.recycle(dummy)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "rainoffire")
+    this.presetOption(Option.VISIBLE, true)
+    this.presetOption(Option.TARGETIMAGE, true)
+    this.presetButtonPosNormal(0, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell,looping")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Rain of Fire")
+    this.presetTargetTypes(Targettype.POINT)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNFire)
+    // Tooltip
+    this.presetHotkey("Q")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(RAIN_OF_FIRE_NL, 2, true, new AbilityTooltipGenerator("Attracts tides of fire that damage units in an area. Each wave deals initial damage and damage per second. \nLasts 5 waves."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Initial damage", lvl -> DMG_NL[lvl - 1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl - 1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Rain of Fire")
+
+    new ChannelAbilityPreset(RAIN_OF_FIRE_L, 4, true, new AbilityTooltipGenerator("Attracts tides of fire that damage units in an area. Each wave deals initial damage and damage per second. \nLasts 5 waves."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetButtonPosResearch(0, 0)
+        // Stats
+        ..addTooltipProperty("Initial damage", lvl -> DMG_L[lvl - 1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl - 1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Rain of Fire")
+    
+    new ChannelAbilityPreset(RAIN_OF_FIRE_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Rain of Fire")
+        ..presetHotkey("F")
+        // Stats
+        ..presetAreaofEffect(lvl -> begin
+            real value
+            if lvl < 3
+                value = AREA_NL[lvl - 1]
+            else
+                value = AREA_L[lvl - 3]
+            return value
+        end)
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = DMG_NL[lvl - 1]
+                value2 = DMG_PER_SEC_NL[lvl - 1]
+            else
+                value1 = DMG_L[lvl - 3]
+                value2 = DMG_PER_SEC_L[lvl - 3]
+            return "Attracts tides of fire that damage units in an area. Each wave deals initial damage of " + value1.toString(0) + " and " + value2.toString(0) + " damage per second. \nLasts 5 waves."
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Rain of Fire")
+    
+    new AbilityDefinitionRainofFire(DUMMY_RAIN_OF_FIRE)
+        ..setLevels(6)
+        ..presetDamage(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_NL[lvl - 1]
+            else
+                value = DMG_L[lvl - 3]
+            return value
+        end)
+        ..presetDamagePerSecond(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_PER_SEC_NL[lvl - 1]
+            else
+                value = DMG_PER_SEC_L[lvl - 3]
+            return value
+        end)
+        ..presetNumberofWaves(lvl -> 5)
+        ..presetNumberofShards(lvl -> begin
+            int value
+            if lvl == 1
+                value = 9
+            else if lvl == 2
+                value = 12
+            else
+                value = 6 + lvl
+            return value
+        end)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetAreaofEffect(lvl -> begin
+            real value
+            if lvl < 3
+                value = AREA_NL[lvl - 1]
+            else
+                value = AREA_L[lvl - 3]
+            return value
+        end)
+        ..setName("Rain of fire")
+        ..setEditorSuffix("(Dummy)")
+        .setDummyAbility()

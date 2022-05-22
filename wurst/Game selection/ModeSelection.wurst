@@ -1,0 +1,504 @@
+package ModeSelection
+
+import ClosureForGroups
+import ClosureTimers
+import TimerDialog
+import FogModifier
+
+import Tips
+import initlater HeroSelection
+import initlater ReviveN
+import initlater ReviveL
+import initlater MyBoard
+import initlater Missions
+import NeutralSpawn
+import initlater Repick
+import initlater Tp
+
+public player selector
+public trigger select = CreateTrigger()..disable()
+public timer maxSelection = CreateTimer()
+public timerdialog window = CreateTimerDialog(maxSelection)
+public string array modes
+
+public enum Mode
+    // 1
+    SINGLE_TIMER
+    VARIOUS_TIMERS
+    // 2
+    YES_CREEPS
+    ONLY_DE_AND_DR
+    ONLY_NEUTRAL
+    NO_CREEPS
+    // 3
+    ALL_ITEMS
+    ONLY_COMSUMIBLES
+    NO_RECIPES
+    // 4
+    NORMAL_PICK
+    TRAITOR
+    // 5
+    LEVELING
+    NOT_LEVELING
+
+public Mode array whatMode
+
+// Text tags to the modes
+texttag array modes1 = [
+    createTTEx(vec3(-6992, -6400, 100), "|cffff40001. Timers|r", 12),
+    createTTEx(vec3(-6992, -6448, 100), "  |cff0080ff-v|r: One for each mission.", 12),
+    createTTEx(vec3(-6992, -6496, 100), "    |cff00ff80-s|r: max. 31 minutes.", 12),
+    createTTEx(vec3(-6992, -6544, 100), "    |cff00ff80-m|r: max. 41 minutes.", 12),
+    createTTEx(vec3(-6992, -6592, 100), "    |cff00ff80-l|r: max. 51 minutes.", 12),
+    createTTEx(vec3(-6992, -6640, 100), "    |cff00ff80-h|r: max. 61 minutes.", 12),
+    createTTEx(vec3(-6992, -6688, 100), "  |cff0080ff-u|r: One for the match.", 12),
+    createTTEx(vec3(-6992, -6736, 100), "    |cff00ff80-i|r: 25 minutes.", 12),
+    createTTEx(vec3(-6992, -6784, 100), "    |cff00ff80-t|r: 30 minutes.", 12),
+    createTTEx(vec3(-6992, -6832, 100), "    |cff00ff80-s|r: 35 minutes.", 12),
+    createTTEx(vec3(-6992, -6880, 100), "    |cff00ff80-m|r: 40 minutes.", 12),
+    createTTEx(vec3(-6992, -6928, 100), "    |cff00ff80-l|r: 45 minutes.", 12),
+    createTTEx(vec3(-6992, -6976, 100), "    |cff00ff80-h|r: 50 minutes.", 12),
+    createTTEx(vec3(-6992, -7024, 100), "    |cff00ff80-e|r: 55 minutes.", 12),
+    createTTEx(vec3(-6672, -6400, 100), "|cffff40002. Creeps|r", 12),
+    createTTEx(vec3(-6672, -6448, 100), "  |cff0080ff-ca|r: Yes. (Def)", 12),
+    createTTEx(vec3(-6672, -6496, 100), "  |cff0080ff-n|r: No.", 12),
+    createTTEx(vec3(-6672, -6544, 100), "    |cff00ff80-n|r: Neutral.", 12),
+    createTTEx(vec3(-6672, -6592, 100), "    |cff00ff80-p|r: |cffff0000Draenei|r and |cff32cd32Demons|r.", 12),
+    createTTEx(vec3(-6672, -6640, 100), "    |cff00ff80-c|r: Both.", 12),
+    createTTEx(vec3(-6672, -6688, 100), "|cffff40003. Shops|r", 12),
+    createTTEx(vec3(-6672, -6736, 100), "  |cff0080ff-ns|r: Normal. (Def)", 12),
+    createTTEx(vec3(-6672, -6784, 100), "  |cff0080ff-oc|r: Only consumibles.", 12),
+    createTTEx(vec3(-6672, -6832, 100), "  |cff0080ff-nr|r: No Recipes.", 12),
+    createTTEx(vec3(-6352, -6400, 100), "|cffff40004. Selection|r", 12),
+    createTTEx(vec3(-6352, -6448, 100), "  |cff0080ff-ds|r: Normal. (Def)", 12),
+    createTTEx(vec3(-6352, -6496, 100), "  |cff0080ff-ap|r: Traitor (All pick).", 12),
+    createTTEx(vec3(-6352, -6544, 100), "|cffff40005. Heros|r", 12),
+    createTTEx(vec3(-6352, -6592, 100), "  |cff0080ff-lu|r: Hero (Leveling up). (Def)", 12),
+    createTTEx(vec3(-6352, -6640, 100), "  |cff0080ff-nl|r: Classic (Not levelling up).", 12)
+]
+
+texttag array modes2 = [
+    createTTEx(vec3(-4816, -6400, 100), "|cffff40001. Timers|r", 12),
+    createTTEx(vec3(-4816, -6448, 100), "  |cff0080ff-v|r: One for each mission.", 12),
+    createTTEx(vec3(-4816, -6496, 100), "    |cff00ff80-s|r: max. 31 minutes.", 12),
+    createTTEx(vec3(-4816, -6544, 100), "    |cff00ff80-m|r: max. 41 minutes.", 12),
+    createTTEx(vec3(-4816, -6592, 100), "    |cff00ff80-l|r: max. 51 minutes.", 12),
+    createTTEx(vec3(-4816, -6640, 100), "    |cff00ff80-h|r: max. 61 minutes.", 12),
+    createTTEx(vec3(-4816, -6688, 100), "  |cff0080ff-u|r: One for the match.", 12),
+    createTTEx(vec3(-4816, -6736, 100), "    |cff00ff80-i|r: 25 minutes.", 12),
+    createTTEx(vec3(-4816, -6784, 100), "    |cff00ff80-t|r: 30 minutes.", 12),
+    createTTEx(vec3(-4816, -6832, 100), "    |cff00ff80-s|r: 35 minutes.", 12),
+    createTTEx(vec3(-4816, -6880, 100), "    |cff00ff80-m|r: 40 minutes.", 12),
+    createTTEx(vec3(-4816, -6928, 100), "    |cff00ff80-l|r: 45 minutes.", 12),
+    createTTEx(vec3(-4816, -6976, 100), "    |cff00ff80-h|r: 50 minutes.", 12),
+    createTTEx(vec3(-4816, -7024, 100), "    |cff00ff80-e|r: 55 minutes.", 12),
+    createTTEx(vec3(-4496, -6400, 100), "|cffff40002. Creeps|r", 12),
+    createTTEx(vec3(-4496, -6448, 100), "  |cff0080ff-ca|r: Yes. (Def)", 12),
+    createTTEx(vec3(-4496, -6496, 100), "  |cff0080ff-n|r: No.", 12),
+    createTTEx(vec3(-4496, -6544, 100), "    |cff00ff80-n|r: Neutral.", 12),
+    createTTEx(vec3(-4496, -6592, 100), "    |cff00ff80-p|r: |cffff0000Draenei|r and |cff32cd32Demons|r.", 12),
+    createTTEx(vec3(-4496, -6640, 100), "    |cff00ff80-c|r: Both.", 12),
+    createTTEx(vec3(-4496, -6688, 100), "|cffff40003. Shops|r", 12),
+    createTTEx(vec3(-4496, -6736, 100), "  |cff0080ff-ns|r: Normal. (Def)", 12),
+    createTTEx(vec3(-4496, -6784, 100), "  |cff0080ff-oc|r: Only consumibles.", 12),
+    createTTEx(vec3(-4496, -6832, 100), "  |cff0080ff-nr|r: No Recipes.", 12),
+    createTTEx(vec3(-4176, -6400, 100), "|cffff40004. Selection|r", 12),
+    createTTEx(vec3(-4176, -6448, 100), "  |cff0080ff-ds|r: Normal. (Def)", 12),
+    createTTEx(vec3(-4176, -6496, 100), "  |cff0080ff-ap|r: Traitor (All pick).", 12),
+    createTTEx(vec3(-4176, -6544, 100), "|cffff40005. Heros|r", 12),
+    createTTEx(vec3(-4176, -6592, 100), "  |cff0080ff-lu|r: Hero (Leveling up). (Def)", 12),
+    createTTEx(vec3(-4176, -6640, 100), "  |cff0080ff-nl|r: Classic (Not levelling up).", 12)
+]
+
+function unit.replace(int newId) returns unit
+    this.hide()
+    let newUnit = createUnit(this.getOwner(), newId, this.getPos(), this.getFacingAngle())
+    this.remove()
+    return newUnit
+
+string chat
+
+public function actionsSelect()
+    string mode = chat
+    boolean m2 = true
+    boolean m3 = true
+    boolean m4 = true
+    boolean m5 = true
+    string sub1
+    string sub2
+
+    // Checkings
+    mode = mode.subString(2)
+    if mode.length() > 10
+        DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode (Too much characters)|r")
+        return
+
+    sub1 = mode.char(1)
+    sub2 = mode.char(2)
+
+    // 1 - First 2 characters (obligatory)
+    if sub1 == "u" or sub1 == "v"
+        if sub1 == "u"
+            if sub2 != "s" and sub2 != "m" and sub2 != "l" and sub2 != "h"
+                DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+                return
+        else
+            if sub2 != "i" and sub2 != "t" and sub2 != "s" and sub2 != "m" and sub2 != "l" and sub2 != "h" and sub2 != "e"
+                DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+                return
+    else
+        DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+        return
+
+    // 2
+    mode = mode.subString(3)
+    sub1 = mode.subString(1, 2)
+    if sub1 == "ca" or sub1=="nn" or sub1=="np" or sub1=="nc" or sub1 == null
+        if sub1 == null
+            m2 = false
+        else
+            mode = mode.subString(3)
+    else
+        if sub1 != "ns" and sub1 != "oc" and sub1 != "nr" and sub1 != "ds" and sub1 != "ap" and sub1 != "lu" and sub1 != "nl"
+            DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+            return
+        else
+            m2 = false
+
+    // 3
+    sub1 = mode.subString(1, 2)
+    if sub1 == "ns" or sub1 == "oc" or sub1 == "nr" or sub1 == null
+        if sub1 == null
+            m3 = false
+        else
+            mode = mode.subString(3)
+    else
+        if sub1 != "ds" and sub1 != "ap" and sub1 != "lu" and sub1 != "nl"
+            DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+            return
+        else
+            m3 = false
+    
+    // 4
+    sub1 = mode.subString(1, 2)
+    if sub1 == "ds" or sub1 == "ap" or sub1 == null
+        if sub1 == null
+            m4 = false
+        else
+            mode = mode.subString(3)
+    else
+        if sub1 != "lu" and sub1 != "nl"
+            DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+        else
+            m4 = false
+
+    // 5
+    sub1 = mode
+    if sub1 == "lu" or sub1 == "nl" or sub1 == null
+        if sub1 == null
+            m5 = false
+    else
+        DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
+        return
+
+    maxSelection.pause()
+    window.display(false)
+
+    mode = chat
+
+    // Mode 1: Timers
+    mode = mode.subString(2)
+    sub1 = mode.char(1)
+    sub2 = mode.char(2)
+    mode = mode.subString(3)
+    if sub1 == "v"
+        whatMode[1] = VARIOUS_TIMERS
+        if sub2 == "s"
+            handicapVariousTimers = 0.60
+            modes[1] = "One timer for each mission (31 minutes max.)."
+        else if sub2 == "m"
+            handicapVariousTimers = 0.80
+            modes[1] = "One timer for each mission (41 minutes max.)."
+        else if sub2 == "l"
+            handicapVariousTimers = 1.00
+            modes[1] = "One timer for each mission (51 minutes max.)."
+        else if sub2 == "h"
+            handicapVariousTimers = 1.20
+            modes[1] = "One timer for each mission (61 minutes max.)."
+    else
+        whatMode[1] = SINGLE_TIMER
+        if sub2 == "i"
+            quantityOneTimer = 1500.00
+            modes[1] = "One timer for the match (25 minutes)."
+        else if sub2 == "t"
+            quantityOneTimer = 1800.00
+            modes[1] = "One timer for the match (30 minutes)."
+        else if sub2 == "s"
+            quantityOneTimer = 2100.00
+            modes[1] = "One timer for the match (35 minutes)."
+        else if sub2 == "m"
+            quantityOneTimer = 2400.00
+            modes[1] = "One timer for the match (40 minutes)."
+        else if sub2 == "l"
+            quantityOneTimer = 2700.00
+            modes[1] = "One timer for the match (45 minutes)."
+        else if sub2 == "h"
+            quantityOneTimer = 3000.00
+            modes[1] = "One timer for the match (50 minutes)."
+        else if sub2 == "e"
+            quantityOneTimer = 3300.00
+            modes[1] = "One timer for the match (55 minutes)."
+    
+    // Mode 2: Creeps
+    if m2
+        sub1 = mode.char(1)
+        sub2 = mode.char(2)
+        mode = mode.subString(3)
+        if sub1 + sub2 == "ca"
+            enableNeutralSpawn()
+            tips[3] = "Watch for the missions (push is useless)."
+            modes[2] = "Normal."
+            whatMode[2] = YES_CREEPS
+        else if sub1 == "n"
+            if sub2 == "n"
+                forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
+                    if /*TODO u != udg_Golem_de_carne and*/ not u.isType(UNIT_TYPE_STRUCTURE)
+                        u.remove()
+                end)
+                tips[3] = "Watch for the missions (push is useless)."
+                modes[2] = "No Neutrals."
+                whatMode[2] = ONLY_DE_AND_DR
+            else if sub2 == "p"
+                forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                    let id = u.getTypeId()
+                    if id == 'n00D' or id == 'n00F' or id == 'n00S' or id == 'n002'
+                end)
+                DisableTrigger(gg_trg_Aqui_vamos)
+                enableNeutralSpawn()
+                tips[3] = "Watch for the missions."
+                modes[2] = "No |cffff0000Draenei|r and |cff32cd32Demons|r."
+                whatMode[2] = ONLY_NEUTRAL
+            else if sub2 == "c"
+                forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
+                    if /*TODO u != udg_Golem_de_carne and*/ not u.isType(UNIT_TYPE_STRUCTURE)
+                        u.remove()
+                end)
+                forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                    let id = u.getTypeId()
+                    if id == 'n00D' or id == 'n00F' or id == 'n00S' or id == 'n002'
+                        u.remove()
+                end)
+                DisableTrigger(gg_trg_Aqui_vamos)
+                enableNeutralSpawn()
+                tips[3] = "Watch for the missions."
+                modes[2] = "No Creeps."
+                whatMode[2] = NO_CREEPS
+    else
+        enableNeutralSpawn()
+        tips[3] = "Watch for the missions (push is useless)."
+        modes[2] = "Normal."
+        whatMode[2] = YES_CREEPS
+
+    // Mode 3: Shops
+    if m3
+        sub1 = mode.subString(1, 2)
+        mode = mode.subString(3)
+        if sub1 == "ns"
+            modes[3] = "Normal."
+            whatMode[3] = ALL_ITEMS
+        else if sub1 == "oc"
+            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                let id = u.getTypeId()
+                switch id
+                    case 'h002'
+                        u.hide()
+                    case 'h000'
+                        u.replace('h00E')
+                    case 'h003'
+                        u.replace('h00F')
+                    default
+            end)
+            modes[3] = "Only consummibles."
+            whatMode[3] = ONLY_COMSUMIBLES
+            doAfter(25, () -> begin
+                print("\nAs there are only consummibles items, you can only get wood by buying to balance the costs.")
+                bj_questHintSound.play()
+            end)
+        else if sub1 == "nr"
+            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+                if u.getTypeId() == 'h003'
+                    u.hide()
+            end)
+            modes[3] = "No recipes."
+            whatMode[3] = NO_RECIPES
+    else
+        modes[3] = "Normal."
+        whatMode[3] = ALL_ITEMS
+
+    // Mode 4: Selection
+    if m4
+        sub1 = mode.subString(1, 2)
+        mode = mode.subString(3)
+        if sub1 == "ds"
+            modes[4] = "Normal."
+            whatMode[4] = NORMAL_PICK
+        else if sub1 == "ap"
+            seeDraenei = createVision(DRAENEI, gg_rct_selecionador_demonios, true)..start()
+            seeDemons = createVision(DEMON, gg_rct_selecionador_draeneanos, true)..start()
+            modes[4] = "Traitor (All pick)."
+            whatMode[4] = TRAITOR
+    else
+        modes[4] = "Normal."
+        whatMode[4] = NORMAL_PICK
+
+    // Mode 5: Leveling
+    sub1 = mode.subString(1, 2)
+    if sub1 == "lu" or not m5
+        HeroType.level = true
+
+        doAfter(20, () -> begin
+            print("\nYou can only repick until 2 minutes.")
+            bj_questHintSound.play()
+        end)
+
+        doAfter(120, () -> begin
+            print("\n|cffff0000You cannot longer repick.|r")
+            disableRepick()
+        end)
+        
+        ifDie.disable()
+        ifRevive.disable()
+        reviveNRun = false
+        reviveHero.enable()
+        tips[1] = "There are defensive towers, the demolisher is good for destroy them."
+        tips[2] = "You can heal your heros in the base."
+        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+            let id = u.getTypeId()
+            switch id
+                case 'h001'
+                    u.replace('h009')
+                case 'h000'
+                    u.replace('h00A')
+                case 'h003'
+                    u.replace('h00D')
+                case 'n00H'
+                    u.show()
+                default
+                    for g = 1 to HeroType.MAX
+                        if id == N_HEROS[g]
+                            heroModel[g] = u.replace(L_HEROS[g])..pause()
+                        else if id == L_HEROS[g]
+                            heroModel[g] = u
+        end)
+        // TODO
+        gg_unit_ncop_0124.addAbility('A04C')
+        gg_unit_ncop_0124.addAbility('A04D')
+        gg_unit_ncop_0129.addAbility('A04C')
+        gg_unit_ncop_0129.addAbility('A04D')
+        gg_unit_h002_0151.addAbility('A04C')
+        gg_unit_h002_0151.addAbility('A04D')
+        modes[5] = "Hero (Leveling up)."
+        whatMode[5] = LEVELING
+    else if sub1 == "nl"
+        HeroType.level = false
+
+        ifDie.enable()
+        ifRevive.enable()
+        reviveNRun = true
+        reviveHero.disable()
+        tips[1] = "There are special heros for destroy towers."
+        tips[2] = "If you are low of health, you can use -repick to have all life and mana."
+        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+            u.removeAbility('A04C')
+            u.removeAbility('A04D')
+
+            let id = u.getTypeId()
+            switch id
+                case 'h009'
+                    u.replace('h001')
+                case 'h00A'
+                    u.replace('h000')
+                case 'h00D'
+                    u.replace('h003')
+                case 'n00H'
+                    u.hide()
+                default
+                    for g = 1 to HeroType.MAX
+                        if id == L_HEROS[g]
+                            u.replace(N_HEROS[g])..pause()
+        end)
+        modes[5] = "Classic (Not leveling up)."
+        whatMode[5] = NOT_LEVELING
+    
+    // Final
+    for i = 0 to 29
+        modes1[i].setVisibility(false)
+        modes2[i].setVisibility(false)
+    
+    ClearTextMessages()
+    createItem('I01L', gg_rct_Esqueleto.getCenter())
+    createItem('I01J', gg_rct_Fuego.getCenter())
+    createItem('I01K', gg_rct_Huevo.getCenter())
+    createItem('I01M', gg_rct_Libro.getCenter())
+    gg_trg_Obeliscos.disable()
+    forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+        if u.isType(UNIT_TYPE_HERO) and ((u.getOwner() == DRAENEI and gg_rct_selecionador_draeneanos.contains(u.getPos())) or (u.getOwner() == DEMON and gg_rct_selecionador_demonios.contains(u.getPos())))
+            u.pause()
+            SuspendHeroXP(u, true)
+            u.setInvulnerable(true)
+            herosToPick.addUnit(u)
+    end)
+    bj_FORCE_ALL_PLAYERS.forEach(() -> begin
+        let p = GetEnumPlayer()
+        canPick.addPlayer(p)
+        p.addGold(250)
+        forUnitsSelected(p, u -> begin
+            if localPlayer == p
+                SelectUnit(u, true)
+        end)
+    end)
+    //gg_trg_Si_Puedes.enable()
+    tipDisplayer.enable()
+
+    printTimedToPlayer("|cff7777aaGAMEMODES:|r", 15., localPlayer)
+    printTimedToPlayer("|cffffcc00Timers:|r " + modes[1], 15., localPlayer)
+    printTimedToPlayer("|cffffcc00Creeps:|r " + modes[2], 15., localPlayer)
+    printTimedToPlayer("|cffffcc00Shops:|r " + modes[3], 15., localPlayer)
+    printTimedToPlayer("|cffffcc00Selection:|r " + modes[4], 15., localPlayer)
+    printTimedToPlayer("|cffffcc00Heros:|r  " + modes[5], 15., localPlayer)
+
+    startMission1()
+    startTable()
+    // TODO
+    TriggerExecute(gg_trg_Crear_Gemas)
+    EnableTrigger(gg_trg_Surrender)
+
+    changeTexts()
+    actDrSpawn = gg_rct_spw1
+    actDeSpawn = gg_rct_spw5
+
+    select.disable()
+
+
+public function didntChose()
+    window.display(false)
+
+    let modes = ["-vs", "-vm", "-vl", "-vh", "-ui", "-ut", "-us", "-um", "-ul", "-uh", "-ue"]
+    chat = modes[GetRandomInt(0,11)]
+
+    actionsSelect()
+
+init
+    for i = 0 to 29
+        modes1[i].setVisibility(THE_DEMONS.containsPlayer(localPlayer))
+        modes2[i].setVisibility(THE_DRAENEI.containsPlayer(localPlayer))
+
+    for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE
+        select.registerPlayerChatEvent(players[i], "-", false)
+    
+    select..addAction(function actionsSelect)
+          ..addCondition(Condition(() -> begin
+        chat = GetEventPlayerChatString()
+        return GetTriggerPlayer() == selector and GetEventPlayerChatString().char(1) == "-"
+    end))
+

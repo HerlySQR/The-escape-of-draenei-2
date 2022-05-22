@@ -1,0 +1,145 @@
+/**
+    To use it do:
+    
+        let myEvent = new Event0() // If you don't wanna pass arguments
+        let myEvent = new Event1<Type>() // If you pass 1 argument
+        let myEvent = new Event2<Type1, Type2>() // If you wanna pass 2 arguments
+
+        myEvent.register(listener) // The listener must have as arguments those you specified before
+
+    This function returns the listener that has the functions
+        disconnect() // To can't run this listener again
+        reconnect() // To can run this listener again
+    
+    But you can destroy it to can't run it again forever and save memory
+
+    To call the listeners use the function
+        myEvent.broadcast() // For Event0
+        myEvent.broadcast(t) // For Event1
+        myEvent.broadcast(t1, t2) // For Event2
+    
+    If you don't like this names, you always could use the extends keyword, example:
+
+        public abstract class MyListener extends EventListener1<Type>
+    
+        public class MyEvent extends Event1<Type>
+            function register(MyListener l) returns MyListener
+                return super.register(l) castTo MyListener
+    
+    And do the same stuff
+
+        let myEvent = new MyEvent()
+        myEvent.register(myListener)
+*/
+
+package CustomEvents
+
+import LinkedList
+
+public abstract class EventListener0
+    protected Event0 e
+    private boolean disconnected = false
+
+    abstract function run()
+
+    /** Make the listener can't run anymore */
+    function disconnect()
+        if not disconnected
+            e.listeners.remove(this)
+            disconnected = true
+    
+    /** Make the listener can run again */
+    function reconnect()
+        if disconnected
+            e.listeners.add(this)
+            disconnected = false
+    
+    ondestroy
+        disconnect()
+
+public class Event0
+    protected LinkedList<EventListener0> listeners
+
+    construct()
+        listeners = new LinkedList<EventListener0>()
+    
+    function register(EventListener0 l) returns EventListener0
+        listeners.add(l)
+        l.e = this
+        return l
+
+    function broadcast()
+        for l in listeners
+            l.run()
+
+public abstract class EventListener1<T>
+    protected Event1<T> e
+    private boolean disconnected = false
+
+    abstract function run(T t)
+
+    /** Make the listener can't run anymore */
+    function disconnect()
+        if not disconnected
+            e.listeners.remove(this)
+            disconnected = true
+    
+    /** Make the listener can run again */
+    function reconnect()
+        if disconnected
+            e.listeners.add(this)
+            disconnected = false
+    
+    ondestroy
+        disconnect()
+
+public class Event1<T>
+    protected LinkedList<EventListener1<T>> listeners
+
+    construct()
+        listeners = new LinkedList<EventListener1<T>>()
+    
+    function register(EventListener1<T> l) returns EventListener1<T>
+        listeners.add(l)
+        l.e = this
+        return l
+
+    function broadcast(T t)
+        for l in listeners
+            l.run(t)
+
+public abstract class EventListener2<T1, T2>
+    protected Event2<T1, T2> e
+    private boolean disconnected = false
+
+    abstract function run(T1 t1, T2 t2)
+
+    /** Make the listener can't run anymore */
+    function disconnect()
+        if not disconnected
+            e.listeners.remove(this)
+            disconnected = true
+    
+    /** Make the listener can run again */
+    function reconnect()
+        if disconnected
+            e.listeners.add(this)
+            disconnected = false
+    
+    ondestroy
+        disconnect()
+
+public class Event2<T1, T2>
+    protected LinkedList<EventListener2<T1, T2>> listeners
+
+    construct()
+        listeners = new LinkedList<EventListener2<T1, T2>>()
+    
+    function register(EventListener2<T1, T2> l) returns EventListener2<T1, T2>
+        listeners.add(l)
+        l.e = this
+        return l
+
+    function broadcast(T1 t1, T2 t2)
+        for l in listeners
+            l.run(t1, t2)

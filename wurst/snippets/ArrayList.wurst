@@ -1,0 +1,106 @@
+/**
+    Why this instead of a LinkedList?
+
+    There are cases when is preferable:
+    1) To have knowlegde of the position and get the element directly instead of iterating to get it.
+    2) If you are already iterating over this you can remove the element directly (it requires you subtract 1 the index).
+*/
+package ArrayList
+
+import ErrorHandling
+
+public class ArrayList<T>
+    private static constant int SIZE = 40
+    private T array[SIZE] elements
+    private int size
+
+    /** Creates a new list by copying all elements from another list into it */
+    construct(ArrayList<T> base)
+        size = 0
+        for i = 1 to base.size
+            add(base.get(i))
+
+    /** Creates a new empty list */
+    construct()
+        size = 0
+
+    /** Adds an element to the end of the list (top of stack, beginning of queue) */
+    function add(T elem)
+        if size > SIZE
+            error("You are exceding the size limit of an ArrayList")
+        size++
+        elements[size] = elem
+
+    /** Adds an element to an specific position displacing the next elements
+        (only if is not putting outside the bounds of the list) */
+    function add(int index, T elem)
+        if index > size
+            if index == size + 1
+                add(elem)
+            else
+                error("You are out of the bounds of the list")
+        else
+            size++
+            for i = index + 1 to size
+                elements[i] = elements[i - 1]
+            elements[index] = elem
+    
+    /** Returns the first element*/
+    function first() returns T
+        return elements[1]
+
+    /** Returns the last element*/
+    function last() returns T
+        return elements[size]
+
+    /** Returns the element in the specified position */
+    function get(int index) returns T
+        return elements[index]
+
+    /** Returns whether the list contains the specified element */
+    function contains(T elem) returns boolean
+        for i = 1 to size
+            if elem == elements[i]
+                return true
+        return false
+
+    /** Removes the element in the specified position and returns it*/
+    function remove(int index) returns T
+        if index > size
+            error("You are out of the bounds of the list")
+        else
+            let e = elements[index]
+            for i = index to size - 1
+                elements[i] = elements[i + 1]
+            elements[size] = null
+            size--
+            return e
+
+        return null
+
+    /** Removes the last element in the list and returns it*/
+    function remove() returns T
+        return remove(size)
+    
+    /** Replaces the element on the specified position */
+    function replace(int index, T elem)
+        if index > size
+            error("You are out of the bounds of the list")
+        else
+            elements[index] = elem
+
+    /** Returns the quantity of elements the list have */
+    function size() returns int
+        return size
+
+    /** Returns if the list don't have elements */
+    function isEmpty() returns boolean
+        return size == 0
+
+    /** Returns a shallow copy of this list */
+    function copy() returns ArrayList<T>
+        return new ArrayList<T>(this)
+
+    ondestroy
+        for i = 1 to size
+            elements[i] = null

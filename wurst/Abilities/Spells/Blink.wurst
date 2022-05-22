@@ -1,0 +1,31 @@
+package Blink
+
+import AbilityData
+
+public constant BLINK_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let MAX_RANGE = 1150.
+let MANA = 50
+// Not leveling
+let CD_NL = 10.
+
+@compiletime function gen()
+    new AbilityDefinitionWardenBlink(BLINK_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Teleports the unit a short distance, allowing you to enter and exit combat."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Blink")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..presetMaximumRange(lvl -> MAX_RANGE)
+        ..presetManaCost(lvl -> MANA)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+        .setName("Blink")

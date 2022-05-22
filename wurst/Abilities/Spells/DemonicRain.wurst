@@ -1,0 +1,70 @@
+package DemonicRain
+
+import AbilityData
+
+public constant DEMONIC_RAIN_NL = compiletime(ABIL_ID_GEN.next())
+constant DEMONIC_RAIN_BUFF = compiletime(BUFF_ID_GEN.next())
+constant DEMONIC_RAIN_EFF = 'X000'//compiletime(BUFF_ID_GEN.next())
+
+// General
+let DURATION = 20.
+let CD = 0.//140.
+let AREA = 1000.
+let INTERVAL = 0.9
+let BUILD_REDUCTION = 0.2
+// Not leveling
+let MANA_NL = 0//200
+let DMG_NL = 150.
+let EXTRA_DMG_NL = 250.
+// Internal
+let SOUND = new SoundDefinition(Sounds.doom, true, false)
+SoundInstance varSound
+var count = 0
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityId() == DEMONIC_RAIN_NL
+            if count == 0
+                varSound = SOUND.play()
+            count++
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_ENDCAST, () -> begin
+        if GetSpellAbilityId() == DEMONIC_RAIN_NL
+            count--
+            if count == 0
+                varSound.snd.stop(false, true)
+    end)
+
+@compiletime function gen()
+    new AbilityDefinitionMoonPriestessStarfall(DEMONIC_RAIN_NL)
+        ..setLevels(1)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Flame waves of infernal stones will fall on each unit at " + AREA.toString(0) + " range of the sorcerer, causing damage, if the caster is stunned or makes an action, the spell stops.|nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetDamageInterval(lvl -> INTERVAL)
+        ..presetBuildingReduction(lvl -> BUILD_REDUCTION)
+        ..presetBuffs(lvl -> int2fourchar(DEMONIC_RAIN_BUFF))
+        ..presetEffects(lvl -> int2fourchar(DEMONIC_RAIN_EFF))
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00R|r] Demonic Rain")
+        // Stats
+        ..presetDamageDealt(lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNInfernalStone)
+        // Tooltip
+        ..setAnimationNames("slam,looping")
+        ..presetHotkey("R")
+        .tooltipStopListen()
+    
+    new BuffDefinition(DEMONIC_RAIN_BUFF, 'AEsd')
+        ..setArtTarget(1, Units.infernalBirth)
+        ..setName(1, "Demonic Rain")
+        ..setEditorSuffix(1, "(target)")
+    /*
+    new BuffDefinition(DEMONIC_RAIN_EFF, 'XEsf')
+        ..setArtTarget(1, "")
+        ..setName(1, "Demonic Rain")
+        ..setEditorSuffix(1, "(effect)")*/

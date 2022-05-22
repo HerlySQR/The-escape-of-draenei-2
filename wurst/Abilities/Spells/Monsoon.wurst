@@ -1,0 +1,155 @@
+package Monsoon
+
+import AbilityData
+import MoveSpeedX
+
+import UnitIndexer
+
+public constant MONSOON_NL = compiletime(ABIL_ID_GEN.next())
+public constant MONSOON_L = compiletime(ABIL_ID_GEN.next())
+public constant MONSOON_S = compiletime(ABIL_ID_GEN.next())
+constant DUMMY_MONSOON = compiletime(ABIL_ID_GEN.next())
+constant MONSOON_EFFECT = compiletime(BUFF_ID_GEN.next())
+
+// General
+let CD = 70.
+let RANGE = 900.
+let DURATION = 15.
+let AREA = 400.
+let SPEED = 0.4
+// Not leveling
+let DMG_NL = 150.
+let MANA_NL = 150
+// Leveling
+let DMG_L = [200., 300.]
+let MANA_L = [150, 200]
+// Internal
+let dummies = CreateGroup()
+unit array owners
+real array damages
+int array indexes
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(MONSOON_NL, MONSOON_L, MONSOON_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let pos = getSpellTargetPos()
+            let dummy = DummyRecycler.get(pos, caster.getFacingAngle())
+            dummy.addAbility(DUMMY_MONSOON)
+            dummy.setOwner(caster.getOwner(), false)
+            dummy.issuePointOrderById(Orders.monsoon, pos)
+            dummies.addUnit(dummy)
+            let i = dummy.getIndex()
+            owners[i] = caster
+            if data.isNL
+                damages[i] = DMG_NL
+            else
+                damages[i] = DMG_NL
+            indexes[caster.getIndex()] = i
+            doAfter(1.) -> 
+                caster.setFacing(caster.getFacingAngle() + 180..asAngleDegrees())
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_ENDCAST, () -> begin
+        if abilityCond(MONSOON_NL, MONSOON_L, MONSOON_S).check
+            let i = indexes[GetSpellAbilityUnit().getIndex()]
+            owners[i] = null
+            damages[i] = 0
+            let dummy = (i castTo UnitIndex).getUnit()
+            dummy.removeAbility(DUMMY_MONSOON)
+            dummies.removeUnit(dummy)
+            DummyRecycler.recycle(dummy)
+            indexes[GetSpellAbilityUnit().getIndex()] = 0
+    end)
+    registerDamageEvent(damage -> begin
+        if dummies.contains(damage.source)
+            let u = damage.target
+            u.scaleSpeed("monsoon", SPEED)
+            doAfter(1.) ->
+                u.removeSpeedBuff("monsoon")
+            let i = damage.source.getIndex()
+            damage.amount = 0.
+            Damage.deal(owners[i], damage.target, damages[i], ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "inferno")
+    this.presetOption(Option.TARGETIMAGE, true)
+    this.presetButtonPosNormal(3, 2)
+    this.setAnimationNames("victory,spell,channel")
+    this.setArtTarget(Abilities.monsoonRain)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Monsoon")
+    this.presetTargetTypes(Targettype.POINT)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> RANGE)
+    this.presetFollowThroughTime(lvl -> DURATION)
+    this.presetAreaofEffect(lvl -> AREA)
+    // Audiovisual
+    this.presetIcon(Imports.bTNdancingLightningGS)
+    // Tooltip
+    this.presetHotkey("R")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(MONSOON_NL, 1, true, new AbilityTooltipGenerator("Summons a lightning storm to deal damage to enemy units slows the units a {0}%.".format(((1. - SPEED) * 100.).toString(0))))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Monsoon")
+    
+    new ChannelAbilityPreset(MONSOON_L, 2, true, new AbilityTooltipGenerator("Summons a lightning storm to deal damage to enemy units slows the units a {0}%.".format(((1. - SPEED) * 100.).toString(0))))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("Monsoon")
+    
+    new ChannelAbilityPreset(MONSOON_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Monsoon")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 2
+                value = MANA_NL
+            else
+                value = MANA_L[lvl - 2]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl - 2]
+            return "Summons a lightning storm to deal {0} damage to enemy units in a {1} AOE and slows the units a {2}%.".format(value.toString(0), AREA.toString(0), ((1 - SPEED) * 100.).toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Monsoon")
+    
+    new AbilityDefinitionMonsoon(DUMMY_MONSOON)
+        ..setName("Dummy monsoon")
+        ..setArtCaster("")
+        ..setAreaofEffect(1, AREA)
+        ..setDamageDealt(1, 10.)
+        ..setDurationHero(1, DURATION)
+        ..setDurationNormal(1, DURATION)
+        ..setBuffs(1, int2fourchar(MONSOON_EFFECT))
+        .setDummyAbility()
+    
+    new BuffDefinition(MONSOON_EFFECT, 'ANmd')
+        ..setName(1, "Monsoon")
+        .setArtTarget(1, Imports.lightningsLong)

@@ -1,0 +1,156 @@
+package Earthquake
+
+import AbilityData
+import DummyDamager
+
+public constant EARTHQUAKE_NL = compiletime(ABIL_ID_GEN.next())
+public constant EARTHQUAKE_L = compiletime(ABIL_ID_GEN.next())
+public constant EARTHQUAKE_S = compiletime(ABIL_ID_GEN.next())
+constant DUMMY_EARTHQUAKE = compiletime(ABIL_ID_GEN.next())
+
+// General
+let RANGE = 900.
+let CD = 20.
+// Not leveling
+let DMG_NL = [100., 175.]
+let AREA_NL = [200., 230.]
+let MANA_NL = [110, 135]
+let DURATION_NL = [1.5, 2.]
+// Leveling
+let DMG_L = [100., 155., 210., 265.]
+let AREA_L = [200., 225., 250., 275.]
+let MANA_L = [115, 140, 165, 200]
+let DURATION_L = [1.5, 1.85, 2.2, 2.55]
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(EARTHQUAKE_NL, EARTHQUAKE_L, EARTHQUAKE_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let pos = getSpellTargetPos()
+            let dummy = DummyRecycler.get(pos, UNIT_FACING)
+            dummy.addAbility(DUMMY_EARTHQUAKE)
+            if data.isNL
+                dummy.setAbilityLevel(DUMMY_EARTHQUAKE, data.lvl + 1)
+            else
+                dummy.setAbilityLevel(DUMMY_EARTHQUAKE, data.lvl + 3)
+            dummy.setOwner(caster.getOwner(), false)
+            caster.dummyDamage(dummy, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+            dummy.issueImmediateOrderById(Orders.stomp)
+            doAfter(0.27) -> 
+                dummy.removeAbility(DUMMY_EARTHQUAKE)
+                DummyRecycler.recycle(dummy)
+            addEffect(Abilities.earthquakeTarget, pos).destroyAfter(2.)
+    end)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "inferno")
+    this.presetOption(Option.TARGETIMAGE, true)
+    this.presetButtonPosNormal(1, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.setAnimationNames("spell")
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] EarthQuake")
+    this.presetTargetTypes(Targettype.POINT)
+    this.presetCooldown(lvl -> CD)
+    this.presetCastRange(lvl -> RANGE)
+    // Audiovisual
+    this.presetIcon(Icons.bTNEarthquake)
+    // Tooltip
+    this.presetHotkey("W")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(EARTHQUAKE_NL, 2, true, new AbilityTooltipGenerator("Shakes the earth of the selected area causing and stunning them."))
+        ..setHeroAbility(false)
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION_NL[lvl - 1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl - 1])
+        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("EarthQuake")
+    
+    new ChannelAbilityPreset(EARTHQUAKE_L, 4, true, new AbilityTooltipGenerator("Shakes the earth of the selected area causing and stunning them."))
+        ..setHeroAbility(false)
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl - 1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+        .setName("EarthQuake")
+    
+    new ChannelAbilityPreset(EARTHQUAKE_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] EarthQuake")
+        ..presetHotkey("F")
+        // Stats
+        ..presetAreaofEffect(lvl -> begin
+            real value
+            if lvl < 3
+                value = AREA_NL[lvl - 1]
+            else
+                value = AREA_L[lvl - 3]
+            return value
+        end)
+        ..presetManaCost(lvl -> begin
+            int value
+            if lvl < 3
+                value = MANA_NL[lvl - 1]
+            else
+                value = MANA_L[lvl - 3]
+            return value
+        end)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = DMG_NL[lvl - 1]
+                value2 = DURATION_NL[lvl - 1]
+            else
+                value1 = DMG_L[lvl - 3]
+                value2 = DURATION_L[lvl - 3]
+            return "Shakes the earth of the selected area causing {0} damage and stunning them for {1} seconds.".format(value1.toString(0), value2.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("EarthQuake")
+    
+    new AbilityDefinitionWarStompcreep(DUMMY_EARTHQUAKE)
+        ..setName("Dummy stomp")
+        ..setEditorSuffix("(Earthquake)")
+        ..setArtCaster("")
+        ..presetAreaofEffect(lvl -> begin
+            real value
+            if lvl < 3
+                value = AREA_NL[lvl - 1]
+            else
+                value = AREA_L[lvl - 3]
+            return value
+        end)
+        ..presetDamage(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_NL[lvl - 1]
+            else
+                value = DMG_L[lvl - 3]
+            return value
+        end)
+        ..presetDurationHero(lvl -> begin
+            real value
+            if lvl < 3
+                value = DURATION_NL[lvl - 1]
+            else
+                value = DURATION_L[lvl - 3]
+            return value
+        end)
+        ..presetDurationNormal(lvl -> begin
+            real value
+            if lvl < 3
+                value = DURATION_NL[lvl - 1]
+            else
+                value = DURATION_L[lvl - 3]
+            return value
+        end)
+        .setDummyAbility()

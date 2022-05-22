@@ -1,0 +1,24 @@
+package Evasion
+
+import AbilityData
+
+public constant EVASION_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+// Not leveling
+let CHANCE_NL = 0.15
+
+@compiletime function gen()
+    new AbilityDefinitionDemonHunterEvasion(EVASION_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of avoiding an attack."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..tooltipStartListen()
+        ..setName("Evasion")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetChancetoEvade(lvl -> CHANCE_NL)
+        // Audiovisual
+        // Tooltip
+        .tooltipStopListen()

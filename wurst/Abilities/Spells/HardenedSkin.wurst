@@ -1,0 +1,32 @@
+package HardenedSkin
+
+import AbilityData
+
+public constant HARDENED_SKIN_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let TARGETS = "enemy,ally"
+// Not leveling
+let IGNORED_DMG_NL = 12.
+let MIN_DMG = 3.
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(HARDENED_SKIN_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduce all attacks. Attacks cannot be reduced by more than one damage of " + MIN_DMG.toString(0) + "."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetMinimumDamage(lvl -> MIN_DMG)
+        ..presetChancetoReduceDamage(lvl -> 100.)
+        ..presetIncludeMeleeDamage(lvl -> true)
+        ..presetIncludeRangedDamage(lvl -> true)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Dark Blood")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        // Stats
+        ..presetIgnoredDamage(lvl -> IGNORED_DMG_NL)
+        // Audiovisual
+        // Tooltips
+        .tooltipStopListen()

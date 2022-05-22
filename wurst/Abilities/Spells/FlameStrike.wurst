@@ -1,0 +1,46 @@
+package FlameStrike
+
+import AbilityData
+
+public constant FLAME_STRIKE_NL = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 21.
+let CAST_TIME = 0.7
+let RANGE = 800.
+let DURATION_HERO = 2.67
+let DURATION_NORMAL = 9.
+let TARGETS = "air,enemies,structure,neutral,ground,tree"
+// Not leveling
+let MANA_NL = 115
+let AREA_NL = 200.
+let HALF_DMG_NL = 8.
+let FULL_DMG_NL = 36.67
+let MAX_DMG_NL = 220.
+
+@compiletime function gen()
+    new AbilityDefinitionFlameStrikeCreep(FLAME_STRIKE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Conjure a pillar of flame that burns the nearby units. When the flame pillar begins to calm down, the units inside are still receiving minor damage."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("[|cffffcc00W|r] Flame strike")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..presetHalfDamageDealt(lvl -> HALF_DMG_NL)
+        ..presetFullDamageDealt(lvl -> FULL_DMG_NL)
+        ..presetMaximumDamage(lvl -> MAX_DMG_NL)
+        ..presetDurationHero(lvl -> DURATION_HERO)
+        ..presetDurationNormal(lvl -> DURATION_NORMAL)
+        ..presetCastingTime(lvl -> CAST_TIME)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()

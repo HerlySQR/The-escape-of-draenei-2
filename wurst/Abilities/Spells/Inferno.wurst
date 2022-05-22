@@ -1,0 +1,67 @@
+package Inferno
+
+import AbilityData
+
+public constant INFERNO_NL = compiletime(ABIL_ID_GEN.next())
+constant INFERNAL_NL = compiletime(UNIT_ID_GEN.next())
+
+// General
+let RANGE = 500.
+let TARGETS = "ground,structure,debris,enemy,neutral"
+let DURATION = 50.
+let DURATION_STUN = 2.
+// Not leveling
+let CD_NL = 32.
+let INFERNAL_LIFE_NL = 650
+let INFERNAL_DMG_NL = dice(55, 1, 12)
+let AREA_NL = 250.
+let MANA_NL = 50
+let DMG_NL = 50.
+
+init
+    gg_unit_Ofar_0285.addAbility(INFERNO_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionInferno(INFERNO_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw an infernal from the sky, it lasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetSummonedUnit(lvl -> int2fourchar(INFERNAL_NL))
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Inferno")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..addTooltipProperty("Infernal life", lvl -> INFERNAL_LIFE_NL)
+        ..addTooltipProperty("Infernal damage", lvl -> INFERNAL_DMG_NL.toString())
+        ..presetDuration(lvl -> DURATION)
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetDurationHero(lvl -> DURATION_STUN)
+        ..presetDurationNormal(lvl -> DURATION_STUN)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+        .setName("Inferno")
+
+    new UnitDefinition(INFERNAL_NL, 'ninf')
+        ..setAttack1DamageBase(INFERNAL_DMG_NL.base)
+        ..setAttack1DamageNumberofDice(INFERNAL_DMG_NL.number)
+        ..setAttack1DamageSidesperDie(INFERNAL_DMG_NL.sides)
+        ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward,tree")
+        ..setUnitClassification("summoned")
+        ..setLevel(4)
+        ..setHitPointsMaximumBase(INFERNAL_LIFE_NL)
+        ..setTintingColorRed(255)
+        ..setTintingColorGreen(255)
+        ..setTintingColorBlue(255)
+        ..setScalingValue(0.8)
+        ..setNormalAbilities("ANpi")
+        ..setName("Infernal")
+        .setNameEditorSuffix("(Not leveling / Level 1)")
