@@ -26,7 +26,7 @@ let DMG_PER_SEC_L = [30., 45., 60., 75.]
 let extraHeight = vec3(0., 0., 50.)
 
 function quellActions(unit caster, unit target, player owner, real damage)
-    Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC)
+    caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC)
     target.flashEffect(Imports.holyLight, "origin")
     forUnitsInRange(target.getPos(), AREA, u -> begin
         if not u.isType(UNIT_TYPE_MECHANICAL) and not u.isType(UNIT_TYPE_STRUCTURE) and owner.isAllyOf(u.getOwner())

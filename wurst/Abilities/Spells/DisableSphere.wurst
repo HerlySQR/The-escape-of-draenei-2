@@ -17,9 +17,9 @@ let DMG_NL = 200.
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == DISABLE_SPHERE_NL
-            let caster = GetSpellAbilityUnit()
-            let target = getSpellTargetPos()
+        if EventData.getSpellAbilityId() == DISABLE_SPHERE_NL
+            let caster = EventData.getSpellAbilityUnit()
+            let target = EventData.getSpellTargetPos()
             let m = new Missiles(caster.getPos3with(50.), target.withZ(50.))
             m.setModel(Imports.orbDragonX)
             m.source = caster
@@ -31,7 +31,7 @@ init
                 InstantDummyCaster.castPoint(m.owner, DISABLE_SPHERE_SILENCE, 1, Orders.silence, target, target)
                 forUnitsInRange(target, AREA, u -> begin
                     if m.owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
-                        Damage.deal(m.source, u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FORCE)
+                        m.source.damageTarget(u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FORCE)
                 end)
                 return true
             end)
@@ -70,7 +70,7 @@ init
         ..setAttacksPrevented(1, 3)
         ..setDurationHero(1, DURATION)
         ..setDurationNormal(1, DURATION)
-        ..setBuffs(1, int2fourchar(DISABLE_SPHERE_BUFF))
+        ..setBuffs(1, DISABLE_SPHERE_BUFF.toRawCode())
         ..setName("Silence")
         ..setEditorSuffix("(Disable Sphere)")
         .setDummyAbility()

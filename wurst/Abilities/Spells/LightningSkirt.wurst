@@ -28,7 +28,7 @@ init
             let g = CreateGroup()
             forUnitsInRange(pos, AREA, u -> begin
                 if u.isAlive() and owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
-                    g.addUnit(u)
+                    g.add(u)
             end)
             real damage
             int counter
@@ -40,7 +40,7 @@ init
                 counter = MAX_TARGETS_L[data.lvl]
             for u from g
                 new FlashLightning(LIGHTNING_FORKED_LIGHTNING, caster, u, 1.)
-                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
+                caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
                 counter--
                 if counter == 0
                     break

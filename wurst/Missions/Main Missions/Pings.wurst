@@ -6,17 +6,17 @@ import PlayerData
 
 public trigger pings = CreateTrigger()..disable()
 
-let mission1Objective = gg_rct_Objetivo_1.getCenter()
+let mission1Objective = Dests.dungeonExitDoor2.getPos()
 
-let mission2Objective1 = gg_rct_Colocar_barril.getCenter()
-let mission2Objective2 = gg_rct_Techies.getCenter()
+let mission2Objective1 = Rects.placeBarrel2.getCenter()
+let mission2Objective2 = Rects.lookTheGoblin.getCenter()
 
-let mission3Objective = gg_rct_Salida_2.getCenter()
+let mission3Objective = Rects.respawn4.getCenter()
 
-let mission4Objective1 = gg_rct_Generador_1.getCenter()
-let mission4Objective2 = gg_rct_Generador_2.getCenter()
+let mission4Objective1 = generatorPos1
+let mission4Objective2 = generatorPos2
 
-let mission5Objective = gg_rct_Objetivo_final.getCenter()
+let mission5Objective = Dests.mainEntranceDoor.getPos()
 
 init
     pings

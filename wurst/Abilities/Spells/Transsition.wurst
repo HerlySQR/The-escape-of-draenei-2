@@ -22,12 +22,11 @@ let casterMap = new HashMap<unit, unit>()
 let effMap = new HashMap<unit, LinkedList<effect>>()
 
 init
-    gg_unit_H00L_0205.addAbility(TRANSSITION_NL)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == TRANSSITION_NL
-            let caster = GetSpellAbilityUnit()
+        if EventData.getSpellAbilityId() == TRANSSITION_NL
+            let caster = EventData.getSpellAbilityUnit()
             let shade = createUnit(caster.getOwner(), TRANSSITION_SHADE, caster.getPos(), caster.getFacingAngle())
-            shade.issuePointOrderById(Orders.move, getSpellTargetPos())
+            shade.issuePointOrderById(Orders.move, EventData.getSpellTargetPos())
             shade.setTimedLife(DURATION)
             shade.startWindWalk('BTLF')
             effMap.put(shade, new LinkedList<effect>()
@@ -123,5 +122,5 @@ init
         ..setTintingColorBlue(0)
         ..setSpeedBase(450)
         ..setCollisionSize(0.)
-        ..setNormalAbilities(int2fourchar(AbilityIds.invulnerable) + "," + int2fourchar(TRANSSITION_CANCEL))
+        ..setNormalAbilities(commaList(AbilityIds.invulnerable, TRANSSITION_CANCEL))
         ..setName("Wolf shade")

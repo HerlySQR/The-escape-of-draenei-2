@@ -13,9 +13,6 @@ let AREA_NL = 150.
 let HALF_DMG_NL = 3.
 let FULL_DMG_NL = 6.
 
-init
-    gg_unit_Ofar_0285.addAbility(AbilityIds.invulnerable)
-
 @compiletime function gen()
     new AbilityDefinitionBallsofFire(BOILING_OIL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Soak the demolition's ammunition in boiling oil, causing it to burn the land and enemy units on it.\n\n|cffff0000Orb effects don't stack.|r"))

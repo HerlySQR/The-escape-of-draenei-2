@@ -44,8 +44,8 @@ init
         ..presetAreaofEffect(lvl -> AREA)
         ..presetDamageInterval(lvl -> INTERVAL)
         ..presetBuildingReduction(lvl -> BUILD_REDUCTION)
-        ..presetBuffs(lvl -> int2fourchar(DEMONIC_RAIN_BUFF))
-        ..presetEffects(lvl -> int2fourchar(DEMONIC_RAIN_EFF))
+        ..presetBuffs(lvl -> DEMONIC_RAIN_BUFF.toRawCode())
+        ..presetEffects(lvl -> DEMONIC_RAIN_EFF.toRawCode())
         ..tooltipStartListen()
         ..setName("[|cffffcc00R|r] Demonic Rain")
         // Stats

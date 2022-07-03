@@ -1,9 +1,11 @@
 ---
 projectName: The escape of draenei 2
 dependencies:
-- https://github.com/wurstscript/wurstStdlib2
-- https://github.com/wurstscript/wurstStdlib2:pre1.29
+- https://github.com/HerlySQR/WurstStdlib2:pre1.29
+- https://github.com/Frotty/Ability-Tooltip-Generator
+- https://github.com/HerlySQR/Bounty_Controller
+- https://github.com/HerlySQR/Bounty_Controller:main
 buildMapData:
-  name: MyMapName
-  fileName: MyMapFile
-  author: SEBAS
+  name: The_escape_of_draenei
+  fileName: The_escape_of_draenei
+  author: HerlySQR

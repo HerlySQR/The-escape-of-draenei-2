@@ -21,7 +21,7 @@ let cbMap = new HashMap<unit, CallbackSingle>()
 function fireImact(unit source, unit target)
     source.removeAbility(FIRE_IMPACT_BUFF)
     InstantDummyCaster.castTarget(target.getOwner() == players[PLAYER_NEUTRAL_AGGRESSIVE] ? source.getOwner() : players[PLAYER_NEUTRAL_AGGRESSIVE] , FIRE_IMPACT_STUN, 1, Orders.creepthunderbolt, target, target.getPos())
-    Damage.deal(source, target, dmgMap.get(source), ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE)
+    source.damageTarget(target, dmgMap.get(source), ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE)
     dmgMap.remove(source)
 
 init
@@ -36,12 +36,14 @@ init
                 cbMap.remove(caster)
             end))
     end)
-    registerAfterDamageEvent(damage -> begin
-        if damage.source.hasAbility(FIRE_IMPACT_BUFF) and not damage.isSpell
-            and not damage.source.getOwner().isAllyOf(damage.target.getOwner())
-            fireImact(damage.source, damage.target)
-            destroy cbMap.get(damage.source)
-            cbMap.remove(damage.source)
+    DamageEvent.addListener(() -> begin
+        let source = DamageEvent.getSource()
+        let target = DamageEvent.getTarget()
+        if source.hasAbility(FIRE_IMPACT_BUFF) and not DamageEvent.isSpell()
+            and not DamageEvent.getSource().getOwner().isAllyOf(target.getOwner())
+            fireImact(source, target)
+            destroy cbMap.get(source)
+            cbMap.remove(source)
     end)
 
 @compiletime function gen()
@@ -50,7 +52,7 @@ init
         ..setLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> int2fourchar(FIRE_IMPACT_BUFF))
+        ..presetBuffs(lvl -> FIRE_IMPACT_BUFF.toRawCode())
         ..presetDurationHero(lvl -> MAX_DURATION + 1.)
         ..presetDurationNormal(lvl -> MAX_DURATION + 1.)
         ..presetDamageTakenIncrease(lvl -> 0.)

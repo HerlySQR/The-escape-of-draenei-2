@@ -3,11 +3,15 @@ package Functions
 import UnitIndexer
 import ErrorHandling
 import ClosureForGroups
-import LinkedList
+import DamageEvent
 import ClosureTimers
 import TimerUtils
 import BuffObjEditing
 import HashMap
+
+public function unit.damageTarget(unit target, real amount, attacktype attackType, damagetype damageType)
+    DamageEvent.setNextDamageFromCode()
+    UnitDamageTarget(this, target, amount, true, false, attackType, damageType, WEAPON_TYPE_WHOKNOWS)
 
 // Values
 
@@ -53,7 +57,7 @@ public function group.issueTargetOrder(int order, widget target)
 
     for u in this
         if u.filter()
-            vase.addUnit(u)
+            vase.add(u)
 
     while not vase.isEmpty()
         let vase2 = GetRandomSubGroup(12, vase)
@@ -68,7 +72,7 @@ public function group.issuePointOrder(int order, vec2 target)
 
     for u in this
         if u.filter()
-            vase.addUnit(u)
+            vase.add(u)
 
     while not vase.isEmpty()
         let vase2 = GetRandomSubGroup(12, vase)
@@ -134,9 +138,6 @@ public function unit.pause(boolean flag)
         if paused[i] == 0
             this.unpause()
 
-public function widget.flashEffect(string path, string attachment)
-    AddSpecialEffectTarget(path, this, attachment).destr()
-
 public function unit.ignoreLocust() returns boolean
     return not this.hasAbility(LOCUST_ID)
 
@@ -169,7 +170,7 @@ public function player.setColor(playercolor color, boolean changeExisting)
 
 // Multiboard
 
-public function multiboard.setItemValue(int col, int row, string val)
+/*public function multiboard.setItemValue(int col, int row, string val)
     if row-1 > this.getRowCount() or col-1 > this.getColumnCount() or row < 0 or col < 0
         return
 
@@ -318,7 +319,7 @@ public function multiboard.setItemWidth(int col, int row, real width)
             mbitem = this.getItem(i, j)
             mbitem.setWidth(width)
             mbitem.release()
-
+*/
 // Text tag
 
 public function texttag.setSpeed(real vel, real dir)
@@ -328,11 +329,6 @@ public function texttag.setSpeed(real vel, real dir)
 
 public function texttag.setUnitPos(unit whatUnit)
     SetTextTagPosUnit(this, whatUnit, 0.)
-
-// Effects
-
-public function effect.destroyAfter(real delay)
-    doAfter(delay, () -> this.destr())
 
 // Elevators
 
@@ -457,7 +453,7 @@ public function pingMinimap(player p, vec2 pos, real time)
         pingMinimap(pos, time)
 
 public function pingMinimap(force f, vec2 pos, real time)
-    if f.containsPlayer(localPlayer)
+    if f.has(localPlayer)
         pingMinimap(pos, time)
 
 public function pingMinimap(vec2 pos, real duration, color whatColor, boolean specialEffs)
@@ -468,7 +464,7 @@ public function pingMinimap(player p, vec2 pos, real duration, color whatColor, 
         pingMinimap(pos, duration, whatColor, specialEffs)
 
 public function pingMinimap(force f, vec2 pos, real duration, color whatColor, boolean specialEffs)
-    if f.containsPlayer(localPlayer)
+    if f.has(localPlayer)
         pingMinimap(pos, duration, whatColor, specialEffs)
 
 // Lightning
@@ -590,7 +586,7 @@ public function unit.removeBuff(buffTuple whatbuff)
 
 init
     onUnitDeindex(() -> begin
-        let i = getDeindexedUnit().getIndex()
+        let i = getIndexingUnit().getIndex()
         if durationMaps[i] != null
             destroy durationMaps[i]
             durationMaps[i] = null

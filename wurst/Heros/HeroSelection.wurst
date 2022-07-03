@@ -2,8 +2,8 @@ package HeroSelection
 
 import ClosureTimers
 import ClosureForGroups
-import FogModifier
 import Camera
+import GeneratedValues
 
 import ModeSelection
 import public HeroType
@@ -26,19 +26,19 @@ unit array arrow
 
 init
     forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-        if gg_rct_selecionador_draeneanos.contains(u.getPos()) or gg_rct_selecionador_demonios.contains(u.getPos())
+        if Rects.selectorDraenei.contains(u.getPos()) or Rects.selectorDemon.contains(u.getPos())
             u.setInvulnerable(true)
     end)
 
-    createVision(DRAENEI, gg_rct_selecionador_draeneanos, true).start()
-    createVision(DEMON, gg_rct_selecionador_demonios, true).start()
+    createVision(DRAENEI, Rects.selectorDraenei, true).start()
+    createVision(DEMON, Rects.selectorDemon, true).start()
         
     // If you select
     trigger t = CreateTrigger()
     for i = 1 to 11
         t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_SELECTED, null)
     t..addCondition(Condition(() -> begin
-        return canPick.containsPlayer(GetTriggerPlayer()) and herosToPick.contains(GetTriggerUnit())
+        return canPick.has(GetTriggerPlayer()) and herosToPick.has(GetTriggerUnit())
     end))
      ..addAction(() -> begin
         let heroSelected = GetTriggerUnit()
@@ -54,18 +54,18 @@ init
                 if whatMode[5] == NOT_LEVELING
                     SuspendHeroXP(hero[c], true)
                 /* TODO
-                if udg_Sky_Gem_Power.containsPlayer(playerSelector)
+                if udg_Sky_Gem_Power.has(playerSelector)
                     hero[c].addAbility('A02J')
                     udg_Sky_Gem_Ability = hero[c]
                     udg_Sky_Gem_Visibilidad = createVision(playerSelector, udg_Sky_Gem_Ability.getPos(), 1800, true)..start()*/
                 if whatMode[5] == LEVELING
-                    if (temp == L_CACIQUE or temp == L_MAIDEN_OF_PAIN) and THE_DRAENEI.containsPlayer(playerSelector) //TODO and not udg_Ya_pueden
+                    if (temp == L_CACIQUE or temp == L_MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
                         hero[c].addAbility('A06B')
                         DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
                         if localPlayer == playerSelector
                             bj_questHintSound.play()
                 else
-                    if (temp == N_CACIQUE or temp == N_MAIDEN_OF_PAIN) and THE_DRAENEI.containsPlayer(playerSelector) //TODO and not udg_Ya_pueden
+                    if (temp == N_CACIQUE or temp == N_MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
                         hero[c].removeAbility('A00F')
                         hero[c].addAbility('A022')
                         DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
@@ -77,10 +77,10 @@ init
                     udg_Unidad_que_sigo[c] = hero[c]
                     udg_Distancia_al_objetivo[c] = 1024.00*/
 
-                canPick.removePlayer(playerSelector)
+                canPick.remove(playerSelector)
 
                 vec2 pos
-                if THE_DRAENEI.containsPlayer(playerSelector)
+                if THE_DRAENEI.has(playerSelector)
                     pos = actDrSpawn.randomPoint()
                 else
                     pos = actDeSpawn.randomPoint()
@@ -108,7 +108,7 @@ init
     for i = 1 to 11
         t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_DESELECTED, null)
     t..addCondition(Condition(() -> begin
-        return herosToPick.contains(GetTriggerUnit())
+        return herosToPick.has(GetTriggerUnit())
     end))
     t..addAction(() -> begin
         let id = GetTriggerPlayer().getId()

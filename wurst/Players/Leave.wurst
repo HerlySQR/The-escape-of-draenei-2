@@ -2,6 +2,9 @@ package Leave
 
 import MyBoard
 
+import SoundUtils
+
+let SOUND = new SoundDefinition(Sounds.upkeepRing, false, false)
 int temp
 
 init
@@ -30,6 +33,6 @@ init
                     m.setPos(circleRegion[temp].getCenter())
                     SetItemPlayer(m, players[PLAYER_NEUTRAL_PASSIVE], false)
             end)
-            gg_snd_UpkeepRing.play()
+            SOUND.play()
             playersOrder()
         end)

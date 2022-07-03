@@ -26,7 +26,7 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         let data = abilityCond(SPARKY_EXPLOSIONS_NL, SPARKY_EXPLOSIONS_L, SPARKY_EXPLOSIONS_S)
         if data.check
-            let caster = GetSpellAbilityUnit()
+            let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             let direction = (-1).pow(GetRandomInt(1, 4))
             let pos = caster.getPos()
@@ -55,7 +55,7 @@ init
                 doAfter(4., () -> destroy fx)
                 forUnitsInRange(newPos, area, u -> begin
                     if owner.isEnemyOf(u.getOwner())
-                        Damage.deal(caster, u, damage, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_DEMOLITION)
+                        caster.damageTarget(u, damage, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_DEMOLITION)
                 end)
                 breakTrees(newPos, area, true)
             end)

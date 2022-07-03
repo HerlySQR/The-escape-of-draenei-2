@@ -44,7 +44,7 @@ init
                     createRipple(2., false, pos, AREA, AREA, 64., 1., AREA)
                     forUnitsInRange(pos, AREA, u -> begin
                         if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE) and not u.isType(UNIT_TYPE_STRUCTURE)
-                            Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC, WEAPON_TYPE_ROCK_HEAVY_BASH)
+                            caster.damageTarget(u, damage, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC, WEAPON_TYPE_ROCK_HEAVY_BASH)
                             u.issuePointOrderById(Orders.move, u.getPos().moveTowards(pos, -AREA))
                     end)
                     target.setFlyHeight(target.getDefaultFlyHeight(), 1000.)
@@ -63,7 +63,7 @@ init
         ..presetTargetsAllowed(lvl -> "enemies,debris,neutral,organic,ground")
         ..presetDurationHero(lvl -> MAX_DURATION)
         ..presetDurationNormal(lvl -> MAX_DURATION)
-        ..presetBuffs(lvl -> int2fourchar(AXE_OF_DESTRUCTION_BUFF))
+        ..presetBuffs(lvl -> AXE_OF_DESTRUCTION_BUFF.toRawCode())
         ..tooltipStartListen()
         ..setName("[|cffffcc00R|r] Axe of Destruction")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)

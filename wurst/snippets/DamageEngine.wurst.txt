@@ -8,7 +8,6 @@ import ClosureTimers
 import ClosureForGroups
 import AbilityObjEditing
 import ObjectIdGenerator
-import Annotations
 
 /** The damage events can be used to deal other damage, so here is a limit of how many are allowed per instance*/
 @configurable constant LIMIT_RECURSION = 48

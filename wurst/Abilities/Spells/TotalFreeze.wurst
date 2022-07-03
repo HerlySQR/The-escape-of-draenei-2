@@ -26,11 +26,12 @@ var timeFreeze = false
 let INTERVAL = 0.1
 let COUNTER = compiletime((DURATION/INTERVAL).toInt())
 var duration = 0
+let SOUND = new SoundDefinition(Sounds.creepAggroWhat1, false, false)
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CHANNEL, () -> begin
         if abilityCond(TOTAL_FREEZE_NL, TOTAL_FREEZE_L, TOTAL_FREEZE_S).check
-            gg_snd_CreepAggroWhat1.play()
+            SOUND.play()
             DisplayTextToPlayer(localPlayer, 0., 0., "|cffae0000The Dark Wizard will cast Total Freeze|r")
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
@@ -76,12 +77,12 @@ init
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
         if timeFreeze and GetDyingUnit().isType(UNIT_TYPE_HERO)
-            diedFreezed.addUnit(GetDyingUnit())
+            diedFreezed.add(GetDyingUnit())
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_HERO_REVIVE_FINISH, () -> begin
-        if diedFreezed.contains(GetRevivingUnit())
+        if diedFreezed.has(GetRevivingUnit())
             GetRevivingUnit().setTimeScale(1.)
-            diedFreezed.removeUnit(GetRevivingUnit())
+            diedFreezed.remove(GetRevivingUnit())
     end)
 
 function AbilityDefinitionPitLordHowlofTerror.general()
@@ -89,7 +90,7 @@ function AbilityDefinitionPitLordHowlofTerror.general()
     this.setAnimationNames("spell")
     this.setArtCaster("")
     this.presetTargetsAllowed(lvl -> TARGETS)
-    this.presetBuffs(lvl -> int2fourchar(TOTAL_FREEZE_BUFF))
+    this.presetBuffs(lvl -> TOTAL_FREEZE_BUFF.toRawCode())
     this.presetDamageIncrease(lvl -> 0.)
     this.presetAreaofEffect(lvl -> AREA)
     this.tooltipStartListen()

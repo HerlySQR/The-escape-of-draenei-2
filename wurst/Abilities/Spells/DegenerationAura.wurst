@@ -20,7 +20,7 @@ let SPEED_NL = -0.1
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetAttackSpeedIncrease(lvl -> 0.)
         ..presetMovementSpeedIncrease(lvl -> SPEED_NL)
-        ..presetBuffs(lvl -> int2fourchar(DEGENERATION_AURA_BUFF))
+        ..presetBuffs(lvl -> DEGENERATION_AURA_BUFF.toRawCode())
         ..tooltipStartListen()
         ..setName("Degeneration Aura")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)

@@ -1,33 +1,37 @@
 // Make a damage deal from a unit comes from another instead
 package DummyDamager
 
-import DamageEngine
+import Functions
+
+import DamageEvent
 import UnitIndexer
 
 group dummies = CreateGroup()
-unit array source
+unit array sources
 attacktype array att
 damagetype array dtt
 
 public function unit.dummyDamage(unit dummy, attacktype at, damagetype dt)
-    dummies.addUnit(dummy)
+    dummies.add(dummy)
     let i = dummy.getIndex()
-    source[i] = this
+    sources[i] = this
     att[i] = at
     dtt[i] = dt
 
 init
-    registerDamageEvent(damage -> begin
-        if dummies.contains(damage.source)
-            let i = damage.source.getIndex()
-            Damage.deal(source[i], damage.target, damage.amount, att[i], dtt[i])
-            damage.amount = 0.
+    DamageEvent.addUnreducedListener(() -> begin
+        let source = DamageEvent.getSource()
+        if dummies.has(source)
+            let target = DamageEvent.getTarget()
+            let i = source.getIndex()
+            sources[i].damageTarget(target, DamageEvent.getAmount(), att[i], dtt[i])
+            DamageEvent.setAmount(0.)
     end)
     onUnitDeindex(() -> begin
-        if dummies.contains(getDeindexedUnit())
-            dummies.removeUnit(getDeindexedUnit())
-            let i = getDeindexedUnit().getIndex()
-            source[i] = null
+        if dummies.has(getIndexingUnit())
+            dummies.remove(getIndexingUnit())
+            let i = getIndexingUnit().getIndex()
+            sources[i] = null
             att[i] = null
             dtt[i] = null
     end)

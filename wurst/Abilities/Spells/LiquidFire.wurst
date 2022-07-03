@@ -32,7 +32,7 @@ let SLOW_ATTACK_NL = 0.4
         ..presetPrimaryDamage(lvl -> DMG_ACT_NL)
         ..presetSecondaryDamage(lvl -> DMG_ACT_NL)
         ..presetCastRange(lvl -> RANGE)
-        ..presetBuffs(lvl -> int2fourchar(LIQUID_FIRE_BUFF))
+        ..presetBuffs(lvl -> LIQUID_FIRE_BUFF.toRawCode())
         ..presetAttackSpeedReduction(lvl -> -SLOW_ATTACK_NL) // It should be negative
         ..presetMovementSpeedReduction(lvl -> -SLOW_MOVE)
         ..tooltipStartListen()

@@ -31,9 +31,9 @@ init
         let p = GetTriggerPlayer()
         let i = p.getNumber()
         afkTime[i] = 0
-        if not whoAreHere.containsPlayer(p)
-            whoAreHere.addPlayer(p)
-            table.setItemColor(0, row[i], 255, 255, 255, 255)
+        if not whoAreHere.has(p)
+            whoAreHere.add(p)
+            table.setItemValueColor(0, row[i], 255, 255, 255, 255)
             table.setItemValue(2, row[i], playerName[i])
     end)
     // Register
@@ -43,7 +43,7 @@ init
             if players[i].isIngame()
                 afkTime[j]++
             if afkTime[j] >= 30
-                whoAreHere.removePlayer(players[i])
+                whoAreHere.has(players[i])
                 table.setItemValue(2, row[j], players[i].getName())
-                table.setItemColor(0, row[j], 128, 128, 128, 255)
+                table.setItemValueColor(0, row[j], 128, 128, 128, 255)
     end)

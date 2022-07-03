@@ -10,9 +10,6 @@ let DELAY = 4.5
 let DURATION = 60.
 let TARGETS = "allies,structure,invulnerable,neutral,nonhero,ground,player,vulnerable"
 
-init
-    gg_unit_Ofar_0285.addAbility(TELEPORT)
-
 @compiletime function gen()
     new AbilityDefinitionStaffoTeleportation(TELEPORT)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Teleports the hero to a ally unit."))

@@ -18,18 +18,17 @@ let SOUND_1 = new SoundDefinition(Sounds.possessionMissileLaunch1, false, true)
 let SOUND_2 = new SoundDefinition(Sounds.possessionMissileHit1, false, true)
 
 init
-    gg_unit_Otch_0284.addAbility(AbilityIds.invulnerable)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         if GetSpellAbilityId() == DARK_SUMMONING_NL
-            let caster = GetSpellAbilityUnit()
+            let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             let vase = CreateGroup()
             let delay = DELAY_NL
-            let where = THE_DRAENEI.containsPlayer(owner)? actDrSpawn : actDeSpawn
-            forUnitsInRange(getSpellTargetPos(), AREA, u -> begin
+            let where = THE_DRAENEI.has(owner)? actDrSpawn : actDeSpawn
+            forUnitsInRange(EventData.getSpellTargetPos(), AREA, u -> begin
                 if owner.isAllyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
                     u.addEffect(Abilities.darkSummonTarget, "origin").destroyAfter(delay)
-                    vase.addUnit(u)
+                    vase.add(u)
             end)
             doAfter(delay) -> 
                 for u from vase

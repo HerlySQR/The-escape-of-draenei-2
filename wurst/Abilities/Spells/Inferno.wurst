@@ -18,9 +18,6 @@ let AREA_NL = 250.
 let MANA_NL = 50
 let DMG_NL = 50.
 
-init
-    gg_unit_Ofar_0285.addAbility(INFERNO_NL)
-
 @compiletime function gen()
     new AbilityDefinitionInferno(INFERNO_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw an infernal from the sky, it lasts " + DURATION.toString(0) + " seconds."))
@@ -28,7 +25,7 @@ init
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
-        ..presetSummonedUnit(lvl -> int2fourchar(INFERNAL_NL))
+        ..presetSummonedUnit(lvl -> INFERNAL_NL.toRawCode())
         ..setRequirements("")
         ..tooltipStartListen()
         ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Inferno")

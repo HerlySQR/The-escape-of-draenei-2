@@ -6,11 +6,12 @@ import TimerDialog
 
 import PlayerData
 import ModeSelection
+import GeneratedValues
 
 init
     nullTimer(() -> begin
-        forUnitsInRect(gg_rct_selecionador_draeneanos, u -> u.pause())
-        forUnitsInRect(gg_rct_selecionador_demonios, u -> u.pause())
+        forUnitsInRect(Rects.selectorDraenei, u -> u.pause())
+        forUnitsInRect(Rects.selectorDemon, u -> u.pause())
         for i = 0 to 11
             if players[i].isIngame()
                 selector = players[i]

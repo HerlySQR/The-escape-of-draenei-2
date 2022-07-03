@@ -2,8 +2,9 @@ package LifeSteal
 
 import UnitIndexer
 import LinkedList
-import DamageEngine
 import public Orders
+
+import Functions
 
 LinkedList<LifeSteal> array instances = [new LinkedList<LifeSteal>()]
 
@@ -27,7 +28,7 @@ class LifeSteal
             counter += INTERVAL
             if counter >= interval
                 counter -= interval
-                Damage.deal(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+                source.damageTarget(target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
                 source.addHP(amount)
                 if actions != null
                     actions.run()

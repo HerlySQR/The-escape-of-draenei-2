@@ -17,19 +17,11 @@ let FACTOR_DMG_L = [0.4, 0.45, 0.5, 0.55]
 int array hits
 
 init
-    gg_unit_H00L_0205.addAbility(LIZZARD_SCALES_NL)
-    gg_unit_H00L_0205.setAbilityLevel(LIZZARD_SCALES_NL, 2)
-    gg_unit_Ofar_0285.addAbility(LIZZARD_SCALES_L)
-    gg_unit_Ofar_0285.setAbilityLevel(LIZZARD_SCALES_L, 3)
-    /*gg_unit_Otch_0284.addAbility(RAIN_OF_FIRE_S)
-    gg_unit_Otch_0284.setAbilityLevel(RAIN_OF_FIRE_S, 4)*/
-
-init
-    registerDamageEvent(damage -> begin
-        if not damage.isSpell
-            let data = damage.target.pasAbilityCond(LIZZARD_SCALES_NL, LIZZARD_SCALES_L)
+    DamageEvent.addUnreducedListener(() -> begin
+        if not DamageEvent.isSpell()
+            let data = DamageEvent.getTarget().pasAbilityCond(LIZZARD_SCALES_NL, LIZZARD_SCALES_L)
             if data.check
-                let i = damage.target.getIndex()
+                let i = DamageEvent.getTarget().getIndex()
                 int hit
                 real factor
                 if data.isNL
@@ -40,14 +32,14 @@ init
                     factor = FACTOR_DMG_L[data.lvl]
                 hits[i]++
                 if hits[i] mod hit == 0
-                    Damage.deal(damage.target, damage.source, damage.amount * factor, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL)
-                    damage.target.flashEffect(Abilities.devourEffectArt, "origin")
-                    damage.amount = 0.
+                    DamageEvent.getTarget().damageTarget(DamageEvent.getSource(), DamageEvent.getAmount() * factor, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL)
+                    DamageEvent.getTarget().flashEffect(Abilities.devourEffectArt, "origin")
+                    DamageEvent.setAmount(0.)
                     hits[i] = 0
     end)
 
     onUnitDeindex(() -> begin
-        hits[getDeindexedUnit().getIndex()] = 0
+        hits[getIndexingUnit().getIndex()] = 0
     end)
 
 function AbilityDefinitionHardenedSkin.general()

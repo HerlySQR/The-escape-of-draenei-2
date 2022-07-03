@@ -40,7 +40,7 @@ init
             forUnitsInRange(caster.getPos(), AREA, u -> begin
                 if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE)
                     u.flashEffect(Abilities.stampedeMissileDeath, "chest")
-                    Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED)
+                    caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED)
             end)
             let eff = effMap.get(caster)
             doAfter(0.27, () -> eff.destr())

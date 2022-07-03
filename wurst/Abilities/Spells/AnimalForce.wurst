@@ -2,7 +2,6 @@ package AnimalForce
 
 import AbilityData
 import PseudoWindWalk
-import ModeSelection
 
 public constant ANIMAL_FORCE_NL = compiletime(ABIL_ID_GEN.next())
 constant ANIMAL_FORCE_BUFF = compiletime(BUFF_ID_GEN.next())
@@ -11,19 +10,23 @@ constant ANIMAL_FORCE_BUFF = compiletime(BUFF_ID_GEN.next())
 let SPEED = 1.75
 let DURATION = 8.
 let CD = 45.
-let MANA_NL = 100
 // Not Leveling
+let MANA_NL = 100
 let EXTRA_DMG_NL = 100.
+// Leveling
+let EXTRA_DMG_L = 150.
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         if GetSpellAbilityId() == ANIMAL_FORCE_NL
             GetSpellAbilityUnit().startWindWalk(ANIMAL_FORCE_BUFF)
     end)
-    registerDamageEvent(damage -> begin
-        if damage.source.hasAbility(ANIMAL_FORCE_BUFF) and damage.isSpell
-            //if whatMode[5] == NOT_LEVELING
-            damage.amount += EXTRA_DMG_NL
+    DamageEvent.addUnreducedListener(() -> begin
+        if DamageEvent.getSource().hasAbility(ANIMAL_FORCE_BUFF) and DamageEvent.isSpell()
+            if whatMode[5] == NOT_LEVELING
+                DamageEvent.addAmount(EXTRA_DMG_NL)
+            else
+                DamageEvent.addAmount(EXTRA_DMG_L)
     end)
 
 @compiletime function gen()
@@ -32,7 +35,7 @@ init
         ..setLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> int2fourchar(ANIMAL_FORCE_BUFF))
+        ..presetBuffs(lvl -> ANIMAL_FORCE_BUFF.toRawCode())
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetDamageTakenIncrease(lvl -> 0.)

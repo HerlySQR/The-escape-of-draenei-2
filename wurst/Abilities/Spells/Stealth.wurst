@@ -12,9 +12,6 @@ let CD_NL = 12.
 let MANA_NL = 50
 let EXTRA_DMG_NL = 40.
 
-init
-    gg_unit_H00L_0205.addAbility(STEALTH_NL)
-
 @compiletime function gen()
     new AbilityDefinitionWindWalk(STEALTH_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It returns invisible to the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))

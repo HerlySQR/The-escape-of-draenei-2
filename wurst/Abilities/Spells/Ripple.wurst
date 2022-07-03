@@ -3,7 +3,6 @@ package Ripple
 import AbilityData
 
 import Simulate3dSound
-import Sound3DUtils
 
 public constant RIPLE_NL = compiletime(ABIL_ID_GEN.next())
 public constant RIPLE_L = compiletime(ABIL_ID_GEN.next())
@@ -47,7 +46,7 @@ init
             playSound("MetalMediumBashStone1", r)
             playSound("MetalMediumBashStone2", r)
             playSound("MetalMediumBashStone3", r)
-            let mysound = CreateSoundFromLabel("EarthquakeLoop", true, true, true, 10, 10)..play(127, pos)
+            let mysound = CreateSoundFromLabel("EarthquakeLoop", true, true, true, 10, 10)//..setPos(127, pos)
             let td = createCrater(duration, false, pos, RADIUS, 96)
             doPeriodically(INTERVAL, cb -> begin
                 duration -= INTERVAL
@@ -58,7 +57,7 @@ init
                             if owner.isEnemyOf(u.getOwner())
                                 if u.getAbilityLevel('BPSE') == 0
                                     InstantDummyCaster.castTarget(owner, DUMMY_STUN, 1, Orders.firebolt, u)
-                                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+                                caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
                     end)
                 else
                     myeffect.destr()

@@ -29,17 +29,17 @@ let TOTAL_TIME_OF_TICKS = INTERVAL * TICKS_BEFORE_NEXT
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == EXPLOSIVE_FLARES_NL
-            let caster = GetSpellAbilityUnit()
+        if EventData.getSpellAbilityId() == EXPLOSIVE_FLARES_NL
+            let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             var pos = caster.getPos()
-            let angl = pos.angleTo(getSpellTargetPos())
+            let angl = pos.angleTo(EventData.getSpellTargetPos())
             // Shake the camera for the players those units are nearby
             let f = CreateForce()
             forUnitsInRange(pos, 1000., u -> begin
-                f.addPlayer(u.getOwner())
+                f.add(u.getOwner())
             end)
-            if f.containsPlayer(localPlayer)
+            if f.has(localPlayer)
                 CameraSetTargetNoiseEx(20., 1000000., true)
                 CameraSetSourceNoiseEx(20., 1000000., true)
             f.destr()
@@ -58,7 +58,7 @@ init
                     ticks++
                     forUnitsInRange(pos, AREA_PER_EXPLOSIONS, u -> begin
                         if owner.isEnemyOf(u.getOwner())
-                            Damage.deal(caster, u, damage, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_MAGIC)
+                            caster.damageTarget(u, damage, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_MAGIC)
                     end)
                     if ticks > TICKS_BEFORE_NEXT
                         ticks = 0

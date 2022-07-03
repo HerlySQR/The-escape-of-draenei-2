@@ -3,8 +3,6 @@ package MagicChains
 import AbilityData
 import PseudoWindWalk
 
-import TerrainUtils
-
 public constant MAGIC_CHAINS_PULL_NL = compiletime(ABIL_ID_GEN.next())
 public constant MAGIC_CHAINS_GRASP_NL = compiletime(ABIL_ID_GEN.next())
 public constant MAGIC_CHAINS_PULL_L = compiletime(ABIL_ID_GEN.next())
@@ -27,7 +25,7 @@ let RANGE_L = [600., 750., 900., 1050.]
 // Internal
 
 function unit.getPos3RealPlus50() returns vec3
-    return vec3(this.getX(), this.getY(), getTerrainZ(this.getX(), this.getY()) + this.getFlyHeight() + 50)
+    return vec3(this.getX(), this.getY(), this.getPos().getTerrainZ() + this.getFlyHeight() + 50)
 
 let INTERVAL = 0.02
 let MAX_ITERATIONS = 150

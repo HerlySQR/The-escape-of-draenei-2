@@ -1,0 +1,422 @@
+function Reinicio_funcion1 takes nothing returns nothing
+    call SetPlayerStateBJ(GetEnumPlayer(),PLAYER_STATE_RESOURCE_GOLD,0)
+    call SetPlayerStateBJ(GetEnumPlayer(),PLAYER_STATE_RESOURCE_LUMBER,0)
+    call SetPlayerStateBJ(GetEnumPlayer(),PLAYER_STATE_RESOURCE_FOOD_USED,0)
+    set udg_LS_hits[GetConvertedPlayerId(GetEnumPlayer())]=0
+    set udg_AE_max_charges[GetConvertedPlayerId(GetEnumPlayer())]=6
+endfunction
+
+function Reinicio_funcion2 takes nothing returns nothing
+    call DestructableRestoreLife(GetEnumDestructable(),GetDestructableMaxLife(GetEnumDestructable()),false)
+endfunction
+
+function Reinicio_funcion3 takes nothing returns nothing
+    call RemoveDestructable(GetEnumDestructable())
+endfunction
+
+function Reinicio_funcion4 takes nothing returns boolean
+    return (GetDestructableTypeId(GetFilterDestructable())=='B000')
+endfunction
+
+function Reinicio_funcion5 takes nothing returns nothing
+    call SetDestructableLifePercentBJ(GetEnumDestructable(),100)
+endfunction
+
+function Reinicio_funcion6 takes nothing returns boolean
+    return (GetDestructableTypeId(GetFilterDestructable())=='KTtw')
+endfunction
+
+function Reinicio_funcion7 takes nothing returns nothing
+    call DestructableRestoreLife(GetEnumDestructable(),100.00,false)
+endfunction
+
+function Reinicio_funcion8 takes nothing returns nothing
+    call KillDestructable(GetEnumDestructable())
+endfunction
+
+function Reinicio_funcion9 takes nothing returns nothing
+    call ChangeElevatorHeight(GetEnumDestructable(),1)
+    call ChangeElevatorWalls(true,bj_ELEVATOR_WALL_TYPE_ALL,GetEnumDestructable())
+endfunction
+
+function Reinicio_funcion10 takes nothing returns boolean
+    return IsDestructableDeadBJ(GetFilterDestructable())
+endfunction
+
+function Reinicio_funcion11 takes nothing returns boolean
+    return IsDestructableAliveBJ(GetFilterDestructable())
+endfunction
+
+function Reinicio_funcion12 takes nothing returns nothing
+    call SetDestructableAnimation(GetEnumDestructable(),"stand")
+endfunction
+
+function Reinicio_funcion13 takes nothing returns nothing
+    call SetUnitOwner(GetEnumUnit(),Player(PLAYER_NEUTRAL_AGGRESSIVE),true)
+endfunction
+
+function Reinicio_funcion14 takes nothing returns nothing
+    call SetUnitOwner(GetEnumUnit(),Player(6),true)
+endfunction
+
+function Reinicio_funcion15 takes nothing returns nothing
+    call TriggerExecute(gg_trg_Revivir_unidades)
+    call TriggerExecute(gg_trg_Cambio_de_equipos)
+    call TriggerExecute(gg_trg_Torres_defensivas_1)
+    call EnableTrigger(gg_trg_Aqui_vamos)
+    call EnableTrigger(gg_trg_Repick)
+    call EnableTrigger(udg_No_durante_combate)
+    call EnableTrigger(gg_trg_Para_que_sea_mas_aleatorio)
+    call EnableTrigger(gg_trg_Primera_persona)
+    call ReleaseTimer(GetExpiredTimer())
+endfunction
+
+function Trig_Reinicio_Actions takes nothing returns nothing
+    local integer i
+    local integer j
+    set udg_Se_acabo_el_tiempo=false
+    call PauseTimer(udg_Revivir)
+    call DestroyTimerDialog(udg_Reloj_Revivir)
+    // Datos
+    call DestroyMultiboard(udg_Tabla)
+    call ForceClear(udg_Pick_hero)
+    call ForForce(bj_FORCE_ALL_PLAYERS,function Reinicio_funcion1)
+    set i=1
+    loop
+        exitwhen i >5
+        set udg_Saltar_dialogo[i]=false
+        set i=i+1
+    endloop
+    set i=1
+    loop
+        exitwhen i>10
+        set udg_kills[i]=0
+        set udg_deaths[i]=0
+        set udg_assists[i]=0
+        set udg_spree[i]=0
+        set udg_Saltar_dialogo[i]=false
+        set j=0
+        loop
+            exitwhen j>5
+            call RemoveItem(UnitItemInSlot(udg_Hero[i],j))
+            set j=j+1
+        endloop
+        set i=i+1
+    endloop
+    set ColocarBarril_Lugar=gg_rct_Barril_1
+    set ColocarBarril_Counter=0
+    set udg_Nivel_de_mejora=1
+    set udg_Demonios=gg_rct_spw5
+    set udg_Draeneanos=gg_rct_spw1
+    set i=1
+    loop
+        exitwhen i>5
+        call SetUnitPositionLoc(udg_Circle[i],udg_Point_circle1[i])
+        call SetUnitPositionLoc(udg_Circle[(i+5)],udg_Point_circle2[i])
+        set i=i+1
+    endloop
+    set udg_Item_draeneanos=gg_rct_Items
+    set udg_Circle_region[1]=gg_rct_cdr11
+    set udg_Circle_region[2]=gg_rct_cdr12
+    set udg_Circle_region[3]=gg_rct_cdr13
+    set udg_Circle_region[4]=gg_rct_cdr14
+    set udg_Circle_region[5]=gg_rct_cdr15
+    set udg_Item_demonios=gg_rct_Items_2
+    set udg_Circle_region[6]=gg_rct_cde11
+    set udg_Circle_region[7]=gg_rct_cde12
+    set udg_Circle_region[8]=gg_rct_cde13
+    set udg_Circle_region[9]=gg_rct_cde14
+    set udg_Circle_region[10]=gg_rct_cde15
+    set udg_Fue_porque_desertaron=false
+    set udg_Salieron_de_la_cueva=false
+    set udg_Puerta_destruida=false
+    set udg_Generadores_destruidos=false
+    set udg_Ya_pueden=false
+    call PauseTimer(udg_Wait_Timer[12])
+    call WaygateActivate(gg_unit_n004_0205,false)
+    call WaygateActivate(gg_unit_n004_0212,false)
+    // Limpieza
+    set bj_wantDestroyGroup=true
+    set ItsID='h004'
+    call ForGroupBJ(GetUnitsInRectMatching(bj_mapInitialPlayableArea,Condition(function IsUnitTypebyGroup)),function RemoveUnitbyGroup)
+    set udg_Temp_Group=GetUnitsOfTypeIdAll('h008')
+    call ForGroup(udg_Temp_Group,function RemoveUnitbyGroup)
+    call DestroyGroup(udg_Temp_Group)
+    set udg_Temp_Group=GetUnitsOfTypeIdAll('h005')
+    call ForGroup(udg_Temp_Group,function RemoveUnitbyGroup)
+    call DestroyGroup(udg_Temp_Group)
+    set udg_Temp_Group=GetUnitsOfTypeIdAll('h00C')
+    call ForGroup(udg_Temp_Group,function RemoveUnitbyGroup)
+    call DestroyGroup(udg_Temp_Group)
+    
+    //! textmacro REMOVE_UNIT takes ID
+    set ItsID=$ID$
+    set bj_wantDestroyGroup=true
+    call ForGroupBJ(GetUnitsInRectMatching(bj_mapInitialPlayableArea,Condition(function IsUnitTypebyGroup)),function RemoveUnitbyGroup)
+    //! endtextmacro
+    
+    //! runtextmacro REMOVE_UNIT ("'o00E'")
+    //! runtextmacro REMOVE_UNIT ("'n00K'")
+    //! runtextmacro REMOVE_UNIT ("'n00U'")
+    //! runtextmacro REMOVE_UNIT ("'n00V'")
+    //! runtextmacro REMOVE_UNIT ("'n016'")
+    //! runtextmacro REMOVE_UNIT ("'n00G'")
+    //! runtextmacro REMOVE_UNIT ("'n00N'")
+    //! runtextmacro REMOVE_UNIT ("'nglm'")
+    //! runtextmacro REMOVE_UNIT ("'oeye'")
+    //! runtextmacro REMOVE_UNIT ("'otot'")
+    //! runtextmacro REMOVE_UNIT ("'z004'")
+    //! runtextmacro REMOVE_UNIT ("'z000'")
+    //! runtextmacro REMOVE_UNIT ("'z001'")
+    //! runtextmacro REMOVE_UNIT ("'z003'")
+    //! runtextmacro REMOVE_UNIT ("'z002'")
+    //! runtextmacro REMOVE_UNIT ("'z005'")
+    //! runtextmacro REMOVE_UNIT ("'n006'")
+    //! runtextmacro REMOVE_UNIT ("'n00Y'")
+    //! runtextmacro REMOVE_UNIT ("'n00Z'")
+    //! runtextmacro REMOVE_UNIT ("'n019'")
+    
+    // Tienda Secreta
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'uobs')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'uske')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'uskm')
+    call RemoveItemFromStock(gg_unit_h00H_0226,'rsps')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'ubsp')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'ucs1')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'ucs2')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'emtg')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'ocat')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'hmil')
+    call RemoveUnitFromStock(gg_unit_h00H_0226,'espv')
+    set udg_Tienda_secreta_abierta=false
+    call SetDoodadAnimationRect(gg_rct_Quitar_picos_1,'D004',"show",false)
+    call SetDoodadAnimationRect(gg_rct_Quitar_picos_2,'D004',"show",false)
+    // Destructibles Revivir
+    call DestructableRestoreLife(gg_dest_DTg3_0017,GetDestructableMaxLife(gg_dest_DTg3_0017),false)
+    call DestructableRestoreLife(gg_dest_DTg1_0217,GetDestructableMaxLife(gg_dest_DTg1_0217),false)
+    call DestructableRestoreLife(gg_dest_DTg1_0253,GetDestructableMaxLife(gg_dest_DTg1_0253),false)
+    call DestructableRestoreLife(gg_dest_ATg3_0002,400.00,false)
+    call DestructableRestoreLife(gg_dest_ATg1_1002,GetDestructableMaxLife(gg_dest_ATg1_1002),false)
+    call DestructableRestoreLife(gg_dest_DTg6_0506,GetDestructableMaxLife(gg_dest_DTg6_0506),false)
+    call SetDestructableInvulnerable(gg_dest_DTg6_0506,true)
+    call DestructableRestoreLife(gg_dest_Dofw_0852,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofw_0852,"stand")
+    call DestructableRestoreLife(gg_dest_Dofw_0855,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofw_0855,"stand")
+    call DestructableRestoreLife(gg_dest_Dofw_0850,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofw_0850,"stand")
+    call DestructableRestoreLife(gg_dest_Dofw_0851,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofw_0851,"stand")
+    call DestructableRestoreLife(gg_dest_Dofv_0087,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofv_0087,"stand")
+    call DestructableRestoreLife(gg_dest_Dofv_0088,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofv_0088,"stand")
+    call DestructableRestoreLife(gg_dest_Dofv_0849,500.00,true)
+    call SetDestructableAnimation(gg_dest_Dofv_0849,"stand")
+    call DestructableRestoreLife(gg_dest_B002_1060,250.00,false)
+    call DestructableRestoreLife(gg_dest_B002_1062,250.00,false)
+    call SetDestructableLifePercentBJ(gg_dest_B002_1060,100)
+    call SetDestructableLifePercentBJ(gg_dest_B002_1062,100)
+    call SetDestructableLifePercentBJ(gg_dest_DTg3_0017,100)
+    call SetDestructableLifePercentBJ(gg_dest_DTg1_0001,100)
+    call SetDestructableLifePercentBJ(gg_dest_DTg1_0000,100)
+    call SetDestructableLifePercentBJ(gg_dest_ATg3_0002,100)
+    call SetDestructableLifePercentBJ(gg_dest_ATg1_1002,100)
+    call SetDestructableLifePercentBJ(gg_dest_DTg1_0253,100)
+    call SetDestructableLifePercentBJ(gg_dest_DTg1_0217,100)
+    call SetDestructableLifePercentBJ(gg_dest_DTg6_0506,100)
+    set udg_Puerta_abierta[1]=true
+    set udg_Puerta_abierta[2]=true
+    call ModifyGateBJ(bj_GATEOPERATION_OPEN,gg_dest_YTcx_0808)
+    call ModifyGateBJ(bj_GATEOPERATION_OPEN,gg_dest_YTce_0810)
+    call DestructableRestoreLife(gg_dest_B002_0035,250.00,false)
+    call DestructableRestoreLife(gg_dest_B002_0241,250.00,false)
+    call DestructableRestoreLife(gg_dest_B002_1060,250.00,false)
+    call DestructableRestoreLife(gg_dest_B002_1062,250.00,false)
+    call DestructableRestoreLife(gg_dest_B002_0009,250.00,false)
+    call DestructableRestoreLife(gg_dest_B002_0012,250.00,false)
+    call ShowDestructable(gg_dest_B002_0035,true)
+    call ShowDestructable(gg_dest_B002_0241,true)
+    call ShowDestructable(gg_dest_B002_1060,true)
+    call ShowDestructable(gg_dest_B002_1062,true)
+    call ShowDestructable(gg_dest_B002_0009,true)
+    call ShowDestructable(gg_dest_B002_0012,true)
+    call DestructableRestoreLife(gg_dest_B008_0091,500.00,true)
+    call SetDestructableAnimation(gg_dest_B008_0091,"stand")
+    call DestructableRestoreLife(gg_dest_B008_0094,500.00,true)
+    call SetDestructableAnimation(gg_dest_B008_0094,"stand")
+    call DestructableRestoreLife(gg_dest_B008_1593,500.00,true)
+    call SetDestructableAnimation(gg_dest_B008_1593,"stand")
+    call DestructableRestoreLife(gg_dest_B008_0089,500.00,true)
+    call SetDestructableAnimation(gg_dest_B008_0089,"stand")
+    if udg_Direccion==-1 then
+        call TriggerExecute(gg_trg_Mover_Muro)
+    endif
+    call EnumDestructablesInRect(gg_rct_Miren_al_goblin,null,function Reinicio_funcion2)
+    call EnumDestructablesInRect(gg_rct_Para_revivir_estos,null,function Reinicio_funcion2)
+    call EnumDestructablesInRect(gg_rct_Rompanse,null,function Reinicio_funcion2)
+    call EnumDestructablesInRect(gg_rct_Para_revivir_estos,null,function Reinicio_funcion2)
+    call EnumDestructablesInRect(gg_rct_Rocas_rotas,null,function Reinicio_funcion2)
+    call EnumDestructablesInRect(gg_rct_Barril_1,null,function Reinicio_funcion3)
+    call EnumDestructablesInRect(gg_rct_Barril_2,null,function Reinicio_funcion3)
+    call EnumDestructablesInRect(gg_rct_Barril_3,null,function Reinicio_funcion3)
+    call DestructableRestoreLife(gg_dest_B00I_0332,300.00,false)
+    call DestructableRestoreLife(gg_dest_B000_1675,300.00,false)
+    call DestructableRestoreLife(gg_dest_B000_1680,300.00,false)
+    call DestructableRestoreLife(gg_dest_B000_1681,300.00,false)
+    call DestructableRestoreLife(gg_dest_B00F_0280,300.00,false)
+    call EnumDestructablesInRect(bj_mapInitialPlayableArea,Condition(function Reinicio_funcion4),function Reinicio_funcion5)
+    call SetDestructableInvulnerable(gg_dest_B00F_0280,true)
+    call ChangeElevatorHeight(gg_dest_DTrx_1674,3)
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_ALL,gg_dest_DTrx_1674)
+    call ChangeElevatorHeight(gg_dest_B007_1682,2)
+    call ChangeElevatorHeight(gg_dest_DTrx_1683,3)
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_ALL,gg_dest_DTrx_1683)
+    call ChangeElevatorHeight(gg_dest_B007_1684,2)
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_NORTH,gg_dest_DTrx_1723)
+    call ChangeElevatorHeight(gg_dest_DTrx_1723,2)
+    call SetDestructableAnimation(gg_dest_DTrx_1723,"stand second")
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_SOUTH,gg_dest_DTrx_1713)
+    call ChangeElevatorHeight(gg_dest_DTrx_1713,2)
+    call SetDestructableAnimation(gg_dest_DTrx_1713,"stand second")
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_NORTH,gg_dest_DTrx_1725)
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_EAST,gg_dest_DTrx_1725)
+    call ChangeElevatorHeight(gg_dest_DTrx_1725,3)
+    call SetDestructableAnimation(gg_dest_DTrx_1725,"stand third")
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_EAST,gg_dest_DTrx_1724)
+    call ChangeElevatorWalls(false,bj_ELEVATOR_WALL_TYPE_SOUTH,gg_dest_DTrx_1724)
+    call SetDestructableAnimation(gg_dest_DTrx_1724,"stand third")
+    call ChangeElevatorHeight(gg_dest_DTrx_1713,3)
+    call ChangeElevatorHeight(gg_dest_B007_1729,2)
+    call SetDestructableAnimation(gg_dest_B007_1729,"stand second")
+    call ChangeElevatorHeight(gg_dest_B007_1728,2)
+    call SetDestructableAnimation(gg_dest_B007_1728,"stand second")
+    call EnumDestructablesInRect(bj_mapInitialPlayableArea,Condition(function Reinicio_funcion6),function Reinicio_funcion7)
+    call EnumDestructablesInRect(gg_rct_MUERAN_ARBOLES,Condition(function Reinicio_funcion6),function Reinicio_funcion8)
+    if not udg_Generador1_is_alive then
+        call CreateUnitAtLoc(Player(6),'npgr',udg_Generador_Punto[1],bj_UNIT_FACING)
+        set udg_Generador1_is_alive=true
+    endif
+    if not udg_Generador2_is_alive then
+        call CreateUnitAtLoc(Player(6),'npgr',udg_Generador_Punto[2],bj_UNIT_FACING)
+        set udg_Generador2_is_alive=true
+    endif
+    if udg_Generador_is_alive then
+        call SetUnitLifePercentBJ(udg_Generador_de_pared,100)
+    else
+        set udg_Generador_de_pared=CreateUnitAtLoc(Player(6),'n010',udg_Lugar_de_la_bateria,bj_UNIT_FACING)
+        set udg_Generador_is_alive=true
+    endif
+    call EnumDestructablesInRect(gg_rct_Plataformas,null,function Reinicio_funcion9)
+    call EnumDestructablesInRect(gg_rct_Plataformas_del_agua,null,function Reinicio_funcion9)
+    call ModifyGateBJ(bj_GATEOPERATION_CLOSE,gg_dest_DTg2_0401)
+    call EnumDestructablesInRect(bj_mapInitialPlayableArea,Condition(function Reinicio_funcion10),function Reinicio_funcion2)
+    call EnumDestructablesInRect(bj_mapInitialPlayableArea,Condition(function Reinicio_funcion11),function Reinicio_funcion12)
+    call DestructableRestoreLife(gg_dest_B00G_0286,500,true)
+    // Apagar detonadores
+    call DisableTrigger(gg_trg_Si_Puedes)
+    call DisableTrigger(gg_trg_Tomen_su_oro_pobres)
+    call DisableTrigger(gg_trg_Tips)
+    call DisableTrigger(gg_trg_Modos)
+    call DisableTrigger(gg_trg_Deformacion_de_la_tierra)
+    call DisableTrigger(gg_trg_Para_mantenerlo)
+    call DisableTrigger(gg_trg_Ping_1)
+    call DisableTrigger(gg_trg_Ping_2)
+    call DisableTrigger(gg_trg_Ping_3)
+    call DisableTrigger(gg_trg_Ping_4)
+    call DisableTrigger(gg_trg_Segundo_Generador)
+    call DisableTrigger(gg_trg_Si_mueres_Heroe)
+    call DisableTrigger(gg_trg_Respawn_campamentos)
+    call DisableTrigger(gg_trg_Salida_de_la_cueva)
+    // Encender Detonadores
+    call EnableTrigger(gg_trg_No_atravesar_pared)
+    call EnableTrigger(gg_trg_No_atravesar_pared_2)
+    call EnableTrigger(gg_trg_NI_LO_INTENTES)
+    call EnableTrigger(gg_trg_Salida_de_la_cueva)
+    call EnableTrigger(gg_trg_Reloj1)
+    call EnableTrigger(gg_trg_Si_mueres)
+    call EnableTrigger(gg_trg_Si_revives)
+    call EnableTrigger(gg_trg_Salida_de_la_prision)
+    call EnableTrigger(gg_trg_Colocar_barril)
+    call EnableTrigger(gg_trg_Salida_de_la_cueva)
+    call EnableTrigger(gg_trg_Lo_destruyeron)
+    call EnableTrigger(gg_trg_Fin)
+    call EnableTrigger(gg_trg_Si_mueres)
+    call EnableTrigger(gg_trg_Si_revives)
+    call EnableTrigger(gg_trg_Heroes)
+    call EnableTrigger(gg_trg_NO_PASARAS_Parte_1)
+    // Remover Efectos
+    call DestroyEffect(udg_Fuego1)
+    call DestroyEffect(udg_Fuego2)
+    call DestroyEffect(udg_Fuego3)
+    call TerrainDeformationStopBJ(udg_Sismo,1.00)
+    call RemoveUnit(udg_Temblor)
+    call FogModifierStop(udg_Quiero_ver)
+    call FogModifierStop(udg_ver_draeneanos)
+    call DestroyFogModifier(udg_ver_draeneanos)
+    call FogModifierStop(udg_ver_demonios)
+    call DestroyFogModifier(udg_ver_demonios)
+    call FogModifierStop(udg_ver1)
+    call FogModifierStop(udg_ver2)
+    call FogModifierStop(udg_ver3)
+    call FogModifierStop(udg_ver4)
+    call DestroyEffect(udg_Pozo)
+    // Restaurar unidades
+    call CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE),'n001',GetRectCenterX(gg_rct_Zappador_Goblin),GetRectCenterY(gg_rct_Zappador_Goblin),bj_UNIT_FACING)
+    set udg_Temp_Group=GetUnitsOfTypeIdAll('h002')
+    call ForGroup(udg_Temp_Group,function ShowUnitbyGroup)
+    call DestroyGroup(udg_Temp_Group)
+    
+    //! textmacro REPLACE_UNIT takes ITS, NEW
+    set bj_wantDestroyGroup=true
+    set ItsID=$ITS$
+    set NewID=$NEW$
+    call ForGroupBJ(GetUnitsInRectMatching(bj_mapInitialPlayableArea,Condition(function IsUnitTypebyGroup)),function ReplaceUnitbyGroup)
+    //! endtextmacro
+    
+    //! runtextmacro REPLACE_UNIT ("'h00E'","'h000'")
+    //! runtextmacro REPLACE_UNIT ("'h00F'","'h003'")
+    //! runtextmacro REPLACE_UNIT ("'h00A'","'h000'")
+    //! runtextmacro REPLACE_UNIT ("'h00D'","'h003'")
+    
+    set udg_Temp_Group=GetUnitsOfTypeIdAll('h003')
+    call ForGroup(udg_Temp_Group,function ShowUnitbyGroup)
+    call DestroyGroup(udg_Temp_Group)
+    set udg_Temp_Group=GetUnitsOfTypeIdAll('h00D')
+    call ForGroup(udg_Temp_Group,function ShowUnitbyGroup)
+    call DestroyGroup(udg_Temp_Group)
+    set bj_wantDestroyGroup=true
+    set ItsID='o00H'
+    call ForGroupBJ(GetUnitsInRectMatching(bj_mapInitialPlayableArea,Condition(function IsUnitTypebyGroup)),function RemoveUnitbyGroup)
+    call GroupClear(udg_Heroes_para_elegir)
+    set i=1
+    loop
+        exitwhen i>3
+        set udg_Temp_Loc=GetRandomLocInRect(gg_rct_Spawneo_de_draeneanos)
+        call CreateUnitAtLoc(Player(0),'n002',udg_Temp_Loc,GetRandomReal(0,360))
+        call RemoveLocation(udg_Temp_Loc)
+        set i=i+1
+    endloop
+    // Cambiar Dueño
+    call SetUnitOwner(gg_unit_n00X_0251,Player(PLAYER_NEUTRAL_PASSIVE),true)
+    call SetUnitOwner(gg_unit_n00X_0232,Player(PLAYER_NEUTRAL_PASSIVE),true)
+    call SetUnitOwner(gg_unit_n00X_0259,Player(PLAYER_NEUTRAL_PASSIVE),true)
+    set bj_wantDestroyGroup=true
+    call ForGroupBJ(GetUnitsInRectMatching(gg_rct_Tiendas_1,Condition(function IsStructure)),function Reinicio_funcion13)
+    set bj_wantDestroyGroup=true
+    call ForGroupBJ(GetUnitsInRectMatching(gg_rct_Tiendas_2,Condition(function IsStructure)),function Reinicio_funcion13)
+    set bj_wantDestroyGroup=true
+    call ForGroupBJ(GetUnitsInRectMatching(gg_rct_Tiendas_3,Condition(function IsStructure)),function Reinicio_funcion14)
+    // Ultimos detalles
+    call TriggerExecute(gg_trg_Ya_no_quiero_usar_los_mismos_detonadores)
+    call TriggerExecute(gg_trg_Rehacer_misiones)
+    call ClearTextMessages()
+    call TimerStart(NewTimer(),17.00,false,function Reinicio_funcion15)
+endfunction
+
+//===========================================================================
+function InitTrig_Reinicio takes nothing returns nothing
+    set gg_trg_Reinicio=CreateTrigger()
+    call TriggerAddAction(gg_trg_Reinicio,function Trig_Reinicio_Actions)
+endfunction
+

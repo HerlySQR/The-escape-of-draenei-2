@@ -67,9 +67,9 @@ class Charge
             destroy this
 
 init
-    registerDamageEvent(damage -> begin
-        if not damage.isSpell
-            let data = damage.target.pasAbilityCond(ADVANCED_ENGINEERING_NL, ADVANCED_ENGINEERING_L)
+    DamageEvent.addListener(() -> begin
+        if not DamageEvent.isSpell()
+            let data = DamageEvent.getTarget().pasAbilityCond(ADVANCED_ENGINEERING_NL, ADVANCED_ENGINEERING_L)
             if data.check
                 int armor
                 int maxCharges
@@ -82,7 +82,7 @@ init
                     armor = AE_ARMOR_L[data.lvl]
                     maxCharges = MAX_CHARGES_L[data.lvl]
                     inc = ARMOR_AND_REGEN_INC_L[data.lvl]
-                let caster = damage.target
+                let caster = DamageEvent.getTarget()
                 let charges = caster.getAbilityLevel(armor)
                 // Create or get the charges list of the caster
                 var list = chargeMap.get(caster)

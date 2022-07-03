@@ -35,17 +35,17 @@ init
                 target.addEffect(Abilities.purgeBuffTarget, "origin").destroyAfter(1.)
                 UnitRemoveBuffs(target, true, true)
                 if owner1.isEnemyOf(owner2)
-                    Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
+                    caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING)
             end)
     end)
-    registerDamageEvent(damage -> begin
-        if damage.isSpell and damage.source.hasAbility(PURGE_SOUL_BUFF)
-            damage.amount *= 1.25
+    DamageEvent.addUnreducedListener(() -> begin
+        if DamageEvent.isSpell() and DamageEvent.getSource().hasAbility(PURGE_SOUL_BUFF)
+            DamageEvent.setAmount(DamageEvent.getAmount() * 1.25)
     end)
 
 function AbilityDefinitionPurge.general()
     this.presetButtonPosNormal(1, 2)
-    this.presetBuffs(lvl -> int2fourchar(PURGE_SOUL_BUFF))
+    this.presetBuffs(lvl -> PURGE_SOUL_BUFF.toRawCode())
     this.presetMovementUpdateFrequency(lvl -> 5)
     this.tooltipStartListen()
     this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Purge Soul")

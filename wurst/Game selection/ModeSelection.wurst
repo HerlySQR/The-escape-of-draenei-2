@@ -1,9 +1,6 @@
 package ModeSelection
 
-import ClosureForGroups
-import ClosureTimers
 import TimerDialog
-import FogModifier
 
 import Tips
 import initlater HeroSelection
@@ -14,6 +11,7 @@ import initlater Missions
 import NeutralSpawn
 import initlater Repick
 import initlater Tp
+import GeneratedValues
 
 public player selector
 public trigger select = CreateTrigger()..disable()
@@ -273,7 +271,7 @@ public function actionsSelect()
                     let id = u.getTypeId()
                     if id == 'n00D' or id == 'n00F' or id == 'n00S' or id == 'n002'
                 end)
-                DisableTrigger(gg_trg_Aqui_vamos)
+                // TODO DisableTrigger(gg_trg_Aqui_vamos)
                 enableNeutralSpawn()
                 tips[3] = "Watch for the missions."
                 modes[2] = "No |cffff0000Draenei|r and |cff32cd32Demons|r."
@@ -288,7 +286,7 @@ public function actionsSelect()
                     if id == 'n00D' or id == 'n00F' or id == 'n00S' or id == 'n002'
                         u.remove()
                 end)
-                DisableTrigger(gg_trg_Aqui_vamos)
+                // TODO DisableTrigger(gg_trg_Aqui_vamos)
                 enableNeutralSpawn()
                 tips[3] = "Watch for the missions."
                 modes[2] = "No Creeps."
@@ -343,8 +341,8 @@ public function actionsSelect()
             modes[4] = "Normal."
             whatMode[4] = NORMAL_PICK
         else if sub1 == "ap"
-            seeDraenei = createVision(DRAENEI, gg_rct_selecionador_demonios, true)..start()
-            seeDemons = createVision(DEMON, gg_rct_selecionador_draeneanos, true)..start()
+            seeDraenei = createVision(DRAENEI, Rects.selectorDraenei, true)..start()
+            seeDemons = createVision(DEMON, Rects.selectorDemon, true)..start()
             modes[4] = "Traitor (All pick)."
             whatMode[4] = TRAITOR
     else
@@ -391,12 +389,10 @@ public function actionsSelect()
                             heroModel[g] = u
         end)
         // TODO
-        gg_unit_ncop_0124.addAbility('A04C')
-        gg_unit_ncop_0124.addAbility('A04D')
-        gg_unit_ncop_0129.addAbility('A04C')
-        gg_unit_ncop_0129.addAbility('A04D')
-        gg_unit_h002_0151.addAbility('A04C')
-        gg_unit_h002_0151.addAbility('A04D')
+        circle[3].addAbility('A04C')
+        circle[3].addAbility('A04D')
+        circle[8].addAbility('A04C')
+        circle[8].addAbility('A04D')
         modes[5] = "Hero (Leveling up)."
         whatMode[5] = LEVELING
     else if sub1 == "nl"
@@ -436,13 +432,13 @@ public function actionsSelect()
         modes2[i].setVisibility(false)
     
     ClearTextMessages()
-    createItem('I01L', gg_rct_Esqueleto.getCenter())
-    createItem('I01J', gg_rct_Fuego.getCenter())
-    createItem('I01K', gg_rct_Huevo.getCenter())
-    createItem('I01M', gg_rct_Libro.getCenter())
-    gg_trg_Obeliscos.disable()
+    createItem('I01L', Rects.skullPlace.getCenter())
+    createItem('I01J', Rects.firePlace.getCenter())
+    createItem('I01K', Rects.eggPlace.getCenter())
+    createItem('I01M', Rects.bookPlace.getCenter())
+    
     forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-        if u.isType(UNIT_TYPE_HERO) and ((u.getOwner() == DRAENEI and gg_rct_selecionador_draeneanos.contains(u.getPos())) or (u.getOwner() == DEMON and gg_rct_selecionador_demonios.contains(u.getPos())))
+        if u.isType(UNIT_TYPE_HERO) and ((u.getOwner() == DRAENEI and Rects.selectorDraenei.contains(u.getPos())) or (u.getOwner() == DEMON and Rects.selectorDemon.contains(u.getPos())))
             u.pause()
             SuspendHeroXP(u, true)
             u.setInvulnerable(true)
@@ -450,14 +446,13 @@ public function actionsSelect()
     end)
     bj_FORCE_ALL_PLAYERS.forEach(() -> begin
         let p = GetEnumPlayer()
-        canPick.addPlayer(p)
+        canPick.add(p)
         p.addGold(250)
         forUnitsSelected(p, u -> begin
             if localPlayer == p
                 SelectUnit(u, true)
         end)
     end)
-    //gg_trg_Si_Puedes.enable()
     tipDisplayer.enable()
 
     printTimedToPlayer("|cff7777aaGAMEMODES:|r", 15., localPlayer)
@@ -469,13 +464,13 @@ public function actionsSelect()
 
     startMission1()
     startTable()
-    // TODO
+    /* TODO
     TriggerExecute(gg_trg_Crear_Gemas)
-    EnableTrigger(gg_trg_Surrender)
+    EnableTrigger(gg_trg_Surrender)*/
 
     changeTexts()
-    actDrSpawn = gg_rct_spw1
-    actDeSpawn = gg_rct_spw5
+    actDrSpawn = Rects.respawn1
+    actDeSpawn = Rects.respawn2
 
     select.disable()
 
@@ -490,8 +485,8 @@ public function didntChose()
 
 init
     for i = 0 to 29
-        modes1[i].setVisibility(THE_DEMONS.containsPlayer(localPlayer))
-        modes2[i].setVisibility(THE_DRAENEI.containsPlayer(localPlayer))
+        modes1[i].setVisibility(THE_DEMONS.has(localPlayer))
+        modes2[i].setVisibility(THE_DRAENEI.has(localPlayer))
 
     for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE
         select.registerPlayerChatEvent(players[i], "-", false)

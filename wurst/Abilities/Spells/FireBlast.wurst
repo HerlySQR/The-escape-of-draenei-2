@@ -35,7 +35,7 @@ init
             else
                 baseDmg = BASE_DMG_L[data.lvl]
                 extraDmg = EXTRA_DMG_FACTOR_L[data.lvl]
-            Damage.deal(caster, target, baseDmg + (target.getMaxHP() - target.getLife()) * extraDmg, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+            caster.damageTarget(target, baseDmg + (target.getMaxHP() - target.getLife()) * extraDmg, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
     end)
 
 function AbilityDefinitionThunderBoltCreep.general()

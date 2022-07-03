@@ -19,7 +19,7 @@ let AREA_NL = 300.
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
-        ..presetBuffs(lvl -> int2fourchar(SCORCHING_HEAT_BUFF))
+        ..presetBuffs(lvl -> SCORCHING_HEAT_BUFF.toRawCode())
         ..tooltipStartListen()
         ..setName("Scorching Heat")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)

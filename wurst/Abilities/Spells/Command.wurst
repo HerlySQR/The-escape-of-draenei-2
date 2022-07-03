@@ -16,10 +16,10 @@ let MAX_CHARGES_NL = 6
 let chargeMap = new HashMap<unit, int>()
 
 init
-    registerAfterDamageEvent(damage -> begin
-        let lvl = damage.source.getAbilityLevel(COMMAND_NL)
+    DamageEvent.addListener(() -> begin
+        let lvl = DamageEvent.getSource().getAbilityLevel(COMMAND_NL)
         if lvl > 0
-            let master = damage.source
+            let master = DamageEvent.getSource()
             chargeMap.put(master, CHARGE_DURATION)
             if not master.hasAbility(COMMAND_AURA)
                 master.addAbility(COMMAND_AURA)
@@ -73,7 +73,7 @@ init
         ..presetMeleeBonus(lvl -> true)
         ..presetRangedBonus(lvl -> true)
         ..presetTargetsAllowed(lvl -> "air,ground,friend,self,vuln,invu")
-        ..presetBuffs(lvl -> int2fourchar(COMMAND_BUFF))
+        ..presetBuffs(lvl -> COMMAND_BUFF.toRawCode())
         ..setItemAbility(true)
         ..presetButtonPosNormal(0, -11)
         ..presetIcon(Imports.pASHellscreamBerserk)

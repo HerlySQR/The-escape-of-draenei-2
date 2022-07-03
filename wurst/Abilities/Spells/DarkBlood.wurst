@@ -14,16 +14,16 @@ let LIFE_LOST_FACTOR_NL = [0.1, 0.2]
 let LIFE_LOST_FACTOR_L = [0.1, 0.15, 0.2, 0.25]
 
 init
-    registerDamageEvent(damage -> begin
-        if not damage.isSpell
-            let data = damage.target.pasAbilityCond(DARK_BLOOD_NL, DARK_BLOOD_L)
+    DamageEvent.addUnreducedListener(() -> begin
+        if not DamageEvent.isSpell()
+            let data = DamageEvent.getTarget().pasAbilityCond(DARK_BLOOD_NL, DARK_BLOOD_L)
             if data.check
                 real factor
                 if data.isNL
                     factor = LIFE_LOST_FACTOR_NL[data.lvl]
                 else
                     factor = LIFE_LOST_FACTOR_L[data.lvl]
-                damage.amount *= (1. - factor).pow((1. - damage.target.getHP()/damage.target.getMaxHP())/LIFE_UNIT)
+                DamageEvent.setAmount(DamageEvent.getAmount() * (1. - factor).pow((1. - DamageEvent.getTarget().getHP()/DamageEvent.getTarget().getMaxHP())/LIFE_UNIT)) 
     end)
 
 function AbilityDefinitionHardenedSkin.general()

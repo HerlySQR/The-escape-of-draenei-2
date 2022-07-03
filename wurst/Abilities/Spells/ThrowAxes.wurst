@@ -35,7 +35,7 @@ init
             let caster = GetSpellAbilityUnit()
             let owner = caster.getOwner()
             let pos = caster.getPos().withZ(50.)
-            let face = caster.getFacing()
+            let face = caster.getFacingAngle()
             var speed = 60.
             real damage
             if data.isNL
@@ -44,7 +44,7 @@ init
                 damage = DMG_PER_SEC_L[data.lvl] * INTERVAL
             let axes = new LinkedList<Axe>()
             for i = 1 to 3
-                axes.add(new Axe(pos, (face - 60. + 30.*i).asAngleDegrees(), Abilities.rexxarMissile))
+                axes.add(new Axe(pos, (face.degrees() - 60. + 30.*i).asAngleDegrees(), Abilities.rexxarMissile))
             doPeriodically(INTERVAL, cb -> begin
                 speed -= 3.
                 if speed > -60.
@@ -54,7 +54,7 @@ init
                         forUnitsInRange(newPos.toVec2(), AREA, u -> begin
                             if u.isAlive() and owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE)
                                 u.flashEffect(Abilities.stampedeMissileDeath, "chest")
-                                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+                                caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
                         end)
                         breakTrees(newPos.toVec2(), AREA, true)
                 else

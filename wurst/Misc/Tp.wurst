@@ -39,7 +39,7 @@ class Tp
             ..addCondition(cond)
             ..addAction(actions)
         
-        doPeriodically(0.016, cb -> begin
+        doPeriodically(0.03125, cb -> begin
             textTag.setVisibility(IsUnitVisible(portal, localPlayer) and not inCinematic)
         end)
     
@@ -49,82 +49,74 @@ class Tp
         enter.setPos(target)
 
 Tp dungeon
-Tp shops
 Tp pavilion
+Tp construction
+Tp habitat
 Tp back1
-Tp cave
-Tp mainHall
 Tp back2
 Tp back3
 Tp back4
 
 public function changeTexts()
     dungeon.textTag.setColor(0, 255, 230, 255)
-    shops.textTag.setColor(0, 255, 230, 255)
 
     doAfter(100, () -> begin
         dungeon.textTag.setColor(255, 255, 255, 255)
-        shops.textTag.setColor(255, 255, 255, 255)
     end)
 
 init
-    dungeon = new Tp(gg_unit_ncp3_0234, gg_rct_Recibir_1.getCenter(), "Dungeon",
+    dungeon = new Tp(Units.tpEntranceToDungeon, Rects.dungeonReceiver.getCenter(), "Dungeon",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",
         "Models\\Void Teleport Teal Caster.mdl",
-        gg_rct_Tp1, () -> dungeon.move(GetEnteringUnit()))
-    shops = new Tp(gg_unit_ncp3_0235, gg_rct_Recibir_2.getCenter(), "Shops (Dungeon)",
-        "Models\\Void Teleport Teal To.mdl",
-        "Models\\Void Teleport Teal Target.mdl",
-        "Models\\Void Teleport Teal Caster.mdl",
-        gg_rct_Tp2, () -> shops.move(GetEnteringUnit()))
-    pavilion = new Tp(gg_unit_ncp3_0236, gg_rct_Recibir_3.getCenter(), "Pavilion",
+        Rects.tpEntranceToDungeon, () -> dungeon.move(GetEnteringUnit()))
+    construction = new Tp(Units.tpEntranceToConstruction, Rects.constructionReceiver.getCenter(), "Construction",
+        "Models\\Void Teleport Red To.mdl",
+        "Models\\Void Teleport Red Target.mdl",
+        "Models\\Void Teleport Red Caster.mdl",
+        Rects.tpEntranceToConstruction, () -> begin
+            if actMission < 3 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                construction.move(GetEnteringUnit())
+        end)
+    pavilion = new Tp(Units.tpEntranceToPavilion, Rects.pavilionReceiver.getCenter(), "Pavilion",
         "Models\\Void Teleport Blue To.mdl",
         "Models\\Void Teleport Blue Target.mdl",
         "Models\\Void Teleport Blue Caster.mdl",
-        gg_rct_Tp3, () -> pavilion.move(GetEnteringUnit()))
-    back1 = new Tp(gg_unit_ncp3_0246, receiverPoint, "Main Hall (Entry)",
+        Rects.tpEntranceToPavilion, () -> pavilion.move(GetEnteringUnit()))
+    habitat = new Tp(Units.tpEntranceToHabitat, Rects.habitatReceiver.getCenter(), "habitat",
+        "Models\\Void Teleport Orange To.mdl",
+        "Models\\Void Teleport Orange Target.mdl",
+        "Models\\Void Teleport Orange Caster.mdl",
+        Rects.tpEntranceToHabitat, () -> begin
+            if actMission < 4 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                habitat.move(GetEnteringUnit())
+        end)
+    back1 = new Tp(Units.tpDungeonToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",
         "Models\\Void Teleport Teal Caster.mdl",
-        gg_rct_Tp4, () -> begin
-            if actMission == 1 and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
+        Rects.tpDungeonToEntrance, () -> begin
+            if actMission == 1 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
                 DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
             else
                 back1.move(GetEnteringUnit())
         end)
-    cave = new Tp(gg_unit_ncp3_0070, gg_rct_Recibir_4.getCenter(), "Cave",
-        "Models\\Void Teleport Orange To.mdl",
-        "Models\\Void Teleport Orange Target.mdl",
-        "Models\\Void Teleport Orange Caster.mdl",
-        gg_rct_Tp5, () -> begin
-            if actMission < 4 and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
-                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
-            else
-                cave.move(GetEnteringUnit())
-        end)
-    mainHall = new Tp(gg_unit_ncp3_0071, gg_rct_Recibir_5.getCenter(), "Main Hall",
-        "Models\\Void Teleport Red To.mdl",
-        "Models\\Void Teleport Red Target.mdl",
-        "Models\\Void Teleport Red Caster.mdl",
-        gg_rct_Tp6, () -> begin
-            if actMission < 4 and THE_DRAENEI.containsPlayer(GetEnteringUnit().getOwner())
-                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
-            else
-                mainHall.move(GetEnteringUnit())
-        end)
-    back2 = new Tp(gg_unit_ncp3_0072, receiverPoint, "Main Hall (Entry)",
-        "Models\\Void Teleport Orange To.mdl",
-        "Models\\Void Teleport Orange Target.mdl",
-        "Models\\Void Teleport Orange Caster.mdl",
-        gg_rct_Tp7, () -> back2.move(GetEnteringUnit()))
-    back3 = new Tp(gg_unit_ncp3_0073, receiverPoint, "Main Hall (Entry)",
-        "Models\\Void Teleport Red To.mdl",
-        "Models\\Void Teleport Red Target.mdl",
-        "Models\\Void Teleport Red Caster.mdl",
-        gg_rct_Tp8, () -> back3.move(GetEnteringUnit()))
-    back4 = new Tp(gg_unit_ncp3_0171, receiverPoint, "Main Hall (Entry)",
+    back2 = new Tp(Units.tpPavilionToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Blue To.mdl",
         "Models\\Void Teleport Blue Target.mdl",
         "Models\\Void Teleport Blue Caster.mdl",
-        gg_rct_Tp9, () -> back4.move(GetEnteringUnit()))
+        Rects.tpPavilionToEntrance, () -> back2.move(GetEnteringUnit()))
+    back3 = new Tp(Units.tpConstructionToEntrance, receiverPoint, "Entrance",
+        "Models\\Void Teleport Red To.mdl",
+        "Models\\Void Teleport Red Target.mdl",
+        "Models\\Void Teleport Red Caster.mdl",
+        Rects.tpConstructionToEntrance, () -> back3.move(GetEnteringUnit()))
+    back4 = new Tp(Units.tpHabitatToEntrance, receiverPoint, "Entrance",
+        "Models\\Void Teleport Orange To.mdl",
+        "Models\\Void Teleport Orange Target.mdl",
+        "Models\\Void Teleport Orange Caster.mdl",
+        Rects.tpHabitatToEntrance, () -> back4.move(GetEnteringUnit()))

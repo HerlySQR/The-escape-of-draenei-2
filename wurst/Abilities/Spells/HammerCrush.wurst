@@ -21,7 +21,7 @@ function hammerCrushActions(unit caster, vec2 pos, player owner, real damage, an
     flashEffect(Abilities.thunderclapCaster, newPos)
     forUnitsInRange(newPos, 200., u -> begin
         if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
-            Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+            caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
             u.scaleSpeed("hammer crush", SLOW)
             doAfter(DURATION) -> 
                 u.removeSpeedBuff("hammer crush")
@@ -29,11 +29,11 @@ function hammerCrushActions(unit caster, vec2 pos, player owner, real damage, an
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == HAMMER_CRUSH_NL
-            let caster = GetSpellAbilityUnit()
+        if EventData.getSpellAbilityId() == HAMMER_CRUSH_NL
+            let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             let pos = caster.getPos()
-            let ang = pos.angleTo(getSpellTargetPos())
+            let ang = pos.angleTo(EventData.getSpellTargetPos())
             let damage = DMG_NL
             SMASH.playOnPoint(pos.toVec3())
             hammerCrushActions(caster, pos, owner, damage, ang, 1)

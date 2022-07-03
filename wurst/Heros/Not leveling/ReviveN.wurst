@@ -4,6 +4,7 @@ import TimerDialog
 
 import PlayerData
 import HeroSelection
+import Reset
 
 // Control the resurrection of the dying heros in the not leveling mode
 
@@ -43,4 +44,9 @@ init
             ..addAction(() -> begin
         if localPlayer == GetDyingUnit().getOwner()
             reviveWindow.display(true)
+    end)
+
+    onReset(false, () -> begin
+        revive.pause()
+        reviveWindow.display(false)
     end)

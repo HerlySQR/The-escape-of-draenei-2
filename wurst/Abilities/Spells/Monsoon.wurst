@@ -33,13 +33,13 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         let data = abilityCond(MONSOON_NL, MONSOON_L, MONSOON_S)
         if data.check
-            let caster = GetSpellAbilityUnit()
-            let pos = getSpellTargetPos()
+            let caster = EventData.getSpellAbilityUnit()
+            let pos = EventData.getSpellTargetPos()
             let dummy = DummyRecycler.get(pos, caster.getFacingAngle())
             dummy.addAbility(DUMMY_MONSOON)
             dummy.setOwner(caster.getOwner(), false)
             dummy.issuePointOrderById(Orders.monsoon, pos)
-            dummies.addUnit(dummy)
+            dummies.add(dummy)
             let i = dummy.getIndex()
             owners[i] = caster
             if data.isNL
@@ -57,19 +57,19 @@ init
             damages[i] = 0
             let dummy = (i castTo UnitIndex).getUnit()
             dummy.removeAbility(DUMMY_MONSOON)
-            dummies.removeUnit(dummy)
+            dummies.remove(dummy)
             DummyRecycler.recycle(dummy)
             indexes[GetSpellAbilityUnit().getIndex()] = 0
     end)
-    registerDamageEvent(damage -> begin
-        if dummies.contains(damage.source)
-            let u = damage.target
+    DamageEvent.addUnreducedListener(() -> begin
+        if dummies.has(DamageEvent.getSource())
+            let u = DamageEvent.getTarget()
             u.scaleSpeed("monsoon", SPEED)
             doAfter(1.) ->
                 u.removeSpeedBuff("monsoon")
-            let i = damage.source.getIndex()
-            damage.amount = 0.
-            Damage.deal(owners[i], damage.target, damages[i], ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+            let i = DamageEvent.getSource().getIndex()
+            DamageEvent.setAmount(0.)
+            owners[i].damageTarget(u, damages[i], ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
     end)
 
 function ChannelAbilityPreset.general()
@@ -147,7 +147,7 @@ function ChannelAbilityPreset.general()
         ..setDamageDealt(1, 10.)
         ..setDurationHero(1, DURATION)
         ..setDurationNormal(1, DURATION)
-        ..setBuffs(1, int2fourchar(MONSOON_EFFECT))
+        ..setBuffs(1, MONSOON_EFFECT.toRawCode())
         .setDummyAbility()
     
     new BuffDefinition(MONSOON_EFFECT, 'ANmd')

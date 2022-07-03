@@ -1,14 +1,10 @@
 package Missiles
 
-import TerrainUtils
 import DummyRecycler
 import MapBounds
 import HashMap
 import ErrorHandling
 import Annotations
-
-init
-    suppressErrorMessages = false
 
 // System based in Missiles v2.3 by Chopinski https://www.hiveworkshop.com/threads/relativistic-missiles-vjass-lua-gui.325964/
 
@@ -61,7 +57,7 @@ class Coordinates
             if dx != 0. and dy != 0.
                 break
             b.x = b.x + .01
-            b.z = b.z - getTerrainZ(b.x -.01, b.y) + getTerrainZ(b.x, b.y)
+            b.z = b.z - vec2(b.x -.01, b.y).getTerrainZ() + vec2(b.x, b.y).getTerrainZ()
 
         a.square   = dx
         a.distance = dy
@@ -84,7 +80,7 @@ class Coordinates
     function move(real toX, real toY, real toZ)
         x = toX
         y = toY
-        z = toZ + getTerrainZ(toX, toY)
+        z = toZ + vec2(toX, toY).getTerrainZ()
         if ref != this
             math(this, ref)
 
@@ -243,14 +239,14 @@ public class Missiles
 
     /* ---------------------------- Bound and Deflect --------------------------- */
     function bounce()
-        origin.move(pos.x, pos.y, pos.z - getTerrainZ(pos.toVec2()))
+        origin.move(pos.x, pos.y, pos.z - pos.toVec2().getTerrainZ())
         travel = 0.
     
     function deflect(vec2 t)
-        let locZ = getTerrainZ(pos.toVec2()) 
+        let locZ = pos.toVec2().getTerrainZ()
         
         target = null
-        toZ = origin.z - getTerrainZ(t)
+        toZ = origin.z - t.getTerrainZ()
         
         if pos.z < locZ
             nextPos = prevPos
@@ -302,7 +298,7 @@ public class Missiles
 
         if not temp.widgetMap.has(d)
             if temp.collideZ
-                let dz = getTerrainZ(d.getPos())
+                let dz = d.getPos().getTerrainZ()
                 let tz = GetDestructableOccluderHeight(d)
                 if dz + tz >= temp.pos.z - temp.collision and dz <= temp.pos.z + temp.collision
                     temp.widgetMap.put(d, true)
@@ -321,7 +317,7 @@ public class Missiles
 
         if not temp.widgetMap.has(i)
             if temp.collideZ
-                let dz = getTerrainZ(GetItemX(i), GetItemY(i))
+                let dz = i.getPos().getTerrainZ()
                 if dz + ITEM_SIZE >= temp.pos.z - temp.collision and dz <= temp.pos.z + temp.collision
                     temp.widgetMap.put(i, true)
                     if temp.itemEvent.run(i)
@@ -543,7 +539,7 @@ public class Missiles
                             temp.terminate()
 
                 if temp.terrainEvent != null
-                    if getTerrainZ(temp.pos.toVec2()) > temp.pos.z
+                    if temp.pos.toVec2().getTerrainZ() > temp.pos.z
                         if temp.terrainEvent.run()
                             temp.terminate()
 

@@ -27,7 +27,7 @@ init
             let damage = DMG_NL
             let cooldowns = new HashMap<unit, real>()
             let affected = CreateGroup()
-            if not herosCanByPass and THE_DRAENEI.containsPlayer(caster.getOwner())
+            if not herosCanByPass and THE_DRAENEI.has(caster.getOwner())
                 caster.startWindWalk(INTANGIBILITY_BUFF)
             else
                 caster.disableCollision()
@@ -39,18 +39,18 @@ init
                         if u.isAlive()
                             and not u.isType(UNIT_TYPE_STRUCTURE)
                             and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
-                            and not affected.contains(u) and u.ignoreLocust()
+                            and not affected.has(u) and u.ignoreLocust()
 
                             cooldowns.put(u, DMG_CD)
-                            affected.addUnit(u)
-                            Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
+                            affected.add(u)
+                            caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL)
                             u.flashEffect(Abilities.annihilationMissile, "chest")
                     end)
                     for u in affected
                         if cooldowns.get(u) > 0. and u.isAlive()
                             cooldowns.put(u, cooldowns.get(u) - INTERVAL)
                         else
-                            affected.removeUnit(u)
+                            affected.remove(u)
                 else
                     affected.destr()
                     destroy cooldowns
@@ -65,7 +65,7 @@ init
         ..setLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> int2fourchar(INTANGIBILITY_BUFF))
+        ..presetBuffs(lvl -> INTANGIBILITY_BUFF.toRawCode())
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetDamageTakenIncrease(lvl -> 0.)

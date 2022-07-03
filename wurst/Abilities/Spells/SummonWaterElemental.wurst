@@ -21,7 +21,6 @@ let ELEM_DMG_NL = dice(30, 1, 9)
 let levelMap = new HashMap<unit, int>()
 
 init
-    gg_unit_H00L_0205.addAbility(SUMMON_WATER_ELEMENTAL_NL)
     // Zest
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SUMMON, () -> begin
         switch GetSummonedUnit().getTypeId()
@@ -55,7 +54,7 @@ init
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..setRequirements("")
-        ..presetSummonedUnitType(lvl -> int2fourchar(ELEM_NL))
+        ..presetSummonedUnitType(lvl -> ELEM_NL.toRawCode())
         ..tooltipStartListen()
         ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Summon Water Elemental")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
@@ -91,7 +90,7 @@ init
         ..setArtTarget("")
         ..setName("Zest")
         ..setEditorSuffix("(Water Elemental)")
-        ..setBuffs(1, int2fourchar(ZEST_BUFF))
+        ..setBuffs(1, ZEST_BUFF.toRawCode())
         ..setTargetsAllowed(1, "")
         ..setAttackSpeedIncrease(1, 0.)
         ..setMovementSpeedIncrease(1, 0.)
@@ -127,7 +126,7 @@ init
         ..setTintingColorGreen(255)
         ..setTintingColorBlue(255)
         ..setScalingValue(1.)
-        ..setNormalAbilities(int2fourchar(ELEM_ZEST) + "," + int2fourchar(ELEM_BASH))
+        ..setNormalAbilities(commaList(ELEM_ZEST, ELEM_BASH))
         ..setSpeedBase(270)
         ..setName("Water Elemental")
         .setNameEditorSuffix("(Not leveling / Level 1)")

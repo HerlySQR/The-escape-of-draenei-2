@@ -22,7 +22,7 @@ let DMG_NL = 70.
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetBufferManaRequired(lvl -> 0.)
-        ..presetBuffs(lvl -> int2fourchar(CRYING_SOULS_BUFF))
+        ..presetBuffs(lvl -> CRYING_SOULS_BUFF.toRawCode())
         ..tooltipStartListen()
         ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Crying Souls")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)

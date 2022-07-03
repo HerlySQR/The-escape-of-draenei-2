@@ -1,6 +1,7 @@
 package PlayerData
 
 import public Circles
+import Reset
 
 public constant player DRAENEI = players[0]
 public constant player DEMON = players[6]
@@ -20,6 +21,15 @@ public int array firstKill
 public int array doubleKill
 public int array tripleKill
 public int array ultraKill
+
+init
+    onReset(false, () -> begin
+        for i = 1 to 10
+            kills[i] = 0
+            deaths[i] = 0
+            assists[i] = 0
+            spree[i] = 0
+    end)
 
 public function switchMembers(player p1, player p2)
     let i1 = p1.getNumber()
@@ -74,18 +84,18 @@ public function switchMembers(player p1, player p2)
 public trigger giveGold = CreateTrigger()..disable()
 
 init
-    THE_DRAENEI.addPlayer(players[0])
-    THE_DRAENEI.addPlayer(players[1])
-    THE_DRAENEI.addPlayer(players[2])
-    THE_DRAENEI.addPlayer(players[3])
-    THE_DRAENEI.addPlayer(players[4])
-    THE_DRAENEI.addPlayer(players[5])
-    THE_DEMONS.addPlayer(players[6])
-    THE_DEMONS.addPlayer(players[7])
-    THE_DEMONS.addPlayer(players[8])
-    THE_DEMONS.addPlayer(players[9])
-    THE_DEMONS.addPlayer(players[10])
-    THE_DEMONS.addPlayer(players[11])
+    THE_DRAENEI.add(players[0])
+    THE_DRAENEI.add(players[1])
+    THE_DRAENEI.add(players[2])
+    THE_DRAENEI.add(players[3])
+    THE_DRAENEI.add(players[4])
+    THE_DRAENEI.add(players[5])
+    THE_DEMONS.add(players[6])
+    THE_DEMONS.add(players[7])
+    THE_DEMONS.add(players[8])
+    THE_DEMONS.add(players[9])
+    THE_DEMONS.add(players[10])
+    THE_DEMONS.add(players[11])
 
 // Number
 
@@ -133,18 +143,18 @@ init
     numb[0] = 11
     numb[6] = 12
 
-    colorId[1] = playercolors[1].toColorString()
-    colorId[2] = playercolors[2].toColorString()
-    colorId[3] = playercolors[3].toColorString()
-    colorId[4] = playercolors[4].toColorString()
-    colorId[5] = playercolors[5].toColorString()
-    colorId[6] = playercolors[7].toColorString()
-    colorId[7] = playercolors[8].toColorString()
-    colorId[8] = playercolors[9].toColorString()
-    colorId[9] = playercolors[10].toColorString()
-    colorId[10] = playercolors[11].toColorString()
-    colorId[11] = playercolors[0].toColorString()
-    colorId[12] = playercolors[6].toColorString()
+    colorId[1] = PLAYER_COLORS[1].toColorString()
+    colorId[2] = PLAYER_COLORS[2].toColorString()
+    colorId[3] = PLAYER_COLORS[3].toColorString()
+    colorId[4] = PLAYER_COLORS[4].toColorString()
+    colorId[5] = PLAYER_COLORS[5].toColorString()
+    colorId[6] = PLAYER_COLORS[7].toColorString()
+    colorId[7] = PLAYER_COLORS[8].toColorString()
+    colorId[8] = PLAYER_COLORS[9].toColorString()
+    colorId[9] = PLAYER_COLORS[10].toColorString()
+    colorId[10] = PLAYER_COLORS[11].toColorString()
+    colorId[11] = PLAYER_COLORS[0].toColorString()
+    colorId[12] = PLAYER_COLORS[6].toColorString()
 
     playerName[1] = colorId[1] + players[1].getName() + "|r"
     playerName[2] = colorId[2] + players[2].getName() + "|r"

@@ -28,9 +28,9 @@ let SOUND_4 = new SoundDefinition(Sounds.flareTarget4, false, true)
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == VORTEX_NL
-            let caster = GetSpellAbilityUnit()
-            let target = getSpellTargetPos()
+        if EventData.getSpellAbilityId() == VORTEX_NL
+            let caster = EventData.getSpellAbilityUnit()
+            let target = EventData.getSpellTargetPos()
             let owner = caster.getOwner()
             let vortex = new Fx(target.withZ(50.), UNIT_FACING, Imports.blackHole)..setScale(0.5)
             let pulled = CreateGroup()
@@ -40,7 +40,7 @@ init
             var size = 0.
             let deformation = createCrater(DURATION, false, target, area, 96.)
             let finalDmgMap = new HashMap<unit, real>()
-            casters.addUnit(caster)
+            casters.add(caster)
             vortex.getDummy()..addAbility(SHIELD)..setOwner(owner, false)
             doPeriodically(INTERVAL, cb -> begin
                 if caster.getCurrentOrder() == Orders.voodoo
@@ -51,11 +51,11 @@ init
                         vortex.setScale(r)
                         size++
                     forUnitsInRange(target, area, u -> begin
-                        if not u.isType(UNIT_TYPE_STRUCTURE) and not casters.contains(u) and owner.isEnemyOf(u.getOwner()) and u.ignoreLocust()
-                            pulled.addUnit(u)
+                        if not u.isType(UNIT_TYPE_STRUCTURE) and not casters.has(u) and owner.isEnemyOf(u.getOwner()) and u.ignoreLocust()
+                            pulled.add(u)
                             if u.getPos().distanceTo(target) <= 80.
-                                pulled.removeUnit(u)
-                                enter.addUnit(u)
+                                pulled.remove(u)
+                                enter.add(u)
                                 u.hide()
                     end)
                     for u in pulled
@@ -63,21 +63,21 @@ init
                             r = 0.08 * size.squared()
                             r /= 100.
                             u.setPos(u.getPos().moveTowards(target, r))
-                            Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
-                            if not paused.contains(u)
-                                paused.addUnit(u)
+                            caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                            if not paused.has(u)
+                                paused.add(u)
                                 u.pause(true)
                         else
-                            pulled.removeUnit(u)
-                            if paused.contains(u)
-                                paused.removeUnit(u)
+                            pulled.remove(u)
+                            if paused.has(u)
+                                paused.remove(u)
                                 u.pause(false)
                     for u in enter
                         if owner.isEnemyOf(u.getOwner())
                             finalDmgMap.put(u, finalDmgMap.get(u) + 1.)
                 else
                     destroy new Fx(target.withZ(50.), UNIT_FACING, Imports.arcaneNova)..setScale(1. + 0.002 * size.squared())
-                    casters.removeUnit(caster)
+                    casters.remove(caster)
                     let target3 = target.toVec3()
                     SOUND_1.playOnPoint(target3)
                     SOUND_2.playOnPoint(target3)
@@ -86,14 +86,14 @@ init
                     for u from enter
                         u.show()
                         if owner.isEnemyOf(u.getOwner())
-                            Damage.deal(caster, u, damage * finalDmgMap.get(u), ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
-                        pulled.addUnit(u)
+                            caster.damageTarget(u, damage * finalDmgMap.get(u), ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                        pulled.add(u)
                     for u from pulled
-                        if paused.contains(u)
-                            paused.removeUnit(u)
+                        if paused.has(u)
+                            paused.remove(u)
                             u.pause(false)
                         if owner.isEnemyOf(u.getOwner())
-                            Damage.deal(caster, u, EXTRA_DMG_NL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                            caster.damageTarget(u, EXTRA_DMG_NL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
                     vortex.getDummy()..removeAbility(SHIELD)..setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     TerrainDeformStop(deformation, 1000)
                     enter.destr()
@@ -137,7 +137,7 @@ init
         ..setRangedBonus(1, false)
         ..setTargetsAllowed(1, "air,friend,invulnerable,ground,vulnerable")
         ..setArtTarget("")
-        ..setBuffs(1, int2fourchar(SHIELD_BUFF))
+        ..setBuffs(1, SHIELD_BUFF.toRawCode())
         ..setName("Shield")
         ..setEditorSuffix("(Vortex)")
         ..setTooltipNormal(1, "Shield")

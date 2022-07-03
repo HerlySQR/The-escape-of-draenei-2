@@ -130,7 +130,7 @@ function ChannelAbilityPreset.general()
                 value = ARMOR_AND_HP_REGEN_L[lvl - 2]
             return value
         end)
-        ..presetBuffs(lvl -> int2fourchar(POWER_OF_LIGHT_BUFF))
+        ..presetBuffs(lvl -> POWER_OF_LIGHT_BUFF.toRawCode())
         ..presetTargetsAllowed(lvl -> "self")
         ..setItemAbility(true)
         ..presetButtonPosNormal(0, -11)

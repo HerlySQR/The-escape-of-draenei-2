@@ -26,8 +26,8 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         let data = abilityCond(EARTHQUAKE_NL, EARTHQUAKE_L, EARTHQUAKE_S)
         if data.check
-            let caster = GetSpellAbilityUnit()
-            let pos = getSpellTargetPos()
+            let caster = EventData.getSpellAbilityUnit()
+            let pos = EventData.getSpellTargetPos()
             let dummy = DummyRecycler.get(pos, UNIT_FACING)
             dummy.addAbility(DUMMY_EARTHQUAKE)
             if data.isNL

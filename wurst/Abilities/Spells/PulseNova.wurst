@@ -29,8 +29,8 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         let data = abilityCond(PULSE_NOVA_NL, PULSE_NOVA_L, PULSE_NOVA_S)
         if data.check
-            let caster = GetSpellAbilityUnit()
-            let target = getSpellTargetPos()
+            let caster = EventData.getSpellAbilityUnit()
+            let target = EventData.getSpellTargetPos()
             let m = new Missiles(caster.getPos3with(75.), target.withZ(75.))
             m.setSpeed(800.)
             m.setModel(Imports.holySmiteMissileNew)
@@ -59,9 +59,9 @@ init
                     forUnitsInRange(pos, AREA_PER_TICK * counter, u -> begin
                         if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
                             u.setPos(u.getPos().moveTowards(pos, -PUSH_DIST))
-                            if not affected.contains(u)
-                                Damage.deal(caster, u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
-                                affected.addUnit(u)
+                            if not affected.has(u)
+                                caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+                                affected.add(u)
                     end)
                     damage -= 2.
                     if cb.isLast()

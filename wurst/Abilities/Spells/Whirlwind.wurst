@@ -13,9 +13,6 @@ let MANA = 105
 let CD_NL = 30.
 let DMG_PER_SEC_NL = 100.
 
-init
-    gg_unit_Otch_0284.addAbility(WHIRLWIND_NL)
-
 @compiletime function gen()
     new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing damage per second to nearby enemy ground units. \nLast " + DURATION.toString(0) + " seconds."))

@@ -7,14 +7,15 @@ import ClosureForGroups
 import PlayerData
 import Orders
 import Barrels
-import DamageEngine
+import DamageEvent
+import GeneratedValues
 
 import LinkedList
 import OnUnitEnterLeave
 
 // Functions and values to use
 
-public rect returnPoint = gg_rct_Donde_estaban_los_trabajadores
+public rect returnPoint = Rects.whereTheWorkersWere
 
 let towerCond = Condition(() -> begin
     let id = GetDyingUnit().getTypeId()
@@ -44,12 +45,12 @@ let endItsJob = CreateGroup()
 
 function acolyteSpawnPos(vec2 p) returns vec2
     vec2 pos = ZERO2
-    if gg_rct_Torre_de_los_demonios_1.contains(p)
-        pos = gg_unit_o00C_0081.getPos()
-    else if gg_rct_Torre_de_los_demonios_2.contains(p) or gg_rct_Torres_del_muro.contains(p)
-        pos = gg_unit_o00C_0083.getPos()
-    else if gg_rct_Torre_de_los_demonios_3.contains(p)
-        pos = gg_unit_o00C_0084.getPos()
+    if Rects.demonTower1.contains(p) or Rects.demonTower2.contains(p)
+        pos = Units.barrack1.getPos()
+    else if Rects.demonTower3.contains(p)// or gg_rct_Torres_del_muro.contains(p)
+        pos = Units.barrack2.getPos()
+    else if Rects.demonTower4.contains(p) or Rects.demonTower5.contains(p)
+        pos = Units.barrack3.getPos()
     return pos
 
 function unit.issueBuildOrder(int unitToBuild, vec2 pos)
@@ -166,12 +167,12 @@ function disableTower()
     if u.getTypeId() != 'o00I'
         return
     let p = u.getPos()
-    // TODO: Init the destructables
+    /* TODO: Init the destructables
     if (gg_rct_Torre_de_los_demonios_1.contains(p) and gg_dest_ATg1_1002.getLife() < 0) or
         (gg_rct_Torre_de_los_demonios_2.contains(p) and gg_dest_DTrc_0239.getLife() < 0) or
         (gg_rct_Torres_del_muro.contains(p) and not generatorAlive) or
         (gg_rct_Torre_de_los_demonios_3.contains(p) and gg_dest_DTg6_0506.getLife() < 0)
-        u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+        u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)*/
 
 init
     // This towers don't work
@@ -225,7 +226,7 @@ init
             forUnitsInRange(p, 200., u -> begin
                 if u.getTypeId() == 'u00J'
                     u.issuePointOrderById(Orders.smart, acolyteSpawnPos(p))
-                    endItsJob.addUnit(u)
+                    endItsJob.add(u)
             end)
             doAfter(3.5) -> 
                 let a = createUnit(DEMON, 'u00L', p, UNIT_FACING)
@@ -238,20 +239,20 @@ init
         end)
     // Remove acolyte
     CreateTrigger()
-        ..registerUnitInRange(gg_unit_o00C_0081, 200., null)
-        ..registerUnitInRange(gg_unit_o00C_0083, 200., null)
-        ..registerUnitInRange(gg_unit_o00C_0084, 200., null)
+        ..registerUnitInRange(Units.barrack1, 200., null)
+        ..registerUnitInRange(Units.barrack2, 200., null)
+        ..registerUnitInRange(Units.barrack3, 200., null)
         ..addCondition(Condition(() -> begin
-            return endItsJob.contains(GetTriggerUnit())
+            return endItsJob.has(GetTriggerUnit())
         end))
         ..addAction(() -> begin
             let u = GetTriggerUnit()
-            endItsJob.removeUnit(u)
+            endItsJob.remove(u)
             doAfter(0.33, () -> u.remove())
         end)
     // Don't touch the builders
-    registerDamageEvent(damage -> begin
-        let id = damage.target.getTypeId()
+    DamageEvent.addUnreducedListener(() -> begin
+        let id = DamageEvent.getTarget().getTypeId()
         if id == 'ndrl' or id == 'u00J'
-            damage.amount = 0.
+            DamageEvent.setAmount(0.)
     end)

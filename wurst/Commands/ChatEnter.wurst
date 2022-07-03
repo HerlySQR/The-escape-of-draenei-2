@@ -18,12 +18,12 @@ function commands()
             if p == localPlayer
                 ClearTextMessages()
         case "yestip"
-            if not whoWannaHelp.containsPlayer(p)
-                whoWannaHelp.addPlayer(p)
+            if not whoWannaHelp.has(p)
+                whoWannaHelp.add(p)
                 DisplayTextToPlayer(p, 0., 0., "The tips are enabled.")
         case "notip"
-            if whoWannaHelp.containsPlayer(p)
-                whoWannaHelp.removePlayer(p)
+            if whoWannaHelp.has(p)
+                whoWannaHelp.remove(p)
                 DisplayTextToPlayer(p, 0., 0., "The tips are disabled.")
         case "repick"
             repick(p)

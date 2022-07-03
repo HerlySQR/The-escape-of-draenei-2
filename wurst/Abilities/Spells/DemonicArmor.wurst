@@ -16,26 +16,26 @@ let delayMap = new HashMap<unit, real>()
 let DELAY_EFF = 0.5
 
 init
-    registerDamageEvent(damage -> begin
-        if not damage.isSpell
-            let data = damage.target.pasAbilityCond(DEMONIC_ARMOR_NL, DEMONIC_ARMOR_L)
+    DamageEvent.addUnreducedListener(() -> begin
+        if not DamageEvent.isSpell()
+            let data = DamageEvent.getTarget().pasAbilityCond(DEMONIC_ARMOR_NL, DEMONIC_ARMOR_L)
             if data.check
                 real reflect
                 if data.isNL
                     reflect = DMG_REFLECT_NL[data.lvl]
                 else
                     reflect = DMG_REFLECT_L[data.lvl]
-                let caster = damage.target
-                let dmg = reflect * damage.amount
-                let owner = damage.target.getOwner()
+                let caster = DamageEvent.getTarget()
+                let dmg = reflect * DamageEvent.getAmount()
+                let owner = caster.getOwner()
                 let showEff = delayMap.get(caster) <= 0.
                 forUnitsInRange(caster.getPos(), AREA, u -> begin
                     if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and u.isAlive()
-                        Damage.deal(caster, u, dmg, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                        caster.damageTarget(u, dmg, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
                         if showEff
                             u.flashEffect(Abilities.spiritOfVengeanceMissile, "origin")
                 end)
-                damage.amount =- dmg
+                DamageEvent.subAmount(dmg)
                 if showEff
                     delayMap.put(caster, DELAY_EFF)
                     doPeriodically(INTERVAL, cb -> begin

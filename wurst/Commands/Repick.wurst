@@ -1,11 +1,13 @@
 package Repick
 
-import DamageEngine
 import ModeSelection
 import HeroSelection
 import MyBoard
+import Reset
+import GeneratedValues
 
 import Icons
+import DamageEvent
 
 public boolean yesOrYes = false
 
@@ -16,12 +18,12 @@ trigger reduce = CreateTrigger()
 
 public function enableRepick()
     canRepick = true
-    noRepick.reconnect()
+    DamageEvent.addListener(noRepick)
     reduce.enable()
 
 public function disableRepick()
     canRepick = false
-    noRepick.disconnect()
+    DamageEvent.removeListener(noRepick)
     reduce.disable()
 
 public function repick(player p)
@@ -38,11 +40,11 @@ public function repick(player p)
             // TODO udg_Si_lo_mataste[p.getId()] = false
             hero[i] = null
             table.setItemIcon(1, row[i], Icons.bTNSelectHeroOn)
-            if THE_DRAENEI.containsPlayer(p)
+            if THE_DRAENEI.has(p)
                 repick.getItemOfId('I000').remove()
-                repick.setPos(gg_rct_selecionador_draeneanos.getCenter())
+                repick.setPos(Rects.selectorDraenei.getCenter())
             else
-                repick.setPos(gg_rct_selecionador_demonios.getCenter())
+                repick.setPos(Rects.selectorDemon.getCenter())
             p.panCamToTimed(repick, 0.)
             let pos = circleRegion[i].getCenter()
             for j = 0 to 5
@@ -53,14 +55,14 @@ public function repick(player p)
             for j = 1 to 6
                 if IsPlayerInForce(p,udg_Mision[j]) or IsPlayerInForce(p,udg_No_aceptaste_la_mision[j])
                     ForceAddPlayer(udg_Sabe_quien_eres[j],p)*/
-            canPick.addPlayer(p)
+            canPick.add(p)
             repick.remove()
 
 // No during combat
 init
-    noRepick = registerAfterDamageEvent(damage -> begin
-        if damage.target.isType(UNIT_TYPE_HERO)
-            inCombat[damage.target.getOwner().getNumber()] = 3
+    noRepick = DamageEvent.addListener(() -> begin
+        if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
+            inCombat[DamageEvent.getTarget().getOwner().getNumber()] = 3
     end)
     reduce
         ..registerTimerEvent(1, true)
@@ -68,3 +70,6 @@ init
             for i = 1 to 10
                 inCombat[i]--
         end)
+    onReset(false, () -> begin
+        enableRepick()
+    end)

@@ -3,6 +3,7 @@ package Switch
 import AFK
 import Repick
 import MyBoard
+import GeneratedValues
 
 import Dialog
 import ClosureForGroups
@@ -19,7 +20,7 @@ boolean switchSuccesful
 boolean okEnabled = false
 
 public function switchPlayer(player p)
-    if not whoAreHere.containsPlayer(p)
+    if not whoAreHere.has(p)
         DisplayTextToPlayer(p, 0., 0., "Please select a unit if you wanna switch (it's to know you're here).")
     else if youCantNow
         DisplayTextToPlayer(p, 0., 0., "Someone is doing switch, you have to wait.")
@@ -27,7 +28,7 @@ public function switchPlayer(player p)
         print("Someone wanna switch (Only has 60 seconds).")
         youCantNow = true
         switchWindow.setMessage("What player do you want to change with?")
-        if THE_DEMONS.containsPlayer(p)
+        if THE_DEMONS.has(p)
             for i = 1 to 5
                 switchButton[i] = switchWindow.addButton(playerName[i])
         else
@@ -49,12 +50,12 @@ function youCantVote()
 
 public function ok(player p)
     if okEnabled
-        if whoVoted.containsPlayer(p)
+        if whoVoted.has(p)
             return
         howManyVoted++
         if howManyVoted < whoAreHere.count()
             print(p.getName() + " typed ok (" + howManyVoted.toString() + "/" + whoAreHere.count().toString() + ")")
-            whoVoted.addPlayer(p)
+            whoVoted.add(p)
         else
             changePlayers()
             whoVoted.clear()
@@ -85,7 +86,7 @@ init
             if j == 1
                 changePlayers()
             else
-                whoVoted.addPlayer(p)
+                whoVoted.add(p)
                 print("|cff879cdc" + swp1.getName() + " wants switch with " + swp2.getName() + "|r")
                 print("Type -ok for switch")
                 okEnabled = true
@@ -105,7 +106,7 @@ function changePlayers()
     // Change the players
     swc1 = circleRegion[i1].getCenter()
     swc2 = circleRegion[i2].getCenter()
-    vase = gg_rct_Index.getCenter()
+    vase = Rects.index.getCenter()
     for i = 0 to 5
         hero[i1].itemInSlot(i).setPos(swc1)
         hero[i2].itemInSlot(i).setPos(swc2)
@@ -121,7 +122,7 @@ function changePlayers()
         if GetItemPlayer(m) == swp2
             m.setPos(swc1)
     end)
-    EnumItemsInRect(gg_rct_Index, null, () -> begin
+    EnumItemsInRect(Rects.index, null, () -> begin
         GetEnumItem().setPos(swc1)
     end)
     vec2 where
@@ -184,24 +185,24 @@ function changePlayers()
 
 function changeAlliance(player p)
     vec2 where
-    if THE_DRAENEI.containsPlayer(p)
-        THE_DRAENEI.removePlayer(p)
+    if THE_DRAENEI.has(p)
+        THE_DRAENEI.remove(p)
         for i = 0 to 11
-            if THE_DRAENEI.containsPlayer(players[i])
+            if THE_DRAENEI.has(players[i])
                 noAllies(p, players[i])
-            else if THE_DEMONS.containsPlayer(players[i])
+            else if THE_DEMONS.has(players[i])
                 yesAllies(p, players[i])
-        THE_DEMONS.addPlayer(p)
-        where = gg_rct_selecionador_demonios.getCenter()
+        THE_DEMONS.add(p)
+        where = Rects.selectorDemon.getCenter()
     else
-        THE_DEMONS.removePlayer(p)
+        THE_DEMONS.remove(p)
         for i = 0 to 11
-            if THE_DRAENEI.containsPlayer(players[i])
+            if THE_DRAENEI.has(players[i])
                 yesAllies(p, players[i])
-            else if THE_DEMONS.containsPlayer(players[i])
+            else if THE_DEMONS.has(players[i])
                 noAllies(p, players[i])
-        THE_DRAENEI.addPlayer(p)
-        where = gg_rct_selecionador_draeneanos.getCenter()
+        THE_DRAENEI.add(p)
+        where = Rects.selectorDraenei.getCenter()
     doAfter(0.1) -> 
         playersOrder()
         PanCameraToTimedForPlayer(p, where.x, where.y, 0.)

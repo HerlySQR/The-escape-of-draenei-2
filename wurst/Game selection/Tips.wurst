@@ -9,7 +9,7 @@ int actTip = 0
 init
     for i = 1 to PLAYER_NEUTRAL_AGGRESSIVE
         if players[i].isIngame()
-            whoWannaHelp.addPlayer(players[i])
+            whoWannaHelp.add(players[i])
     
     tips[4] = "You can buy wards."
     tips[5] = "If you repick, your items go to your circle."

@@ -14,9 +14,6 @@ let TARGETS = "hero"
 // Not leveling
 let MANA_NL = 150
 
-init
-    gg_unit_Ofar_0285.addAbility(ILLUSION_NL)
-
 @compiletime function gen()
     new AbilityDefinitionItemIllusion(ILLUSION_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates an illusion of a hero.\nLasts " + DURATION.toString(0) + " seconds."))

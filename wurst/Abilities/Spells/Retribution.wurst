@@ -15,14 +15,14 @@ let EXTRA_DMG_FACTOR = 0.1
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         if GetSpellAbilityId() == RETRIBUTION_NL
-            let caster = GetSpellAbilityUnit()
-            let target = GetSpellTargetUnit()
+            let caster = EventData.getSpellAbilityUnit()
+            let target = EventData.getSpellTargetUnit()
             let baseD = BASE_DMG
             let factor = EXTRA_DMG_FACTOR
             let eff = target.addEffect(Imports.retribution, "origin")
             doAfter(3.) -> 
                 let damage = baseD + target.getLife() * factor
-                Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_DIVINE)
+                caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_DIVINE)
                 eff.destr()
                 createTTEx(target.getPos3Zero(), damage.toInt().toString(), 12)
                     ..setColor(255, 255, 127, 255)

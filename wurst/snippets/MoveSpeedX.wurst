@@ -201,7 +201,7 @@ init
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
         ..addAction(function MoveSpeed.storeOrderPoint)
     onUnitDeindex(() -> begin
-        let i = getDeindexedUnit().getIndex()
+        let i = getIndexingUnit().getIndex()
         if speeds[i] != null
             destroy speeds[i]
             speeds[i] = null

@@ -1,0 +1,17 @@
+package Reset
+
+import LinkedList
+
+interface ResetListener
+    function run()
+
+let listeners = new LinkedList<ResetListener>()
+
+public function onReset(boolean run, ResetListener l)
+    if run
+        l.run()
+    listeners.add(l)
+
+public function resetGame()
+    for l in listeners
+        l.run()

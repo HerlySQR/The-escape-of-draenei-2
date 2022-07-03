@@ -105,8 +105,8 @@ class SurgingFury
     
 init
     onUnitIndex(() -> begin
-        if getIndexedUnit().hasAbility(SURGING_FURY_NL)
-            new SurgingFury(getIndexedUnit(), false)
+        if getIndexingUnit().hasAbility(SURGING_FURY_NL)
+            new SurgingFury(getIndexingUnit(), false)
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_HERO_SKILL, () -> begin
         if GetLearnedSkill() == SURGING_FURY_L
@@ -115,9 +115,9 @@ init
             else
                 SurgingFury.getInstance(GetLearningUnit()).update(GetLearnedSkillLevel() - 1, true)
     end)
-    registerAfterDamageEvent(damage -> begin
-        if not damage.isSpell
-            let curr = SurgingFury.getInstance(damage.source)
+    DamageEvent.addListener(() -> begin
+        if not DamageEvent.isSpell()
+            let curr = SurgingFury.getInstance(DamageEvent.getSource())
             if curr != null
                 curr.counter = 6
                 if curr.charges < curr.maxCharges
@@ -125,7 +125,7 @@ init
                     curr.update()
     end)
     onUnitDeindex(() -> begin
-        let curr = SurgingFury.getInstance(getDeindexedUnit())
+        let curr = SurgingFury.getInstance(getIndexingUnit())
         if curr != null
             destroy curr
     end)
@@ -140,10 +140,10 @@ init
             else
                 baseDmg = BASE_DMG_L[data.lvl]
                 dmgPerCh = DMG_PER_CH_L[data.lvl]
-            let curr = SurgingFury.getInstance(GetSpellAbilityUnit())
+            let curr = SurgingFury.getInstance(EventData.getSpellAbilityUnit())
             let target = GetSpellTargetUnit()
             let damage = baseDmg + curr.charges * dmgPerCh
-            Damage.deal(curr.caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
+            curr.caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
             CreateTextTag()
                 ..setText(damage.toInt().toString() + "!", 10.)
                 ..setUnitPos(target)
@@ -160,7 +160,7 @@ function AbilityDefinitionThunderBoltCreep.general()
     this.setMissileSpeed(0)
     this.setMissileArt("")
     this.presetDamage(lvl -> 0.)
-    this.presetBuffs(lvl -> int2fourchar(SURGING_FURY_BUFF))
+    this.presetBuffs(lvl -> SURGING_FURY_BUFF.toRawCode())
     this.setArtTarget(Abilities.demonBoltImpact + "," + Abilities.markOfChaosDone)
     this.tooltipStartListen()
     this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Surging Fury")

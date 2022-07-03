@@ -27,19 +27,19 @@ function onHitActions(Missiles m, unit hit) returns boolean
     if check(m, hit)
         forUnitsInRange(m.getPos().toVec2(), AREA_DMG, u -> begin
             if check(m, u)
-                Damage.deal(m.source, u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
+                m.source.damageTarget(u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
         end)
         return true
     return false
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == FIRE_STORM_NL
-            let caster = GetSpellAbilityUnit()
+        if EventData.getSpellAbilityId() == FIRE_STORM_NL
+            let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             let damage = DMG_NL
             let center = caster.getPos()
-            let face = center.angleTo(getSpellTargetPos())
+            let face = center.angleTo(EventData.getSpellTargetPos())
             let faceComp = face - angle(PIHALF)
             let offset = center.polarOffset(face, -AREA)
             doPeriodically(INTERVAL, cb -> begin

@@ -1,7 +1,8 @@
 package DontPlaySmart
 
-import DamageEngine
+import DamageEvent
 import PlayerData
+import GeneratedValues
 
 import Orders
 import ClosureForGroups
@@ -24,11 +25,7 @@ init
     DONT_PASS
         ..registerTimerEvent(1., true)
         ..addAction(() -> begin
-            forUnitsInRect(gg_rct_No_pases_1, u -> begin
-                u.setInvulnerable(false)
-                u.removeAbility('BHbn')
-            end)
-            forUnitsInRect(gg_rct_No_pases_2, u -> begin
+            forUnitsInRect(Rects.DONT_PASS, u -> begin
                 u.setInvulnerable(false)
                 u.removeAbility('BHbn')
             end)
@@ -39,12 +36,12 @@ init
 let theyNow = CreateForce()
 
 init
-    registerAfterDamageEvent(damage -> begin
-        if damage.source.hasAbility('Bvul') and damage.target.getTypeId() == 'npgr'
-            let u = damage.source
+    DamageEvent.addListener(() -> begin
+        if DamageEvent.getSource().hasAbility('Bvul') and DamageEvent.getTarget().getTypeId() == 'npgr'
+            let u = DamageEvent.getSource()
             let p = u.getOwner()
-            if not theyNow.containsPlayer(p)
-                theyNow.addPlayer(p)
+            if not theyNow.has(p)
+                theyNow.add(p)
                 DisplayTextToPlayer(u.getOwner(), 0., 0., "To prevent injustice, the buff of invunerability will be remove on 2 seconds.")
                 if p == localPlayer
                     bj_questHintSound.play()
@@ -58,9 +55,9 @@ init
 
 function cond() returns boolean
     let d = GetOrderTargetDestructable()
-    if not (d == gg_dest_ATg3_0002 or d == gg_dest_ATg1_1002 or d == gg_dest_DTg6_0506)
+    if not (d == Dests.dungeonExitDoor1 or d == Dests.dungeonExitDoor2 or d == Dests.mainEntranceDoor)
         return false
-    else if not THE_DEMONS.containsPlayer(GetOrderedUnit().getOwner())
+    else if not THE_DEMONS.has(GetOrderedUnit().getOwner())
         return false
     else if not (GetIssuedOrderId() == Orders.attack or GetIssuedOrderId() == Orders.smart)
         return false

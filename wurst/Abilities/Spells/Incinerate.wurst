@@ -24,7 +24,7 @@ let DMG_NL = 15.
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
-        ..presetBuffs(lvl -> int2fourchar(INCINERATE_BUFF))
+        ..presetBuffs(lvl -> INCINERATE_BUFF.toRawCode())
         ..tooltipStartListen()
         ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Incinerate")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)

@@ -2,24 +2,289 @@ package GeneratedValues
 
 // Here I store the generated variables on the map to use them in the Wurst script
 
+/** The generated units. */
 public class Units
 
+    // Tp
+    static constant tpEntranceToDungeon = gg_unit_ncp3_0038
+    static constant tpEntranceToPavilion = gg_unit_ncp3_0039
+    static constant tpEntranceToConstruction = gg_unit_ncp3_0040
+    static constant tpEntranceToHabitat = gg_unit_ncp3_0041
+    static constant tpDungeonToEntrance = gg_unit_ncp3_0014
+    static constant tpPavilionToEntrance = gg_unit_ncp3_0043
+    static constant tpConstructionToEntrance = gg_unit_ncp3_0042
+    static constant tpHabitatToEntrance = gg_unit_ncp3_0044
+
+    // Misc
+    
+    static constant activeEarthQuake = gg_unit_ncop_0026
+
+    // Barracks
+    static constant barrack1 = gg_unit_obar_0012
+    static constant barrack2 = gg_unit_obar_0035
+    static constant barrack3 = gg_unit_obar_0033
+
+    // Missions
+    
+    static constant generator1 = gg_unit_npgr_0015
+    static constant generator2 = gg_unit_npgr_0016
+
+/** The generated destructables. */
 public class Dests
 
+    // Doors
+
+    static constant dungeonDoor1 = gg_dest_DTg3_0020
+    static constant dungeonExitDoor1 = gg_dest_ATg3_0042
+    static constant dungeonExitDoor2 = gg_dest_ATg1_1128
+    static constant constructionEntranceDoor1 = gg_dest_LTg2_2727
+    static constant constructionEntranceDoor2 = gg_dest_LTg1_2771
+    static constant voidTravellerDoor = gg_dest_LTe3_4731
+    static constant habitatDoor = gg_dest_DTg2_4451
+    static constant automaticDoor1 = gg_dest_B007_6355
+    static constant automaticDoor2 = gg_dest_B007_6354
+    static constant entranceDoor1 = gg_dest_YTce_5536
+    static constant entranceDoor2 = gg_dest_YTcx_5537
+    static constant mainEntranceDoor = gg_dest_DTg6_5527
+
+    static constant footSwitch1 = gg_dest_DTfx_2142
+    static constant footSwitch2 = gg_dest_DTfp_2143
+    static constant footSwitch3 = gg_dest_DTfp_2144
+    static constant footSwitch4 = gg_dest_DTfp_2145
+    static constant footSwitch5 = gg_dest_DTfx_2147
+    static constant footSwitch6 = gg_dest_DTfx_2146
+
+    static constant leverHabitat1 = gg_dest_DTlv_4448
+    static constant leverHabitat2 = gg_dest_DTlv_4405
+
+    // Elevators
+
+    static constant elevatorHabitat1 = gg_dest_DTrf_6359
+    static constant elevatorHabitat2 = gg_dest_DTrf_6360
+    static constant elevatorGenerator1 = gg_dest_DTrx_2141
+    static constant elevatorGenerator2 = gg_dest_DTrx_2140
+
+    static constant leverGenerator = gg_dest_B008_6364
+
+    // Misc
+    
+    static constant leverSecret = gg_dest_B009_6603
+
+    // Missions
+
+    static constant entranceForceWall1 = gg_dest_Dofw_6525
+    static constant entranceForceWall2 = gg_dest_Dofw_6524
+    static constant entranceForceWall3 = gg_dest_Dofv_6521
+    static constant entranceForceWall4 = gg_dest_Dofw_6519
+    static constant entranceForceWall5 = gg_dest_Dofw_6520
+    static constant entranceForceWall6 = gg_dest_Dofw_6595
+    static constant entranceForceWall7 = gg_dest_Dofv_6526
+    static constant entranceForceWall8 = gg_dest_Dofw_6594
+
+/** The generated regions (rects). */
 public class Rects
     
     // Circles of power
-    static constant circleDr11 = gg_rct_Circle_dr_11
-    static constant circleDr12 = gg_rct_Circle_dr_12
-    static constant circleDr13 = gg_rct_Circle_dr_13
-    static constant circleDr14 = gg_rct_Circle_dr_14
-    static constant circleDr15 = gg_rct_Circle_dr_15
-    static constant circleDe11 = gg_rct_Circle_de_11
-    static constant circleDe12 = gg_rct_Circle_de_12
-    static constant circleDe13 = gg_rct_Circle_de_13
-    static constant circleDe14 = gg_rct_Circle_de_14
-    static constant circleDe15 = gg_rct_Circle_de_15
+    static constant circle11 = gg_rct_Circle11
+    static constant circle12 = gg_rct_Circle12
+    static constant circle13 = gg_rct_Circle13
+    static constant circle14 = gg_rct_Circle14
+    static constant circle15 = gg_rct_Circle15
+    static constant circle21 = gg_rct_Circle21
+    static constant circle22 = gg_rct_Circle22
+    static constant circle23 = gg_rct_Circle23
+    static constant circle24 = gg_rct_Circle24
+    static constant circle25 = gg_rct_Circle25
+    static constant circle31 = gg_rct_Circle31
+    static constant circle32 = gg_rct_Circle32
+    static constant circle33 = gg_rct_Circle33
+    static constant circle34 = gg_rct_Circle34
+    static constant circle35 = gg_rct_Circle35
+    static constant circle41 = gg_rct_Circle41
+    static constant circle42 = gg_rct_Circle42
+    static constant circle43 = gg_rct_Circle43
+    static constant circle44 = gg_rct_Circle44
+    static constant circle45 = gg_rct_Circle45
+    static constant circle51 = gg_rct_Circle51
+    static constant circle52 = gg_rct_Circle52
+    static constant circle53 = gg_rct_Circle53
+    static constant circle54 = gg_rct_Circle54
+    static constant circle55 = gg_rct_Circle55
 
     // Items
     static constant items1 = gg_rct_Items_1
     static constant items2 = gg_rct_Items_2
+    static constant items3 = gg_rct_Items_3
+    static constant items4 = gg_rct_Items_4
+    static constant items5 = gg_rct_Items_5
+
+    // Tp
+
+    static constant tpEntranceToDungeon = gg_rct_TpEntranceToDungeon
+    static constant tpEntranceToPavilion = gg_rct_TpEntranceToPavilion
+    static constant tpEntranceToConstruction = gg_rct_TpEntranceToConstruction
+    static constant tpEntranceToHabitat = gg_rct_TpEntranceToHabitat
+    static constant tpDungeonToEntrance = gg_rct_TpDungeonToEntrance
+    static constant tpPavilionToEntrance = gg_rct_TpPavilionToEntrance
+    static constant tpConstructionToEntrance = gg_rct_TpConstructionToEntrance
+    static constant tpHabitatToEntrance = gg_rct_TpHabitatToEntrance
+
+    static constant entranceReceiver = gg_rct_EntranceReceiver
+    static constant dungeonReceiver = gg_rct_DungeonReceiver
+    static constant pavilionReceiver = gg_rct_PavilionReceiver
+    static constant constructionReceiver = gg_rct_ConstructionReceiver
+    static constant habitatReceiver = gg_rct_HabitatReceiver
+
+    // Doors
+
+    static constant footSwitch1 = gg_rct_FootSwitch1
+    static constant footSwitch2 = gg_rct_FootSwitch2
+    static constant footSwitch3 = gg_rct_FootSwitch3
+    static constant footSwitch4 = gg_rct_FootSwitch4
+    static constant footSwitch5 = gg_rct_FootSwitch5
+    static constant footSwitch6 = gg_rct_FootSwitch6
+
+    static constant automaticDoor1 = gg_rct_AutomaticDoor1
+    static constant automaticDoor2 = gg_rct_AutomaticDoor2
+    static constant openDoor1 = gg_rct_OpenDoor1
+    static constant openDoor2 = gg_rct_OpenDoor2
+
+    // Elevators
+    static constant elevatorHabitat1 = gg_rct_ElevatorHabitat1
+    static constant elevatorHabitat2 = gg_rct_ElevatorHabitat2
+    static constant elevatorGenerator1 = gg_rct_ElevatorGenerator1
+    static constant elevatorGenerator2 = gg_rct_ElevatorGenerator2
+
+    // Selectors
+    static constant selectorDraenei = gg_rct_SelectorDraenei
+    static constant selectorDemon = gg_rct_SelectorDemon
+
+    // Attack points
+    static constant attackPoint1 = gg_rct_AttackPoint1
+    static constant attackPoint2 = gg_rct_AttackPoint2
+    static constant attackPoint3 = gg_rct_AttackPoint3
+    static constant attackPoint4 = gg_rct_AttackPoint4
+    static constant attackPoint5 = gg_rct_AttackPoint5
+
+    // Spawns
+    static constant draeneiSpawn = gg_rct_DraeneiSpawn
+    static constant demonSpawn1 = gg_rct_DemonSpawn1
+    static constant demonSpawn21 = gg_rct_DemonSpawn21
+    static constant demonSpawn22 = gg_rct_DemonSpawn22
+    static constant demonSpawn31 = gg_rct_DemonSpawn31
+    static constant demonSpawn32 = gg_rct_DemonSpawn32
+
+    // Respawns
+    static constant respawn1 = gg_rct_Respawn1
+    static constant respawn2 = gg_rct_Respawn2
+    static constant respawn3 = gg_rct_Respawn3
+    static constant respawn4 = gg_rct_Respawn4
+    static constant respawn5 = gg_rct_Respawn5
+
+    // Creep campaments
+    static constant creepCamp1 = gg_rct_CreepCamp1
+    static constant creepCamp2 = gg_rct_CreepCamp2
+    static constant creepCamp3 = gg_rct_CreepCamp3
+    static constant creepCamp4 = gg_rct_CreepCamp4
+    static constant creepCamp5 = gg_rct_CreepCamp5
+    static constant creepCamp6 = gg_rct_CreepCamp6
+    static constant creepCamp7 = gg_rct_CreepCamp7
+    static constant creepCamp8 = gg_rct_CreepCamp8
+    static constant creepCamp9 = gg_rct_CreepCamp9
+    static constant creepCamp10 = gg_rct_CreepCamp10
+    static constant creepCamp11 = gg_rct_CreepCamp11
+    static constant creepCamp12 = gg_rct_CreepCamp12
+    static constant creepCamp13 = gg_rct_CreepCamp13
+    static constant creepCamp14 = gg_rct_CreepCamp14
+    static constant creepCamp15 = gg_rct_CreepCamp15
+    static constant creepCamp16 = gg_rct_CreepCamp16
+    static constant creepCamp17 = gg_rct_CreepCamp17
+    static constant creepCamp18 = gg_rct_CreepCamp18
+    static constant creepCamp19 = gg_rct_CreepCamp19
+    static constant creepCamp20 = gg_rct_CreepCamp20
+    static constant creepCamp21 = gg_rct_CreepCamp21
+    static constant creepCamp22 = gg_rct_CreepCamp22
+    static constant creepCamp23 = gg_rct_CreepCamp23
+    static constant creepCamp24 = gg_rct_CreepCamp24
+    static constant creepCamp25 = gg_rct_CreepCamp25
+
+    // Towers
+
+    static constant whereTheWorkersWere = gg_rct_WhereTheWorkersWere
+
+    static constant demonTower1 = gg_rct_DemonTower1
+    static constant demonTower2 = gg_rct_DemonTower2
+    static constant demonTower3 = gg_rct_DemonTower3
+    static constant demonTower4 = gg_rct_DemonTower4
+    static constant demonTower5 = gg_rct_DemonTower5
+
+    // Missions
+
+    static constant justHidePls = gg_rct_JustHidePls
+
+    static constant barrel1 = gg_rct_Barrel1
+    static constant barrel2 = gg_rct_Barrel2
+    static constant barrel3 = gg_rct_Barrel3
+    static constant lookTheGoblin = gg_rct_LookTheGoblin
+    static constant placeBarrel1 = gg_rct_PlaceBarrel1
+    static constant placeBarrel2 = gg_rct_PlaceBarrel2
+    static constant placeBarrel3 = gg_rct_PlaceBarrel3
+    static constant DESTROY = gg_rct_DESTROY
+
+    static constant habitatExit1 = gg_rct_HabitatExit1
+    static constant habitatExit2 = gg_rct_HabitatExit2
+
+    // Optional missions
+    static constant skullPlace = gg_rct_SkullPlace
+    static constant eggPlace = gg_rct_EggPlace
+    static constant firePlace = gg_rct_FirePlace
+    static constant bookPlace = gg_rct_BookPlace
+
+    // Misc
+
+    static constant elevatorsSecret = gg_rct_ElevatorsSecret
+
+    static constant DONT_PASS = gg_rct_DONT_PASS
+
+    static constant quake = gg_rct_Quake
+    static constant activeEarthQuake = gg_rct_ActiveEarthQuake
+
+    // Index (dummy rect)
+    static constant index = gg_rct_Index
+
+    // Enviroment
+    static constant dungeon = gg_rct_Dungeon
+    static constant entrance = gg_rct_FinalPart
+
+    // Cinematic
+
+    static constant whereTheDraeneiAppear1 = gg_rct_WhereTheDraeneiAppear1
+    static constant whereTheDraeneiAppear2 = gg_rct_WhereTheDraeneiAppear2
+    static constant whereTheDemonsAppear = gg_rct_WhereTheDemonsAppear
+
+    static constant exitPoint = gg_rct_ExitPoint
+    static constant theyAreGone = gg_rct_TheyAreGone
+
+    static constant guard1 = gg_rct_Guard1
+    static constant guard2 = gg_rct_Guard2
+    static constant guard3 = gg_rct_Guard3
+    static constant guard4 = gg_rct_Guard4
+
+    static constant iWin1 = gg_rct_I_Win_1
+    static constant iWin2 = gg_rct_I_Win_2
+    static constant iWin3 = gg_rct_I_Win_3
+    static constant iWin4 = gg_rct_I_Win_4
+    static constant iWin5 = gg_rct_I_Win_5
+    static constant iLost1 = gg_rct_I_Lost_1
+    static constant iLost2 = gg_rct_I_Lost_2
+    static constant iLost3 = gg_rct_I_Lost_3
+    static constant iLost4 = gg_rct_I_Lost_4
+    static constant iLost5 = gg_rct_I_Lost_5
+
+/** The generated cameras. */
+public class Cams
+
+    // Cinematic
+    static constant draeneiWin = gg_cam_DraeneiWin
+    static constant demonsWin1 = gg_cam_DemonsWin1
+    static constant demonsWin2 = gg_cam_DemonsWin2

@@ -30,7 +30,7 @@ class Reviver
     ondestroy
         clock.destr()
         revive.destr()
-        if THE_DRAENEI.containsPlayer(hero.getOwner())
+        if THE_DRAENEI.has(hero.getOwner())
             hero.revive(actDrSpawn.randomPoint(), true)
         else
             hero.revive(actDeSpawn.randomPoint(), true)

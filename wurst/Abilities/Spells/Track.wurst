@@ -20,7 +20,7 @@ let ARMOR_DEC_NL = 10
         ..setLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> int2fourchar(TRACK_BUFF))
+        ..presetBuffs(lvl -> TRACK_BUFF.toRawCode())
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()

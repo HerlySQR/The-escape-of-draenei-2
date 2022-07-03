@@ -3,8 +3,6 @@ package Charge
 import AbilityData
 import MoveSpeedX
 
-import FogModifier
-
 public constant CHARGE_NL = compiletime(ABIL_ID_GEN.next())
 
 // General
@@ -32,25 +30,25 @@ init
             caster.setBaseSpeed("charge", SPEED)
             targetMap.put(caster, target)
             runMap.put(caster, true)
-            casters.addUnit(caster)
+            casters.add(caster)
             doPeriodically(INTERVAL, cb -> begin
                 vision.destr()
                 if runMap.get(caster)
                     vision = createFogModifier(caster.getOwner(), FOG_OF_WAR_VISIBLE, target.getPos(), 150., true, false)
                     if caster.getPos().distanceTo(target.getPos()) <= 150. or not target.isAlive()
                         if target.isAlive()
-                            Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_METAL_HEAVY_BASH)
+                            caster.damageTarget(target, damage, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_METAL_HEAVY_BASH)
                         runMap.put(caster, false)
                 else
                     caster.removeSpeedBuff("charge")
                     eff.destr()
-                    casters.removeUnit(caster)
+                    casters.remove(caster)
                     destroy cb
             end)
     end)
     code func = () -> begin
         let u = GetOrderedUnit()
-        if casters.contains(u) and not GetOrderTarget() == targetMap.get(u)
+        if casters.has(u) and not GetOrderTarget() == targetMap.get(u)
             runMap.put(u, false)
     end
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, func)

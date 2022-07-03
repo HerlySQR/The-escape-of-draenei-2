@@ -31,7 +31,7 @@ init
                 factor = LIFE_FACTOR_L[data.lvl]
             doAfter(0.2) -> 
                 let damage = (target.getMaxHP() - target.getHP()) * factor
-                Damage.deal(caster, target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
                 createTTEx(target.getPos3Real(), "+" + damage.toInt().toString(), 10, colorA(255, 0, 0, 255), localPlayer)
                     ..setSpeed(64., 90.)
                     ..setPermanent(false)

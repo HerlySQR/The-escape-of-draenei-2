@@ -24,7 +24,7 @@ let cond = Condition(function filt)
 init
     // Attack point 1
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_1)
+        ..registerRectEnterEventSource(Rects.attackPoint1)
         ..addCondition(cond)
         ..addAction(() -> begin
             let enter = GetEnteringUnit()
@@ -39,7 +39,7 @@ init
         end)
     // Attack point 2
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_2)
+        ..registerRectEnterEventSource(Rects.attackPoint2)
         ..addCondition(cond)
         ..addAction(() -> begin
             let enter = GetEnteringUnit()
@@ -54,13 +54,13 @@ init
         end)
     // Attack point 3
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_3)
+        ..registerRectEnterEventSource(Rects.attackPoint3)
         ..addCondition(cond)
         ..addAction(() -> begin
             let enter = GetEnteringUnit()
             if enter.getOwner() == DRAENEI
                 if actMission == 2
-                    target[enter.getIndex()] = deSpw2
+                    target[enter.getIndex()] = deSpw21
                 else
                     target[enter.getIndex()] = attackPoint4
             else
@@ -69,13 +69,13 @@ init
         end)
     // Attack point 4
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Punto_de_ataque_4)
+        ..registerRectEnterEventSource(Rects.attackPoint4)
         ..addCondition(cond)
         ..addAction(() -> begin
             let enter = GetEnteringUnit()
             if enter.getOwner() == DRAENEI
                 if generatorsDestroyed
-                    target[enter.getIndex()] = deSpw3
+                    target[enter.getIndex()] = attackPoint5
                 else
                     target[enter.getIndex()] = attackPoint4
             else

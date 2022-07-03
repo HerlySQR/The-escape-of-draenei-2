@@ -3,7 +3,7 @@ package DrAndDeSpawn
 import UnitIndexer
 import Orders
 
-import DamageEngine
+import DamageEvent
 import Functions
 import PlayerData
 import initlater Missions
@@ -17,15 +17,18 @@ public constant int array DRAENEI_MAGE = [0, 0, 'n00B', 'n003']
 public constant int array CHAOS_GRUNT = [0, 'n00D', 'n00F', 'n00S']
 public constant int array CHAOS_WARLOCK = [0, 0, 'n017', 'n00R']
 
-public constant attackPoint1 = gg_rct_Punto_de_ataque_1.getCenter()
-public constant attackPoint2 = gg_rct_Punto_de_ataque_2.getCenter()
-public constant attackPoint3 = gg_rct_Punto_de_ataque_3.getCenter()
-public constant attackPoint4 = gg_rct_Punto_de_ataque_4.getCenter()
+public constant attackPoint1 = Rects.attackPoint1.getCenter()
+public constant attackPoint2 = Rects.attackPoint2.getCenter()
+public constant attackPoint3 = Rects.attackPoint3.getCenter()
+public constant attackPoint4 = Rects.attackPoint4.getCenter()
+public constant attackPoint5 = Rects.attackPoint5.getCenter()
 
-public constant drSpw = gg_rct_Spawneo_de_draeneanos.getCenter()
-public constant deSpw1 = gg_rct_Spawneo_de_Grunts_1.getCenter()
-public constant deSpw2 = gg_rct_Spawneo_de_Grunts_2.getCenter()
-public constant deSpw3 = gg_rct_Spawneo_de_Grunts_3.getCenter()
+public constant drSpw = Rects.draeneiSpawn.getCenter()
+public constant deSpw1 = Rects.demonSpawn1.getCenter()
+public constant deSpw21 = Rects.demonSpawn21.getCenter()
+public constant deSpw22 = Rects.demonSpawn21.getCenter()
+public constant deSpw31 = Rects.demonSpawn31.getCenter()
+public constant deSpw32 = Rects.demonSpawn31.getCenter()
 
 public vec2 array target
 
@@ -46,14 +49,14 @@ DamageListener theyAreCowards
 public function startSpawn()
     spawning.enable()
     attack.enable()
-    theyAreCowards.reconnect()
+    DamageEvent.addListener(theyAreCowards)
     changeTarget.enable()
     cleaner.enable()
 
 public function stopSpawn()
     spawning.disable()
     attack.disable()
-    theyAreCowards.disconnect()
+    DamageEvent.removeListener(theyAreCowards)
     changeTarget.disable()
     cleaner.disable()
 
@@ -64,8 +67,8 @@ function createDr(int id)
     let c = createUnit(DRAENEI, id, drSpw, UNIT_FACING)
     target[c.getIndex()] = attackPoint1
     c.issuePointOrderById(Orders.attack, attackPoint1)
-    drUnits.addUnit(c)
-    attackers.addUnit(c)
+    drUnits.add(c)
+    attackers.add(c)
 
 function createDe(int id, vec2 pos, vec2 t)
     if deInMap > 15
@@ -74,8 +77,8 @@ function createDe(int id, vec2 pos, vec2 t)
     let c = createUnit(DEMON, id, pos, UNIT_FACING)
     target[c.getIndex()] = t
     c.issuePointOrderById(Orders.attack, t)
-    deUnits.addUnit(c)
-    attackers.addUnit(c)
+    deUnits.add(c)
+    attackers.add(c)
 
 init
     // The units spawn
@@ -89,17 +92,17 @@ init
             else if actMission == 2
                 for i = 1 to 3
                     createDr(DRAENEI_WARRIOR[2])
-                    createDe(CHAOS_GRUNT[2], deSpw2, attackPoint2)
+                    createDe(CHAOS_GRUNT[2], deSpw21, attackPoint2)
                 for i = 1 to 2
                     createDr(DRAENEI_MAGE[2])
-                    createDe(CHAOS_WARLOCK[2], deSpw2, attackPoint2)
+                    createDe(CHAOS_WARLOCK[2], deSpw22, attackPoint2)
             else if actMission >= 3
                 for i = 1 to 3
                     createDr(DRAENEI_WARRIOR[3])
-                    createDe(CHAOS_GRUNT[3], deSpw3, attackPoint4)
+                    createDe(CHAOS_GRUNT[3], deSpw31, attackPoint4)
                 for i = 1 to 2
                     createDr(DRAENEI_MAGE[3])
-                    createDe(CHAOS_WARLOCK[3], deSpw3, attackPoint4)
+                    createDe(CHAOS_WARLOCK[3], deSpw32, attackPoint4)
         end)
     // Keep the units attack their targets
     attack
@@ -107,43 +110,43 @@ init
         .addAction(() -> begin
             attackers.forEachIn(u -> begin
                 if not u.isAlive()
-                    attackers.removeUnit(u)
-                else if u.getCurrentOrder() == Orders.attack or theyGo.contains(u)
+                    attackers.remove(u)
+                else if u.getCurrentOrder() == Orders.attack or theyGo.has(u)
                     u.issuePointOrderById(Orders.attack, target[u.getIndex()])
-                    theyGo.removeUnit(u)
+                    theyGo.remove(u)
             end)
         end)
     // If a creep wanna go back for taking damage from an ally
-    theyAreCowards = registerAfterDamageEvent(damage -> begin
-        if attackers.contains(damage.target) and
-            damage.isSpell and
-            damage.source.getOwner().isAllyOf(damage.target.getOwner())
-            theyGo.addUnit(damage.target)
-    end)..disconnect()
+    theyAreCowards = () -> begin
+        if attackers.has(DamageEvent.getTarget()) and
+            DamageEvent.isSpell() and
+            DamageEvent.getSource().getOwner().isAllyOf(DamageEvent.getTarget().getOwner())
+            theyGo.add(DamageEvent.getTarget())
+    end
     // Clear the groups when the units die
     cleaner
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
         ..addAction(() -> begin
             let u = GetDyingUnit()
-            if drUnits.contains(u)
-                drUnits.removeUnit(u)
+            if drUnits.has(u)
+                drUnits.remove(u)
                 drInMap--
-            else if deUnits.contains(u)
-                deUnits.removeUnit(u)
+            else if deUnits.has(u)
+                deUnits.remove(u)
                 deInMap--
         end)
     // Actions when the prision door is destroyed
     CreateTrigger()
-        ..registerDeathEvent(gg_dest_DTg3_0017)
+        ..registerDeathEvent(Dests.dungeonDoor1)
         ..addAction(() -> begin
             forUnitsOfPlayer(DRAENEI, u -> begin
                 if u.getTypeId() == DRAENEI_WARRIOR[1]
                     u.issuePointOrderById(Orders.attack, attackPoint1)
-                    attackers.addUnit(u)
+                    attackers.add(u)
             end)
             forUnitsOfPlayer(DEMON, u -> begin
-                if gg_rct_Punto_de_ataque_1.contains(u.getPos())
+                if Rects.attackPoint1.contains(u.getPos())
                     u.issuePointOrderById(Orders.attack, drSpw)
-                    attackers.addUnit(u)
+                    attackers.add(u)
             end)
         end)

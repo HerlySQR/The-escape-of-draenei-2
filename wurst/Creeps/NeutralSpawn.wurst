@@ -1,7 +1,5 @@
 package NeutralSpawn
 
-import Functions
-
 constant OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
 
 let spawning = CreateTrigger()..disable()
@@ -16,6 +14,7 @@ public function enableNeutralSpawn()
 public function disableNeutralSpawn()
     spawning.disable()
 
+/*TODO
 init
     spawning
         ..registerTimerEvent(60.00, false)
@@ -85,4 +84,4 @@ init
             if camp.isEmpty()
                 createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_13.getCenter(), UNIT_FACING)
             camp.clear()
-    end)
+    end)*/

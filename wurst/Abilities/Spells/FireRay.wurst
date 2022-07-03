@@ -13,9 +13,6 @@ let MANA_NL = 75
 let DURATION_NL = 1.
 let DMG_NL = 90.
 
-init
-    gg_unit_Otch_0284.addAbility(FIRE_RAY_NL)
-
 @compiletime function gen()
     new AbilityDefinitionFireBoltcreep(FIRE_RAY_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a burning beam that stuns a selected enemy unit causing damage."))

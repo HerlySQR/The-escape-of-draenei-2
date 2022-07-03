@@ -28,35 +28,31 @@ function addCreed(unit caster)
     end))
 
 init
-    nullTimer() ->
-        gg_unit_H00L_0205.addAbility(CREED_NL)
-        addCreed(gg_unit_H00L_0205)
-        believers.addUnit(gg_unit_H00L_0205)
-    registerDamageEvent(damage -> begin
-        if believers.contains(damage.source)
-            and availableMap.get(damage.source)
-            and not damage.target.isType(UNIT_TYPE_STRUCTURE)
-            and not damage.target.isType(UNIT_TYPE_MECHANICAL)
-            and not damage.target.isType(UNIT_TYPE_MAGIC_IMMUNE)
-            and not damage.isSpell
-            let caster = damage.source
-            let target = damage.target
+    DamageEvent.addUnreducedListener(() -> begin
+        let caster = DamageEvent.getSource()
+        let target = DamageEvent.getTarget()
+        if believers.has(caster)
+            and availableMap.get(caster)
+            and not target.isType(UNIT_TYPE_STRUCTURE)
+            and not target.isType(UNIT_TYPE_MECHANICAL)
+            and not target.isType(UNIT_TYPE_MAGIC_IMMUNE)
+            and not DamageEvent.isSpell()
             target.scaleSpeed("creed", SLOW)
             target.addBuff(CREED_BUFF, DURATION, () -> target.removeSpeedBuff("creed"))
             target.flashEffect(Objects.bloodElfSpellThiefBlood, "chest")
             effMap.get(caster).destr()
             effMap.remove(caster)
-            damage.amount += EXTRA_DMG_NL
+            DamageEvent.addAmount(EXTRA_DMG_NL)
             addCreed(caster)
     end)
     onUnitIndex(() -> begin
-        if getIndexedUnit().hasAbility(CREED_NL)
-            addCreed(getIndexedUnit())
+        if getIndexingUnit().hasAbility(CREED_NL)
+            addCreed(getIndexingUnit())
     end)
     onUnitDeindex(() -> begin
-        if believers.contains(getDeindexedUnit())
-            let d = getDeindexedUnit()
-            believers.removeUnit(d)
+        if believers.has(getIndexingUnit())
+            let d = getIndexingUnit()
+            believers.remove(d)
             availableMap.remove(d)
             if effMap.has(d)
                 effMap.get(d).destr()

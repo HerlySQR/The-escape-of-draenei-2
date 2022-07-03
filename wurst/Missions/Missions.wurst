@@ -3,7 +3,6 @@ package Missions
 import public ClosureTimers
 import public ClosureForGroups
 import Orders
-import FogModifier
 
 import public DefineMissions
 import public MissionTimers
@@ -18,6 +17,7 @@ import public initlater ModeSelection
 import DrAndDeSpawn
 import NeutralSpawn
 import Surrender
+import public GeneratedValues
 
 public int actMission = 0
 
@@ -27,13 +27,13 @@ public fogmodifier array seeDeSpawn
 boolean timeIsOver = false
 
 init
-    seeDrSpawn[1] = createVision(DRAENEI, gg_rct_Items_1, true)..start()
-    seeDrSpawn[2] = createVision(DRAENEI, gg_rct_Items_3, true)
-    seeDrSpawn[3] = createVision(DRAENEI, gg_rct_Items_4, true)
-    seeDrSpawn[4] = createVision(DRAENEI, gg_rct_Items_5, true)
-    seeDeSpawn[1] = createVision(DEMON, gg_rct_Items_2, true)..start()
-    seeDeSpawn[2] = createVision(DEMON, gg_rct_Items_5, true)..start()
-    seeDeSpawn[3] = createVision(DEMON, gg_rct_Items_6, true)..start()
+    seeDrSpawn[1] = createVision(DRAENEI, Rects.items1, true)..start()
+    seeDrSpawn[2] = createVision(DRAENEI, Rects.items2, true)
+    seeDrSpawn[3] = createVision(DRAENEI, Rects.items3, true)
+    seeDrSpawn[4] = createVision(DRAENEI, Rects.items4, true)
+    seeDeSpawn[1] = createVision(DEMON, Rects.items2, true)..start()
+    seeDeSpawn[2] = createVision(DEMON, Rects.items3, true)..start()
+    seeDeSpawn[3] = createVision(DEMON, Rects.items5, true)..start()
 
 // Mission 1
 
@@ -53,10 +53,10 @@ public function startMission1()
         QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 1:|r The door")
 
         table.display(true)
-        table.minimalize(false)
-        forUnitsInRect(gg_rct_Spawneo_de_draeneanos, u -> begin
+        table.minimize()
+        forUnitsInRect(Rects.draeneiSpawn, u -> begin
             if u.getOwner() == DRAENEI
-                u.issueTargetOrderById(Orders.attack, gg_dest_DTg3_0017)
+                u.issueTargetOrderById(Orders.attack, Dests.dungeonDoor1)
         end)
         if whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_DE_AND_DR
             doAfter(5, () -> begin
@@ -87,10 +87,6 @@ public function startMission2()
                 doAfter(15.) -> 
                     if whatMode[5] == NOT_LEVELING
                         QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
-                    doAfter(40.) -> 
-                        gg_unit_h002_0151.removeAbility('A04C')
-                        gg_unit_h002_0151.removeAbility('A04D')
-
 // Mission 3
 
 public function startMission3()
@@ -106,9 +102,9 @@ public function startMission3()
         forUnitsOfPlayer(DRAENEI, u -> begin
             vec2 target
             if u.getTypeId() == 'ndrl'
-                target = gg_rct_No_se_que_le_ven_a_este_lugar.getCenter()
+                target = Rects.justHidePls.getCenter()
             else
-                target = gg_rct_Punto_de_ataque_4.getCenter()
+                target = Rects.attackPoint4.getCenter()
             u.issuePointOrderById(Orders.attack, target)
         end)
         if whatMode[1] == VARIOUS_TIMERS
@@ -153,12 +149,12 @@ public function startMission5()
 
     pings.disable()
 
-    SetDestructableInvulnerable(gg_dest_DTg6_0506, false)
+    SetDestructableInvulnerable(Dests.mainEntranceDoor, false)
     mission[4].setState(QuestState.COMPLETED)
     QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
     QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
     // Order all draenei attack the demons
-    let pos = gg_rct_Spawneo_de_Grunts_3.getCenter()
+    let pos = Rects.demonSpawn31.getCenter()
     forUnitsOfPlayer(DRAENEI, u -> begin
         if not u.isType(UNIT_TYPE_HERO) and not u.getTypeId() == 'ndrl'
             u.issuePointOrderById(Orders.attack, pos)
@@ -191,11 +187,6 @@ public function draeneiWin()
     else
         QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DEMONS SURRENDERED|r\nDraenei have won")
         QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DEMONS SURRENDERED|r\nDraenei have won")
-    
-    forUnitsInRect(gg_rct_Torre_de_los_demonios_3, u -> begin
-        if u.getTypeId() == 'o00I'
-            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
-    end)
 
     for i = 1 to 10
         hero[i].setInvulnerable(true)
@@ -207,7 +198,7 @@ trigger mainExit = CreateTrigger()
 
 init
     mainExit
-        ..registerDeathEvent(gg_dest_DTg6_0506)
+        ..registerDeathEvent(Dests.mainEntranceDoor)
         .addAction(function draeneiWin)
 
 // Demons Win
