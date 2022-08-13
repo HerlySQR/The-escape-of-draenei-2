@@ -1,0 +1,78 @@
+package ItemCreation
+
+import public ObjectIdGenerator
+import public UnitObjEditing
+import public ItemObjEditing
+import public UnitIds
+import public Assets
+import public ObjectIds
+import public Annotations
+import ClosureEvents
+
+import public Imports
+
+import public RecipeItem
+
+public function fixRecipe(Recipe recipe, RecipeItem result, int goldCost, int woodCost)
+    recipe.setTooltipExtended(
+        recipe.tooltipExtended +
+        "|cff6d6d6dTotal cost: " +
+        (goldCost > 0 ? goldCost.toString() + " gold and " : "") +
+        (woodCost > 0 ? woodCost.toString() + " lumber." : "") + "|r")
+    
+    result..setGoldCost(goldCost)..setLumberCost(woodCost)
+
+/** Class created to have the recipe item in the shop with other icon. */
+public class Recipe extends RecipeItem
+
+    private int dummyItem
+    private ItemDefinition dummyDef
+
+    construct()
+        super('skrt')
+        
+        //setArmorType(ArmorSoundType.Ethereal)
+        setClassification("Campaign")
+    
+        dummyItem = ITEM_ID_GEN.next()
+
+        dummyDef = new ItemDefinition(dummyItem, 'skrt')
+    
+    override function setStockReplenishInterval(int data)
+        dummyDef.setStockReplenishInterval(data)
+    
+    override function setButtonPositionX(int data)
+        dummyDef.setButtonPositionX(data)
+    
+    override function setButtonPositionY(int data)
+        dummyDef.setButtonPositionY(data)
+    
+    override function setHotkey(string data)
+        dummyDef.setHotkey(data)
+    
+    override function setTooltipExtended(string data)
+        super.setTooltipExtended(data)
+        dummyDef.setTooltipExtended(data)
+    
+    /** Always use this function at the end. */
+    override function setName(string data)
+        super.setName(data)
+
+        dummyDef
+            ..setGoldCost(goldCost)
+            ..setLumberCost(lumberCost)
+            ..setInterfaceIcon(icon)
+            ..setTooltipBasic(tooltipBasic)
+        
+        setInterfaceIcon(Icons.bTNScrollOfRegeneration)
+    
+    function getDummyItem() returns int
+        return dummyItem
+
+    function initShopConditions()
+        EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+            let m = EventData.getManipulatedItem()
+            if m.getTypeId() == dummyItem
+                m.remove()
+                EventData.getTriggerUnit().addItemById(newId)
+        end)

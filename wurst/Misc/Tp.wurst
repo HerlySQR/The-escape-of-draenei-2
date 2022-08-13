@@ -65,12 +65,12 @@ public function changeTexts()
     end)
 
 init
-    dungeon = new Tp(Units.tpEntranceToDungeon, Rects.dungeonReceiver.getCenter(), "Dungeon",
+    dungeon = new Tp(GUnits.tpEntranceToDungeon, Rects.dungeonReceiver.getCenter(), "Dungeon",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",
         "Models\\Void Teleport Teal Caster.mdl",
         Rects.tpEntranceToDungeon, () -> dungeon.move(GetEnteringUnit()))
-    construction = new Tp(Units.tpEntranceToConstruction, Rects.constructionReceiver.getCenter(), "Construction",
+    construction = new Tp(GUnits.tpEntranceToConstruction, Rects.constructionReceiver.getCenter(), "Construction",
         "Models\\Void Teleport Red To.mdl",
         "Models\\Void Teleport Red Target.mdl",
         "Models\\Void Teleport Red Caster.mdl",
@@ -80,12 +80,12 @@ init
             else
                 construction.move(GetEnteringUnit())
         end)
-    pavilion = new Tp(Units.tpEntranceToPavilion, Rects.pavilionReceiver.getCenter(), "Pavilion",
+    pavilion = new Tp(GUnits.tpEntranceToPavilion, Rects.pavilionReceiver.getCenter(), "Pavilion",
         "Models\\Void Teleport Blue To.mdl",
         "Models\\Void Teleport Blue Target.mdl",
         "Models\\Void Teleport Blue Caster.mdl",
         Rects.tpEntranceToPavilion, () -> pavilion.move(GetEnteringUnit()))
-    habitat = new Tp(Units.tpEntranceToHabitat, Rects.habitatReceiver.getCenter(), "habitat",
+    habitat = new Tp(GUnits.tpEntranceToHabitat, Rects.habitatReceiver.getCenter(), "habitat",
         "Models\\Void Teleport Orange To.mdl",
         "Models\\Void Teleport Orange Target.mdl",
         "Models\\Void Teleport Orange Caster.mdl",
@@ -95,7 +95,7 @@ init
             else
                 habitat.move(GetEnteringUnit())
         end)
-    back1 = new Tp(Units.tpDungeonToEntrance, receiverPoint, "Entrance",
+    back1 = new Tp(GUnits.tpDungeonToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",
         "Models\\Void Teleport Teal Caster.mdl",
@@ -105,17 +105,17 @@ init
             else
                 back1.move(GetEnteringUnit())
         end)
-    back2 = new Tp(Units.tpPavilionToEntrance, receiverPoint, "Entrance",
+    back2 = new Tp(GUnits.tpPavilionToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Blue To.mdl",
         "Models\\Void Teleport Blue Target.mdl",
         "Models\\Void Teleport Blue Caster.mdl",
         Rects.tpPavilionToEntrance, () -> back2.move(GetEnteringUnit()))
-    back3 = new Tp(Units.tpConstructionToEntrance, receiverPoint, "Entrance",
+    back3 = new Tp(GUnits.tpConstructionToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Red To.mdl",
         "Models\\Void Teleport Red Target.mdl",
         "Models\\Void Teleport Red Caster.mdl",
         Rects.tpConstructionToEntrance, () -> back3.move(GetEnteringUnit()))
-    back4 = new Tp(Units.tpHabitatToEntrance, receiverPoint, "Entrance",
+    back4 = new Tp(GUnits.tpHabitatToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Orange To.mdl",
         "Models\\Void Teleport Orange Target.mdl",
         "Models\\Void Teleport Orange Caster.mdl",

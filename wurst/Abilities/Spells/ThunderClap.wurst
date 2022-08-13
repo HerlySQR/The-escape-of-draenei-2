@@ -27,7 +27,7 @@ let DMG_NL = 100.
         ..presetMovementSpeedReduction(lvl -> SLOW)
         ..setRequirements("")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00W|r] Thunder Clap")
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Thunder Clap")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
         // Stats
         ..presetAOEDamage(lvl -> DMG_NL)
@@ -38,4 +38,5 @@ let DMG_NL = 100.
         ..presetIcon(Icons.bTNSeaGiantWarStomp)
         // Tooltip
         ..presetHotkey("W")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        .setName("Thunder Clap")

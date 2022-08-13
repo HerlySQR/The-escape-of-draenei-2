@@ -46,11 +46,11 @@ let endItsJob = CreateGroup()
 function acolyteSpawnPos(vec2 p) returns vec2
     vec2 pos = ZERO2
     if Rects.demonTower1.contains(p) or Rects.demonTower2.contains(p)
-        pos = Units.barrack1.getPos()
+        pos = GUnits.barrack1.getPos()
     else if Rects.demonTower3.contains(p)// or gg_rct_Torres_del_muro.contains(p)
-        pos = Units.barrack2.getPos()
+        pos = GUnits.barrack2.getPos()
     else if Rects.demonTower4.contains(p) or Rects.demonTower5.contains(p)
-        pos = Units.barrack3.getPos()
+        pos = GUnits.barrack3.getPos()
     return pos
 
 function unit.issueBuildOrder(int unitToBuild, vec2 pos)
@@ -239,9 +239,9 @@ init
         end)
     // Remove acolyte
     CreateTrigger()
-        ..registerUnitInRange(Units.barrack1, 200., null)
-        ..registerUnitInRange(Units.barrack2, 200., null)
-        ..registerUnitInRange(Units.barrack3, 200., null)
+        ..registerUnitInRange(GUnits.barrack1, 200., null)
+        ..registerUnitInRange(GUnits.barrack2, 200., null)
+        ..registerUnitInRange(GUnits.barrack3, 200., null)
         ..addCondition(Condition(() -> begin
             return endItsJob.has(GetTriggerUnit())
         end))

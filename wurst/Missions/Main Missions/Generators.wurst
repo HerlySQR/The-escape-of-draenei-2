@@ -5,8 +5,8 @@ import initlater Missions
 import PlayerData
 import Towers
 
-public unit generator1 = Units.generator1
-public unit generator2 = Units.generator2
+public unit generator1 = GUnits.generator1
+public unit generator2 = GUnits.generator2
 public vec2 generatorPos1 = generator1.getPos()
 public vec2 generatorPos2 = generator2.getPos()
 public boolean generator1IsAlive = true

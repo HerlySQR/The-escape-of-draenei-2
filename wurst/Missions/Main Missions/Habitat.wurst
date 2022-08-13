@@ -74,13 +74,13 @@ init
         .addAction(() -> begin
             if not actived
                 actived = true
-                Units.activeEarthQuake.setColor(PLAYER_COLOR_GREEN)
+                GUnits.activeEarthQuake.setColor(PLAYER_COLOR_GREEN)
                 holding.enable()
                 deformation.enable()
                 earthQuake = createRipple(5., false, Rects.quake.getCenter(), 592.00, 592.00, 64, 1, 512)
             else
                 actived = false
-                Units.activeEarthQuake.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+                GUnits.activeEarthQuake.setColor(PLAYER_COLOR_BLACK_PASSIVE)
                 holding.disable()
                 deformation.disable()
                 TerrainDeformStop(earthQuake, 1000)

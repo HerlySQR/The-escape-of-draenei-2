@@ -1,0 +1,136 @@
+package Shops
+
+import ItemCreation
+import Merchant
+import SpecialMerchant
+import ArmsMerchant
+import RecipesMerchant
+import SecretMerchant
+import GeneratedValues
+import PlayerData
+
+public constant MERCHANT = compiletime(UNIT_ID_GEN.next())
+public constant ARMS_MERCHANT = compiletime(UNIT_ID_GEN.next())
+public constant SPECIAL_MERCHANT = compiletime(UNIT_ID_GEN.next())
+public constant RECIPES_MERCHANT = compiletime(UNIT_ID_GEN.next())
+public constant SECRET_MERCHANT = compiletime(UNIT_ID_GEN.next())
+
+init
+    let owners = [DRAENEI, DEMON, players[PLAYER_NEUTRAL_AGGRESSIVE], DEMON, DEMON]
+    let angles = [270..fromDeg(), 315..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
+    for i = 0 to 4
+        createUnit(owners[i], MERCHANT, Rects.merchant[i].getCenter(), angles[i])
+        createUnit(owners[i], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])
+        createUnit(owners[i], SPECIAL_MERCHANT, Rects.specialMerchant[i].getCenter(), angles[i])
+        createUnit(owners[i], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])
+
+function BuildingDefinition.defaultSettings()
+    this..setSelectionScale(2.25)
+        ..setShadowTextureBuilding(Textures.shadowHouse)
+        ..setGroundTexture("")
+        ..setPropulsionWindowdegrees(30.)
+        ..setNormalAbilities(
+        commaList(
+            AbilityIds.neutralBuildinganyunit,
+            AbilityIds.invulnerable,
+            AbilityIds.shopSharingAlliedBldg,
+            AbilityIds.shopPurchaseItem,
+            'Asid', 'Asud'
+        ))
+        ..setItemsMade("")
+        ..setPlacementPreventedBy("")
+        ..setPlacementRequires("")
+        ..setPathingMap("PathTextures\\4x4SimpleSolid.tga")
+        ..setCollisionSize(25.)
+
+@compiletime function gen()
+    new BuildingDefinition(MERCHANT, UnitIds.arcanevault)
+        ..defaultSettings()
+        ..setItemsSold(commaList(
+            HEALING_POTION.getNewId(),
+            //HEALING_SALVE.getNewId(),
+            MANA_POTION.getNewId(),
+            //CLARITY_POTION.getNewId(),
+            SCROLL_OF_THE_BEAST.getNewId(),
+            WIND_SCEPTER.getNewId(),
+            GREATER_HEALING_POTION.getNewId(),
+            GREATER_MANA_POTION.getNewId(),
+            //POTION_OF_RESTORATION.getNewId(),
+            //GREATER_POTION_OF_RESTORATION.getNewId(),
+            SCROLL_OF_PROTECTION.getNewId(),
+            SCROLL_OF_SPEED.getNewId(),
+            INVULNERAVILITY_POTION.getNewId(),
+            SENTINEL_TOTEMS.getNewId(),
+            VAMPIRIC_POTION.getNewId(),
+            ANTIMAGIC_POTION.getNewId()
+        ))
+        ..setModelFile(Units.peon1)
+        ..setUnitSoundSet(Soundsets.peon)
+        .setName("Merchant")
+
+    new BuildingDefinition(ARMS_MERCHANT, UnitIds.arcanevault)
+        ..defaultSettings()
+        ..setItemsSold(commaList(
+            CLAWS_OF_ATTACK_12.getNewId(),
+            CLAWS_OF_ATTACK_15.getNewId(),
+            CLAWS_OF_ATTACK_18.getNewId(),
+            CLAWS_OF_ATTACK_21.getNewId(),
+            RING_OF_PROTECTION_2.getNewId(),
+            RING_OF_PROTECTION_3.getNewId(),
+            RING_OF_PROTECTION_4.getNewId(),
+            RING_OF_PROTECTION_6.getNewId(),
+            ORB_OF_CORRUPTION.getNewId(),
+            ORB_OF_LIGHTNING.getNewId(),
+            ICE_ORB.getNewId(),
+            'rspl'
+        ))
+        ..setModelFile(Units.grunt1)
+        ..setUnitSoundSet(Soundsets.grunt)
+        .setName("Arms merchant")
+
+    new BuildingDefinition(SPECIAL_MERCHANT, UnitIds.arcanevault)
+        ..defaultSettings()
+        ..setItemsSold(commaList(
+            STAFF_OF_NEGATION.getNewId(),
+            GLOVES_OF_HASTE.getNewId(),
+            NETHER_POTION.getNewId(),
+            GOBLIN_LANDMINES.getNewId(),
+            KHADGAR_HEATH_STONE.getNewId(),
+            MANA_PENDANT.getNewId(),
+            STORM_DIAMOND.getNewId(),
+            SUMMON_COURIER.getNewId(),
+            GOLD_COINS.getNewId(),
+            LUMBER_BALE.getNewId(),
+            POWER_BOOSTER.getNewId(),
+            BOOTS_OF_SPEED.getNewId()
+        ))
+        ..setModelFile(Units.acolyte1)
+        ..setUnitSoundSet(Soundsets.acolyte)
+        .setName("Special merchant")
+
+    new BuildingDefinition(RECIPES_MERCHANT, UnitIds.arcanevault)
+        ..defaultSettings()
+        ..setItemsSold(commaList(
+            SHIELD_OF_HONOR_RECIPE.getDummyItem(),
+            RING_OF_REGENERATION_1_RECIPE.getDummyItem(),
+            //RING_OF_REGENERATION_2_RECIPE.getDummyItem(),
+            SOBI_MASK_1_RECIPE.getDummyItem(),
+            //SOBI_MASK_2_RECIPE.getDummyItem(),
+            FIRE_BLADE_RECIPE.getDummyItem(),
+            IMPULSE_BOOTS_RECIPE.getDummyItem(),
+            MASK_OF_DEATH_RECIPE.getDummyItem(),
+            SHIELD_OF_LORD_OF_DEAD_RECIPE.getDummyItem(),
+            GLOVES_OF_CORRUPTION_RECIPE.getDummyItem(),
+            SHAMANS_CLAWS_RECIPE.getDummyItem(),
+            NORTHREND_ARTIFACT_RECIPE.getDummyItem()
+        ))
+        ..setModelFile(Units.voidWalker)
+        ..setUnitSoundSet(Soundsets.netherDragon)
+        .setName("Recipes merchant")
+
+    new BuildingDefinition(SECRET_MERCHANT, UnitIds.arcanevault)
+        ..defaultSettings()
+        ..setItemsSold("")
+        ..setModelFile(Units.spiritOfVengeance)
+        ..setUnitSoundSet(Soundsets.vengeance)
+        .setName("Recipes merchant")

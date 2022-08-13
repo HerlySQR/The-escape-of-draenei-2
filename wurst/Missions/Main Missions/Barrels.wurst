@@ -4,11 +4,20 @@ import Functions
 import PlayerData
 import initlater Missions
 import HeroSelection
+import ObjectIdGenerator
+import UnitObjEditing
+import ItemObjEditing
+import UnitIds
+import ObjectIds
+import Assets
+import Annotations
 
 import EventHelper
+import ClosureEvents
 import RegisterEvents
 import UnitIndexer
 import SoundUtils
+import Imports
 
 public boolean generatorAlive = true
 public trigger placeBarrel = CreateTrigger()
@@ -25,47 +34,47 @@ let dustPoint = [
     vec2(-3360.00, -1504.00)
 ]
 
+let BARREL = compiletime(ITEM_ID_GEN.next())
+
 init
     // Get barrel
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
-        return GetManipulatedItem().getTypeId() == 'I000' and GetTriggerUnit().isType(UNIT_TYPE_HERO)
-    end, () -> begin
-        let u = GetTriggerUnit()
-        let m = GetManipulatedItem()
-        let p = u.getOwner()
-        if THE_DRAENEI.has(p)
-            var b = false
-            for i = 0 to 5
-                if u.itemInSlot(i) != m and u.itemInSlot(i).getTypeId() == 'I000'
-                    b = true
-                    break
-            if b
-                m.remove()
-                message("warning", "You cannot have more than one at a time.", p)
-                // TODO
-                doAfter(2.) () ->
-                    TransmissionFromUnitTypeWithNameBJ(GetForceOfPlayer(p), Player(PLAYER_NEUTRAL_PASSIVE), 'n001', "Goblin Sapper", GetRectCenter(Rects.lookTheGoblin), null, "Hey, you have one in your hand, wait for leaving it.", bj_TIMETYPE_ADD, 2.50, true)
+    EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        let u = EventData.getTriggerUnit()
+        let m = EventData.getManipulatedItem()
+        if m.getTypeId() == BARREL and u.isType(UNIT_TYPE_HERO)
+            let p = u.getOwner()
+            if THE_DRAENEI.has(p)
+                var b = false
+                for i = 0 to 5
+                    if u.itemInSlot(i) != m and u.itemInSlot(i).getTypeId() == BARREL
+                        b = true
+                        break
+                if b
+                    m.remove()
+                    message("warning", "You cannot have more than one at a time.", p)
+                    // TODO
+                    doAfter(2.) () ->
+                        TransmissionFromUnitTypeWithNameBJ(GetForceOfPlayer(p), Player(PLAYER_NEUTRAL_PASSIVE), 'n001', "Goblin Sapper", GetRectCenter(Rects.lookTheGoblin), null, "Hey, you have one in your hand, wait for leaving it.", bj_TIMETYPE_ADD, 2.50, true)
+                else
+                    QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_ITEMACQUIRED, "Someone got a barrel.")
+                    let i = p.getNumber()
+                    barrelEffect[i] = u.addEffect("Models\\TNTBarrel.mdl", "hand")
+                    heroWithBarrel[i] = u
             else
-                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_ITEMACQUIRED, "Someone got a barrel.")
-                let i = p.getNumber()
-                barrelEffect[i] = u.addEffect("Models\\TNTBarrel.mdl", "hand")
-                heroWithBarrel[i] = u
-        else
-            m.remove()
-            message("error", "Why do you need this?", p)
+                m.remove()
+                message("error", "Why do you need this?", p)
     end)
     // Die with barrel
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
-        return GetDyingUnit().hasItemById('I000')
-    end, () -> begin
+    EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
         let u = GetDyingUnit()
-        u.getItemOfId('I000').remove()
-        for i = 1 to 5
-            if u == heroWithBarrel[i]
-                barrelEffect[i].destr()
-                heroWithBarrel[i] = null
-                u.addEffect("Units\\Other\\TNTBarrel\\TNTBarrel.mdl", "hand").destr()
-                break
+        if u.hasItemById(BARREL)
+            u.getItemOfId(BARREL).remove()
+            for i = 1 to 5
+                if u == heroWithBarrel[i]
+                    barrelEffect[i].destr()
+                    heroWithBarrel[i] = null
+                    u.addEffect("Units\\Other\\TNTBarrel\\TNTBarrel.mdl", "hand").destr()
+                    break
     end)
     onUnitDeindex(() -> begin
         if getIndexingUnit().isType(UNIT_TYPE_HERO)
@@ -82,11 +91,11 @@ init
         ..registerRectEnterEventSource(Rects.placeBarrel2)
         ..registerRectEnterEventSource(Rects.placeBarrel3)
         ..addCondition(Condition(() -> begin
-            return GetEnteringUnit().hasItemById('I000')
+            return GetEnteringUnit().hasItemById(BARREL)
         end))
         ..addAction(() -> begin
             let u = GetEnteringUnit()
-            u.getItemOfId('I000').remove()
+            u.getItemOfId(BARREL).remove()
             SetDestructableInvulnerable(createDestructable('LTex', place.getCenter(), GetRandomDirectionDeg().asAngleDegrees(), 1., 0), true)
             switch barrelNumber
                 case 1
@@ -117,8 +126,8 @@ function destroyWall()
     forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
         if u.getTypeId() == 'n001'
             u.remove()
-        if u.hasItemById('I000')
-            u.getItemOfId('I000').remove()
+        if u.hasItemById(BARREL)
+            u.getItemOfId(BARREL).remove()
     end)
     forUnitsInRect(Rects.demonTower3, u -> begin
         if u.getTypeId() == 'o00I'
@@ -162,4 +171,29 @@ function destroyWall()
         startMission3()
         doAfter(0.2) ->
             moveCircles(3)
-            
+
+let GOBLIN_SHOP = compiletime(UNIT_ID_GEN.next())
+
+@compiletime function gen()
+    new ItemDefinition(BARREL, 'skrt')
+        ..setClassification("Miscellaneous")
+        ..setGoldCost(0)
+        ..setStockReplenishInterval(1)
+        ..setCanBeSoldByMerchants(true)
+        ..setCanBeDropped(false)
+        ..setInterfaceIcon(Imports.bTNExplBarrel)
+        ..setAbilities("")
+        ..setTooltipExtended("This barrel is used to destroy walls although it is not very powerful.")
+        ..setTooltipBasic("Acquire Explosive Barrel")
+        ..setDescription("Explosive Barrel")
+        ..setName("Explosive Barrel")
+    
+    new BuildingDefinition(GOBLIN_SHOP, UnitIds.goblinmerchant)
+        ..setModelFile(Units.goblinSapper1)
+        ..setSelectionScale(1.5)
+        ..setIconGameInterface(Icons.bTNGoblinSapper)
+        ..setShadowTextureBuilding(Textures.shadowCrates)
+        ..setGroundTexture("")
+        ..setItemsSold(BARREL.toRawCode())
+        ..setUnitSoundSet(Soundsets.goblinSapper)
+        ..setName("Goblin Sapper")

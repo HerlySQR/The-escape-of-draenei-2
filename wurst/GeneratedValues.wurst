@@ -3,7 +3,7 @@ package GeneratedValues
 // Here I store the generated variables on the map to use them in the Wurst script
 
 /** The generated units. */
-public class Units
+public class GUnits
 
     // Tp
     static constant tpEntranceToDungeon = gg_unit_ncp3_0038
@@ -34,9 +34,9 @@ public class Dests
 
     // Doors
 
-    static constant dungeonDoor1 = gg_dest_DTg3_0020
-    static constant dungeonExitDoor1 = gg_dest_ATg3_0042
-    static constant dungeonExitDoor2 = gg_dest_ATg1_1128
+    static constant dungeonDoor1 = gg_dest_B00E_0020
+    static constant dungeonExitDoor1 = gg_dest_B00C_0042
+    static constant dungeonExitDoor2 = gg_dest_B00B_1128
     static constant constructionEntranceDoor1 = gg_dest_LTg2_2727
     static constant constructionEntranceDoor2 = gg_dest_LTg1_2771
     static constant voidTravellerDoor = gg_dest_LTe3_4731
@@ -59,10 +59,10 @@ public class Dests
 
     // Elevators
 
-    static constant elevatorHabitat1 = gg_dest_DTrf_6359
-    static constant elevatorHabitat2 = gg_dest_DTrf_6360
-    static constant elevatorGenerator1 = gg_dest_DTrx_2141
-    static constant elevatorGenerator2 = gg_dest_DTrx_2140
+    static constant elevatorHabitat1 = gg_dest_B00F_6359
+    static constant elevatorHabitat2 = gg_dest_B00F_6360
+    static constant elevatorGenerator1 = gg_dest_B00G_2141
+    static constant elevatorGenerator2 = gg_dest_B00G_2140
 
     static constant leverGenerator = gg_dest_B008_6364
 
@@ -280,6 +280,14 @@ public class Rects
     static constant iLost3 = gg_rct_I_Lost_3
     static constant iLost4 = gg_rct_I_Lost_4
     static constant iLost5 = gg_rct_I_Lost_5
+
+    /* Postions for placed units */
+
+    // Merchants
+    static constant merchant = [gg_rct_Merchant_0, gg_rct_Merchant_1, gg_rct_Merchant_2, gg_rct_Merchant_3, gg_rct_Merchant_4]
+    static constant armsMerchant = [gg_rct_Arms_Merchant_0, gg_rct_Arms_Merchant_1, gg_rct_Arms_Merchant_2, gg_rct_Arms_Merchant_3, gg_rct_Arms_Merchant_4]
+    static constant specialMerchant = [gg_rct_Special_Merchant_0, gg_rct_Special_Merchant_1, gg_rct_Special_Merchant_2, gg_rct_Special_Merchant_3, gg_rct_Special_Merchant_4]
+    static constant recipeMerchant = [gg_rct_Recipe_Merchant_0, gg_rct_Recipe_Merchant_1, gg_rct_Recipe_Merchant_2, gg_rct_Recipe_Merchant_3, gg_rct_Recipe_Merchant_4]
 
 /** The generated cameras. */
 public class Cams
