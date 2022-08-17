@@ -6,11 +6,6 @@ dependencies:
 - https://github.com/HerlySQR/Bounty_Controller
 - https://github.com/HerlySQR/Bounty_Controller:main
 buildMapData:
-<<<<<<< HEAD
-  name: The escape of draenei vBeta25
-  fileName: The_escape_of_draenei_vBeta25
-=======
-  name: The_escape_of_draenei
-  fileName: The_escape_of_draenei
->>>>>>> parent of b1e75a8 (Shops)
+  name: The escape of draenei
+  fileName: The_escape_of_draenei_vbeta25
   author: HerlySQR

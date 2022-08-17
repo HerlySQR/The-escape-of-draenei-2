@@ -6,6 +6,7 @@ import initlater Missions
 import HeroSelection
 
 import ClosureEvents
+import RegisterEvents
 import UnitIndexer
 import SoundUtils
 

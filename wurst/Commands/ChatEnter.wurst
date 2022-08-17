@@ -56,5 +56,7 @@ init
         ..registerPlayerChatEvent(players[9], "-", false)
         ..registerPlayerChatEvent(players[10], "-", false)
         ..registerPlayerChatEvent(players[11], "-", false)
-        ..addCondition(Condition(() -> GetEventPlayerChatString().subString(1, 1) == "-"))
+        ..addCondition(Condition(() -> begin
+            return GetEventPlayerChatString().subString(1, 1) == "-"
+        end))
         .addAction(function commands)

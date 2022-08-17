@@ -69,7 +69,6 @@ public class Dests
     // Misc
     
     static constant leverSecret = gg_dest_B009_6603
-    static constant secretMerchantLever = [gg_dest_B00H_4873, gg_dest_B00H_2593, gg_dest_B00H_2594]
 
     // Missions
 
@@ -250,8 +249,6 @@ public class Rects
     static constant quake = gg_rct_Quake
     static constant activeEarthQuake = gg_rct_ActiveEarthQuake
 
-    static constant secretMerchantEntrance = gg_rct_Secret_Merchant_Entrance
-
     // Index (dummy rect)
     static constant index = gg_rct_Index
 
@@ -291,7 +288,6 @@ public class Rects
     static constant armsMerchant = [gg_rct_Arms_Merchant_0, gg_rct_Arms_Merchant_1, gg_rct_Arms_Merchant_2, gg_rct_Arms_Merchant_3, gg_rct_Arms_Merchant_4]
     static constant specialMerchant = [gg_rct_Special_Merchant_0, gg_rct_Special_Merchant_1, gg_rct_Special_Merchant_2, gg_rct_Special_Merchant_3, gg_rct_Special_Merchant_4]
     static constant recipeMerchant = [gg_rct_Recipe_Merchant_0, gg_rct_Recipe_Merchant_1, gg_rct_Recipe_Merchant_2, gg_rct_Recipe_Merchant_3, gg_rct_Recipe_Merchant_4]
-    static constant secretMerchant = gg_rct_Secret_Merchant
 
 /** The generated cameras. */
 public class Cams
