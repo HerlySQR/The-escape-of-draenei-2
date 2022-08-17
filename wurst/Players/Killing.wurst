@@ -6,7 +6,8 @@ import ArrayList
 import DamageEvent
 import BountyController
 
-import RegisterEvents
+import ClosureEvents
+import ClosureTimers
 
 /** First index: attacker, Second index: attacked */
 ArrayList<int> array assistTime
@@ -17,25 +18,26 @@ init
         for j = 1 to 10
             assistTime[i].add(0)
     // Kill a hero
-    CreateTrigger()
-        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
-        ..addCondition(Condition(() -> begin
-            return GetDyingUnit().isType(UNIT_TYPE_HERO) and not (GetDyingUnit().getOwner() == DRAENEI or GetDyingUnit().getOwner() == DEMON)
-        end))
-        ..addAction(() -> begin
+    EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let u = EventData.getDyingUnit()
+        let p2 = u.getOwner()
+
+        if u.isType(UNIT_TYPE_HERO) and not (p2 == DRAENEI or p2 == DEMON)
             let noKiller = GetKillingUnit() == null
+
             player p1 = null
-            let p2 = GetDyingUnit().getOwner()
             int k = 0
             let d = p2.getNumber()
+
             if not noKiller
-                p1 = GetKillingUnit().getOwner()
+                p1 = EventData.getKillingUnit().getOwner()
                 k = p1.getNumber()
             
             deaths[d]++
             table.setItemValue(4, row[d], deaths[d].toString())
+            
             if noKiller
-                DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just died")
+                print(playerName[k] + " just died")
             else if p1.isEnemyOf(p2)
                 // Killed by an enemy
                 let oldSpree = spree[d]
@@ -109,18 +111,19 @@ init
                             DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffRampage|r!")
                 else
                     /*if GetKillingUnit() == udg_Golem_de_carne
-                        printTimedToPlayer(playerName[d] + " was killed by The Monster", 4.00, localPlayer)
+                        printTimed(playerName[d] + " was killed by The Monster", 4.00)
                     else
-                        printTimedToPlayer(playerName[d] + " was killed by the Neutral Creeps", 4.00, localPlayer)*/
+                        printTimed(playerName[d] + " was killed by the Neutral Creeps", 4.00)*/
             else
-                // Killed by a ally
+                // Killed by an ally
                 if p1 == p2
-                    printTimedToPlayer(playerName[d] + " has killed himself.", 4.00, localPlayer)
+                    printTimed(playerName[d] + " has killed himself.", 4.00)
                 else
-                    printTimedToPlayer(playerName[k] + " killed his teammate " + playerName[d], 4.00, localPlayer)
+                    printTimed(playerName[k] + " killed his teammate " + playerName[d], 4.00)
+    end)
 
-        end)
     // Assist time
+
     DamageEvent.addListener(() -> begin
         if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
             let p1 = DamageEvent.getSource().getOwner()
@@ -129,25 +132,26 @@ init
                 if p1.isEnemyOf(p2)
                     assistTime[p1.getNumber()].replace(p2.getNumber(), 12)
     end)
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellTargetUnit().isType(UNIT_TYPE_HERO)
-            let p1 = GetSpellAbilityUnit().getOwner()
-            let p2 = GetSpellTargetUnit().getOwner()
+
+    EventListener.onTargetCast(-1, (source, target) -> begin
+        if target.isType(UNIT_TYPE_HERO)
+            let p1 = source.getOwner()
+            let p2 = target.getOwner()
             if p1.isIngame() and p2.isIngame()
                 if p1.isEnemyOf(p2)
                     assistTime[p1.getNumber()].replace(p2.getNumber(), 12)
     end)
-    CreateTimer()
-        ..startPeriodic(1.00, () -> begin
-            // Reducing assist
-            for i = 1 to 5
-                for j = 6 to 10
-                    assistTime[i].replace(j, assistTime[i].get(j) - 1)
-                    assistTime[j].replace(i, assistTime[j].get(i) - 1)
-            // Reducing spree
-            for i = 1 to 10
-                firstKill[i]--
-                doubleKill[i]--
-                tripleKill[i]--
-                ultraKill[i]--
-        end)
+
+    doPeriodically(1.00, cb -> begin
+        // Reducing assist
+        for i = 1 to 5
+            for j = 6 to 10
+                assistTime[i].replace(j, assistTime[i].get(j) - 1)
+                assistTime[j].replace(i, assistTime[j].get(i) - 1)
+        // Reducing spree
+        for i = 1 to 10
+            firstKill[i]--
+            doubleKill[i]--
+            tripleKill[i]--
+            ultraKill[i]--
+    end)

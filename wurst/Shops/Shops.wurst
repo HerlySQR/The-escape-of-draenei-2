@@ -8,12 +8,24 @@ import RecipesMerchant
 import SecretMerchant
 import GeneratedValues
 import PlayerData
+import Reset
+import ModeSelection
+
+import ClosureForGroups
 
 public constant MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant ARMS_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant SPECIAL_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant RECIPES_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant SECRET_MERCHANT = compiletime(UNIT_ID_GEN.next())
+
+let secretMerchant = createUnit(players[PLAYER_NEUTRAL_PASSIVE], SECRET_MERCHANT, Rects.secretMerchant.getCenter(), 180..fromDeg())
+
+function addItemToStock(ItemDefinition m, int maxStock)
+    AddItemToStock(secretMerchant, (m instanceof Recipe) ? (m castTo Recipe).getDummyItem() : m.getNewId(), 1, maxStock)
+
+function removeItemFromStock(ItemDefinition m)
+    RemoveItemFromStock(secretMerchant, (m instanceof Recipe) ? (m castTo Recipe).getDummyItem() : m.getNewId())
 
 init
     let owners = [DRAENEI, DEMON, players[PLAYER_NEUTRAL_AGGRESSIVE], DEMON, DEMON]
@@ -23,6 +35,76 @@ init
         createUnit(owners[i], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])
         createUnit(owners[i], SPECIAL_MERCHANT, Rects.specialMerchant[i].getCenter(), angles[i])
         createUnit(owners[i], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])
+    
+    CreateTrigger()
+        ..registerDeathEvent(Dests.secretMerchantLever[0])
+        ..registerDeathEvent(Dests.secretMerchantLever[1])
+        ..registerDeathEvent(Dests.secretMerchantLever[2])
+        ..addAction(() -> begin
+            if not (Dests.secretMerchantLever[0].isAliveTrick() or
+                Dests.secretMerchantLever[1].isAliveTrick() or
+                Dests.secretMerchantLever[2].isAliveTrick())
+
+                forDestructablesInRect(Rects.secretMerchantEntrance, d -> begin
+                    elevator(d).setHeight(1)
+                end)
+                
+                SetDoodadAnimationRect(Rects.secretMerchantEntrance, 'D00Q', "hide", false)
+
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_SECRET, "|cff9b00ffThe Secret Shop was unlocked.|r")
+
+                addItemToStock(STONE_GOLEM, 2)
+                addItemToStock(CROWN_OF_KINGS, 1)
+                addItemToStock(HORN_OF_THE_LEGION, 1)
+                addItemToStock(WAR_HELMET_RECIPE, 1)
+                addItemToStock(STAFF_OF_THE_CYCLONES_RECIPE, 1)
+                addItemToStock(ACID_STONE, 1)
+                addItemToStock(CLOACK_OF_FLAMES, 1)
+                addItemToStock(TRAP_TOTEM_RECIPE, 1)
+                addItemToStock(POWER_BOOTS_RECIPE, 1)
+                addItemToStock(RUNIC_BRACERS_RECIPE, 1)
+                addItemToStock(STAFF_OF_SILENCE_RECIPE, 1)
+                addItemToStock(SHIELD_RUNE, 1)
+
+                if whatMode[3] == Mode.NO_RECIPES
+                    removeItemFromStock(WAR_HELMET_RECIPE)
+                    removeItemFromStock(STAFF_OF_THE_CYCLONES_RECIPE)
+                    removeItemFromStock(TRAP_TOTEM_RECIPE)
+                    removeItemFromStock(POWER_BOOTS_RECIPE)
+                    removeItemFromStock(RUNIC_BRACERS_RECIPE)
+                    removeItemFromStock(STAFF_OF_SILENCE_RECIPE)
+                else if whatMode[3] == Mode.ONLY_COMSUMIBLES
+                    removeItemFromStock(CROWN_OF_KINGS)
+                    removeItemFromStock(HORN_OF_THE_LEGION)
+                    removeItemFromStock(WAR_HELMET_RECIPE)
+                    removeItemFromStock(STAFF_OF_THE_CYCLONES_RECIPE)
+                    removeItemFromStock(ACID_STONE)
+                    removeItemFromStock(CLOACK_OF_FLAMES)
+                    removeItemFromStock(POWER_BOOTS_RECIPE)
+                    removeItemFromStock(RUNIC_BRACERS_RECIPE)
+                    removeItemFromStock(STAFF_OF_SILENCE_RECIPE)
+        end)
+    
+    onReset(false, () -> begin
+        SetDoodadAnimationRect(Rects.secretMerchantEntrance, 'D00Q', "show", false)
+
+        forDestructablesInRect(Rects.secretMerchantEntrance, d -> begin
+            elevator(d).setHeight(3)
+        end)
+        
+        removeItemFromStock(STONE_GOLEM)
+        removeItemFromStock(CROWN_OF_KINGS)
+        removeItemFromStock(HORN_OF_THE_LEGION)
+        removeItemFromStock(WAR_HELMET_RECIPE)
+        removeItemFromStock(STAFF_OF_THE_CYCLONES_RECIPE)
+        removeItemFromStock(ACID_STONE)
+        removeItemFromStock(CLOACK_OF_FLAMES)
+        removeItemFromStock(TRAP_TOTEM_RECIPE)
+        removeItemFromStock(POWER_BOOTS_RECIPE)
+        removeItemFromStock(RUNIC_BRACERS_RECIPE)
+        removeItemFromStock(STAFF_OF_SILENCE_RECIPE)
+        removeItemFromStock(SHIELD_RUNE)
+    end)
 
 function BuildingDefinition.defaultSettings()
     this..setSelectionScale(2.25)
@@ -31,6 +113,7 @@ function BuildingDefinition.defaultSettings()
         ..setPropulsionWindowdegrees(30.)
         ..setNormalAbilities(
         commaList(
+            'Ane2',
             AbilityIds.neutralBuildinganyunit,
             AbilityIds.invulnerable,
             AbilityIds.shopSharingAlliedBldg,
@@ -82,7 +165,7 @@ function BuildingDefinition.defaultSettings()
             ORB_OF_CORRUPTION.getNewId(),
             ORB_OF_LIGHTNING.getNewId(),
             ICE_ORB.getNewId(),
-            'rspl'
+            UNITE_SPIRIT_RUNE.getNewId()
         ))
         ..setModelFile(Units.grunt1)
         ..setUnitSoundSet(Soundsets.grunt)
@@ -118,11 +201,13 @@ function BuildingDefinition.defaultSettings()
             //SOBI_MASK_2_RECIPE.getDummyItem(),
             FIRE_BLADE_RECIPE.getDummyItem(),
             IMPULSE_BOOTS_RECIPE.getDummyItem(),
+            ENERGY_PENDANT_RECIPE.getDummyItem(),
             MASK_OF_DEATH_RECIPE.getDummyItem(),
             SHIELD_OF_LORD_OF_DEAD_RECIPE.getDummyItem(),
             GLOVES_OF_CORRUPTION_RECIPE.getDummyItem(),
             SHAMANS_CLAWS_RECIPE.getDummyItem(),
-            NORTHREND_ARTIFACT_RECIPE.getDummyItem()
+            NORTHREND_ARTIFACT_RECIPE.getDummyItem(),
+            POCKET_CATAPULT_RECIPE.getDummyItem()
         ))
         ..setModelFile(Units.voidWalker)
         ..setUnitSoundSet(Soundsets.netherDragon)

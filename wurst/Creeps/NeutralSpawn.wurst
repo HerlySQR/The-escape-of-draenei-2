@@ -4,9 +4,7 @@ constant OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
 
 let spawning = CreateTrigger()..disable()
 let camp = CreateGroup()
-let filt = Filter(() -> begin
-    return GetFilterUnit().isAlive()
-end)
+let filt = Filter(() -> GetFilterUnit().isAlive())
 
 public function enableNeutralSpawn()
     spawning.enable()

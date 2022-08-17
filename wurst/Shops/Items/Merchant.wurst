@@ -2,8 +2,6 @@ package Merchant
 
 import ItemCreation
 
-// The order is in how they will be displayed in game
-
 public constant HEALING_POTION = compiletime(
     new RecipeItem('phea')
         //..setArmorType(ArmorSoundType.Stone)

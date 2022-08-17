@@ -9,7 +9,7 @@ import ModeSelection
 import GeneratedValues
 
 init
-    nullTimer(() -> begin
+    nullTimer() ->
         forUnitsInRect(Rects.selectorDraenei, u -> u.pause())
         forUnitsInRect(Rects.selectorDemon, u -> u.pause())
         for i = 0 to 11
@@ -31,5 +31,3 @@ init
                 maxSelection.start(60.00, function didntChose)
             
                 break
-        
-    end)

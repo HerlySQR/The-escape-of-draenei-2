@@ -1,11 +1,10 @@
 package RecipesMerchant
 
-import ClosureEvents
-
 import ItemCreation
 import Merchant
 import SpecialMerchant
 import ArmsMerchant
+import initlater SecretMerchant
 import HeroType
 
 // Shield of honor
@@ -365,6 +364,56 @@ init
 
     IMPULSE_BOOTS_RECIPE.initShopConditions()
 
+// Impulse boots
+
+public constant ENERGY_PENDANT_RECIPE = compiletime(
+    new Recipe()
+        ..setGoldCost(400)
+        ..setLumberCost(2)
+        ..setStockReplenishInterval(5)
+        ..setInterfaceIcon(Icons.bTNPendantOfEnergy)
+        ..setButtonPositionX(0)
+        ..setButtonPositionY(1)
+        ..setHotkey("S")
+        ..setTooltipBasic("[|cffffcc00S|r] Buy Energy Pendant (Recipe)")
+        ..setTooltipExtended("+200 mana points and if you uses it, restore 100 mana to nearby allied units.\n\n" +
+                             "Requires:\n" +
+                             "- Pendant of mana\n" +
+                             "- Scroll of protection\n\n")
+        ..setDescription("+200 mana points and if you uses it, restore 100 mana to nearby allied units.")
+        ..setName("Recipe of Energy Pendant"))
+
+public constant ENERGY_PENDANT = compiletime(
+    new RecipeItem('pmna')
+        //..setArmorType(ArmorSoundType.Flesh)
+        ..setClassification("Miscellaneous")
+        ..setInterfaceIcon(Icons.bTNPendantOfEnergy)
+        ..addBonus(Bonus.MANA, 200)
+        ..setTooltipExtended("+200 mana points and if you uses it, restore 100 mana to nearby allied units.")
+        ..setDescription("+200 mana points and if you uses it, restore 100 mana to nearby allied units.")
+        ..setName("Energy Pendant"))
+
+@compiletime function genEnergyPendant()
+    fixRecipe(ENERGY_PENDANT_RECIPE, ENERGY_PENDANT,
+        
+        MANA_PENDANT.goldCost +
+        SCROLL_OF_PROTECTION.goldCost +
+        ENERGY_PENDANT_RECIPE.goldCost,
+        
+        MANA_PENDANT.lumberCost +
+        SCROLL_OF_PROTECTION.lumberCost +
+        ENERGY_PENDANT_RECIPE.lumberCost)
+
+init
+    new ItemRecipe()
+        ..setRequiredItems(
+            MANA_PENDANT,
+            SCROLL_OF_PROTECTION,
+            ENERGY_PENDANT_RECIPE)
+        ..setResultItem(ENERGY_PENDANT)
+
+    ENERGY_PENDANT_RECIPE.initShopConditions()
+
 // Mask of Death
 
 public constant MASK_OF_DEATH_RECIPE = compiletime(
@@ -459,29 +508,30 @@ public constant SHIELD_OF_LORD_OF_DEAD = compiletime(
         KHADGAR_HEATH_STONE.goldCost +
         MANA_PENDANT.goldCost +
         RING_OF_PROTECTION_3.goldCost +
-        RING_OF_PROTECTION_4.goldCost/* +
-        FLAME_CLOACK.goldCost*/ +
+        RING_OF_PROTECTION_4.goldCost +
+        CLOACK_OF_FLAMES.goldCost +
         SHIELD_OF_LORD_OF_DEAD_RECIPE.goldCost,
         
         KHADGAR_HEATH_STONE.lumberCost +
         MANA_PENDANT.lumberCost +
         RING_OF_PROTECTION_3.lumberCost +
-        RING_OF_PROTECTION_4.lumberCost/* +
-        FLAME_CLOACK.lumberCost*/ +
+        RING_OF_PROTECTION_4.lumberCost +
+        CLOACK_OF_FLAMES.lumberCost +
         SHIELD_OF_LORD_OF_DEAD_RECIPE.lumberCost)
 
 init
-    new ItemRecipe()
-        ..setRequiredItems(
-            KHADGAR_HEATH_STONE,
-            MANA_PENDANT,
-            RING_OF_PROTECTION_3,
-            RING_OF_PROTECTION_4/*,
-            FLAME_CLOACK*/,
-            SHIELD_OF_LORD_OF_DEAD_RECIPE)
-        ..setResultItem(SHIELD_OF_LORD_OF_DEAD)
+    nullTimer() -> 
+        new ItemRecipe()
+            ..setRequiredItems(
+                KHADGAR_HEATH_STONE,
+                MANA_PENDANT,
+                RING_OF_PROTECTION_3,
+                RING_OF_PROTECTION_4,
+                CLOACK_OF_FLAMES,
+                SHIELD_OF_LORD_OF_DEAD_RECIPE)
+            ..setResultItem(SHIELD_OF_LORD_OF_DEAD)
 
-    SHIELD_OF_LORD_OF_DEAD_RECIPE.initShopConditions()
+        SHIELD_OF_LORD_OF_DEAD_RECIPE.initShopConditions()
 
 // Gloves of corruption
 
