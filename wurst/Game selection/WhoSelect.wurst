@@ -28,6 +28,6 @@ init
                       ..setTitleColor(0, 128, 255, 255)
                       ..setTimeColor(0, 128, 255, 255)
                       ..display(true)
-                maxSelection.start(60.00, function didntChose)
+                maxSelection.start(60.00, () -> didntChose())
             
                 break

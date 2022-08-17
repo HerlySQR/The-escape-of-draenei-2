@@ -1,4 +1,4 @@
-package HeroSpells
+package Spells
 
 import public AdvancedEngineering
 import public AnimalForce

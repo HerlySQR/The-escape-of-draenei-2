@@ -11,6 +11,7 @@ import initlater Missions
 import NeutralSpawn
 import initlater Repick
 import initlater Tp
+import GeneratedValues
 
 public player selector
 public trigger select = CreateTrigger()..disable()
@@ -116,11 +117,11 @@ function unit.replace(int newId) returns unit
 string chat
 
 public function actionsSelect()
-    var mode = chat
-    var m2 = true
-    var m3 = true
-    var m4 = true
-    var m5 = true
+    string mode = chat
+    boolean m2 = true
+    boolean m3 = true
+    boolean m4 = true
+    boolean m5 = true
     string sub1
     string sub2
 
@@ -441,7 +442,7 @@ public function actionsSelect()
             u.pause()
             SuspendHeroXP(u, true)
             u.setInvulnerable(true)
-            herosToPick.add(u)
+            herosToPick.addUnit(u)
     end)
     bj_FORCE_ALL_PLAYERS.forEach(() -> begin
         let p = GetEnumPlayer()
