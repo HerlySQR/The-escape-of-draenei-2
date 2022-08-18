@@ -107,10 +107,8 @@ init
     t = CreateTrigger()
     for i = 1 to 11
         t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_DESELECTED, null)
-    t..addCondition(Condition(() -> begin
-        return herosToPick.has(GetTriggerUnit())
-    end))
-    t..addAction(() -> begin
+    t..addCondition(Condition(() -> herosToPick.has(GetTriggerUnit())))
+    ..addAction(() -> begin
         let id = GetTriggerPlayer().getId()
         youSelected[id] = false
         if arrow[id] != null

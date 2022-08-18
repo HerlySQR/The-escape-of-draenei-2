@@ -69,7 +69,7 @@ public function playersOrder()
                  ..setItemValue(5, r, assists[i].toString())
             table.getItem(1, r).setStyle(false, true)
             let g = HeroType.get(hero[i])
-            if g == 0
+            if g == null
                 table.setItemIcon(1, r, Icons.bTNSelectHeroOff)
             else
                 table.setItemIcon(1, r, HeroType.roots[g])
