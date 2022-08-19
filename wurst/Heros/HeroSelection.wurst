@@ -15,12 +15,12 @@ public rect actDrSpawn
 public rect actDeSpawn
 
 public force canPick = CreateForce()
-public group herosToPick = CreateGroup()
 
 public HashMap<int, unit> heroModel
 
 let seeDraenei = createVision(DEMON, Rects.selectorDraenei, true)
 let seeDemons = createVision(DRAENEI, Rects.selectorDemon, true)
+let herosToPick = CreateGroup()
 
 int array clicks
 boolean array youSelected
@@ -34,6 +34,24 @@ init
 
         actDrSpawn = Rects.respawn1
         actDeSpawn = Rects.respawn2
+
+        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+            if u.isType(UNIT_TYPE_HERO) and ((u.getOwner() == DRAENEI and Rects.selectorDraenei.contains(u.getPos())) or (u.getOwner() == DEMON and Rects.selectorDemon.contains(u.getPos())))
+                u.pause()
+                SuspendHeroXP(u, true)
+                u.setInvulnerable(true)
+                herosToPick.add(u)
+
+            let id = u.getTypeId()
+
+            if whatMode[5] == LEVELING
+                if id == HeroType.get(id).getL()
+                    heroModel.put(id, u)
+                else if id == HeroType.get(id).getNL()
+                    heroModel.put(id, u.replace(id))
+            else if whatMode[5] == NOT_LEVELING
+                heroModel.get(id).replace(HeroType.get(id).getNL())
+        end)
     end)
 
     onReset(false, () -> begin

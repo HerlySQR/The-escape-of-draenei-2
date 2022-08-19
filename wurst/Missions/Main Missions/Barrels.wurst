@@ -17,6 +17,8 @@ import UnitIndexer
 import SoundUtils
 import Imports
 
+public constant BARREL = compiletime(ITEM_ID_GEN.next())
+
 public boolean generatorAlive = true
 public trigger placeBarrel = CreateTrigger()
 public unit array heroWithBarrel
@@ -31,8 +33,6 @@ let dustPoint = [
     vec2(-4192.00, -1248.00),
     vec2(-3360.00, -1504.00)
 ]
-
-let BARREL = compiletime(ITEM_ID_GEN.next())
 
 init
     // Get barrel

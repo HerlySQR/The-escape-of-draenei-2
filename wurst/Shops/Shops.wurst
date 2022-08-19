@@ -1,11 +1,13 @@
 package Shops
 
+import Functions
 import ItemCreation
 import Merchant
 import SpecialMerchant
 import ArmsMerchant
 import RecipesMerchant
 import SecretMerchant
+import BookStore
 import GeneratedValues
 import PlayerData
 import Reset
@@ -18,6 +20,7 @@ public constant ARMS_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant SPECIAL_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant RECIPES_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant SECRET_MERCHANT = compiletime(UNIT_ID_GEN.next())
+public constant BOOK_STORE = compiletime(UNIT_ID_GEN.next())
 
 let secretMerchant = createUnit(players[PLAYER_NEUTRAL_PASSIVE], SECRET_MERCHANT, Rects.secretMerchant.getCenter(), 180..fromDeg())
 
@@ -31,7 +34,7 @@ init
     onModesSelected(() -> begin
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             let id = u.getTypeId()
-            
+
             if whatMode[3] == ONLY_COMSUMIBLES
                 if id == ARMS_MERCHANT
                     u.hide()
@@ -62,15 +65,21 @@ init
                     u.hide()
             
             if whatMode[5] == LEVELING
-                RemoveItemFromStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem())
-                AddItemToStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem(), 1, 1)
-                RemoveItemFromStock(u, SOBI_MASK_1_RECIPE.getDummyItem())
-                AddItemToStock(u, SOBI_MASK_2_RECIPE.getDummyItem(), 1, 1)
+                if id == RECIPES_MERCHANT
+                    RemoveItemFromStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem())
+                    AddItemToStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem(), 1, 1)
+                    RemoveItemFromStock(u, SOBI_MASK_1_RECIPE.getDummyItem())
+                    AddItemToStock(u, SOBI_MASK_2_RECIPE.getDummyItem(), 1, 1)
+                else if id == BOOK_STORE
+                    u.show()
             else if whatMode[5] == NOT_LEVELING
-                RemoveItemFromStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem())
-                AddItemToStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem(), 1, 1)
-                RemoveItemFromStock(u, SOBI_MASK_2_RECIPE.getDummyItem())
-                AddItemToStock(u, SOBI_MASK_1_RECIPE.getDummyItem(), 1, 1)
+                if id == RECIPES_MERCHANT
+                    RemoveItemFromStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem())
+                    AddItemToStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem(), 1, 1)
+                    RemoveItemFromStock(u, SOBI_MASK_2_RECIPE.getDummyItem())
+                    AddItemToStock(u, SOBI_MASK_1_RECIPE.getDummyItem(), 1, 1)
+                else if id == BOOK_STORE
+                    u.hide()
         end)
     end)
 
@@ -81,6 +90,9 @@ init
         createUnit(owners[i], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])
         createUnit(owners[i], SPECIAL_MERCHANT, Rects.specialMerchant[i].getCenter(), angles[i])
         createUnit(owners[i], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])
+    
+    for i = 0 to 3
+        createUnit(owners[2], BOOK_STORE, Rects.bookStore[i].getCenter(), UNIT_FACING)
     
     CreateTrigger()
         ..registerDeathEvent(Dests.secretMerchantLever[0])
@@ -265,3 +277,21 @@ function BuildingDefinition.defaultSettings()
         ..setModelFile(Units.spiritOfVengeance)
         ..setUnitSoundSet(Soundsets.vengeance)
         .setName("Recipes merchant")
+
+    new BuildingDefinition(BOOK_STORE, UnitIds.goblinmerchant)
+        ..defaultSettings()
+        ..setItemsSold(commaList(
+            BOOK_OF_STRENGTH,
+            BOOK_OF_AGILITY,
+            BOOK_OF_INTELLIGENCE,
+            BOOK_OF_STRENGTH_5,
+            BOOK_OF_AGILITY_5,
+            BOOK_OF_INTELLIGENCE_5,
+            BOOK_OF_RECONVERSION,
+            BOOK_OF_EXPERIENCE
+        ))
+        ..setModelFile(Buildings.bookOfSummoning)
+        ..setIconGameInterface(Icons.bTNBookOfSummoning)
+        ..setScalingValue(1.5)
+        ..setUnitSoundSet(Soundsets.marketPlace)
+        .setName("Book Store")

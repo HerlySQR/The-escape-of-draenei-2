@@ -51,7 +51,6 @@ function HeroDefinition.defaultStats()
 
 public class HeroType
     static int MAX = 0
-    static boolean level
     static string array roots
 
     HeroDefinition heroNL

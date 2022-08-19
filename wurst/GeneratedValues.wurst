@@ -292,6 +292,7 @@ public class Rects
     static constant specialMerchant = [gg_rct_Special_Merchant_0, gg_rct_Special_Merchant_1, gg_rct_Special_Merchant_2, gg_rct_Special_Merchant_3, gg_rct_Special_Merchant_4]
     static constant recipeMerchant = [gg_rct_Recipe_Merchant_0, gg_rct_Recipe_Merchant_1, gg_rct_Recipe_Merchant_2, gg_rct_Recipe_Merchant_3, gg_rct_Recipe_Merchant_4]
     static constant secretMerchant = gg_rct_Secret_Merchant
+    static constant bookStore = [gg_rct_BookStore0, gg_rct_BookStore1, gg_rct_BookStore2]
 
 /** The generated cameras. */
 public class Cams

@@ -2,11 +2,15 @@ package Circles
 
 import ArrayList
 
+import ModeSelection
 import AbilityData
 import GeneratedValues
 import Reset
 
 public constant CIRCLE = compiletime(UNIT_ID_GEN.next())
+
+let LIFE_REGEN = compiletime(ABIL_ID_GEN.next())
+let MANA_REGEN = compiletime(ABIL_ID_GEN.next())
 
 public rect itemDraenei = Rects.items1
 public rect itemDemons = Rects.items2
@@ -33,6 +37,19 @@ public function moveCircles(int mission)
             itemDemons = Rects.items5
 
 init
+    onModesSelected(() -> begin
+        if whatMode[5] == LEVELING
+            circle[3].addAbility(LIFE_REGEN)
+            circle[3].addAbility(MANA_REGEN)
+            circle[8].addAbility(LIFE_REGEN)
+            circle[8].addAbility(MANA_REGEN)
+        else if whatMode[5] == NOT_LEVELING
+            circle[3].removeAbility(LIFE_REGEN)
+            circle[3].removeAbility(MANA_REGEN)
+            circle[8].removeAbility(LIFE_REGEN)
+            circle[8].removeAbility(MANA_REGEN)
+    end)
+
     circleRegion[1] = Rects.circle11
     circleRegion[2] = Rects.circle12
     circleRegion[3] = Rects.circle13
@@ -104,3 +121,15 @@ init
         ..setFoodProduced(5) // 5 missions
         ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory))
         ..setName("Circle of power")
+    
+    new AbilityDefinitionAuraRegenerationHealingWard(LIFE_REGEN)
+        ..setAmountofHitPointsRegenerated(1, 0.02)
+        ..setPercentage(1, true)
+        ..setTargetsAllowed(1, "air,allies,invulnerable,organic,ground,player,vulnerable")
+        ..setAreaofEffect(1, 700.)
+    
+    new AbilityDefinitionNeutralRegenmanaonly(MANA_REGEN)
+        ..setAmountRegenerated(1, 0.02)
+        ..setPercentage(1, true)
+        ..setTargetsAllowed(1, "air,allies,invulnerable,organic,ground,player,vulnerable")
+        ..setAreaofEffect(1, 700.)

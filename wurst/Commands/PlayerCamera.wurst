@@ -1,6 +1,7 @@
 package PlayerCamera
 
 import Functions
+import Circles
 
 import Orders
 
@@ -22,14 +23,14 @@ init
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
         ..addAction(() -> begin
-            if (GetIssuedOrderId() == Orders.defend or GetIssuedOrderId() == Orders.undefend) and GetOrderedUnit().getTypeId() == 'ncop'
+            if (GetIssuedOrderId() == Orders.defend or GetIssuedOrderId() == Orders.undefend) and GetOrderedUnit().getTypeId() == CIRCLE
                 if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) >= 300.
                     distanceToTarget[GetOrderedUnit().getOwner().getId()] -= 100.
         end)
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
         ..addAction(() -> begin
-            if (GetIssuedOrderId() == Orders.magicdefense or GetIssuedOrderId() == Orders.magicundefense) and GetOrderedUnit().getTypeId() == 'ncop'
+            if (GetIssuedOrderId() == Orders.magicdefense or GetIssuedOrderId() == Orders.magicundefense) and GetOrderedUnit().getTypeId() == CIRCLE
                 if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) <= 3000.
                     distanceToTarget[GetOrderedUnit().getOwner().getId()] += 100.
         end)

@@ -1,6 +1,7 @@
 package TotalFreeze
 
 import AbilityData
+import Circles
 
 public constant TOTAL_FREEZE_NL = compiletime(ABIL_ID_GEN.next())
 public constant TOTAL_FREEZE_L = compiletime(ABIL_ID_GEN.next())
@@ -43,7 +44,7 @@ init
                 timeFreeze = true
                 fadeOut(Textures.hazeAndFogFilter_Mask, 0.50)
                 forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                    if u != caster and u.getTypeId() != 'ncop'
+                    if u != caster and u.getTypeId() != CIRCLE
                         u.pause(true)
                 end)
                 var count1 = 0
@@ -66,7 +67,7 @@ init
                             end)
                         else
                             forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                                if u != caster and u.getTypeId() != 'ncop'
+                                if u != caster and u.getTypeId() != CIRCLE
                                     u.removeAbility(TOTAL_FREEZE_BUFF)
                                     u.pause(false)
                             end)

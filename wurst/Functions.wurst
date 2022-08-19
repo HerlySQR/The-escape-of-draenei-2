@@ -9,6 +9,15 @@ import TimerUtils
 import BuffObjEditing
 import HashMap
 
+public function unit.replace(int newId) returns unit
+    if this.getTypeId() == newId
+        return this
+
+    this.hide()
+    let newUnit = createUnit(this.getOwner(), newId, this.getPos(), this.getFacingAngle())
+    this.remove()
+    return newUnit
+
 public function unit.damageTarget(unit target, real amount, attacktype attackType, damagetype damageType)
     DamageEvent.setNextDamageFromCode()
     UnitDamageTarget(this, target, amount, true, false, attackType, damageType, WEAPON_TYPE_WHOKNOWS)
@@ -48,8 +57,8 @@ public function string.concat(string other) returns string
 
 function unit.filter() returns boolean
     let id = this.getTypeId()
-    if id == 'ndrl' or id == 'u00J'
-        return false
+    /*if id == 'ndrl' or id == 'u00J'
+        return false*/
     return true
 
 public function group.issueTargetOrder(int order, widget target)
@@ -363,7 +372,7 @@ function changeWallBlocker(real x, real y, real facing, boolean open)
     // Ensure that the blocker exists.
     if (blocker == null)
         blocker = CreateDeadDestructable(bj_ELEVATOR_BLOCKER_CODE, x, y, facing, 1, 0)
-    else if blocker.getTypeId() != bj_ELEVATOR_BLOCKER_CODE and blocker.getTypeId() != 'B007' // This is just for me
+    else if blocker.getTypeId() != bj_ELEVATOR_BLOCKER_CODE//TODO and blocker.getTypeId() != 'B007' // This is just for me
         // If a different destructible exists in the blocker's spot, ignore
         // the request.  (Two destructibles cannot occupy the same location
         // on the map, so we cannot create an elevator blocker here.)

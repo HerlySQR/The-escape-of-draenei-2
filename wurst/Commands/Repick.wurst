@@ -5,6 +5,7 @@ import HeroSelection
 import MyBoard
 import Reset
 import GeneratedValues
+import Barrels
 
 import Icons
 import DamageEvent
@@ -42,7 +43,7 @@ public function repick(player p)
             hero[i] = null
             table.setItemIcon(1, row[i], Icons.bTNSelectHeroOn)
             if THE_DRAENEI.has(p)
-                repick.getItemOfId('I000').remove()
+                repick.getItemOfId(BARREL).remove()
                 repick.setPos(Rects.selectorDraenei.getCenter())
             else
                 repick.setPos(Rects.selectorDemon.getCenter())

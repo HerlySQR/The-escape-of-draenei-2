@@ -23,9 +23,6 @@ public function draeneiCinematic()
             u.remove()
         else if u.isType(UNIT_TYPE_HERO)
             SuspendHeroXP(u, true)
-        else
-            u.removeAbility('A04C')
-            u.removeAbility('A04D')
     end)
     for i = 1 to 10
         hero[i].revive(actDrSpawn.getCenter(), false)
@@ -101,9 +98,6 @@ public function demonsCinematic()
             u.remove()
         else if u.isType(UNIT_TYPE_HERO)
             SuspendHeroXP(u, true)
-        else
-            u.removeAbility('A04C')
-            u.removeAbility('A04D')
     end)
     forUnitsInRect(Rects.dungeon, u -> begin
         if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])

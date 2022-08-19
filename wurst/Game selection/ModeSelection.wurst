@@ -3,13 +3,10 @@ package ModeSelection
 import TimerDialog
 import LinkedList
 
+import Functions
 import initlater HeroSelection
-import initlater ReviveN
-import initlater ReviveL
 import initlater MyBoard
 import initlater Missions
-import initlater Repick
-import initlater Tp
 
 public player selector
 public trigger select = CreateTrigger()..disable()
@@ -113,15 +110,6 @@ texttag array modes2 = [
     createTTEx(vec3(-4176, -6592, 100), "  |cff0080ff-lu|r: Hero (Leveling up). (Def)", 12),
     createTTEx(vec3(-4176, -6640, 100), "  |cff0080ff-nl|r: Classic (Not levelling up).", 12)
 ]
-
-function unit.replace(int newId) returns unit
-    if this.getTypeId() == newId
-        return this
-
-    this.hide()
-    let newUnit = createUnit(this.getOwner(), newId, this.getPos(), this.getFacingAngle())
-    this.remove()
-    return newUnit
 
 string chat
 
@@ -316,40 +304,9 @@ public function actionsSelect()
     // Mode 5: Leveling
     sub1 = mode.subString(1, 2)
     if sub1 == "lu" or not m5
-        HeroType.level = true
-        
-        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-            let id = u.getTypeId()
-            switch id
-                case 'n00H'
-                    u.show()
-                default
-                    if id == HeroType.get(id).getL()
-                        heroModel.put(id, u)
-                    else if id == HeroType.get(id).getNL()
-                        heroModel.put(id, u.replace(id))
-        end)
-        // TODO
-        circle[3].addAbility('A04C')
-        circle[3].addAbility('A04D')
-        circle[8].addAbility('A04C')
-        circle[8].addAbility('A04D')
         modes[5] = "Hero (Leveling up)."
         whatMode[5] = LEVELING
     else if sub1 == "nl"
-        HeroType.level = false
-
-        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-            u.removeAbility('A04C')
-            u.removeAbility('A04D')
-
-            let id = u.getTypeId()
-            switch id
-                case 'n00H'
-                    u.hide()
-                default
-                    heroModel.get(id).replace(HeroType.get(id).getNL())
-        end)
         modes[5] = "Classic (Not leveling up)."
         whatMode[5] = NOT_LEVELING
     
@@ -359,18 +316,13 @@ public function actionsSelect()
         modes2[i].setVisibility(false)
     
     ClearTextMessages()
+    /* TODO
     createItem('I01L', Rects.skullPlace.getCenter())
     createItem('I01J', Rects.firePlace.getCenter())
     createItem('I01K', Rects.eggPlace.getCenter())
     createItem('I01M', Rects.bookPlace.getCenter())
+    TriggerExecute(gg_trg_Crear_Gemas)*/
     
-    forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-        if u.isType(UNIT_TYPE_HERO) and ((u.getOwner() == DRAENEI and Rects.selectorDraenei.contains(u.getPos())) or (u.getOwner() == DEMON and Rects.selectorDemon.contains(u.getPos())))
-            u.pause()
-            SuspendHeroXP(u, true)
-            u.setInvulnerable(true)
-            herosToPick.add(u)
-    end)
     bj_FORCE_ALL_PLAYERS.forEach(() -> begin
         let p = GetEnumPlayer()
         canPick.add(p)
@@ -392,7 +344,6 @@ public function actionsSelect()
         cb.run()
 
     /* TODO
-    TriggerExecute(gg_trg_Crear_Gemas)
     EnableTrigger(gg_trg_Surrender)*/
 
     select.disable()
