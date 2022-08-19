@@ -1,5 +1,10 @@
 package NeutralSpawn
 
+import ClosureForGroups
+
+import ModeSelection
+import Reset
+
 constant OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
 
 let spawning = CreateTrigger()..disable()
@@ -12,8 +17,21 @@ public function enableNeutralSpawn()
 public function disableNeutralSpawn()
     spawning.disable()
 
-/*TODO
 init
+    onReset(false, () -> begin
+        forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
+            if /*TODO u != udg_Golem_de_carne and*/ not u.isType(UNIT_TYPE_STRUCTURE)
+                u.remove()
+        end)
+        spawning.disable()
+    end)
+
+    onModesSelected(() -> begin
+        if whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_NEUTRAL
+            spawning.enable()
+    end)
+
+    /*TODO
     spawning
         ..registerTimerEvent(60.00, false)
         ..addAction(() -> begin

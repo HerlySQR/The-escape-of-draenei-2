@@ -8,6 +8,7 @@ import GeneratedValues
 
 import Icons
 import DamageEvent
+import ClosureTimers
 
 public boolean yesOrYes = false
 
@@ -36,7 +37,7 @@ public function repick(player p)
                 DisplayTextToPlayer(p, 0., 0., "You cannot repick during combat")
                 return
             if whatMode[5] == LEVELING
-                heroModel[HeroType.get(repick)].show()
+                heroModel.get(repick.getTypeId()).show()
             // TODO udg_Si_lo_mataste[p.getId()] = false
             hero[i] = null
             table.setItemIcon(1, row[i], Icons.bTNSelectHeroOn)
@@ -60,6 +61,23 @@ public function repick(player p)
 
 // No during combat
 init
+    onModesSelected(() -> begin
+        if whatMode[5] == LEVELING
+            doAfter(20, () -> begin
+                print("\nYou can only repick until 2 minutes.")
+                bj_questHintSound.play()
+            end)
+
+            doAfter(120, () -> begin
+                print("\n|cffff0000You cannot longer repick.|r")
+                disableRepick()
+            end)
+    end)
+
+    onReset(false, () -> begin
+        enableRepick()
+    end)
+
     noRepick = DamageEvent.addListener(() -> begin
         if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
             inCombat[DamageEvent.getTarget().getOwner().getNumber()] = 3
@@ -70,6 +88,3 @@ init
             for i = 1 to 10
                 inCombat[i]--
         end)
-    onReset(false, () -> begin
-        enableRepick()
-    end)

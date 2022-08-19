@@ -2,6 +2,7 @@ package ReviveN
 
 import TimerDialog
 
+import ModeSelection
 import PlayerData
 import HeroSelection
 import Reset
@@ -29,6 +30,19 @@ public function reviveStart()
                 ..display(false)
 
 init
+    onModesSelected(() -> begin
+        switch whatMode[5]
+            case LEVELING
+                ifDie.disable()
+                ifRevive.disable()
+                reviveNRun = false
+            case NOT_LEVELING
+                ifDie.enable()
+                ifRevive.enable()
+                reviveNRun = true
+            default
+    end)
+
     ifRevive..registerAnyUnitEvent(EVENT_PLAYER_HERO_REVIVE_START)
             ..addCondition(Condition(() -> begin
         return GetTriggerUnit().isType(UNIT_TYPE_HERO)

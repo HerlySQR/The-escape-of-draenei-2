@@ -28,6 +28,52 @@ function removeItemFromStock(ItemDefinition m)
     RemoveItemFromStock(secretMerchant, (m instanceof Recipe) ? (m castTo Recipe).getDummyItem() : m.getNewId())
 
 init
+    onModesSelected(() -> begin
+        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+            let id = u.getTypeId()
+            
+            if whatMode[3] == ONLY_COMSUMIBLES
+                if id == ARMS_MERCHANT
+                    u.hide()
+                else if id == SPECIAL_MERCHANT
+                    RemoveItemFromStock(u, GLOVES_OF_HASTE.getNewId())
+                    RemoveItemFromStock(u, KHADGAR_HEATH_STONE.getNewId())
+                    RemoveItemFromStock(u, MANA_PENDANT.getNewId())
+                    RemoveItemFromStock(u, STORM_DIAMOND.getNewId())
+                    RemoveItemFromStock(u, POWER_BOOSTER.getNewId())
+                    RemoveItemFromStock(u, BOOTS_OF_SPEED.getNewId())
+                    AddItemToStock(u, UNITE_SPIRIT_RUNE.getNewId(), 1, 2)
+                else if id == RECIPES_MERCHANT
+                    RemoveItemFromStock(u, SHIELD_OF_HONOR_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, SOBI_MASK_1_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, SOBI_MASK_2_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, FIRE_BLADE_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, IMPULSE_BOOTS_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, ENERGY_PENDANT_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, MASK_OF_DEATH_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, SHIELD_OF_LORD_OF_DEAD_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, GLOVES_OF_CORRUPTION_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, SHAMANS_CLAWS_RECIPE.getDummyItem())
+                    RemoveItemFromStock(u, NORTHREND_ARTIFACT_RECIPE.getDummyItem())
+            else if whatMode[3] == NO_RECIPES
+                if id == RECIPES_MERCHANT
+                    u.hide()
+            
+            if whatMode[5] == LEVELING
+                RemoveItemFromStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem())
+                AddItemToStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem(), 1, 1)
+                RemoveItemFromStock(u, SOBI_MASK_1_RECIPE.getDummyItem())
+                AddItemToStock(u, SOBI_MASK_2_RECIPE.getDummyItem(), 1, 1)
+            else if whatMode[5] == NOT_LEVELING
+                RemoveItemFromStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem())
+                AddItemToStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem(), 1, 1)
+                RemoveItemFromStock(u, SOBI_MASK_2_RECIPE.getDummyItem())
+                AddItemToStock(u, SOBI_MASK_1_RECIPE.getDummyItem(), 1, 1)
+        end)
+    end)
+
     let owners = [DRAENEI, DEMON, players[PLAYER_NEUTRAL_AGGRESSIVE], DEMON, DEMON]
     let angles = [270..fromDeg(), 315..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
     for i = 0 to 4

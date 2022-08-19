@@ -5,11 +5,15 @@ import Icons
 
 import public Functions
 import public PlayerData
+import ModeSelection
 import HeroType
 import ReviveN
 import DrAndDeSpawn
 
 public multiboard table = CreateMultiboard()
+
+init
+    onModesSelected(() -> startTable())
 
 public function startTable()
     int pl = 0

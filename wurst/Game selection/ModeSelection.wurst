@@ -1,14 +1,13 @@
 package ModeSelection
 
 import TimerDialog
+import LinkedList
 
-import Tips
 import initlater HeroSelection
 import initlater ReviveN
 import initlater ReviveL
 import initlater MyBoard
 import initlater Missions
-import NeutralSpawn
 import initlater Repick
 import initlater Tp
 
@@ -39,6 +38,14 @@ public enum Mode
     NOT_LEVELING
 
 public Mode array whatMode
+
+public interface ModeSelectionCallback
+    function run()
+
+LinkedList<ModeSelectionCallback> callbacks
+
+public function onModesSelected(ModeSelectionCallback cb)
+    callbacks.add(cb)
 
 // Text tags to the modes
 texttag array modes1 = [
@@ -108,6 +115,9 @@ texttag array modes2 = [
 ]
 
 function unit.replace(int newId) returns unit
+    if this.getTypeId() == newId
+        return this
+
     this.hide()
     let newUnit = createUnit(this.getOwner(), newId, this.getPos(), this.getFacingAngle())
     this.remove()
@@ -252,47 +262,19 @@ public function actionsSelect()
         sub2 = mode.char(2)
         mode = mode.subString(3)
         if sub1 + sub2 == "ca"
-            enableNeutralSpawn()
-            tips[3] = "Watch for the missions (push is useless)."
             modes[2] = "Normal."
             whatMode[2] = YES_CREEPS
         else if sub1 == "n"
             if sub2 == "n"
-                forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
-                    if /*TODO u != udg_Golem_de_carne and*/ not u.isType(UNIT_TYPE_STRUCTURE)
-                        u.remove()
-                end)
-                tips[3] = "Watch for the missions (push is useless)."
                 modes[2] = "No Neutrals."
                 whatMode[2] = ONLY_DE_AND_DR
             else if sub2 == "p"
-                forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                    let id = u.getTypeId()
-                    if id == 'n00D' or id == 'n00F' or id == 'n00S' or id == 'n002'
-                end)
-                // TODO DisableTrigger(gg_trg_Aqui_vamos)
-                enableNeutralSpawn()
-                tips[3] = "Watch for the missions."
                 modes[2] = "No |cffff0000Draenei|r and |cff32cd32Demons|r."
                 whatMode[2] = ONLY_NEUTRAL
             else if sub2 == "c"
-                forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
-                    if /*TODO u != udg_Golem_de_carne and*/ not u.isType(UNIT_TYPE_STRUCTURE)
-                        u.remove()
-                end)
-                forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                    let id = u.getTypeId()
-                    if id == 'n00D' or id == 'n00F' or id == 'n00S' or id == 'n002'
-                        u.remove()
-                end)
-                // TODO DisableTrigger(gg_trg_Aqui_vamos)
-                enableNeutralSpawn()
-                tips[3] = "Watch for the missions."
                 modes[2] = "No Creeps."
                 whatMode[2] = NO_CREEPS
     else
-        enableNeutralSpawn()
-        tips[3] = "Watch for the missions (push is useless)."
         modes[2] = "Normal."
         whatMode[2] = YES_CREEPS
 
@@ -304,17 +286,6 @@ public function actionsSelect()
             modes[3] = "Normal."
             whatMode[3] = ALL_ITEMS
         else if sub1 == "oc"
-            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                let id = u.getTypeId()
-                switch id
-                    case 'h002'
-                        u.hide()
-                    case 'h000'
-                        u.replace('h00E')
-                    case 'h003'
-                        u.replace('h00F')
-                    default
-            end)
             modes[3] = "Only consummibles."
             whatMode[3] = ONLY_COMSUMIBLES
             doAfter(25, () -> begin
@@ -322,10 +293,6 @@ public function actionsSelect()
                 bj_questHintSound.play()
             end)
         else if sub1 == "nr"
-            forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                if u.getTypeId() == 'h003'
-                    u.hide()
-            end)
             modes[3] = "No recipes."
             whatMode[3] = NO_RECIPES
     else
@@ -340,8 +307,6 @@ public function actionsSelect()
             modes[4] = "Normal."
             whatMode[4] = NORMAL_PICK
         else if sub1 == "ap"
-            seeDraenei = createVision(DRAENEI, Rects.selectorDraenei, true)..start()
-            seeDemons = createVision(DEMON, Rects.selectorDemon, true)..start()
             modes[4] = "Traitor (All pick)."
             whatMode[4] = TRAITOR
     else
@@ -352,40 +317,17 @@ public function actionsSelect()
     sub1 = mode.subString(1, 2)
     if sub1 == "lu" or not m5
         HeroType.level = true
-
-        doAfter(20, () -> begin
-            print("\nYou can only repick until 2 minutes.")
-            bj_questHintSound.play()
-        end)
-
-        doAfter(120, () -> begin
-            print("\n|cffff0000You cannot longer repick.|r")
-            disableRepick()
-        end)
         
-        ifDie.disable()
-        ifRevive.disable()
-        reviveNRun = false
-        reviveHero.enable()
-        tips[1] = "There are defensive towers, the demolisher is good for destroy them."
-        tips[2] = "You can heal your heros in the base."
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             let id = u.getTypeId()
             switch id
-                case 'h001'
-                    u.replace('h009')
-                case 'h000'
-                    u.replace('h00A')
-                case 'h003'
-                    u.replace('h00D')
                 case 'n00H'
                     u.show()
                 default
-                    for g = 1 to HeroType.MAX
-                        if id == N_HEROS[g]
-                            heroModel[g] = u.replace(L_HEROS[g])..pause()
-                        else if id == L_HEROS[g]
-                            heroModel[g] = u
+                    if id == HeroType.get(id).getL()
+                        heroModel.put(id, u)
+                    else if id == HeroType.get(id).getNL()
+                        heroModel.put(id, u.replace(id))
         end)
         // TODO
         circle[3].addAbility('A04C')
@@ -397,30 +339,16 @@ public function actionsSelect()
     else if sub1 == "nl"
         HeroType.level = false
 
-        ifDie.enable()
-        ifRevive.enable()
-        reviveNRun = true
-        reviveHero.disable()
-        tips[1] = "There are special heros for destroy towers."
-        tips[2] = "If you are low of health, you can use -repick to have all life and mana."
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             u.removeAbility('A04C')
             u.removeAbility('A04D')
 
             let id = u.getTypeId()
             switch id
-                case 'h009'
-                    u.replace('h001')
-                case 'h00A'
-                    u.replace('h000')
-                case 'h00D'
-                    u.replace('h003')
                 case 'n00H'
                     u.hide()
                 default
-                    for g = 1 to HeroType.MAX
-                        if id == L_HEROS[g]
-                            u.replace(N_HEROS[g])..pause()
+                    heroModel.get(id).replace(HeroType.get(id).getNL())
         end)
         modes[5] = "Classic (Not leveling up)."
         whatMode[5] = NOT_LEVELING
@@ -452,7 +380,6 @@ public function actionsSelect()
                 SelectUnit(u, true)
         end)
     end)
-    tipDisplayer.enable()
 
     printTimedToPlayer("|cff7777aaGAMEMODES:|r", 15., localPlayer)
     printTimedToPlayer("|cffffcc00Timers:|r " + modes[1], 15., localPlayer)
@@ -461,15 +388,12 @@ public function actionsSelect()
     printTimedToPlayer("|cffffcc00Selection:|r " + modes[4], 15., localPlayer)
     printTimedToPlayer("|cffffcc00Heros:|r  " + modes[5], 15., localPlayer)
 
-    startMission1()
-    startTable()
+    for cb in callbacks
+        cb.run()
+
     /* TODO
     TriggerExecute(gg_trg_Crear_Gemas)
     EnableTrigger(gg_trg_Surrender)*/
-
-    changeTexts()
-    actDrSpawn = Rects.respawn1
-    actDeSpawn = Rects.respawn2
 
     select.disable()
 

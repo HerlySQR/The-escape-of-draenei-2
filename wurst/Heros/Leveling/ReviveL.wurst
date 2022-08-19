@@ -3,13 +3,14 @@ package ReviveL
 import UnitIndexer
 import TimerDialog
 
+import ModeSelection
 import HeroSelection
 import ClosureTimers
 import PlayerData
 
 // Control the resurrection of the dying heros in the leveling mode
 
-public trigger reviveHero = CreateTrigger()..disable()
+let reviveHero = CreateTrigger()..disable()
 
 class Reviver
     unit hero
@@ -38,13 +39,22 @@ class Reviver
 Reviver array instance
 
 init
-    reviveHero..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
-              ..addCondition(Condition(() -> begin
-        return GetDyingUnit().isType(UNIT_TYPE_HERO)
-    end))
-              ..addAction(() -> instance[GetDyingUnit().getIndex()] == new Reviver(GetDyingUnit()))
+    onModesSelected(() -> begin
+        switch whatMode[5]
+            case LEVELING
+                reviveHero.enable()
+            case NOT_LEVELING
+                reviveHero.disable()
+            default
+    end)
+
+    reviveHero
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addCondition(Condition(() -> GetDyingUnit().isType(UNIT_TYPE_HERO)))
+        ..addAction(() -> instance[GetDyingUnit().getIndex()] == new Reviver(GetDyingUnit()))
+
     onUnitDeindex(() -> begin
-        let i = getDeindexedUnit().getIndex()
+        let i = getIndexingUnit().getIndex()
         if instance[i] != null
             destroy instance[i]
             instance[i] = null

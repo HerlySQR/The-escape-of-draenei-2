@@ -719,11 +719,11 @@ init
     // Replace the item with its breath version when necessary
     EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
         let u = EventData.getTriggerUnit()
-        let uTyp = u.getTypeId()
+        let typ = HeroType.get(u)
         let m = GetManipulatedItem()
         var newId = 0
 
-        if uTyp == N_SALAMANDER or uTyp == N_INFERNAL_MACHINE or uTyp == L_SALAMANDER or uTyp == L_INFERNAL_MACHINE
+        if typ == SALAMANDER or typ == INFERNAL_MACHINE
             switch m.getTypeId()
                 case ICE_ORB.getNewId()
                     newId = ICE_ORB_BREATH.getNewId()

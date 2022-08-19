@@ -2,9 +2,10 @@ package DrAndDeSpawn
 
 import UnitIndexer
 import Orders
-
 import DamageEvent
+
 import Functions
+import Reset
 import PlayerData
 import initlater Missions
 
@@ -81,6 +82,17 @@ function createDe(int id, vec2 pos, vec2 t)
     attackers.add(c)
 
 init
+    onReset(false, () -> begin
+        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+            let id = u.getTypeId()
+            for i = 1 to 3
+                if id == DRAENEI_WARRIOR[i] or id == CHAOS_GRUNT[i]
+                    u.remove()
+            for i = 1 to 2
+                if id == DRAENEI_MAGE[i] or id == CHAOS_WARLOCK[i]
+                    u.remove()
+        end)
+    end)
     // The units spawn
     spawning
         ..registerTimerEvent(30., true)

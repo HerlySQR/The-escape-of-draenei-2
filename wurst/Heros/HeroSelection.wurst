@@ -3,14 +3,13 @@ package HeroSelection
 import ClosureTimers
 import ClosureForGroups
 import Camera
-import GeneratedValues
+import HashMap
 
+import GeneratedValues
 import ModeSelection
+import Reset
 import public HeroType
 import initlater MyBoard
-
-public fogmodifier seeDraenei
-public fogmodifier seeDemons
 
 public rect actDrSpawn
 public rect actDeSpawn
@@ -18,13 +17,30 @@ public rect actDeSpawn
 public force canPick = CreateForce()
 public group herosToPick = CreateGroup()
 
-public unit array heroModel
+public HashMap<int, unit> heroModel
+
+let seeDraenei = createVision(DEMON, Rects.selectorDraenei, true)
+let seeDemons = createVision(DRAENEI, Rects.selectorDemon, true)
 
 int array clicks
 boolean array youSelected
 unit array arrow
 
 init
+    onModesSelected(() -> begin
+        if whatMode[4] == TRAITOR
+            seeDraenei.start()
+            seeDemons.start()
+
+        actDrSpawn = Rects.respawn1
+        actDeSpawn = Rects.respawn2
+    end)
+
+    onReset(false, () -> begin
+        seeDraenei.stop()
+        seeDemons.stop()
+    end)
+
     forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
         if Rects.selectorDraenei.contains(u.getPos()) or Rects.selectorDemon.contains(u.getPos())
             u.setInvulnerable(true)
@@ -49,6 +65,7 @@ init
             if clicks[id] == 2
                 let c = playerSelector.getNumber()
                 let temp = heroSelected.getTypeId()
+                let typ = HeroType.get(temp)
 
                 hero[c] = createUnit(playerSelector, temp, heroSelected.getPos(), UNIT_FACING)
                 if whatMode[5] == NOT_LEVELING
@@ -59,13 +76,13 @@ init
                     udg_Sky_Gem_Ability = hero[c]
                     udg_Sky_Gem_Visibilidad = createVision(playerSelector, udg_Sky_Gem_Ability.getPos(), 1800, true)..start()*/
                 if whatMode[5] == LEVELING
-                    if (temp == L_CACIQUE or temp == L_MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
+                    if (typ == CACIQUE or typ == MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
                         hero[c].addAbility('A06B')
                         DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
                         if localPlayer == playerSelector
                             bj_questHintSound.play()
                 else
-                    if (temp == N_CACIQUE or temp == N_MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
+                    if (typ == CACIQUE or typ == MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
                         hero[c].removeAbility('A00F')
                         hero[c].addAbility('A022')
                         DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")

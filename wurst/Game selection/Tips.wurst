@@ -1,12 +1,34 @@
 package Tips
 
-public trigger tipDisplayer = CreateTrigger()..disable()
-public string array tips
+import ModeSelection
+
 public force whoWannaHelp = CreateForce()
 
+let tipDisplayer = CreateTrigger()..disable()
 int actTip = 0
+string array tips
 
 init
+    onModesSelected(() -> begin
+        switch whatMode[2]
+            case YES_CREEPS | ONLY_DE_AND_DR
+                tips[3] = "Watch for the missions (push is useless)."
+            case ONLY_NEUTRAL | NO_CREEPS
+                tips[3] = "Watch for the missions."
+            default
+
+        switch whatMode[5]
+            case LEVELING
+                tips[1] = "There are defensive towers, the demolisher is good for destroy them."
+                tips[2] = "You can heal your heros in the base."
+            case NOT_LEVELING
+                tips[1] = "There are special heros for destroy towers."
+                tips[2] = "If you are low of health, you can use -repick to have all life and mana."
+            default
+
+        tipDisplayer.enable()
+    end)
+        
     for i = 1 to PLAYER_NEUTRAL_AGGRESSIVE
         if players[i].isIngame()
             whoWannaHelp.add(players[i])

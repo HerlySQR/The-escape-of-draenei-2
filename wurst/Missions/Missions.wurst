@@ -35,6 +35,8 @@ init
     seeDeSpawn[2] = createVision(DEMON, Rects.items3, true)..start()
     seeDeSpawn[3] = createVision(DEMON, Rects.items5, true)..start()
 
+    onModesSelected(() -> startMission1())
+
 // Mission 1
 
 public function startMission1()

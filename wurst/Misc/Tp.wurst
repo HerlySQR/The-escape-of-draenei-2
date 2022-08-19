@@ -57,14 +57,15 @@ Tp back2
 Tp back3
 Tp back4
 
-public function changeTexts()
-    dungeon.textTag.setColor(0, 255, 230, 255)
+init
+    onModesSelected(() -> begin
+        dungeon.textTag.setColor(0, 255, 230, 255)
 
-    doAfter(100, () -> begin
-        dungeon.textTag.setColor(255, 255, 255, 255)
+        doAfter(100, () -> begin
+            dungeon.textTag.setColor(255, 255, 255, 255)
+        end)
     end)
 
-init
     dungeon = new Tp(GUnits.tpEntranceToDungeon, Rects.dungeonReceiver.getCenter(), "Dungeon",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",

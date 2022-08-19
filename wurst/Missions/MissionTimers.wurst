@@ -15,7 +15,6 @@ timerdialog windowActMission = CreateTimerDialog(actMission)
 init
     nullTimer(() -> begin
         windowActMission.setTitle("The demons will win in:")
-        GetTriggeringTrigger().destr()
     end)
 
 public function startSingleTimer()
