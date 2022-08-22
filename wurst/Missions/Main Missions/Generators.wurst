@@ -4,6 +4,10 @@ import Functions
 import initlater Missions
 import PlayerData
 import Towers
+import DrAndDeSpawn
+
+import ObjectIdGenerator
+import UnitObjEditing
 
 public unit generator1 = GUnits.generator1
 public unit generator2 = GUnits.generator2
@@ -15,11 +19,13 @@ public boolean generatorsDestroyed = false
 public int generatorsLeft
 public trigger destroyGenerators = CreateTrigger()
 
+let GENERATOR = compiletime(UNIT_ID_GEN.next())
+
 function defineGenerators()
     if generator1 == null
-        generator1 = createUnit(DEMON, 'npgr', generatorPos1, UNIT_FACING)
+        generator1 = createUnit(DEMON, GENERATOR, generatorPos1, UNIT_FACING)
     if generator2 == null
-        generator2 = createUnit(DEMON, 'npgr', generatorPos2, UNIT_FACING)
+        generator2 = createUnit(DEMON, GENERATOR, generatorPos2, UNIT_FACING)
     generator1.setInvulnerable(true)
     generator2.setInvulnerable(true)
     generatorsLeft = 2
@@ -28,9 +34,7 @@ init
     defineGenerators()
     destroyGenerators
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
-        ..addCondition(Condition(() -> begin
-            return GetDyingUnit().getTypeId() == 'npgr'
-        end))
+        ..addCondition(Condition(() -> GetDyingUnit().getTypeId() == GENERATOR))
         .addAction(() -> begin
             generatorsLeft--
             if GetDyingUnit() == generator1
@@ -48,7 +52,7 @@ init
                     stopActTimer()
                 defensiveTowers3()
                 forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                    if u.getTypeId() == 'n00J'
+                    if u.getTypeId() == ADVANCE_DEATH_TOWER
                         u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     // TODO: wall generator
                     ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall1)
@@ -63,3 +67,8 @@ init
                 startMission5()
         end)
 
+@compiletime function gen()
+    new UnitDefinition(GENERATOR, 'npgr')
+        ..setHitPointsMaximumBase(1000)
+        ..setHitPointsRegenerationType("always")
+        ..setHitPointsRegenerationRate(1.)

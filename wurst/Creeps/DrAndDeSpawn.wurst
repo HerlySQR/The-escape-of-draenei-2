@@ -3,6 +3,9 @@ package DrAndDeSpawn
 import UnitIndexer
 import Orders
 import DamageEvent
+import ObjectIdGenerator
+import AbilityObjEditing
+import ObjectIds
 
 import Functions
 import Reset
@@ -17,6 +20,11 @@ public constant int array DRAENEI_MAGE = [0, 0, 'n00B', 'n003']
 
 public constant int array CHAOS_GRUNT = [0, 'n00D', 'n00F', 'n00S']
 public constant int array CHAOS_WARLOCK = [0, 0, 'n017', 'n00R']
+
+public constant ADVANCE_DEATH_TOWER = compiletime(UNIT_ID_GEN.next())
+public constant DEATH_TOWER_1 = compiletime(UNIT_ID_GEN.next())
+public constant DEATH_TOWER_2 = compiletime(UNIT_ID_GEN.next())
+public constant DEATH_TOWER_3 = compiletime(UNIT_ID_GEN.next())
 
 public constant attackPoint1 = Rects.attackPoint1.getCenter()
 public constant attackPoint2 = Rects.attackPoint2.getCenter()
@@ -82,6 +90,16 @@ function createDe(int id, vec2 pos, vec2 t)
     attackers.add(c)
 
 init
+    // Create the towers
+    for i = 0 to 8
+        createUnit(DEMON, ADVANCE_DEATH_TOWER, Rects.advanceDeathTower[i].getCenter(), UNIT_FACING)
+    for i = 0 to 8
+        createUnit(DEMON, DEATH_TOWER_1, Rects.deathTower1[i].getCenter(), UNIT_FACING)
+    for i = 0 to 11
+        createUnit(DEMON, DEATH_TOWER_2, Rects.deathTower2[i].getCenter(), UNIT_FACING)
+    for i = 0 to 13
+        createUnit(DEMON, DEATH_TOWER_3, Rects.deathTower3[i].getCenter(), UNIT_FACING)
+
     onReset(false, () -> begin
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             let id = u.getTypeId()
@@ -162,3 +180,47 @@ init
                     attackers.add(u)
             end)
         end)
+
+let sentinel = compiletime(new AbilityDefinitionDetectMagicSentinel(ABIL_ID_GEN.next())
+    ..setCastRange(1, 600.)
+    ..setRequirements(""))
+
+function BuildingDefinition.towerGeneral()
+    this
+        ..setDefenseBase(1)
+        ..setSightRadiusDay(1500)
+        ..setSightRadiusNight(1500)
+        ..setGroundTexture("OSMA")
+        ..setNormalAbilities(sentinel.getNewId().toRawCode())
+        ..setName("Death Tower")
+
+@compiletime function gen()
+    new BuildingDefinition(ADVANCE_DEATH_TOWER, 'ntx2')
+        ..setAcquisitionRange(700.)
+        ..setAttack1Range(700)
+        ..setAttack1DamageBase(250)
+        ..setAttack1CooldownTime(0.2)
+        ..setSightRadiusNight(1800)
+        ..setGroundTexture("OSMA")
+        ..setNormalAbilities(commaList(AbilityIds.invulnerable, sentinel.getNewId()))
+    
+    new BuildingDefinition(DEATH_TOWER_1, 'ntt1')
+        ..towerGeneral()
+        ..setAttack1DamageBase(38)
+        ..setAttack1CooldownTime(1.1)
+        ..setHitPointsMaximumBase(450)
+        ..setNameEditorSuffix("(Level 1)")
+    
+    new BuildingDefinition(DEATH_TOWER_2, 'ntt1')
+        ..towerGeneral()
+        ..setAttack1DamageBase(42)
+        ..setAttack1CooldownTime(1.05)
+        ..setHitPointsMaximumBase(500)
+        ..setNameEditorSuffix("(Level 2)")
+    
+    new BuildingDefinition(DEATH_TOWER_3, 'ntt1')
+        ..towerGeneral()
+        ..setAttack1DamageBase(46)
+        ..setAttack1CooldownTime(1.)
+        ..setHitPointsMaximumBase(550)
+        ..setNameEditorSuffix("(Level 3)")

@@ -294,6 +294,18 @@ public class Rects
     static constant secretMerchant = gg_rct_Secret_Merchant
     static constant bookStore = [gg_rct_BookStore0, gg_rct_BookStore1, gg_rct_BookStore2]
 
+    // Towers
+    static constant advanceDeathTower = [gg_rct_AdvanceDeathTower0, gg_rct_AdvanceDeathTower1, gg_rct_AdvanceDeathTower2, gg_rct_AdvanceDeathTower3, gg_rct_AdvanceDeathTower4,
+                                         gg_rct_AdvanceDeathTower5, gg_rct_AdvanceDeathTower6, gg_rct_AdvanceDeathTower7, gg_rct_AdvanceDeathTower8]
+    static constant deathTower1 = [gg_rct_DeathTower100, gg_rct_DeathTower101, gg_rct_DeathTower102, gg_rct_DeathTower103, gg_rct_DeathTower104,
+                                   gg_rct_DeathTower105, gg_rct_DeathTower106]
+    static constant deathTower2 = [gg_rct_DeathTower200, gg_rct_DeathTower201, gg_rct_DeathTower202, gg_rct_DeathTower203, gg_rct_DeathTower204,
+                                   gg_rct_DeathTower205, gg_rct_DeathTower206, gg_rct_DeathTower207, gg_rct_DeathTower208, gg_rct_DeathTower209,
+                                   gg_rct_DeathTower210, gg_rct_DeathTower211]
+    static constant deathTower3 = [gg_rct_DeathTower300, gg_rct_DeathTower301, gg_rct_DeathTower302, gg_rct_DeathTower303, gg_rct_DeathTower304,
+                                   gg_rct_DeathTower305, gg_rct_DeathTower306, gg_rct_DeathTower307, gg_rct_DeathTower308, gg_rct_DeathTower309,
+                                   gg_rct_DeathTower310, gg_rct_DeathTower311, gg_rct_DeathTower312, gg_rct_DeathTower313]
+
 /** The generated cameras. */
 public class Cams
 

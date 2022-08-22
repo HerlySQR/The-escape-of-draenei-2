@@ -92,7 +92,7 @@ init
         createUnit(owners[i], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])
     
     for i = 0 to 3
-        createUnit(owners[2], BOOK_STORE, Rects.bookStore[i].getCenter(), UNIT_FACING)
+        createUnit(players[PLAYER_NEUTRAL_PASSIVE], BOOK_STORE, Rects.bookStore[i].getCenter(), UNIT_FACING)
     
     CreateTrigger()
         ..registerDeathEvent(Dests.secretMerchantLever[0])

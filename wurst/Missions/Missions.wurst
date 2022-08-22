@@ -16,6 +16,7 @@ import MyBoard
 import public initlater ModeSelection
 import DrAndDeSpawn
 import NeutralSpawn
+import Towers
 import Surrender
 import public GeneratedValues
 
@@ -103,7 +104,7 @@ public function startMission3()
         // Move all the Draenei units
         forUnitsOfPlayer(DRAENEI, u -> begin
             vec2 target
-            if u.getTypeId() == 'ndrl'
+            if u.getTypeId() == DRAENEI_WORKER
                 target = Rects.justHidePls.getCenter()
             else
                 target = Rects.attackPoint4.getCenter()
@@ -158,7 +159,7 @@ public function startMission5()
     // Order all draenei attack the demons
     let pos = Rects.demonSpawn31.getCenter()
     forUnitsOfPlayer(DRAENEI, u -> begin
-        if not u.isType(UNIT_TYPE_HERO) and not u.getTypeId() == 'ndrl'
+        if not u.isType(UNIT_TYPE_HERO) and not u.getTypeId() == DRAENEI_WORKER
             u.issuePointOrderById(Orders.attack, pos)
     end)
     doAfter(5.) -> 

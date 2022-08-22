@@ -4,6 +4,7 @@ import Functions
 import HeroSelection
 import PlayerData
 import Surrender
+import Towers
 import GeneratedValues
 import Reset
 
@@ -27,7 +28,7 @@ public function draeneiCinematic()
     for i = 1 to 10
         hero[i].revive(actDrSpawn.getCenter(), false)
     for i = 1 to 8
-        createUnit(DRAENEI, 'ndrl', Rects.whereTheWorkersWere.randomPoint(), UNIT_FACING)
+        createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), UNIT_FACING)
     for i = 1 to 5
         hero[i].setPos(Rects.whereTheDraeneiAppear2.getCenter())
     if not theySurrender
@@ -47,7 +48,7 @@ public function draeneiCinematic()
             ..add(() -> begin
                     toLeave.enable()
                     toNotSeeThem.enable()
-                    createNUnits(DRAENEI, 4, 'ndrl', Rects.whereTheDraeneiAppear1.getCenter(), UNIT_FACING)
+                    createNUnits(DRAENEI, 4, DRAENEI_WORKER, Rects.whereTheDraeneiAppear1.getCenter(), UNIT_FACING)
                     createNUnits(DRAENEI, 3, 'ndrt', Rects.whereTheDraeneiAppear2.getCenter(), UNIT_FACING)
                     forUnitsInRect(Rects.whereTheDraeneiAppear1, u -> u.issuePointOrderById(Orders.move, Rects.exitPoint.getCenter()))
                     forUnitsInRect(Rects.whereTheDraeneiAppear2, u -> u.issuePointOrderById(Orders.attack, Rects.exitPoint.getCenter()))
@@ -123,7 +124,7 @@ public function demonsCinematic()
     for i = 1 to 10
         hero[i].revive(actDrSpawn.getCenter(), false)
     for i = 1 to 8
-        createUnit(DRAENEI, 'ndrl', Rects.whereTheWorkersWere.randomPoint(), UNIT_FACING)
+        createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), UNIT_FACING)
     createUnit(DEMON, 'nbal', Rects.guard1.getCenter(), UNIT_FACING).issuePointOrderById(Orders.patrol, Rects.guard2.getCenter())
     createUnit(DEMON, 'nbal', Rects.guard3.getCenter(), UNIT_FACING)
     createUnit(DEMON, 'nbal', Rects.guard4.getCenter(), UNIT_FACING)
@@ -143,7 +144,7 @@ public function demonsCinematic()
         () -> begin
             // TODO: First person
             forUnitsInRect(Rects.dungeon, u -> begin
-                if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getTypeId() == 'ndrl' or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
+                if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getTypeId() == DRAENEI_WORKER or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
                     u.remove()
             end)
             ResetToGameCamera(0.)

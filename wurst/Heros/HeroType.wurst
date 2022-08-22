@@ -34,7 +34,7 @@ public constant DARK_WIZARD = compiletime(new HeroType('Emns'))
 public constant AXEMASTER = compiletime(new HeroType('Opgh'))
 public constant LAVA_ELEMENTAL = compiletime(new HeroType('Nfir'))
 
-HashMap<int, HeroType> heroTypes
+let heroTypes = compiletime(new HashMap<int, HeroType>())
 
 function HeroDefinition.defaultStats()
     this
@@ -59,8 +59,8 @@ public class HeroType
 
     construct(int origId)
         MAX++
-        heroL = new HeroDefinition(UNIT_ID_GEN.next(), origId)..defaultStats()
-        heroNL = new HeroDefinition(UNIT_ID_GEN.next(), origId)..defaultStats()
+        heroL = new HeroDefinition(HERO_ID_GEN.next(), origId)..defaultStats()
+        heroNL = new HeroDefinition(HERO_ID_GEN.next(), origId)..defaultStats()
 
         heroTypes.put(heroL.getNewId(), this)
         heroTypes.put(heroNL.getNewId(), this)

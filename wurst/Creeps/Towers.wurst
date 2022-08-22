@@ -6,24 +6,36 @@ import ClosureTimers
 import ClosureForGroups
 import PlayerData
 import Orders
-import Barrels
 import DamageEvent
 import GeneratedValues
 
 import LinkedList
 import OnUnitEnterLeave
+import ObjectIdGenerator
+import UnitObjEditing
+import ObjectIds
+import Assets
+import Fx
 
 // Functions and values to use
+
+public constant DRAENEI_WORKER = compiletime(UNIT_ID_GEN.next())
+public constant DEMON_ACOLYTE = compiletime(UNIT_ID_GEN.next())
+public constant DRAENEI_TOWER = compiletime(UNIT_ID_GEN.next())
+public constant DEMON_TOWER = compiletime(UNIT_ID_GEN.next())
+
+let DEMON_TOWER_DUMMY_ZIGURAT = compiletime(UNIT_ID_GEN.next())
+let DEMON_TOWER_DUMMY_MODEL = compiletime(UNIT_ID_GEN.next())
 
 public rect returnPoint = Rects.whereTheWorkersWere
 
 let towerCond = Condition(() -> begin
     let id = GetDyingUnit().getTypeId()
-    return id == 'o00H' or id == 'o00I' or id == 'u00K'
+    return id == DRAENEI_TOWER or id == DEMON_TOWER or id == DEMON_TOWER_DUMMY_ZIGURAT
 end)
 
 function filt() returns boolean
-    if GetFilterUnit().getTypeId() != 'ndrl'
+    if GetFilterUnit().getTypeId() != DRAENEI_WORKER
         return false
     else if GetFilterUnit().getCurrentOrder() == Orders.smart or GetFilterUnit().getCurrentOrder() == 0
         return true
@@ -32,7 +44,7 @@ function filt() returns boolean
 let builderCond = Filter(function filt)
 
 function filt2() returns boolean
-    if GetFilterUnit().getTypeId() != 'u00J'
+    if GetFilterUnit().getTypeId() != DEMON_ACOLYTE
         return false
     else if GetFilterUnit().getCurrentOrder() == Orders.smart or GetFilterUnit().getCurrentOrder() == 0
         return true
@@ -73,32 +85,32 @@ let towerDraeneiPos = [
 public function defensiveTowers1()
     let builders = CreateGroup()
     GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[1])
-    new BuildingInstance(towerDraeneiPos[1], 'o00H')
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[2])
-    new BuildingInstance(towerDraeneiPos[2], 'o00H')
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[1])
+    new BuildingInstance(towerDraeneiPos[1], DRAENEI_TOWER)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[2])
+    new BuildingInstance(towerDraeneiPos[2], DRAENEI_TOWER)
     builders.destr()
 
 public function defensiveTowers2()
     let builders = CreateGroup()
     GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[3])
-    new BuildingInstance(towerDraeneiPos[3], 'o00H')
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[4])
-    new BuildingInstance(towerDraeneiPos[4], 'o00H')
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[3])
+    new BuildingInstance(towerDraeneiPos[3], DRAENEI_TOWER)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[4])
+    new BuildingInstance(towerDraeneiPos[4], DRAENEI_TOWER)
     builders.destr()
 
 public function defensiveTowers3()
     let builders = CreateGroup()
     GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[5])
-    new BuildingInstance(towerDraeneiPos[5], 'o00H')
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[6])
-    new BuildingInstance(towerDraeneiPos[6], 'o00H')
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[7])
-    new BuildingInstance(towerDraeneiPos[7], 'o00H')
-    builders.next().issueBuildOrder('o00H', towerDraeneiPos[8])
-    new BuildingInstance(towerDraeneiPos[8], 'o00H')
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[5])
+    new BuildingInstance(towerDraeneiPos[5], DRAENEI_TOWER)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[6])
+    new BuildingInstance(towerDraeneiPos[6], DRAENEI_TOWER)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[7])
+    new BuildingInstance(towerDraeneiPos[7], DRAENEI_TOWER)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[8])
+    new BuildingInstance(towerDraeneiPos[8], DRAENEI_TOWER)
     builders.destr()
 
 // Check everytime a tower is correctly builded in less of a 60 seconds
@@ -116,7 +128,7 @@ class BuildingInstance
         count--
         if count == 0 and not haveTower
             unit newBuilder
-            if tower == 'o00H'
+            if tower == DRAENEI_TOWER
                 GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
                 for u in g
                     if not returnPoint.contains(u.getPos())
@@ -125,10 +137,10 @@ class BuildingInstance
                 newBuilder = g.next()
                 g.clear()
             else
-                GroupEnumUnitsOfPlayer(g, DRAENEI, acolyteCond)
+                GroupEnumUnitsOfPlayer(g, DEMON, acolyteCond)
                 for u in g
                     u.remove()
-                newBuilder = createUnit(DEMON, 'u00J', acolyteSpawnPos(point), UNIT_FACING)
+                newBuilder = createUnit(DEMON, DEMON_ACOLYTE, acolyteSpawnPos(point), UNIT_FACING)
                 g.clear()
             newBuilder.issueBuildOrder(tower, point)
             count = 60
@@ -164,7 +176,7 @@ class BuildingInstance
 
 function disableTower()
     let u = getEnterLeaveUnit()
-    if u.getTypeId() != 'o00I'
+    if u.getTypeId() != DEMON_TOWER
         return
     let p = u.getPos()
     /* TODO: Init the destructables
@@ -186,15 +198,15 @@ init
         ..addAction(() -> begin
             let u = GetTriggerUnit()
             let p = u.getPos()
-            if u.getTypeId() == 'o00H'
+            if u.getTypeId() == DRAENEI_TOWER
                 GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
-                g.next().issueBuildOrder('o00H', p)
+                g.next().issueBuildOrder(DRAENEI_TOWER, p)
                 g.clear()
-                new BuildingInstance(p, 'o00H')
+                new BuildingInstance(p, DRAENEI_TOWER)
             else
                 doAfter(3.) ->
-                    createUnit(DEMON, 'u00J', acolyteSpawnPos(p), UNIT_FACING).issueBuildOrder('u00K', p)
-                    new BuildingInstance(p, 'u00K')
+                    createUnit(DEMON, DEMON_ACOLYTE, acolyteSpawnPos(p), UNIT_FACING).issueBuildOrder(DEMON_TOWER_DUMMY_ZIGURAT, p)
+                    new BuildingInstance(p, DEMON_TOWER_DUMMY_ZIGURAT)
         end)
     // Tower been constructed
     CreateTrigger()
@@ -204,47 +216,44 @@ init
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_FINISH)
         ..addCondition(Condition(() -> begin
-            return GetConstructedStructure().getTypeId() == 'o00H'
+            return GetConstructedStructure().getTypeId() == DRAENEI_TOWER
         end))
         ..addAction(() -> begin
             let p = GetTriggerUnit().getPos()
             doAfter(0.2) -> 
                 forUnitsInRange(p, 200., u -> begin
-                    if u.getTypeId() == 'ndrl' and u.getCurrentOrder() == 0
+                    if u.getTypeId() == DRAENEI_WORKER and u.getCurrentOrder() == 0
                         u.issuePointOrderById(Orders.smart, returnPoint.randomPoint())
                 end)
         end)
     // Return acolyte
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_START)
-        ..addCondition(Condition(() -> begin
-            return GetConstructingStructure().getTypeId() == 'u00K'
-        end))
+        ..addCondition(Condition(() -> GetConstructingStructure().getTypeId() == DEMON_TOWER_DUMMY_ZIGURAT))
         ..addAction(() -> begin
             let u = GetConstructingStructure()
             let p = u.getPos()
             forUnitsInRange(p, 200., u -> begin
-                if u.getTypeId() == 'u00J'
+                if u.getTypeId() == DEMON_ACOLYTE
                     u.issuePointOrderById(Orders.smart, acolyteSpawnPos(p))
                     endItsJob.add(u)
             end)
             doAfter(3.5) -> 
-                let a = createUnit(DEMON, 'u00L', p, UNIT_FACING)
+                let a = new Fx(p, UNIT_FACING, Buildings.towerDefenseTower)
+                a.getDummy().setAnimation("fifth")
                 u.setVertexColor(0, 255, 255, 127)
                 doAfter(0.6) -> 
                     let r = 680. - u.getLife()
                     u.remove()
-                    a.remove()
-                    createUnit(DEMON, 'o00I', p, UNIT_FACING)..addHP(-r)
+                    a.hiddenDestroy()
+                    createUnit(DEMON, DEMON_TOWER, p, UNIT_FACING)..addHP(-r)
         end)
     // Remove acolyte
     CreateTrigger()
         ..registerUnitInRange(GUnits.barrack1, 200., null)
         ..registerUnitInRange(GUnits.barrack2, 200., null)
         ..registerUnitInRange(GUnits.barrack3, 200., null)
-        ..addCondition(Condition(() -> begin
-            return endItsJob.has(GetTriggerUnit())
-        end))
+        ..addCondition(Condition(() -> endItsJob.has(GetTriggerUnit())))
         ..addAction(() -> begin
             let u = GetTriggerUnit()
             endItsJob.remove(u)
@@ -253,6 +262,75 @@ init
     // Don't touch the builders
     DamageEvent.addUnreducedListener(() -> begin
         let id = DamageEvent.getTarget().getTypeId()
-        if id == 'ndrl' or id == 'u00J'
+        if id == DRAENEI_WORKER or id == DEMON_ACOLYTE
             DamageEvent.setAmount(0.)
     end)
+
+@compiletime function gen()
+    new UnitDefinition(DRAENEI_WORKER, 'ndrl')
+        ..setAttacksEnabled(0)
+        ..setFoodCost(0)
+        ..setRace(Race.Orc)
+        ..setNormalAbilities(AbilityIds.magicImmunityCreep.toRawCode())
+        ..setStructuresBuilt(DRAENEI_TOWER.toRawCode())
+
+    new UnitDefinition(DEMON_ACOLYTE, 'uaco')
+        ..setAttacksEnabled(0)
+        ..setFoodCost(0)
+        ..setRace(Race.Undead)
+        ..setNormalAbilities(AbilityIds.magicImmunityCreep.toRawCode())
+        ..setStructuresBuilt(DEMON_TOWER_DUMMY_ZIGURAT.toRawCode())
+    
+    new BuildingDefinition(DRAENEI_TOWER, 'owtw')
+        ..setAttack1Range(700)
+        ..setAttack1DamageBase(70)
+        ..setAttack1CooldownTime(1.)
+        ..setDefenseBase(15)
+        ..setGoldCost(0)
+        ..setLumberCost(0)
+        ..setHitPointsMaximumBase(1000)
+        ..setBuildTime(4)
+        ..setHitPointsRegenerationType("always")
+        ..setHitPointsRegenerationRate(2.)
+        ..setScalingValue(1.2)
+        ..setRequirements("")
+        ..setPlacementRequires("")
+        ..setName("Defense Tower")
+        ..setNameEditorSuffix("(Draenei)")
+    
+    new BuildingDefinition(DEMON_TOWER, 'owtw')
+        ..setAttack1Range(700)
+        ..setAttack1DamageBase(70)
+        ..setAttack1ProjectileArt(Abilities.vengeanceMissile)
+        ..setAttack1CooldownTime(1.)
+        ..setDefenseBase(15)
+        ..setGoldCost(0)
+        ..setLumberCost(0)
+        ..setHitPointsMaximumBase(1000)
+        ..setRace(Race.Undead)
+        ..setBuildTime(4)
+        ..setHitPointsRegenerationType("always")
+        ..setHitPointsRegenerationRate(2.)
+        ..setModelFile(Buildings.towerDefenseTower)
+        ..setIconGameInterface(Icons.bTNDeathTower)
+        ..setRequiredAnimationNames("fifth")
+        ..setScalingValue(1.2)
+        ..setRequirements("")
+        ..setPlacementRequires("")
+        ..setName("Defense Tower")
+        ..setNameEditorSuffix("(Demons)")
+    
+    new BuildingDefinition(DEMON_TOWER_DUMMY_ZIGURAT, 'uzig')
+        ..setDefenseBase(15)
+        ..setGoldCost(0)
+        ..setLumberCost(0)
+        ..setHitPointsMaximumBase(1000)
+        ..setBuildTime(6)
+        ..setNormalAbilities("")
+        ..setUpgradesTo("")
+        ..setPlacementPreventedBy("")
+        ..setPlacementRequires("")
+        ..setPathingMap("PathTextures\\4x4SimpleSolid.tga")
+        ..setCollisionSize(72.)
+        ..setName("Defense Tower")
+        ..setNameEditorSuffix("(Dummy)")

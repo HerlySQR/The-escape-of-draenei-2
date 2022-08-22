@@ -39,7 +39,7 @@ public Mode array whatMode
 public interface ModeSelectionCallback
     function run()
 
-LinkedList<ModeSelectionCallback> callbacks
+let callbacks = new LinkedList<ModeSelectionCallback>()
 
 public function onModesSelected(ModeSelectionCallback cb)
     callbacks.add(cb)
