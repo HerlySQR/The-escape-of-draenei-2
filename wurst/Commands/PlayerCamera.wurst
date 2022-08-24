@@ -2,15 +2,17 @@ package PlayerCamera
 
 import Functions
 import Circles
+import ChatEnter
 
 import Orders
 
 real array distanceToTarget
 
-public function defaultCamera(player p)
-    distanceToTarget[p.getId()] = 1650.
-
 init
+    onChatCommand("defcam", (p, _) -> begin
+        distanceToTarget[p.getId()] = 1650.
+    end)
+
     for i = 0 to bj_MAX_PLAYER_SLOTS
         distanceToTarget[i] = 1650.
     // Keeping the camera

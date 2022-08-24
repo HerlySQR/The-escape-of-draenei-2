@@ -2,8 +2,11 @@ package GiveGoldLumber
 
 import Functions
 import PlayerData
+import ChatEnter
 
-public function give(player p, string whatType, string chat)
+player array yesGive
+
+function give(player p, string whatType, string chat)
     let quantity = (chat.subString(4, 11).toReal() * 1.5).toInt()
     let state = whatType == "gg" ? PLAYER_STATE_RESOURCE_GOLD : PLAYER_STATE_RESOURCE_LUMBER
     let giveTo = yesGive[p.getId()]
@@ -25,9 +28,10 @@ public function give(player p, string whatType, string chat)
         DisplayTextToPlayer(p, 0., 0., "You give " + col + quantity.toString() + " of "+ text +"|r to " + giveTo.getName() + ".")
         DisplayTextToPlayer(giveTo, 0., 0., p.getName() + " give you "+ col + quantity.toString() + " of " + text + "|r.")
 
-player array yesGive
-
 init
+    onChatCommand("gg", (p, extra) -> give(p, "gg", extra))
+    onChatCommand("gl", (p, extra) -> give(p, "gl", extra))
+
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_SELECTED)
         ..addAction(() -> begin

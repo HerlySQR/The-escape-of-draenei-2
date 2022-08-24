@@ -6,6 +6,7 @@ import MyBoard
 import Reset
 import GeneratedValues
 import Barrels
+import ChatEnter
 
 import Icons
 import DamageEvent
@@ -60,8 +61,9 @@ public function repick(player p)
             canPick.add(p)
             repick.remove()
 
-// No during combat
 init
+    onChatCommand("repick", (p, _) -> repick(p))
+
     onModesSelected(() -> begin
         if whatMode[5] == LEVELING
             doAfter(20, () -> begin
@@ -83,6 +85,8 @@ init
         if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
             inCombat[DamageEvent.getTarget().getOwner().getNumber()] = 3
     end)
+
+    // No during combat
     reduce
         ..registerTimerEvent(1, true)
         .addAction(() -> begin

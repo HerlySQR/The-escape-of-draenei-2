@@ -1,17 +1,21 @@
 package AFK
 
 import MyBoard
+import ChatEnter
 
 public force whoAreHere = CreateForce()
 
 public function showAFK(player p)
-    for i = 1 to 10
-        if afkTime[i] >= 30
-            printTimedToPlayer(playerName[i] + " is " + afkTime[i].toString() + " seconds afk.", 10., p)
 
-public int array afkTime
+int array afkTime
 
 init
+    onChatCommand("afk", (p, _) -> begin
+        for i = 1 to 10
+            if afkTime[i] >= 30
+                printTimedToPlayer(playerName[i] + " is " + afkTime[i].toString() + " seconds afk.", 10., p)
+    end)
+        
     // To see you are here
     let t = CreateTrigger()
     for i = 1 to 11

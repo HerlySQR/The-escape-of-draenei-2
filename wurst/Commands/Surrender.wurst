@@ -1,5 +1,9 @@
 package Surrender
 
+import ChatEnter
+
 public boolean theySurrender = false
 
-public function surrender(player p)
+init
+    onChatCommand("surrender", (p, _) -> begin
+    end)

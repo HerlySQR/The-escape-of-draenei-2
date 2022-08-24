@@ -3,41 +3,46 @@ package Switch
 import AFK
 import Repick
 import MyBoard
+import ChatEnter
 import GeneratedValues
 
 import Dialog
 import ClosureForGroups
 import ClosureTimers
 
-boolean youCantNow = false
-player whoWantSwitch
-timer endSwitch = CreateTimer()
-dialog switchWindow = createDialog()
-button array switchButton
-force whoVoted = CreateForce()
-int howManyVoted = 1
-boolean switchSuccesful
-boolean okEnabled = false
+let endSwitch = CreateTimer()
+let switchWindow = createDialog()
+let whoVoted = CreateForce()
 
-public function switchPlayer(player p)
-    if not whoAreHere.has(p)
-        DisplayTextToPlayer(p, 0., 0., "Please select a unit if you wanna switch (it's to know you're here).")
-    else if youCantNow
-        DisplayTextToPlayer(p, 0., 0., "Someone is doing switch, you have to wait.")
-    else
-        print("Someone wanna switch (Only has 60 seconds).")
-        youCantNow = true
-        switchWindow.setMessage("What player do you want to change with?")
-        if THE_DEMONS.has(p)
-            for i = 1 to 5
-                switchButton[i] = switchWindow.addButton(playerName[i])
+var youCantNow = false
+var howManyVoted = 1
+var okEnabled = false
+
+button array switchButton
+player whoWantSwitch
+boolean switchSuccesful
+
+init
+    onChatCommand("switch", (p, _) -> begin
+        if not whoAreHere.has(p)
+            DisplayTextToPlayer(p, 0., 0., "Please select a unit if you wanna switch (it's to know you're here).")
+        else if youCantNow
+            DisplayTextToPlayer(p, 0., 0., "Someone is doing switch, you have to wait.")
         else
-            for i = 6 to 10
-                switchButton[i] = switchWindow.addButton(playerName[i])
-        switchWindow.display(p, true)
-        whoWantSwitch = p
-        switchSuccesful = false
-        endSwitch.start(60., function youCantVote)
+            print("Someone wanna switch (Only has 60 seconds).")
+            youCantNow = true
+            switchWindow.setMessage("What player do you want to change with?")
+            if THE_DEMONS.has(p)
+                for i = 1 to 5
+                    switchButton[i] = switchWindow.addButton(playerName[i])
+            else
+                for i = 6 to 10
+                    switchButton[i] = switchWindow.addButton(playerName[i])
+            switchWindow.display(p, true)
+            whoWantSwitch = p
+            switchSuccesful = false
+            endSwitch.start(60., function youCantVote)
+    end)
 
 function youCantVote()
     howManyVoted = 1
@@ -48,21 +53,22 @@ function youCantVote()
     switchWindow.clear()
     youCantNow = false
 
-public function ok(player p)
-    if okEnabled
-        if whoVoted.has(p)
-            return
-        howManyVoted++
-        if howManyVoted < whoAreHere.count()
-            print(p.getName() + " typed ok (" + howManyVoted.toString() + "/" + whoAreHere.count().toString() + ")")
-            whoVoted.add(p)
-        else
-            changePlayers()
-            whoVoted.clear()
-            print("The switch has been succesful.")
-            switchSuccesful = true
-            endSwitch.pause()
-            youCantVote()
+init
+    onChatCommand("ok", (p, _) -> begin
+        if okEnabled
+            if not whoVoted.has(p)
+                howManyVoted++
+                if howManyVoted < whoAreHere.count()
+                    print(p.getName() + " typed ok (" + howManyVoted.toString() + "/" + whoAreHere.count().toString() + ")")
+                    whoVoted.add(p)
+                else
+                    changePlayers()
+                    whoVoted.clear()
+                    print("The switch has been succesful.")
+                    switchSuccesful = true
+                    endSwitch.pause()
+                    youCantVote()
+    end)
 
 player swp1
 player swp2

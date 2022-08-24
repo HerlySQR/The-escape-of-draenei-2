@@ -1,3 +1,37 @@
 package JokeSounds
 
-public function jokeSound(string s)
+import ChatEnter
+import Imports
+
+import HashMap
+
+
+init
+    let jokeSounds = new IterableMap<string, sound>()
+
+    jokeSounds
+        ..put("killingspree", CreateSound(Imports.killingSpree, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("dominating", CreateSound(Imports.dominating, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("megakill", CreateSound(Imports.megaKill, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("unstoppable", CreateSound(Imports.unstoppable, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("wickedsick", CreateSound(Imports.whickedSick, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("monsterkill", CreateSound(Imports.monsterKill, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("godlike", CreateSound(Imports.godLike, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("doublekill", CreateSound(Imports.double_Kill, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("triplekill", CreateSound(Imports.tripleKill, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("ultrakill", CreateSound(Imports.ultraKill, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("rampage", CreateSound(Imports.rampage, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("ownage", CreateSound(Imports.ownage, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("noo", CreateSound(Imports.nOO, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("lion", CreateSound(Imports.lion, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("wtf", CreateSound(Imports.wtf, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("wasted", CreateSound(Imports.wasted, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("help", CreateSound(Imports.helpMe, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("miau", CreateSound(Imports.miaaau, false, false, false, 10, 10, "DefaultEAXON"))
+        ..put("doh", CreateSound(Imports.dOH, false, false, false, 10, 10, "DefaultEAXON"))
+
+    jokeSounds.forEach((key, value) -> onChatCommand(key, (p, _) -> value.play()))
+
+    destroy jokeSounds
+        
+    
