@@ -6,6 +6,7 @@ import Assets
 import ObjectIdGenerator
 import UnitObjEditing
 import HashMap
+import LinkedListModule
 import Annotations
 
 // More easy to remember
@@ -50,12 +51,14 @@ function HeroDefinition.defaultStats()
         ..setProperNamesUsed(1)
 
 public class HeroType
-    static int MAX = 0
-    static string array roots
+    use LinkedListModule
 
-    HeroDefinition heroNL
-    HeroDefinition heroL
-    string icon
+    private static int MAX = 0
+
+    private HeroDefinition heroNL
+    private HeroDefinition heroL
+    private string icon
+    private Race r
 
     construct(int origId)
         MAX++
@@ -85,6 +88,9 @@ public class HeroType
         heroL
             ..setIconGameInterface(icon)
             ..setIconScoreScreen(icon)
+    
+    function getIcon() returns string
+        return icon
     
     function setAcquisitionRange(real data)
         heroNL.setAcquisitionRange(data)
@@ -212,9 +218,13 @@ public class HeroType
         heroL.setManaMaximum(0)
     
     function setRace(Race data)
+        r = data
         heroNL.setRace(data)
         heroL.setRace(data)
     
+    function getRace() returns Race
+        return r
+
     function setHitPointsRegenerationRate(real data)
         heroNL.setHitPointsRegenerationRate(data)
         heroL.setHitPointsRegenerationRate(0.25)

@@ -4,12 +4,15 @@ import ClosureTimers
 import ClosureForGroups
 import Camera
 import HashMap
+import Fx
+import Abilities
 
 import GeneratedValues
 import ModeSelection
 import Reset
 import public HeroType
 import initlater MyBoard
+import ArrayList
 
 public rect actDrSpawn
 public rect actDeSpawn
@@ -24,7 +27,7 @@ let herosToPick = CreateGroup()
 
 int array clicks
 boolean array youSelected
-unit array arrow
+Fx array arrow
 
 init
     onModesSelected(() -> begin
@@ -36,39 +39,36 @@ init
         actDeSpawn = Rects.respawn2
 
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-            if u.isType(UNIT_TYPE_HERO) and ((u.getOwner() == DRAENEI and Rects.selectorDraenei.contains(u.getPos())) or (u.getOwner() == DEMON and Rects.selectorDemon.contains(u.getPos())))
+            if u.isType(UNIT_TYPE_HERO)
+                and ((u.getOwner() == DRAENEI and Rects.selectorDraenei.contains(u.getPos()))
+                or (u.getOwner() == DEMON and Rects.selectorDemon.contains(u.getPos())))
                 u.pause()
                 SuspendHeroXP(u, true)
                 u.setInvulnerable(true)
                 herosToPick.add(u)
 
-            let id = u.getTypeId()
+                let id = u.getTypeId()
 
-            if whatMode[5] == LEVELING
-                if id == HeroType.get(id).getL()
-                    heroModel.put(id, u)
-                else if id == HeroType.get(id).getNL()
-                    heroModel.put(id, u.replace(id))
-            else if whatMode[5] == NOT_LEVELING
-                heroModel.get(id).replace(HeroType.get(id).getNL())
+                if whatMode[5] == LEVELING
+                    if id == HeroType.get(id).getL()
+                        heroModel.put(id, u)
+                    else if id == HeroType.get(id).getNL()
+                        heroModel.put(id, u.replace(id))
+                else if whatMode[5] == NOT_LEVELING
+                    heroModel.get(id).replace(HeroType.get(id).getNL())
         end)
     end)
 
-    onReset(false, () -> begin
+    onReset(true, () -> begin
         seeDraenei.stop()
         seeDemons.stop()
-    end)
-
-    forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-        if Rects.selectorDraenei.contains(u.getPos()) or Rects.selectorDemon.contains(u.getPos())
-            u.setInvulnerable(true)
     end)
 
     createVision(DRAENEI, Rects.selectorDraenei, true).start()
     createVision(DEMON, Rects.selectorDemon, true).start()
         
     // If you select
-    trigger t = CreateTrigger()
+    var t = CreateTrigger()
     for i = 1 to 11
         t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_SELECTED, null)
     t..addCondition(Condition(() -> begin
@@ -83,8 +83,7 @@ init
             if clicks[id] == 2
                 let c = playerSelector.getNumber()
                 let temp = heroSelected.getTypeId()
-                let typ = HeroType.get(temp)
-
+                
                 hero[c] = createUnit(playerSelector, temp, heroSelected.getPos(), UNIT_FACING)
                 if whatMode[5] == NOT_LEVELING
                     SuspendHeroXP(hero[c], true)
@@ -93,20 +92,7 @@ init
                     hero[c].addAbility('A02J')
                     udg_Sky_Gem_Ability = hero[c]
                     udg_Sky_Gem_Visibilidad = createVision(playerSelector, udg_Sky_Gem_Ability.getPos(), 1800, true)..start()*/
-                if whatMode[5] == LEVELING
-                    if (typ == CACIQUE or typ == MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
-                        hero[c].addAbility('A06B')
-                        DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
-                        if localPlayer == playerSelector
-                            bj_questHintSound.play()
-                else
-                    if (typ == CACIQUE or typ == MAIDEN_OF_PAIN) and THE_DRAENEI.has(playerSelector) //TODO and not udg_Ya_pueden
-                        hero[c].removeAbility('A00F')
-                        hero[c].addAbility('A022')
-                        DisplayTimedTextToPlayer(playerSelector, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, "To prevent skipping missions,Teleport was changed for Speed Increase.")
-                        if localPlayer == playerSelector
-                            bj_questHintSound.play()
-                table.setItemIcon(1, row[c], HeroType.roots[HeroType.get(hero[c])])
+                table.setItemIcon(1, row[c], HeroType.get(hero[c]).getIcon())
                 /* TODO
                 if udg_Primera_persona
                     udg_Unidad_que_sigo[c] = hero[c]
@@ -130,7 +116,9 @@ init
             
             if not youSelected[id]
                 youSelected[id] = true
-                arrow[id] = createUnit(playerSelector, 'ufro', heroSelected.getPos(), UNIT_FACING)
+                arrow[id] = new Fx(heroSelected.getPos(), UNIT_FACING, Abilities.aneuTarget)
+                    ..setZ(240.)
+                    ..setPlayerColor(playerSelector.getColor())
             
             doAfter(0.95, () -> begin
                 if clicks[id] > 0
@@ -147,7 +135,70 @@ init
         let id = GetTriggerPlayer().getId()
         youSelected[id] = false
         if arrow[id] != null
-            arrow[id].remove()
+            destroy arrow[id]
+            arrow[id] = null
         clicks[id] = 0
     end)
+
+// Distribute the heros
+
+constant MAX_DIST = 1024.
+
+tuple vec2List(ArrayList<real> xVals, ArrayList<real> yVals)
+
+function vec2List.get(int index) returns vec2
+    return vec2(this.xVals.get(index), this.yVals.get(index))
+
+function vec2List.dstr()
+    destroy this.xVals
+    destroy this.yVals
+
+function getLongestRowSize(int max) returns int
+    var result = 1
+    var quantity = max
+    while quantity > 1
+        result++
+        quantity -= 2*(result - 1)
+    return result
+
+function createDistribution(int quantity, real dist, vec2 center) returns vec2List
+    let xVals = new ArrayList<real>()
+    let yVals = new ArrayList<real>()
+
+    let maxSize = (MAX_DIST/dist).toInt() + 1
+    int longestRowSize = min(maxSize, getLongestRowSize(quantity))
+
+    if quantity == 1
+        xVals.add(center.x)
+        yVals.add(center.y)
+
+    return vec2List(xVals, yVals)
+
+init
+    var maxDr = 0
+    var maxDe = 0
+
+    for hero in HeroType
+        if hero.getRace() == Orc
+            maxDr++
+        else if hero.getRace() == Undead
+            maxDe++
     
+    let drPoints = createDistribution(maxDr, 256., vec2(-6400., -8784.))
+    let dePoints = createDistribution(maxDr, 256., vec2(-8448., -8784.))
+
+    var i = 1
+    for hero in HeroType
+        unit u = null
+        if hero.getRace() == Orc
+            u = createUnit(DRAENEI, hero.getL(), drPoints.get(i), UNIT_FACING)
+        else if hero.getRace() == Undead
+            u = createUnit(DEMON, hero.getL(), dePoints.get(i), UNIT_FACING)
+
+        if u != null
+            u.setInvulnerable(true)
+        
+        i++
+    
+    drPoints.dstr()
+    dePoints.dstr()

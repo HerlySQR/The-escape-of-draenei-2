@@ -76,7 +76,7 @@ public function playersOrder()
             if g == null
                 table.setItemIcon(1, r, Icons.bTNSelectHeroOff)
             else
-                table.setItemIcon(1, r, HeroType.roots[g])
+                table.setItemIcon(1, r, g.getIcon())
     
     r = drPlayers + 3
     table.getItem(1, r).setStyle(true, false)

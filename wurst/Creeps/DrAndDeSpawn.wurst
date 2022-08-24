@@ -5,7 +5,9 @@ import Orders
 import DamageEvent
 import ObjectIdGenerator
 import AbilityObjEditing
+import UpgradeObjEditing
 import ObjectIds
+import Abilities
 
 import Functions
 import Reset
@@ -14,12 +16,12 @@ import initlater Missions
 
 public boolean spawnRun = false
 
-public constant group attackers = CreateGroup()
-public constant int array DRAENEI_WARRIOR = [0, 'n002', 'n005', 'n00Q']
-public constant int array DRAENEI_MAGE = [0, 0, 'n00B', 'n003']
+public constant attackers = CreateGroup()
+public constant DRAENEI_WARRIOR = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+public constant DRAENEI_MAGE = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
 
-public constant int array CHAOS_GRUNT = [0, 'n00D', 'n00F', 'n00S']
-public constant int array CHAOS_WARLOCK = [0, 0, 'n017', 'n00R']
+public constant CHAOS_GRUNT = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+public constant CHAOS_WARLOCK = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
 
 public constant ADVANCE_DEATH_TOWER = compiletime(UNIT_ID_GEN.next())
 public constant DEATH_TOWER_1 = compiletime(UNIT_ID_GEN.next())
@@ -40,6 +42,9 @@ public constant deSpw31 = Rects.demonSpawn31.getCenter()
 public constant deSpw32 = Rects.demonSpawn31.getCenter()
 
 public vec2 array target
+
+let DUMMY_DAMAGE_UPGRADES = [compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next())]
+let DUMMY_ARMOR_UPGRADES = [compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next())]
 
 let drUnits = CreateGroup()
 let deUnits = CreateGroup()
@@ -99,14 +104,21 @@ init
         createUnit(DEMON, DEATH_TOWER_2, Rects.deathTower2[i].getCenter(), UNIT_FACING)
     for i = 0 to 13
         createUnit(DEMON, DEATH_TOWER_3, Rects.deathTower3[i].getCenter(), UNIT_FACING)
+    
+    // Set upgrades
+    for i = 0 to 2
+        SetPlayerTechResearched(DRAENEI, DUMMY_DAMAGE_UPGRADES[i], i + 1)
+        SetPlayerTechResearched(DEMON, DUMMY_DAMAGE_UPGRADES[i], i + 1)
+        SetPlayerTechResearched(DRAENEI, DUMMY_ARMOR_UPGRADES[i], i + 1)
+        SetPlayerTechResearched(DEMON, DUMMY_ARMOR_UPGRADES[i], i + 1)
 
     onReset(false, () -> begin
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             let id = u.getTypeId()
-            for i = 1 to 3
+            for i = 0 to 2
                 if id == DRAENEI_WARRIOR[i] or id == CHAOS_GRUNT[i]
                     u.remove()
-            for i = 1 to 2
+            for i = 0 to 1
                 if id == DRAENEI_MAGE[i] or id == CHAOS_WARLOCK[i]
                     u.remove()
         end)
@@ -116,21 +128,21 @@ init
         ..registerTimerEvent(30., true)
         .addAction(() -> begin
             if actMission == 1
-                for i = 1 to 3
+                for i = 0 to 2
                     createDr(DRAENEI_WARRIOR[1])
                     createDe(CHAOS_GRUNT[1], deSpw1, attackPoint1)
             else if actMission == 2
-                for i = 1 to 3
+                for i = 0 to 2
                     createDr(DRAENEI_WARRIOR[2])
                     createDe(CHAOS_GRUNT[2], deSpw21, attackPoint2)
-                for i = 1 to 2
+                for i = 0 to 1
                     createDr(DRAENEI_MAGE[2])
                     createDe(CHAOS_WARLOCK[2], deSpw22, attackPoint2)
             else if actMission >= 3
-                for i = 1 to 3
+                for i = 0 to 2
                     createDr(DRAENEI_WARRIOR[3])
                     createDe(CHAOS_GRUNT[3], deSpw31, attackPoint4)
-                for i = 1 to 2
+                for i = 0 to 1
                     createDr(DRAENEI_MAGE[3])
                     createDe(CHAOS_WARLOCK[3], deSpw32, attackPoint4)
         end)
@@ -194,6 +206,23 @@ function BuildingDefinition.towerGeneral()
         ..setNormalAbilities(sentinel.getNewId().toRawCode())
         ..setName("Death Tower")
 
+function UnitDefinition.creepGeneral(int i)
+    this
+        ..setAttack1DamageBase(17 + 9*i)
+        ..setAttack1DamageNumberofDice(2 + i)
+        ..setAttack1CooldownTime(1.8 - 0.1 * i)
+        ..setDefenseUpgradeBonus(0)
+        ..setArmorSoundType(ArmorSoundType.Flesh)
+        ..setFoodCost(0)
+        ..setLevel(2)
+        ..setPriority(6)
+        ..setHitPointsRegenerationRate(1.)
+        ..setDefaultActiveAbility("")
+        ..setNormalAbilities("")
+        ..setUpgradesUsed(commaList(DUMMY_DAMAGE_UPGRADES[i], DUMMY_ARMOR_UPGRADES[i]))
+        ..setCollisionSize(16.)
+        ..setNameEditorSuffix("(Level " + (i + 1).toString() + ")")
+
 @compiletime function gen()
     new BuildingDefinition(ADVANCE_DEATH_TOWER, 'ntx2')
         ..setAcquisitionRange(700.)
@@ -224,3 +253,68 @@ function BuildingDefinition.towerGeneral()
         ..setAttack1CooldownTime(1.)
         ..setHitPointsMaximumBase(550)
         ..setNameEditorSuffix("(Level 3)")
+    
+    for i = 0 to 2
+        new UnitDefinition(DRAENEI_WARRIOR[i], 'ndrw')
+            ..setRace(Race.Orc)
+            ..setHitPointsMaximumBase(400 + i * 50)
+            ..creepGeneral(i)
+
+        new UnitDefinition(CHAOS_GRUNT[i], 'nchg')
+            ..setAttack1DamageSidesperDie(2)
+            ..setAttack1AttackType(AttackType.Normal)
+            ..setRace(Race.Demon)
+            ..setHitPointsMaximumBase(400 + i * 50)
+            ..creepGeneral(i)
+
+        if i != 0
+            new UnitDefinition(DRAENEI_MAGE[i-1], 'ndrs')
+                ..setAttack1Range(450)
+                ..setAttack1ProjectileArt(Abilities.priestMissile)
+                ..setAttack1ProjectileSpeed(1100)
+                ..setArmorType(ArmorType.Small)
+                ..setRace(Race.Orc)
+                ..setManaInitialAmount(75)
+                ..setManaMaximum(400)
+                ..setHitPointsMaximumBase(250 + i * 50)
+                ..setTintingColorGreen(100)
+                ..setTintingColorBlue(100)
+                ..setScalingValue(1.)
+                ..creepGeneral(i)
+                ..setName("Draenei Mage")
+            
+            new UnitDefinition(CHAOS_WARLOCK[i-1], 'nchw')
+                ..setAttack1Range(450)
+                ..setAttack1AnimationDamagePoint(0.59)
+                ..setAttack1AnimationBackswingPoint(0.58)
+                ..setAttack1ProjectileArt(Abilities.sorceressMissile)
+                ..setAttack1DamageSidesperDie(7)
+                ..setArmorType(ArmorType.Small)
+                ..setSightRadiusNight(1000)
+                ..setRace(Race.Demon)
+                ..setManaInitialAmount(75)
+                ..setManaMaximum(400)
+                ..setHitPointsMaximumBase(250 + i * 50)
+                ..creepGeneral(i)
+        
+        new UpgradeDefinition(DUMMY_DAMAGE_UPGRADES[i], 'Rhme')
+            ..addEffectAttackDamageBonus(1, 0)
+            ..setGoldCostBase(0)
+            ..setGoldCostIncrement(0)
+            ..setLumberCostBase(0)
+            ..setLumberCostIncrement(0)
+            ..setTimeBase(0)
+            ..setTimeIncrement(0)
+            ..setLevels(i + 1)
+            ..presetName(lvl -> "Damage Level " + (i + 1).toString())
+        
+        new UpgradeDefinition(DUMMY_ARMOR_UPGRADES[i], 'Rhar')
+            ..addEffectApplyDefenseUpgradeBonus()
+            ..setGoldCostBase(0)
+            ..setGoldCostIncrement(0)
+            ..setLumberCostBase(0)
+            ..setLumberCostIncrement(0)
+            ..setTimeBase(0)
+            ..setTimeIncrement(0)
+            ..setLevels(i + 1)
+            ..presetName(lvl -> "Armor Level " + (i + 1).toString())

@@ -4,8 +4,6 @@ import public Quest
 import QuestItem
 import Icons
 
-import Functions
-
 public Quest array mission
 
 public QuestItem voidTraveller
@@ -62,16 +60,16 @@ init
     new Quest(false)
         ..setTitle("Help")
         ..setDescription("The circles can pick and drop items.\n"
-                 .concat("The pings of the minimap indicates where do you have to go (Seriously, many people didn't get it in the first).\n")
-                 .concat("You get between 1 and 2 lumber for killing heros, 0 and 1 for assisting or buying it.\n")
-                 .concat("\n")
-                 .concat("You lost between 10% and 15% of your gold if an enemy kills you.\n")
-                 .concat("The creeps spawn every 60 seconds (if there isn't units in their spawn).\n")
-                 .concat("You can't hurt an ally unit (Unless it has less than 30% of life).\n")
-                 .concat("\n")
-                 .concat("See the main quests for more details\n")
-                 .concat("\n")
-                 .concat("See the comands for more help."))
+                       + "The pings of the minimap indicates where do you have to go (Seriously, many people didn't get it in the first).\n"
+                       + "You get between 1 and 2 lumber for killing heros, 0 and 1 for assisting or buying it.\n"
+                       + "\n"
+                       + "You lost between 10% and 15% of your gold if an enemy kills you.\n"
+                       + "The creeps spawn every 60 seconds (if there isn't units in their spawn).\n"
+                       + "You can't hurt an ally unit (Unless it has less than 30% of life).\n"
+                       + "\n"
+                       + "See the main quests for more details\n"
+                       + "\n"
+                       + "See the comands for more help.")
         ..addObjective("|cffff0000Draenei:|r Have to scape.")
         ..addObjective("|cff32cd32Demons:|r Have to stop the draenei.")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
@@ -90,113 +88,113 @@ init
     new Quest(false)
         ..setTitle("Gamemodes")
         ..setDescription("|cff7777aa1. Timers|r\n"
-                 .concat("\n")
-                 .concat("|cff0080ff-v|r Every time you the draenei complete a mission a new timer will start, each with their own duration (Mission 1: 10 minutes, Mission 2: 13 minutes, Mission 3: 9 minutes, Mission 4: 10 minutes, Mission 5: 9 minutes) each mode let you to select a percentage to that times.\n")
-                 .concat("|cff00ff80-s|r: 60% (max. 31 minutes), |cff00ff80-m|r: 80% (max. 41 minutes), |cff00ff80-l|r: 100% (max. 51 minutes), |cff00ff80-h|r: 120% (max. 61 minutes).\n")
-                 .concat("|cff0080ff-u|r During all the match will be a unique timer that will run even if the draenei complete a mission, each mode is to select the duration of that timer.\n")
-                 .concat("|cff00ff80-i|r: 25 minutes, |cff00ff80-t|r: 30 minutes, |cff00ff80-s|r: 35 minutes, |cff00ff80-m|r: 40 minutes, |cff00ff80-l|r: 45 minutes, |cff00ff80-h|r: 50 minutes, |cff00ff80-e|r: 55 minutes.\n")
-                 .concat("\n")
-                 .concat("|cff7777aa2. Creeps|r\n")
-                 .concat("\n")
-                 .concat("|cff0080ff-ca|r: Normal creeps, |cff00ff80-nn|r: No neutral creeps, |cff00ff80-np|r: No creeps of |cffff0000Draenei|r or |cff32cd32Demons|r, |cff00ff80-nc|r: No creeps of any type.\n")
-                 .concat("\n")
-                 .concat("|cff7777aa3. Shops|r\n")
-                 .concat("\n")
-                 .concat("|cff0080ff-ns|r: Normal items, |cff0080ff-oc|r: There are only consumibles, |cff0080ff-nr|r: There are no recipes.\n")
-                 .concat("\n")
-                 .concat("|cff7777aa4. Selection|r\n")
-                 .concat("\n")
-                 .concat("|cff0080ff-ds|r: You can only select a hero of your class, |cff0080ff-ap|r: You can select all heros.\n")
-                 .concat("\n")
-                 .concat("|cff7777aa5. Heros|r\n")
-                 .concat("\n")
-                 .concat("|cff0080ff-lu|r: The heros level up like normally, |cff0080ff-nl|r: The heros don't level up, they have the abilities by default with no need of learn them, they only can get their ultimate power and increase their abilities obtaining a Power Booster."))
+                       + "\n"
+                       + "|cff0080ff-v|r Every time you the draenei complete a mission a new timer will start, each with their own duration (Mission 1: 10 minutes, Mission 2: 13 minutes, Mission 3: 9 minutes, Mission 4: 10 minutes, Mission 5: 9 minutes) each mode let you to select a percentage to that times.\n"
+                       + "|cff00ff80-s|r: 60% (max. 31 minutes), |cff00ff80-m|r: 80% (max. 41 minutes), |cff00ff80-l|r: 100% (max. 51 minutes), |cff00ff80-h|r: 120% (max. 61 minutes).\n"
+                       + "|cff0080ff-u|r During all the match will be a unique timer that will run even if the draenei complete a mission, each mode is to select the duration of that timer.\n"
+                       + "|cff00ff80-i|r: 25 minutes, |cff00ff80-t|r: 30 minutes, |cff00ff80-s|r: 35 minutes, |cff00ff80-m|r: 40 minutes, |cff00ff80-l|r: 45 minutes, |cff00ff80-h|r: 50 minutes, |cff00ff80-e|r: 55 minutes.\n"
+                       + "\n"
+                       + "|cff7777aa2. Creeps|r\n"
+                       + "\n"
+                       + "|cff0080ff-ca|r: Normal creeps, |cff00ff80-nn|r: No neutral creeps, |cff00ff80-np|r: No creeps of |cffff0000Draenei|r or |cff32cd32Demons|r, |cff00ff80-nc|r: No creeps of any type.\n"
+                       + "\n"
+                       + "|cff7777aa3. Shops|r\n"
+                       + "\n"
+                       + "|cff0080ff-ns|r: Normal items, |cff0080ff-oc|r: There are only consumibles, |cff0080ff-nr|r: There are no recipes.\n"
+                       + "\n"
+                       + "|cff7777aa4. Selection|r\n"
+                       + "\n"
+                       + "|cff0080ff-ds|r: You can only select a hero of your class, |cff0080ff-ap|r: You can select all heros.\n"
+                       + "\n"
+                       + "|cff7777aa5. Heros|r\n"
+                       + "\n"
+                       + "|cff0080ff-lu|r: The heros level up like normally, |cff0080ff-nl|r: The heros don't level up, they have the abilities by default with no need of learn them, they only can get their ultimate power and increase their abilities obtaining a Power Booster.")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
 
     new Quest(false)
         ..setTitle("Joke Sounds")
         ..setDescription("\"-killingspree\", \"-dominating\", \"-megakill\", \"-unstoppable\", \"-wickedsick\", \"-monsterkill\", \"-godlike\", \"-doublekill\", \"-triplekill\", \"-ultrakill\", \"-rampage\", \"-ownage\"\n"
-                 .concat("\n")
-                 .concat("\"-noo\", \"-lion\", \"-wtf\", \"-wasted\", \"-help\", \"-miau\", \"-doh\""))
+                       + "\n"
+                       + "\"-noo\", \"-lion\", \"-wtf\", \"-wasted\", \"-help\", \"-miau\", \"-doh\"")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
 
     new Quest(false)
         ..setTitle("Credits")
         ..setDescription("Map created by HerlySQR\n"
-                 .concat("Map powered with Wurst: https://wurstlang.org/\n")
-                 .concat("\n")
-                 .concat("|cff999999I want to thank all people who gaves me some help me, but I don't remember every name. Check in https://www.hiveworkshop.com|r\n")
-                 .concat("\n")
-                 .concat("|cff7777aaImported Files:|r\n")
-                 .concat("\n")
-                 .concat("-Main Image: “Then and Now”, Jessica Aumaitre https://www.pinterest.com/pin/170925748342097069/\n")
-                 .concat("\n")
-                 .concat("-Some models are from https://www.hiveworkshop.com/threads/the-ultimate-terraining-map-4-0.252232/")
-                 .concat("-Fire Low and Medium by Pyritie.\n")
-                 .concat("-HealingSalve, LesserClarityPotion, PotionofVampirism, SnazzyPotion by Master Creator !\n")
-                 .concat("-Scroll Of Healing, Mask Of Death, Greater Periapt, Heath Stone,Lesser Purple Potion, Boots Of Speed by KAIL333XZ.\n")
-                 .concat("-Orb of Darkness, Orb of Lightning, Orb of Ice, Tiny Blue PotionGem, Diamond, RevenantShield, Orb of Dragons by General Frank.\n")
-                 .concat("-Scroll Red by EviL_BuddhA.\n")
-                 .concat("-claw, cloak of flames mask, RingOfRegeneration, Crown of kings by terrio.\n")
-                 .concat("-RingOfProtection by republicola.\n")
-                 .concat("-Tyrant, Gloves of Speed, Ice Shield, Ankh of Resurrection,Elven Boots by Matarael.\n")
-                 .concat("-AntiMagicShell, SoulArmor, VampiricAuraTarget, BlinkTarget, WispExplode, BladeStorm by JetFangInferno.\n")
-                 .concat("-Staff Of Negation Item, Staff Of Silence Item, Staff Of Mage Item by Grey Knight.\n")
-                 .concat("-PotionOfInvulnerability by Xazuki.\n")
-                 .concat("-Greater Mana Potion, Healing Potion, Lesser Mana Potion, Small Healing Potion, Potion of Omniscence by Ket.\n")
-                 .concat("-Fire_by_matija97 (submitted by TheWhiteWolf).\n")
-                 .concat("-gem by SantoRayo[iP]."))
+                       + "Map powered with Wurst: https://wurstlang.org/\n"
+                       + "\n"
+                       + "|cff999999I want to thank all people who gaves me some help me, but I don't remember every name. Check in https://www.hiveworkshop.com|r\n"
+                       + "\n"
+                       + "|cff7777aaImported Files:|r\n"
+                       + "\n"
+                       + "-Main Image: “Then and Now”, Jessica Aumaitre https://www.pinterest.com/pin/170925748342097069/\n"
+                       + "\n"
+                       + "-Some models are from https://www.hiveworkshop.com/threads/the-ultimate-terraining-map-4-0.252232/"
+                       + "-Fire Low and Medium by Pyritie.\n"
+                       + "-HealingSalve, LesserClarityPotion, PotionofVampirism, SnazzyPotion by Master Creator !\n"
+                       + "-Scroll Of Healing, Mask Of Death, Greater Periapt, Heath Stone,Lesser Purple Potion, Boots Of Speed by KAIL333XZ.\n"
+                       + "-Orb of Darkness, Orb of Lightning, Orb of Ice, Tiny Blue PotionGem, Diamond, RevenantShield, Orb of Dragons by General Frank.\n"
+                       + "-Scroll Red by EviL_BuddhA.\n"
+                       + "-claw, cloak of flames mask, RingOfRegeneration, Crown of kings by terrio.\n"
+                       + "-RingOfProtection by republicola.\n"
+                       + "-Tyrant, Gloves of Speed, Ice Shield, Ankh of Resurrection,Elven Boots by Matarael.\n"
+                       + "-AntiMagicShell, SoulArmor, VampiricAuraTarget, BlinkTarget, WispExplode, BladeStorm by JetFangInferno.\n"
+                       + "-Staff Of Negation Item, Staff Of Silence Item, Staff Of Mage Item by Grey Knight.\n"
+                       + "-PotionOfInvulnerability by Xazuki.\n"
+                       + "-Greater Mana Potion, Healing Potion, Lesser Mana Potion, Small Healing Potion, Potion of Omniscence by Ket.\n"
+                       + "-Fire_by_matija97 (submitted by TheWhiteWolf).\n"
+                       + "-gem by SantoRayo[iP].")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
     new Quest(false)
         ..setTitle("Credits 2")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
         ..setDescription("-Blink Purple Target, Holy Light, Valiant Charge by Mythic.\n"
-                 .concat("-Black Hole by Fingolfin.\n")
-                 .concat("-Deathknight by PROXY.\n")
-                 .concat("-DraeneiAnchorite by Sellenisko.\n")
-                 .concat("-Shadow Poison Bottle Missile by JesusHipster.\n")
-                 .concat("-NewSparksEX by WILL THE ALMIGHTY.\n")
-                 .concat("-Lightnings Multiple, Holy Light by Tranquil.\n")
-                 .concat("-Quest Marking Aura by stan0033.\n")
-                 .concat("-Death Grip by Azsure.\n")
-                 .concat("-Attack Aura by s4nji.\n")
-                 .concat("-Helmet by -Grendel.\n")
-                 .concat("-ProphetVelen by Sellenisko.\n")
-                 .concat("-ShadowDancerLostOneV1.05, VindicatorLostOneV1.02 by Ujimasa Hojo.\n")
-                 .concat("-Draenei by Murlocologist.\n")
-                 .concat("-Retribution by Kuhneghetz.\n")
-                 .concat("-Aura of Shock by levigeorge1617.\n")
-                 .concat("-TNTBarrel (thanks Hermit).\n")
-                 .concat("-BTNNetherPotion by JesusHipster, Tiodor.\n")
-                 .concat("-BTNPlateOfPlaneswalker by JollyD.\n")
-                 .concat("-BTNArcaneField by Eldin HawkWing.\n")
-                 .concat("-BTNSword by Static.\n")
-                 .concat("-BTNCRZOOMOUT, BTNCRZOOMIN by CRAZYRUSSIAN.\n")
-                 .concat("-BTNExplBarrel by Darky29.\n")
-                 .concat("-BTNA7XBloodDiamond, BTNA7XMoonDiamond, BTNA7XPoisonDiamond by a7xpwns3.\n")
-                 .concat("-BTNDranaiHide by Blizzard Entertainment, Starblind.\n")
-                 .concat("-BTNSpell_Holy_Purify,BTNSpell_Fire_FireBolt02 by Blizzard Entertainment.\n")
-                 .concat("-BTNDraeneiFemaleHuntress by FrIkY.\n")
-                 .concat("-BTNLightningboltcontest by kola.\n")
-                 .concat("-BTNMagicExplosion by The Panda.\n")
-                 .concat("-BTNTimeEclipse3 by San.\n")
-                 .concat("-BTNdancingLightningGS by GooS.\n")
-                 .concat("-BTNWindsBoots, BTNHolyLance by Mc !.\n")
-                 .concat("-BTNBloodElvenImprovedHides by Zephyrius2412.\n")
-                 .concat("-BTNElderBlood by morbent.\n")
-                 .concat("-BTNNFHelmet03 by NFWar.\n")
-                 .concat("-BTNANAHolyEnergy by Anachron.\n")
-                 .concat("-BTNAnkhOfRebirthy Palaslayer.\n")
-                 .concat("-BTNStrands by Kershbob.\n")
-                 .concat("-BTNDraeneiDestroyer2 by Null.\n")
-                 .concat("-BTNThunderStorm, BTNSparkle by The Panda.\n")
-                 .concat("-BTNHammerCrush by zbc.\n")
-                 .concat("-BTNCharge by KelThuzad.\n")
-                 .concat("-BTNStormSphere by Darkfang.\n")
-                 .concat("-BTNFlamingWhirlwind by ¿?.\n")
-                 .concat("-BTNFireImpact by FrIkY.\n")
-                 .concat("-BTNGromHellscreamsAxe by -Berz-.\n")
-                 .concat("-BTNHellscreamBerserk by Chen.\n")
-                 .concat("-BTNBreathOfFireNew by ChevronSeven.\n")
-                 .concat("-BTNRainOfFire by Blizzard Entertainment, Darkfang.\n")
-                 .concat("-BTNHellfirePossession by ~Nightmare."))
+                       + "-Black Hole by Fingolfin.\n"
+                       + "-Deathknight by PROXY.\n"
+                       + "-DraeneiAnchorite by Sellenisko.\n"
+                       + "-Shadow Poison Bottle Missile by JesusHipster.\n"
+                       + "-NewSparksEX by WILL THE ALMIGHTY.\n"
+                       + "-Lightnings Multiple, Holy Light by Tranquil.\n"
+                       + "-Quest Marking Aura by stan0033.\n"
+                       + "-Death Grip by Azsure.\n"
+                       + "-Attack Aura by s4nji.\n"
+                       + "-Helmet by -Grendel.\n"
+                       + "-ProphetVelen by Sellenisko.\n"
+                       + "-ShadowDancerLostOneV1.05, VindicatorLostOneV1.02 by Ujimasa Hojo.\n"
+                       + "-Draenei by Murlocologist.\n"
+                       + "-Retribution by Kuhneghetz.\n"
+                       + "-Aura of Shock by levigeorge1617.\n"
+                       + "-TNTBarrel (thanks Hermit).\n"
+                       + "-BTNNetherPotion by JesusHipster, Tiodor.\n"
+                       + "-BTNPlateOfPlaneswalker by JollyD.\n"
+                       + "-BTNArcaneField by Eldin HawkWing.\n"
+                       + "-BTNSword by Static.\n"
+                       + "-BTNCRZOOMOUT, BTNCRZOOMIN by CRAZYRUSSIAN.\n"
+                       + "-BTNExplBarrel by Darky29.\n"
+                       + "-BTNA7XBloodDiamond, BTNA7XMoonDiamond, BTNA7XPoisonDiamond by a7xpwns3.\n"
+                       + "-BTNDranaiHide by Blizzard Entertainment, Starblind.\n"
+                       + "-BTNSpell_Holy_Purify,BTNSpell_Fire_FireBolt02 by Blizzard Entertainment.\n"
+                       + "-BTNDraeneiFemaleHuntress by FrIkY.\n"
+                       + "-BTNLightningboltcontest by kola.\n"
+                       + "-BTNMagicExplosion by The Panda.\n"
+                       + "-BTNTimeEclipse3 by San.\n"
+                       + "-BTNdancingLightningGS by GooS.\n"
+                       + "-BTNWindsBoots, BTNHolyLance by Mc !.\n"
+                       + "-BTNBloodElvenImprovedHides by Zephyrius2412.\n"
+                       + "-BTNElderBlood by morbent.\n"
+                       + "-BTNNFHelmet03 by NFWar.\n"
+                       + "-BTNANAHolyEnergy by Anachron.\n"
+                       + "-BTNAnkhOfRebirthy Palaslayer.\n"
+                       + "-BTNStrands by Kershbob.\n"
+                       + "-BTNDraeneiDestroyer2 by Null.\n"
+                       + "-BTNThunderStorm, BTNSparkle by The Panda.\n"
+                       + "-BTNHammerCrush by zbc.\n"
+                       + "-BTNCharge by KelThuzad.\n"
+                       + "-BTNStormSphere by Darkfang.\n"
+                       + "-BTNFlamingWhirlwind by ¿?.\n"
+                       + "-BTNFireImpact by FrIkY.\n"
+                       + "-BTNGromHellscreamsAxe by -Berz-.\n"
+                       + "-BTNHellscreamBerserk by Chen.\n"
+                       + "-BTNBreathOfFireNew by ChevronSeven.\n"
+                       + "-BTNRainOfFire by Blizzard Entertainment, Darkfang.\n"
+                       + "-BTNHellfirePossession by ~Nightmare.")

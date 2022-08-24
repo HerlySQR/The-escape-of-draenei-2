@@ -1,5 +1,7 @@
 package Functions
 
+import initlater Towers
+
 import UnitIndexer
 import ErrorHandling
 import ClosureForGroups
@@ -50,15 +52,12 @@ public function string.subString(int start) returns string
 public function string.char(int pos) returns string
     return this.subString(pos, pos)
 
-public function string.concat(string other) returns string
-    return this + other
-
 // Order group
 
 function unit.filter() returns boolean
     let id = this.getTypeId()
-    /*if id == 'ndrl' or id == 'u00J'
-        return false*/
+    if id == DRAENEI_WORKER or id == DEMON_ACOLYTE
+        return false
     return true
 
 public function group.issueTargetOrder(int order, widget target)
