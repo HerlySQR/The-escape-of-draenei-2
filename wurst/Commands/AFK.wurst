@@ -20,17 +20,17 @@ init
     let t = CreateTrigger()
     for i = 1 to 11
         if i != 6
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_SELECTED, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_DESELECTED, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_ISSUED_ORDER, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_PAWN_ITEM, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_PICKUP_ITEM, null)
-            t.registerPlayerUnitEvent(Player(i), EVENT_PLAYER_UNIT_SELL_ITEM, null)
-            t.registerPlayerChatEvent(Player(i), "", false)
-            t.registerPlayerEvent(Player(i), EVENT_PLAYER_END_CINEMATIC)
-            t.registerPlayerEvent(Player(i), EVENT_PLAYER_ALLIANCE_CHANGED)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_SELECTED, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_DESELECTED, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_ISSUED_ORDER, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_PAWN_ITEM, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_PICKUP_ITEM, null)
+            t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_SELL_ITEM, null)
+            t.registerPlayerChatEvent(players[i], "", false)
+            t.registerPlayerEvent(players[i], EVENT_PLAYER_END_CINEMATIC)
+            t.registerPlayerEvent(players[i], EVENT_PLAYER_ALLIANCE_CHANGED)
     t.addAction(() -> begin
         let p = GetTriggerPlayer()
         let i = p.getNumber()
@@ -48,7 +48,7 @@ init
             if players[i].isIngame()
                 afkTime[j]++
             if afkTime[j] >= 30
-                whoAreHere.has(players[i])
+                whoAreHere.remove(players[i])
                 gameBoard.setItemValue(row[j], 1, players[i].getName())
                 for k = 0 to 4
                     gameBoard.setItemValueColor(row[j], k, gray)

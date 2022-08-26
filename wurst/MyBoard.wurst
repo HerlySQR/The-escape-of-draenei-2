@@ -16,32 +16,43 @@ init
     onModesSelected(() -> playersOrder())
 
     nullTimer() -> 
-        int pl = 0
+        var pl = 3
         for i = 0 to bj_MAX_PLAYERS
             if players[i].isIngame()
                 pl++
         
         gameBoard
+            ..setRowCount(pl)
             ..setColumnCount(5)
+
+        for i = 0 to 4
+            gameBoard.getItem(0, i)
+                ..setStyle(true, false)
+                ..setValueColor(COLOR_GOLD)
+        
+        for i = 0 to pl - 1
+            gameBoard.setItemWidth(i, 0, 0.0145)
+            gameBoard.setItemWidth(i, 1, 0.0650)
+
+        gameBoard.getItem(1, 0).setStyle(true, false)
+        gameBoard.getItem(1, 1).setStyle(true, false)
+
+        gameBoard
             ..setTitle("Statistics")
             ..display(false)
-            ..setItemWidth(0, 0, 0.0145)
-            ..setItemWidth(0, 1, 0.0650)
             ..setItemValue(0, 0, "")
-            ..setItemValue(1, 0, colorId[11] + "Drae|r")
-            ..setItemValue(1, 1, colorId[11] + " nei|r")
+            ..setItemValue(1, 0, ("Drae").color(colorId[11]))
+            ..setItemValue(1, 1, (" nei").color(colorId[11]))
             ..setItemValue(0, 1, "Player")
             ..setItemValue(0, 2, "Kills")
             ..setItemValue(0, 3, "Deaths")
             ..setItemValue(0, 4, "Assists")
-        for i = 0 to 4
-            gameBoard.getItem(0, i).setValueColor(COLOR_GOLD)
 
 public function playersOrder()
     for i = 1 to 12
         row[i] = 999
 
-    var t = 3
+    var t = 2
     for i = 1 to 5
         if playerM(i).isIngame()
             row[i] = t
@@ -56,30 +67,34 @@ public function playersOrder()
             t++
     
     gameBoard.setRowCount(t)
-
-    int r
+    for i = 0 to gameBoard.getRowCount() - 1
+        for j = 0 to gameBoard.getColumnCount() - 1
+            gameBoard.getItem(i, j).setStyle(true, false)
 
     for i = 1 to 10
-        r = row[i]
+        let r = row[i]
         if r != 999
             gameBoard
-                ..setItemValue(2, r, playerName[i])
-                ..setItemValue(3, r, kills[i].toString())
-                ..setItemValue(4, r, deaths[i].toString())
-                ..setItemValue(5, r, assists[i].toString())
-            gameBoard.getItem(1, r).setStyle(false, true)
+                ..setItemValue(r, 1, playerName[i])
+                ..setItemValue(r, 2, kills[i].toString())
+                ..setItemValue(r, 3, deaths[i].toString())
+                ..setItemValue(r, 4, assists[i].toString())
+            gameBoard.getItem(r, 0).setStyle(false, true)
             let g = HeroType.get(hero[i])
             if g == null
-                gameBoard.setItemIcon(1, r, Icons.bTNSelectHeroOff)
+                gameBoard.setItemIcon(r, 0, Icons.bTNSelectHeroOff)
             else
-                gameBoard.setItemIcon(1, r, g.getIcon())
+                gameBoard.setItemIcon(r, 0, g.getIcon())
     
-    gameBoard.getItem(0, d).setStyle(true, false)
+    gameBoard.getItem(d, 0).setStyle(true, false)
+    gameBoard.getItem(d, 1).setStyle(true, false)
     gameBoard
-        ..setItemValue(0, d, ("Dem").color(colorId[12]))
-        ..setItemValue(1, d, (" ons").color(colorId[12]))
+        ..setItemValue(d, 0, ("Dem").color(colorId[12]))
+        ..setItemValue(d, 1, (" ons").color(colorId[12]))
     for i = 2 to 4
-        gameBoard.setItemValue(0, d, "")
+        gameBoard.setItemValue(d, i, "")
+    
+    gameBoard..show()..maximize()
 
 // Game time
 var seconds = 0

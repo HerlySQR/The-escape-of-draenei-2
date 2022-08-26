@@ -87,7 +87,7 @@ init
                     
                     if p1 != DRAENEI and p1 != DEMON
                         if spree[k] >= 3
-                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " has a spree of |cffffcc00" + spree[k].toString() + "|r")
+                            print(playerName[k] + " has a spree of |cffffcc00" + spree[k].toString() + "|r")
                         let fk = firstKill[k] <= 0
                         let dk = doubleKill[k] <= 0
                         let tk = tripleKill[k] <= 0
@@ -97,18 +97,18 @@ init
                         else if not fk and dk and tk and uk
                             doubleKill[k] = 10
                             firstKill[k] = 0
-                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffDouble kill|r!")
+                            print(playerName[k] + " just got a |cff00ffffDouble kill|r!")
                         else if fk and not dk and tk and uk
                             tripleKill[k] = 10
                             doubleKill[k] = 0
-                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffTriple kill|r!")
+                            print(playerName[k] + " just got a |cff00ffffTriple kill|r!")
                         else if fk and dk and not tk and uk
                             ultraKill[k] = 10
                             tripleKill[k] = 0
-                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffUltra kill|r!")
+                            print(playerName[k] + " just got a |cff00ffffUltra kill|r!")
                         else if fk and dk and tk and not uk
                             ultraKill[k] = 10
-                            DisplayTextToPlayer(localPlayer, 0., 0., playerName[k] + " just got a |cff00ffffRampage|r!")
+                            print(playerName[k] + " just got a |cff00ffffRampage|r!")
                 else
                     /*if GetKillingUnit() == udg_Golem_de_carne
                         printTimed(playerName[d] + " was killed by The Monster", 4.00)
