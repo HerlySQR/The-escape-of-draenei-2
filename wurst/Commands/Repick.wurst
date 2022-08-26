@@ -42,7 +42,7 @@ public function repick(player p)
                 heroModel.get(repick.getTypeId()).show()
             // TODO udg_Si_lo_mataste[p.getId()] = false
             hero[i] = null
-            table.setItemIcon(1, row[i], Icons.bTNSelectHeroOn)
+            gameBoard.setItemIcon(row[i], 0, Icons.bTNSelectHeroOn)
             if THE_DRAENEI.has(p)
                 repick.getItemOfId(BARREL).remove()
                 repick.setPos(Rects.selectorDraenei.getCenter())

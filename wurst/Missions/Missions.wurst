@@ -55,8 +55,8 @@ public function startMission1()
         mission[1].setState(QuestState.DISCOVERED)
         QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 1:|r The door")
 
-        table.display(true)
-        table.minimize()
+        gameBoard.display(true)
+        gameBoard.minimize()
         forUnitsInRect(Rects.draeneiSpawn, u -> begin
             if u.getOwner() == DRAENEI
                 u.issueTargetOrderById(Orders.attack, Dests.dungeonDoor1)

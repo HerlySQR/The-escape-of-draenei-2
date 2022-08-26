@@ -92,7 +92,7 @@ init
                     hero[c].addAbility('A02J')
                     udg_Sky_Gem_Ability = hero[c]
                     udg_Sky_Gem_Visibilidad = createVision(playerSelector, udg_Sky_Gem_Ability.getPos(), 1800, true)..start()*/
-                table.setItemIcon(1, row[c], HeroType.get(hero[c]).getIcon())
+                gameBoard.setItemIcon(row[c], 0, HeroType.get(hero[c]).getIcon())
                 /* TODO
                 if udg_Primera_persona
                     udg_Unidad_que_sigo[c] = hero[c]

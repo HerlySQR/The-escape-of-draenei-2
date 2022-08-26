@@ -34,7 +34,7 @@ init
                 k = p1.getNumber()
             
             deaths[d]++
-            table.setItemValue(4, row[d], deaths[d].toString())
+            gameBoard.setItemValue(row[d], 3, deaths[d].toString())
             
             if noKiller
                 print(playerName[k] + " just died")
@@ -51,7 +51,7 @@ init
             
                     spree[k]++
                     kills[k]++
-                    table.setItemValue(3, row[k], kills[k].toString())
+                    gameBoard.setItemValue(row[k], 2, kills[k].toString())
 
                     var killingMsg = ""
 
@@ -71,7 +71,7 @@ init
                             if assistTime[aKill].get(d) > 0
                                 whoAssisted += playerName[aKill] + "/"
                                 assists[aKill]++
-                                table.setItemValue(5, row[aKill], assists[aKill].toString())
+                                gameBoard.setItemValue(row[aKill], 4, assists[aKill].toString())
                                 if whatMode[3] != ONLY_COMSUMIBLES
                                     players[i].addLumber(GetRandomInt(0, 1))
                                 new Bounty().run(GetRandomInt(30, 48), hero[aKill] == null ? circle[aKill] : hero[aKill], players[i], true, false)

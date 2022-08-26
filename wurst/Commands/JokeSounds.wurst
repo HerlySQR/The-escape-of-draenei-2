@@ -5,7 +5,6 @@ import Imports
 
 import HashMap
 
-
 init
     let jokeSounds = new IterableMap<string, sound>()
 

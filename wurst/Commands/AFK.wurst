@@ -3,9 +3,9 @@ package AFK
 import MyBoard
 import ChatEnter
 
-public force whoAreHere = CreateForce()
+public constant whoAreHere = CreateForce()
 
-public function showAFK(player p)
+let gray = colorA(128, 128, 128, 255)
 
 int array afkTime
 
@@ -37,8 +37,9 @@ init
         afkTime[i] = 0
         if not whoAreHere.has(p)
             whoAreHere.add(p)
-            table.setItemValueColor(0, row[i], 255, 255, 255, 255)
-            table.setItemValue(2, row[i], playerName[i])
+            for j = 0 to 4
+                gameBoard.setItemValueColor(row[i], j, COLOR_WHITE)
+            gameBoard.setItemValue(row[i], 1, playerName[i])
     end)
     // Register
     CreateTimer().startPeriodic(1., () -> begin
@@ -48,6 +49,7 @@ init
                 afkTime[j]++
             if afkTime[j] >= 30
                 whoAreHere.has(players[i])
-                table.setItemValue(2, row[j], players[i].getName())
-                table.setItemValueColor(0, row[j], 128, 128, 128, 255)
+                gameBoard.setItemValue(row[j], 1, players[i].getName())
+                for k = 0 to 4
+                    gameBoard.setItemValueColor(row[j], k, gray)
     end)

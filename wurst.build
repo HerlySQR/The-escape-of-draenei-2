@@ -3,9 +3,8 @@ projectName: The escape of draenei 2
 dependencies:
 - https://github.com/HerlySQR/WurstStdlib2:pre1.29
 - https://github.com/Frotty/Ability-Tooltip-Generator
-- https://github.com/HerlySQR/Bounty_Controller
 - https://github.com/HerlySQR/Bounty_Controller:main
-- https://github.com/Frotty/wurst-item-recipes
+- https://github.com/Frotty/wurst-item-recipes:main
 - https://github.com/Frotty/wurst-bonus-handler
 buildMapData:
   name: The escape of draenei vBeta25
