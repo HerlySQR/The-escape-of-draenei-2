@@ -8,7 +8,6 @@ import GeneratedValues
 
 import Dialog
 import ClosureForGroups
-import ClosureTimers
 
 let endSwitch = CreateTimer()
 let switchWindow = createDialog()
@@ -131,14 +130,9 @@ function changePlayers()
     EnumItemsInRect(Rects.index, null, () -> begin
         GetEnumItem().setPos(swc1)
     end)
-    vec2 where
     yesOrYes = true
-    where = vec2(GetCameraTargetPositionX(), GetCameraTargetPositionY())
     repick(swp1)
-    PanCameraToTimedForPlayer(swp1, where.x, where.y, 0.)
-    where = vec2(GetCameraTargetPositionX(), GetCameraTargetPositionY())
     repick(swp2)
-    PanCameraToTimedForPlayer(swp2, where.x, where.y, 0.)
     yesOrYes = false
     switchMembers(swp1, swp2)
     /* TODO
@@ -190,7 +184,6 @@ function changePlayers()
     swp2.setColor(playerColor[i1], true)
 
 function changeAlliance(player p)
-    vec2 where
     if THE_DRAENEI.has(p)
         THE_DRAENEI.remove(p)
         for i = 0 to 11
@@ -199,7 +192,6 @@ function changeAlliance(player p)
             else if THE_DEMONS.has(players[i])
                 yesAllies(p, players[i])
         THE_DEMONS.add(p)
-        where = Rects.selectorDemon.getCenter()
     else
         THE_DEMONS.remove(p)
         for i = 0 to 11
@@ -208,10 +200,7 @@ function changeAlliance(player p)
             else if THE_DEMONS.has(players[i])
                 noAllies(p, players[i])
         THE_DRAENEI.add(p)
-        where = Rects.selectorDraenei.getCenter()
-    doAfter(0.1) -> 
-        playersOrder()
-        PanCameraToTimedForPlayer(p, where.x, where.y, 0.)
+    playersOrder()
         // TODO udg_Listo=true
 
 function noAllies(player p1, player p2)

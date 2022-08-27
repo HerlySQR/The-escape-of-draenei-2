@@ -284,6 +284,13 @@ public class Rects
     static constant iLost4 = gg_rct_I_Lost_4
     static constant iLost5 = gg_rct_I_Lost_5
 
+    // Shops (as group)
+    static constant shops1 = gg_rct_Shops1
+    static constant shops2 = gg_rct_Shops2
+    static constant shops3 = gg_rct_Shops3
+    static constant shops4 = gg_rct_Shops4
+    static constant shops5 = gg_rct_Shops5
+
     /* Postions for placed units */
 
     // Merchants

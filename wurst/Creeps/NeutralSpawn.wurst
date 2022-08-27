@@ -1,11 +1,25 @@
 package NeutralSpawn
 
 import ClosureForGroups
+import ObjectIdGenerator
+import UnitObjEditing
+import Abilities
+import BountyController
 
+import Functions
 import ModeSelection
 import Reset
+import GeneratedValues
 
-constant OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
+let OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
+let RENEGADE_DRAENEI = compiletime(UNIT_ID_GEN.next())
+let RENEGADE_SOCERER = compiletime(UNIT_ID_GEN.next())
+let WILD_FEALBEST_BIG = compiletime(UNIT_ID_GEN.next())
+let WILD_FEALBEST_SMALL = compiletime(UNIT_ID_GEN.next())
+let RENEGADE_FELGUARD = compiletime(UNIT_ID_GEN.next())
+let ENRAGED_ELEMENTAL = compiletime(UNIT_ID_GEN.next())
+let WILD_DRAGON = compiletime(UNIT_ID_GEN.next())
+let INFERNAL_ARTIFACT = compiletime(UNIT_ID_GEN.next())
 
 let spawning = CreateTrigger()..disable()
 let camp = CreateGroup()
@@ -31,73 +45,216 @@ init
             spawning.enable()
     end)
 
-    /*TODO
     spawning
         ..registerTimerEvent(60.00, false)
         ..addAction(() -> begin
-            camp.enumUnitsInRect(gg_rct_Campamento_1_2, filt)
+            camp.enumUnitsInRect(Rects.creepCamp1, filt)
             if camp.isEmpty()
-                createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_1.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_2_2, filt)
-            if camp.isEmpty()
-                createUnit(OWNER, 'ners', gg_rct_Campamento_2.getCenter(), UNIT_FACING)
-                createNUnits(OWNER, 2, 'nfel', gg_rct_Campamento_2.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_3_2, filt)
-            if camp.isEmpty()
-                createNUnits(OWNER, 3, 'nfgu', gg_rct_Campamento_3.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_5_2, filt)
-            if camp.isEmpty()
-                createNUnits(OWNER, 3, 'nele', gg_rct_Campamento_5.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_6, filt)
-            if camp.isEmpty()
-                createNUnits(OWNER, 3, 'npfl', gg_rct_Campamento_6.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_7, filt)
-            if camp.isEmpty()
-                createNUnits(OWNER, 3, 'nfgu', gg_rct_Campamento_7.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_8_2, filt)
-            if camp.isEmpty()
-                createNUnits(OWNER, 3, 'nfgu', gg_rct_Campamento_8.getCenter(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_9, filt)
-            if camp.isEmpty()
-                for i = 1 to 3
-                    createUnit(OWNER, 'n00O', gg_rct_Campamento_9.randomPoint(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_10, filt)
-            if camp.isEmpty()
-                for i = 1 to 3
-                    createUnit(OWNER, 'n00O', gg_rct_Campamento_10.randomPoint(), UNIT_FACING)
-            camp.clear()
-
-            camp.enumUnitsInRect(gg_rct_Campamento_11_2, filt)
-            if camp.isEmpty()
-                createUnit(OWNER, 'ners', gg_rct_Campamento_11.randomPoint(), 270.00.asAngleDegrees())
-                createUnit(OWNER, 'nfgu', gg_rct_Campamento_11.randomPoint(), 225.00.asAngleDegrees())
-                createUnit(OWNER, 'nfgu', gg_rct_Campamento_11.randomPoint(), 270.00.asAngleDegrees())
-                createUnit(OWNER, 'nfgu', gg_rct_Campamento_11.randomPoint(), 315.00.asAngleDegrees())
+                createNUnits(OWNER, 3, RENEGADE_DRAENEI, Rects.creepCamp1.getCenter(), UNIT_FACING)
             camp.clear()
             
-            camp.enumUnitsInRect(gg_rct_Campamento_12_2, filt)
+            camp.enumUnitsInRect(Rects.creepCamp2, filt)
             if camp.isEmpty()
-                createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_12.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp2.getCenter(), UNIT_FACING)
             camp.clear()
             
-            camp.enumUnitsInRect(gg_rct_Campamento_13, filt)
+            camp.enumUnitsInRect(Rects.creepCamp3, filt)
             if camp.isEmpty()
-                createNUnits(OWNER, 3, 'ndrp', gg_rct_Campamento_13.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 3, RENEGADE_DRAENEI, Rects.creepCamp3.getCenter(), UNIT_FACING)
             camp.clear()
-    end)*/
+            
+            camp.enumUnitsInRect(Rects.creepCamp4, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp4.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp5, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_DRAENEI, Rects.creepCamp5.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp6, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp6.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp7, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_DRAENEI, Rects.creepCamp7.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp8, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_DRAENEI, Rects.creepCamp8.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp9, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp9.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp10, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_SOCERER, Rects.creepCamp10.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, RENEGADE_FELGUARD, Rects.creepCamp10.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp11, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp11.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp12, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_FELGUARD, Rects.creepCamp12.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, INFERNAL_ARTIFACT, Rects.creepCamp12.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp13, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, WILD_DRAGON, Rects.creepCamp11.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp14, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, WILD_DRAGON, Rects.creepCamp11.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp15, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, ENRAGED_ELEMENTAL, Rects.creepCamp15.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp16, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_SOCERER, Rects.creepCamp16.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, RENEGADE_FELGUARD, Rects.creepCamp16.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp17, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_FELGUARD, Rects.creepCamp17.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, INFERNAL_ARTIFACT, Rects.creepCamp17.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp18, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_SOCERER, Rects.creepCamp18.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp19, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_SOCERER, Rects.creepCamp19.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, WILD_FEALBEST_BIG, Rects.creepCamp19.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp20, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, ENRAGED_ELEMENTAL, Rects.creepCamp20.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp21, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp21.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp22, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, WILD_FEALBEST_BIG, Rects.creepCamp22.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, WILD_FEALBEST_SMALL, Rects.creepCamp22.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp23, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_SOCERER, Rects.creepCamp23.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, RENEGADE_FELGUARD, Rects.creepCamp23.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp24, filt)
+            if camp.isEmpty()
+                createNUnits(OWNER, 3, RENEGADE_FELGUARD, Rects.creepCamp24.getCenter(), UNIT_FACING)
+            camp.clear()
+            
+            camp.enumUnitsInRect(Rects.creepCamp25, filt)
+            if camp.isEmpty()
+                createUnit(OWNER, RENEGADE_SOCERER, Rects.creepCamp25.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 2, RENEGADE_FELGUARD, Rects.creepCamp25.getCenter(), UNIT_FACING)
+            camp.clear()
+    end)
+
+    spawning.execute()
+
+    Bounty.set(RENEGADE_DRAENEI, 25, 1, 3)
+    Bounty.set(RENEGADE_SOCERER, 30, 1, 3)
+    Bounty.set(WILD_FEALBEST_BIG, 25, 3, 3)
+    Bounty.set(WILD_FEALBEST_SMALL, 25, 1, 3)
+    Bounty.set(RENEGADE_FELGUARD, 27, 1, 3)
+    Bounty.set(ENRAGED_ELEMENTAL, 25, 2, 3)
+    Bounty.set(WILD_DRAGON, 25, 1, 3)
+    Bounty.set(INFERNAL_ARTIFACT, 17, 3, 3)
+
+function UnitDefinition.creepDefault()
+    this
+        ..setAcquisitionRange(150.)
+        ..setDeathType(0)
+        ..setDefaultActiveAbility("")
+        ..setNormalAbilities("")
+
+@compiletime function gen()
+    new UnitDefinition(RENEGADE_DRAENEI, 'ndrp')
+        ..creepDefault()
+        ..setAttack1DamageBase(25)
+        ..setAttack1CooldownTime(1.6)
+        ..setHitPointsMaximumBase(375)
+        ..setName("Renegade draenei")
+    
+    new UnitDefinition(RENEGADE_SOCERER, 'ners')
+        ..creepDefault()
+        ..setAttack1ProjectileArt(Abilities.bloodElfMissile)
+        ..setAttack1CooldownTime(1.9)
+        ..setName("Renegade Socerer")
+    
+    new UnitDefinition(WILD_FEALBEST_BIG, 'nfel')
+        ..creepDefault()
+        ..setAttack1DamageBase(18)
+        ..setAttack1CooldownTime(1.5)
+        ..setHitPointsMaximumBase(375)
+        ..setName("Wild Felbeast")
+    
+    new UnitDefinition(WILD_FEALBEST_SMALL, 'npfl')
+        ..creepDefault()
+        ..setAttack1CooldownTime(1.5)
+        ..setHitPointsMaximumBase(375)
+        ..setRace(Race.Demon)
+        ..setName("Wild Felbeast")
+    
+    new UnitDefinition(RENEGADE_FELGUARD, 'nfgu')
+        ..creepDefault()
+        ..setAttack1DamageBase(35)
+        ..setAttack1CooldownTime(1.9)
+        ..setHitPointsMaximumBase(400)
+        ..setName("Renegade Felguard")
+    
+    new UnitDefinition(ENRAGED_ELEMENTAL, 'nele')
+        ..creepDefault()
+        ..setAttack1DamageBase(20)
+        ..setAttack1CooldownTime(1.7)
+        ..setHitPointsMaximumBase(400)
+        ..setName("Enraged elemental")
+    
+    new UnitDefinition(WILD_DRAGON, 'nnht')
+        ..creepDefault()
+        ..setAttack1DamageBase(20)
+        ..setAttack1CooldownTime(1.6)
+        ..setLevel(1)
+        ..setHitPointsMaximumBase(400)
+        ..setName("Wild Dragon")
+    
+    new UnitDefinition(INFERNAL_ARTIFACT, 'ninc')
+        ..creepDefault()
+        ..setAttack1DamageBase(20)
+        ..setAttack1CooldownTime(1.6)
+        ..setUnitClassification("")
+        ..setLevel(3)
+        ..setHitPointsMaximumBase(400)
+        ..setName("Wild Dragon")

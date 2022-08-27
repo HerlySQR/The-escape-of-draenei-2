@@ -19,11 +19,11 @@ init
             defensiveTowers2()
             moveCircles(2)
             forUnitsInRect(Rects.demonTower1, u -> begin
-                if u.getTypeId() == 'o00I'
+                if u.getTypeId() == DEMON_TOWER
                     u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
             end)
             forUnitsInRect(Rects.demonTower2, u -> begin
-                if u.getTypeId() == 'o00I'
+                if u.getTypeId() == DEMON_TOWER
                     u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
             end)
             QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")

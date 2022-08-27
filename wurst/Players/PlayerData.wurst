@@ -6,6 +6,10 @@ import Reset
 public constant player DRAENEI = players[0]
 public constant player DEMON = players[6]
 
+init
+    createFogModifier(DRAENEI, FOG_OF_WAR_VISIBLE, bj_mapInitialPlayableArea, true, true).destr()
+    createFogModifier(DEMON, FOG_OF_WAR_VISIBLE, bj_mapInitialPlayableArea, true, true).destr()
+
 public constant force THE_DRAENEI = CreateForce()
 public constant force THE_DEMONS = CreateForce()
 
