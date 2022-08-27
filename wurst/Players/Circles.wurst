@@ -2,7 +2,6 @@ package Circles
 
 import ArrayList
 
-import ModeSelection
 import AbilityData
 import GeneratedValues
 import Reset

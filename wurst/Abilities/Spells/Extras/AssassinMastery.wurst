@@ -25,7 +25,7 @@ init
         ..setLevels(1)
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> int2fourchar(ASSASSIN_MASTERY_BUFF))
+        ..presetBuffs(lvl -> ASSASSIN_MASTERY_BUFF.toRawCode())
         ..tooltipStartListen()
         ..setName("[|cffffcc00F|r] Assassin Mastery")
         // Stats

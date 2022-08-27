@@ -6,7 +6,7 @@ import Assets
 import ObjectIdGenerator
 import UnitObjEditing
 import HashMap
-import LinkedListModule
+import LinkedList
 import Annotations
 
 // More easy to remember
@@ -35,7 +35,7 @@ public constant DARK_WIZARD = compiletime(new HeroType('Emns'))
 public constant AXEMASTER = compiletime(new HeroType('Opgh'))
 public constant LAVA_ELEMENTAL = compiletime(new HeroType('Nfir'))
 
-let heroTypes = compiletime(new HashMap<int, HeroType>())
+let heroTypes = new HashMap<int, HeroType>()
 
 function HeroDefinition.defaultStats()
     this
@@ -51,7 +51,7 @@ function HeroDefinition.defaultStats()
         ..setProperNamesUsed(1)
 
 public class HeroType
-    use LinkedListModule
+    private static constant instances = compiletime(new LinkedList<HeroType>())
 
     private static int MAX = 0
 
@@ -65,14 +65,16 @@ public class HeroType
         heroL = new HeroDefinition(HERO_ID_GEN.next(), origId)..defaultStats()
         heroNL = new HeroDefinition(HERO_ID_GEN.next(), origId)..defaultStats()
 
-        heroTypes.put(heroL.getNewId(), this)
-        heroTypes.put(heroNL.getNewId(), this)
+        instances.add(this)
 
     static function get(unit u) returns HeroType
         return heroTypes.get(u.getTypeId())
 
     static function get(int typ) returns HeroType
         return heroTypes.get(typ)
+    
+    static function iterator() returns LLIterator<HeroType>
+        return instances.iterator()
     
     function getNL() returns int
         return heroNL.getNewId()
@@ -269,7 +271,7 @@ public class HeroType
         heroL
             ..setTintingColorRed(col.red)
             ..setTintingColorGreen(col.green)
-            ..setStartingIntelligence(col.blue)
+            ..setTintingColorBlue(col.blue)
     
     function setElevationSample(int points, real radius)
         heroNL
@@ -374,6 +376,11 @@ public class HeroType
         heroL
             ..setName(data)
             ..setNameEditorSuffix("(Hero)")
+
+init
+    for hero in HeroType
+        heroTypes.put(hero.getL(), hero)
+        heroTypes.put(hero.getNL(), hero)
 
 @compiletime function gen()
     DEMOLISHER

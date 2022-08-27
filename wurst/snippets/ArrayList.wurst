@@ -25,11 +25,12 @@ public class ArrayList<T>
         size = 0
 
     /** Adds an element to the end of the list (top of stack, beginning of queue) */
-    function add(T elem)
-        if size > SIZE
-            error("You are exceding the size limit of an ArrayList")
-        size++
-        elements[size] = elem
+    function add(vararg T elems)
+        for elem in elems
+            if size > SIZE
+                error("You are exceding the size limit of an ArrayList")
+            size++
+            elements[size] = elem
 
     /** Adds an element to an specific position displacing the next elements
         (only if is not putting outside the bounds of the list) */

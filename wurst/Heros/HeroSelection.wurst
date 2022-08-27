@@ -19,7 +19,7 @@ public rect actDeSpawn
 
 public force canPick = CreateForce()
 
-public HashMap<int, unit> heroModel
+public constant heroModel = new HashMap<int, unit>()
 
 let seeDraenei = createVision(DEMON, Rects.selectorDraenei, true)
 let seeDemons = createVision(DRAENEI, Rects.selectorDemon, true)
@@ -168,9 +168,9 @@ function createDistribution(int quantity, real dist, vec2 center) returns vec2Li
     let maxSize = (MAX_DIST/dist).toInt() + 1
     int longestRowSize = min(maxSize, getLongestRowSize(quantity))
 
-    if quantity == 1
-        xVals.add(center.x)
-        yVals.add(center.y)
+    //if quantity == 1
+    xVals.add(center.x)
+    yVals.add(center.y)
 
     return vec2List(xVals, yVals)
 
@@ -191,9 +191,9 @@ init
     for hero in HeroType
         unit u = null
         if hero.getRace() == Orc
-            u = createUnit(DRAENEI, hero.getL(), drPoints.get(i), UNIT_FACING)
+            u = createUnit(DRAENEI, hero.getL(), drPoints.get(1), UNIT_FACING)
         else if hero.getRace() == Undead
-            u = createUnit(DEMON, hero.getL(), dePoints.get(i), UNIT_FACING)
+            u = createUnit(DEMON, hero.getL(), dePoints.get(1), UNIT_FACING)
 
         if u != null
             u.setInvulnerable(true)

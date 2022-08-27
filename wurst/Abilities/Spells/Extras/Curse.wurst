@@ -26,7 +26,7 @@ init
         ..setLevels(1)
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> int2fourchar(CURSE_BUFF))
+        ..presetBuffs(lvl -> CURSE_BUFF.toRawCode())
         ..tooltipStartListen()
         ..addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Curse")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
