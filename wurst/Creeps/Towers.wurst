@@ -7,6 +7,8 @@ import ClosureForGroups
 import PlayerData
 import Orders
 import DamageEvent
+import initlater Dungeon
+import initlater Barrels
 import GeneratedValues
 
 import LinkedList
@@ -57,11 +59,11 @@ let endItsJob = CreateGroup()
 
 function acolyteSpawnPos(vec2 p) returns vec2
     vec2 pos = ZERO2
-    if Rects.demonTower1.contains(p) or Rects.demonTower2.contains(p)
+    if Rects.demonTower1.contains(p)
         pos = GUnits.barrack1.getPos()
-    else if Rects.demonTower3.contains(p)// or gg_rct_Torres_del_muro.contains(p)
+    else if Rects.demonTower2.contains(p) or  Rects.demonTower3.contains(p)
         pos = GUnits.barrack2.getPos()
-    else if Rects.demonTower4.contains(p) or Rects.demonTower5.contains(p)
+    else if Rects.demonTower4.contains(p)
         pos = GUnits.barrack3.getPos()
     return pos
 
@@ -69,15 +71,12 @@ function unit.issueBuildOrder(int unitToBuild, vec2 pos)
     IssueBuildOrderById(this, unitToBuild, pos.x, pos.y)
 
 let towerDraeneiPos = [
-    ZERO2/*,
-    gg_rct_Torre_defesiva_1.getCenter(),
-    gg_rct_Torre_defesiva_2.getCenter(),
-    gg_rct_Torre_defesiva_3.getCenter(),
-    gg_rct_Torre_defesiva_4.getCenter(),
-    gg_rct_Torre_defesiva_5.getCenter(),
-    gg_rct_Torre_defesiva_6.getCenter(),
-    gg_rct_Torre_defesiva_7.getCenter(),
-    gg_rct_Torre_defesiva_8.getCenter()*/
+    Rects.draeneiTower0.getCenter(),
+    Rects.draeneiTower1.getCenter(),
+    Rects.draeneiTower2.getCenter(),
+    Rects.draeneiTower3.getCenter(),
+    Rects.draeneiTower4.getCenter(),
+    Rects.draeneiTower5.getCenter()
 ]
 
 // Functions to order to build the towers
@@ -85,32 +84,28 @@ let towerDraeneiPos = [
 public function defensiveTowers1()
     let builders = CreateGroup()
     GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[0])
+    new BuildingInstance(towerDraeneiPos[0], DRAENEI_TOWER)
     builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[1])
     new BuildingInstance(towerDraeneiPos[1], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[2])
-    new BuildingInstance(towerDraeneiPos[2], DRAENEI_TOWER)
     builders.destr()
 
 public function defensiveTowers2()
     let builders = CreateGroup()
     GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[2])
+    new BuildingInstance(towerDraeneiPos[2], DRAENEI_TOWER)
     builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[3])
     new BuildingInstance(towerDraeneiPos[3], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[4])
-    new BuildingInstance(towerDraeneiPos[4], DRAENEI_TOWER)
     builders.destr()
 
 public function defensiveTowers3()
     let builders = CreateGroup()
     GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[4])
+    new BuildingInstance(towerDraeneiPos[4], DRAENEI_TOWER)
     builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[5])
     new BuildingInstance(towerDraeneiPos[5], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[6])
-    new BuildingInstance(towerDraeneiPos[6], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[7])
-    new BuildingInstance(towerDraeneiPos[7], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[8])
-    new BuildingInstance(towerDraeneiPos[8], DRAENEI_TOWER)
     builders.destr()
 
 // Check everytime a tower is correctly builded in less of a 60 seconds
@@ -179,18 +174,19 @@ function disableTower()
     if u.getTypeId() != DEMON_TOWER
         return
     let p = u.getPos()
-    /* TODO: Init the destructables
-    if (gg_rct_Torre_de_los_demonios_1.contains(p) and gg_dest_ATg1_1002.getLife() < 0) or
-        (gg_rct_Torre_de_los_demonios_2.contains(p) and gg_dest_DTrc_0239.getLife() < 0) or
-        (gg_rct_Torres_del_muro.contains(p) and not generatorAlive) or
-        (gg_rct_Torre_de_los_demonios_3.contains(p) and gg_dest_DTg6_0506.getLife() < 0)
-        u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)*/
+    if (Rects.demonTower1.contains(p) and doorDestroyed) or
+        (Rects.demonTower2.contains(p) and not generatorAlive) or
+        (Rects.demonTower3.contains(p) and wallDestroyed) or
+        (Rects.demonTower4.contains(p) and not Dests.mainEntranceDoor.isAliveTrick())
+        u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
 
 init
     // This towers don't work
     onEnter(function disableTower)
     // Run the first
-    defensiveTowers1()
+    for _ = 1 to 8
+        createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), GetRandomReal(0, PI2).asAngleRadians())
+    nullTimer(() -> defensiveTowers1())
     // If a tower is destroyed
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)

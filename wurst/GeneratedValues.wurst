@@ -26,8 +26,6 @@ public class GUnits
 
     // Missions
     
-    static constant generator1 = gg_unit_npgr_0015
-    static constant generator2 = gg_unit_npgr_0016
 
 /** The generated destructables. */
 public class Dests
@@ -59,10 +57,11 @@ public class Dests
 
     // Elevators
 
-    static constant elevatorHabitat1 = gg_dest_B00F_6359
-    static constant elevatorHabitat2 = gg_dest_B00F_6360
-    static constant elevatorGenerator1 = gg_dest_B00G_2141
-    static constant elevatorGenerator2 = gg_dest_B00G_2140
+    static constant elevatorHabitat1 = elevator(gg_dest_B00F_6359)
+    static constant elevatorHabitat2 = elevator(gg_dest_B00F_6360)
+    static constant elevatorGenerator1 = elevator(gg_dest_B00G_2141)
+    static constant elevatorGenerator2 = elevator(gg_dest_B00G_2140)
+    static constant elevatorSecret = elevator(gg_dest_B00G_4708)
 
     static constant leverGenerator = gg_dest_B008_6364
 
@@ -70,6 +69,8 @@ public class Dests
     
     static constant leverSecret = gg_dest_B009_6603
     static constant secretMerchantLever = [gg_dest_B00H_4873, gg_dest_B00H_2593, gg_dest_B00H_2594]
+
+    static constant dungeonWalls = [gg_dest_B00K_6627, gg_dest_B00K_5690, gg_dest_B00K_5689, gg_dest_B00K_4875]
 
     // Missions
 
@@ -81,6 +82,11 @@ public class Dests
     static constant entranceForceWall6 = gg_dest_Dofw_6595
     static constant entranceForceWall7 = gg_dest_Dofv_6526
     static constant entranceForceWall8 = gg_dest_Dofw_6594
+
+    // Power shield
+    static constant powerField = [gg_dest_B00J_6607, gg_dest_B00J_6608, gg_dest_B00J_2611, gg_dest_B00J_6606,
+                                  gg_dest_B00J_6609, gg_dest_B00J_6611, gg_dest_B00J_6610, gg_dest_B00J_6612,
+                                  gg_dest_B00J_6613, gg_dest_B00J_6614]
 
 /** The generated regions (rects). */
 public class Rects
@@ -155,6 +161,7 @@ public class Rects
     static constant elevatorHabitat2 = gg_rct_ElevatorHabitat2
     static constant elevatorGenerator1 = gg_rct_ElevatorGenerator1
     static constant elevatorGenerator2 = gg_rct_ElevatorGenerator2
+    static constant elevatorSecret = gg_rct_ElevatorSecret
 
     // Selectors
     static constant selectorDraenei = gg_rct_SelectorDraenei
@@ -217,7 +224,13 @@ public class Rects
     static constant demonTower2 = gg_rct_DemonTower2
     static constant demonTower3 = gg_rct_DemonTower3
     static constant demonTower4 = gg_rct_DemonTower4
-    static constant demonTower5 = gg_rct_DemonTower5
+
+    static constant draeneiTower0 = gg_rct_DraeneiTower0
+    static constant draeneiTower1 = gg_rct_DraeneiTower1
+    static constant draeneiTower2 = gg_rct_DraeneiTower2
+    static constant draeneiTower3 = gg_rct_DraeneiTower3
+    static constant draeneiTower4 = gg_rct_DraeneiTower4
+    static constant draeneiTower5 = gg_rct_DraeneiTower5
 
     // Missions
 
@@ -291,6 +304,12 @@ public class Rects
     static constant shops4 = gg_rct_Shops4
     static constant shops5 = gg_rct_Shops5
 
+    // Power fields
+    static constant powerField1 = gg_rct_PowerField1
+    static constant powerField2 = gg_rct_PowerField2
+    static constant powerField3 = gg_rct_PowerField3
+    static constant powerField4 = gg_rct_PowerField4
+
     /* Postions for placed units */
 
     // Merchants
@@ -312,6 +331,19 @@ public class Rects
     static constant deathTower3 = [gg_rct_DeathTower300, gg_rct_DeathTower301, gg_rct_DeathTower302, gg_rct_DeathTower303, gg_rct_DeathTower304,
                                    gg_rct_DeathTower305, gg_rct_DeathTower306, gg_rct_DeathTower307, gg_rct_DeathTower308, gg_rct_DeathTower309,
                                    gg_rct_DeathTower310, gg_rct_DeathTower311, gg_rct_DeathTower312, gg_rct_DeathTower313]
+    
+    // Draenei warriors
+    static constant draeneiWarrior = [gg_rct_DraeneiWarrior0, gg_rct_DraeneiWarrior1, gg_rct_DraeneiWarrior2]
+
+    // Chaos grunts
+    static constant chaosGrunt1 = [gg_rct_ChaosGrunt10, gg_rct_ChaosGrunt11, gg_rct_ChaosGrunt12]
+
+    // Wall generator
+    static constant wallGenerator = gg_rct_WallGenerator
+
+    // Generators
+    static constant generator1 = gg_rct_Generator1
+    static constant generator2 = gg_rct_Generator2
 
 /** The generated cameras. */
 public class Cams

@@ -1,9 +1,69 @@
 package Surrender
 
 import ChatEnter
+import Reset
+import MyBoard
+import initlater Missions
+import GeneratedValues
+
+import ClosureEvents
 
 public boolean theySurrender = false
+var canSurrender = false
+let wannaSurrender = CreateForce()
+var wannaSurrenderDr = 0
+var wannaSurrenderDe = 0
+CallbackSingle endSurrender = null
+
+function surrender(player p)
+    if not canSurrender
+        return
+
+    if p != null
+        if wannaSurrender.has(p)
+            return
+        wannaSurrender.add(p)
+        
+        if THE_DRAENEI.has(p)
+            wannaSurrenderDr++
+        else if THE_DEMONS.has(p)
+            wannaSurrenderDe++
+    
+    if endSurrender == null
+        endSurrender = doAfter(60., () -> begin
+            endSurrender = null
+            wannaSurrenderDr = 0
+            wannaSurrenderDe = 0
+            print("|cffb92929The time to surrender it's over.|r")
+        end)
+    
+    if wannaSurrenderDr == drPlayers or wannaSurrenderDe == dePlayers
+        theySurrender = true
+        wannaSurrenderDr = 0
+        wannaSurrenderDe = 0
+        destroy endSurrender
+        endSurrender = null
+
+        if wannaSurrenderDr == drPlayers
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall1)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall2)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall3)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall4)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall5)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall6)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall7)
+            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall8)
+            draeneiWin()
+        else
+            demonsWin()
 
 init
-    onChatCommand("surrender", (p, _) -> begin
+    onModesSelected(() -> begin
+        canSurrender = true
     end)
+    onReset(false, () -> begin
+        canSurrender = false
+        theySurrender = false
+    end)
+    onChatCommand("surrender", (p, _) -> surrender(p))
+    EventListener.add(EVENT_PLAYER_LEAVE, () -> nullTimer(() -> surrender(null)))

@@ -5,6 +5,7 @@ import initlater Missions
 import PlayerData
 import HeroSelection
 import DontPlaySmart
+import GeneratedValues
 
 import EventHelper
 import Orders

@@ -5,14 +5,16 @@ import initlater Missions
 import PlayerData
 import Towers
 import DrAndDeSpawn
+import Reset
+import GeneratedValues
 
 import ObjectIdGenerator
 import UnitObjEditing
 
-public unit generator1 = GUnits.generator1
-public unit generator2 = GUnits.generator2
-public vec2 generatorPos1 = generator1.getPos()
-public vec2 generatorPos2 = generator2.getPos()
+public unit generator1 = null
+public unit generator2 = null
+public vec2 generatorPos1 = Rects.generator1.getCenter()
+public vec2 generatorPos2 = Rects.generator2.getCenter()
 public boolean generator1IsAlive = true
 public boolean generator2IsAlive = true
 public boolean generatorsDestroyed = false
@@ -21,17 +23,27 @@ public trigger destroyGenerators = CreateTrigger()
 
 let GENERATOR = compiletime(UNIT_ID_GEN.next())
 
-function defineGenerators()
-    if generator1 == null
-        generator1 = createUnit(DEMON, GENERATOR, generatorPos1, UNIT_FACING)
-    if generator2 == null
-        generator2 = createUnit(DEMON, GENERATOR, generatorPos2, UNIT_FACING)
-    generator1.setInvulnerable(true)
-    generator2.setInvulnerable(true)
-    generatorsLeft = 2
-
 init
-    defineGenerators()
+    onReset(true, () -> begin
+        if generator1 == null
+            generator1 = createUnit(DEMON, GENERATOR, generatorPos1, UNIT_FACING)
+        if generator2 == null
+            generator2 = createUnit(DEMON, GENERATOR, generatorPos2, UNIT_FACING)
+        generator1.setInvulnerable(true)
+        generator2.setInvulnerable(true)
+        generatorsLeft = 2
+    end)
+    onReset(false, () -> begin
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall1)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall2)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall3)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall4)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall5)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall6)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall7)
+        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall8)
+    end)
+
     destroyGenerators
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
         ..addCondition(Condition(() -> GetDyingUnit().getTypeId() == GENERATOR))

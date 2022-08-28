@@ -5,17 +5,19 @@ import Icons
 
 import public Functions
 import public PlayerData
-import ModeSelection
+import initlater ModeSelection
 import HeroType
 import ReviveN
 import DrAndDeSpawn
 
 public constant gameBoard = CreateMultiboard()
+public int drPlayers = 0
+public int dePlayers = 0
 
 init
-    onModesSelected(() -> playersOrder())
-
     nullTimer() -> 
+        onModesSelected(() -> playersOrder())
+
         var pl = 3
         for i = 0 to bj_MAX_PLAYERS
             if players[i].isIngame()
@@ -57,7 +59,8 @@ public function playersOrder()
         if playerM(i).isIngame()
             row[i] = t
             t++
-
+            drPlayers++
+            
     let d = t
     t++
 
@@ -65,6 +68,7 @@ public function playersOrder()
         if playerM(i).isIngame()
             row[i] = t
             t++
+            dePlayers++
     
     gameBoard.setRowCount(t)
     for i = 0 to gameBoard.getRowCount() - 1
@@ -93,8 +97,6 @@ public function playersOrder()
         ..setItemValue(d, 1, (" ons").color(colorId[12]))
     for i = 2 to 4
         gameBoard.setItemValue(d, i, "")
-    
-    gameBoard..show()..maximize()
 
 // Game time
 var seconds = 0

@@ -13,6 +13,7 @@ import Functions
 import Reset
 import PlayerData
 import initlater Missions
+import GeneratedValues
 
 public boolean spawnRun = false
 
@@ -104,6 +105,14 @@ init
         createUnit(DEMON, DEATH_TOWER_2, Rects.deathTower2[i].getCenter(), UNIT_FACING)
     for i = 0 to 13
         createUnit(DEMON, DEATH_TOWER_3, Rects.deathTower3[i].getCenter(), UNIT_FACING)
+
+    // Create the draenei warriors
+    for i = 0 to 2
+        createUnit(DRAENEI, DRAENEI_WARRIOR[0], Rects.draeneiWarrior[i].getCenter(), GetRandomReal(0, PI2).asAngleRadians())
+    
+    // Create the chaos grunts
+    for i = 0 to 2
+        createUnit(DEMON, CHAOS_GRUNT[0], Rects.chaosGrunt1[i].getCenter(), 0..asAngleRadians())
     
     // Set upgrades
     for i = 0 to 2
@@ -128,23 +137,23 @@ init
         ..registerTimerEvent(30., true)
         .addAction(() -> begin
             if actMission == 1
-                for i = 0 to 2
-                    createDr(DRAENEI_WARRIOR[1])
-                    createDe(CHAOS_GRUNT[1], deSpw1, attackPoint1)
+                for _ = 0 to 2
+                    createDr(DRAENEI_WARRIOR[0])
+                    createDe(CHAOS_GRUNT[0], deSpw1, attackPoint1)
             else if actMission == 2
-                for i = 0 to 2
-                    createDr(DRAENEI_WARRIOR[2])
-                    createDe(CHAOS_GRUNT[2], deSpw21, attackPoint2)
-                for i = 0 to 1
-                    createDr(DRAENEI_MAGE[2])
-                    createDe(CHAOS_WARLOCK[2], deSpw22, attackPoint2)
+                for _ = 0 to 2
+                    createDr(DRAENEI_WARRIOR[1])
+                    createDe(CHAOS_GRUNT[1], deSpw21, attackPoint2)
+                for _ = 0 to 1
+                    createDr(DRAENEI_MAGE[0])
+                    createDe(CHAOS_WARLOCK[0], deSpw22, attackPoint2)
             else if actMission >= 3
-                for i = 0 to 2
-                    createDr(DRAENEI_WARRIOR[3])
-                    createDe(CHAOS_GRUNT[3], deSpw31, attackPoint4)
-                for i = 0 to 1
-                    createDr(DRAENEI_MAGE[3])
-                    createDe(CHAOS_WARLOCK[3], deSpw32, attackPoint4)
+                for _ = 0 to 2
+                    createDr(DRAENEI_WARRIOR[2])
+                    createDe(CHAOS_GRUNT[2], deSpw31, attackPoint4)
+                for _ = 0 to 1
+                    createDr(DRAENEI_MAGE[1])
+                    createDe(CHAOS_WARLOCK[1], deSpw32, attackPoint4)
         end)
     // Keep the units attack their targets
     attack
@@ -153,7 +162,7 @@ init
             attackers.forEachIn(u -> begin
                 if not u.isAlive()
                     attackers.remove(u)
-                else if u.getCurrentOrder() == Orders.attack or theyGo.has(u)
+                else if u.getCurrentOrder() != Orders.attack or theyGo.has(u)
                     u.issuePointOrderById(Orders.attack, target[u.getIndex()])
                     theyGo.remove(u)
             end)
@@ -182,7 +191,7 @@ init
         ..registerDeathEvent(Dests.dungeonDoor1)
         ..addAction(() -> begin
             forUnitsOfPlayer(DRAENEI, u -> begin
-                if u.getTypeId() == DRAENEI_WARRIOR[1]
+                if u.getTypeId() == DRAENEI_WARRIOR[0]
                     u.issuePointOrderById(Orders.attack, attackPoint1)
                     attackers.add(u)
             end)

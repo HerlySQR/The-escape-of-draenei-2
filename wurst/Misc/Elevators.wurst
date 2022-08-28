@@ -2,12 +2,18 @@ package Elevators
 
 import Functions
 import GeneratedValues
+import Reset
 
 import EventHelper
 import ClosureTimers
 import ClosureForGroups
 
 init
+    Dests.elevatorHabitat1
+        ..changeWalls(true, ElevatorWallType.EAST)
+        ..changeWalls(true, ElevatorWallType.NORTH)
+        ..changeWalls(false, ElevatorWallType.SOUTH)
+        ..changeWalls(true, ElevatorWallType.WEST)
     // Cave exit
     CreateTrigger()
         ..registerRectEnterEventSource(Rects.elevatorHabitat1)
@@ -16,19 +22,24 @@ init
             let t = GetTriggeringTrigger()
             t.disable()
             doAfter(2.5) -> 
-                Dests.elevatorHabitat1.changeHeight(2)
+                Dests.elevatorHabitat1.setHeight(2)
                 doAfter(0.5) -> 
                     Dests.elevatorHabitat1.changeWalls(false, ElevatorWallType.ALL)
-                    Dests.elevatorHabitat1.changeWalls(true, ElevatorWallType.EAST)
+                    Dests.elevatorHabitat1.changeWalls(true, ElevatorWallType.SOUTH)
                     doAfter(2.5) -> 
-                        Dests.elevatorHabitat1.changeHeight(1)
-                        Dests.elevatorHabitat1.changeWalls(false, ElevatorWallType.EAST)
+                        Dests.elevatorHabitat1.setHeight(1)
+                        Dests.elevatorHabitat1.changeWalls(false, ElevatorWallType.SOUTH)
                         doAfter(0.5) -> 
-                            Dests.elevatorHabitat1.changeWalls(true, ElevatorWallType.SOUTH)
+                            Dests.elevatorHabitat1.changeWalls(true, ElevatorWallType.EAST)
                             Dests.elevatorHabitat1.changeWalls(true, ElevatorWallType.NORTH)
                             Dests.elevatorHabitat1.changeWalls(true, ElevatorWallType.WEST)
                             t.enable()
         end)
+    Dests.elevatorHabitat2
+        ..changeWalls(true, ElevatorWallType.NORTH)
+        ..changeWalls(true, ElevatorWallType.SOUTH)
+        ..changeWalls(false, ElevatorWallType.EAST)
+        ..changeWalls(true, ElevatorWallType.WEST)
     CreateTrigger()
         ..registerRectEnterEventSource(Rects.elevatorHabitat2)
         ..addCondition(notFlying)
@@ -36,15 +47,15 @@ init
             let t = GetTriggeringTrigger()
             t.disable()
             doAfter(2.5) -> 
-                Dests.elevatorHabitat2.changeHeight(2)
+                Dests.elevatorHabitat2.setHeight(2)
                 doAfter(0.5) -> 
                     Dests.elevatorHabitat2.changeWalls(false, ElevatorWallType.ALL)
-                    Dests.elevatorHabitat2.changeWalls(true, ElevatorWallType.SOUTH)
+                    Dests.elevatorHabitat2.changeWalls(true, ElevatorWallType.EAST)
                     doAfter(2.5) -> 
-                        Dests.elevatorHabitat2.changeHeight(1)
-                        Dests.elevatorHabitat2.changeWalls(false, ElevatorWallType.SOUTH)
+                        Dests.elevatorHabitat2.setHeight(1)
+                        Dests.elevatorHabitat2.changeWalls(false, ElevatorWallType.EAST)
                         doAfter(0.5) -> 
-                            Dests.elevatorHabitat2.changeWalls(true, ElevatorWallType.EAST)
+                            Dests.elevatorHabitat2.changeWalls(true, ElevatorWallType.SOUTH)
                             Dests.elevatorHabitat2.changeWalls(true, ElevatorWallType.NORTH)
                             Dests.elevatorHabitat2.changeWalls(true, ElevatorWallType.WEST)
                             t.enable()
@@ -53,6 +64,11 @@ init
     CreateTrigger()
         ..registerDeathEvent(Dests.leverGenerator)
         ..addAction(() -> print("The elevator near the generator was activated"))
+    Dests.elevatorGenerator1
+        ..changeWalls(true, ElevatorWallType.NORTH)
+        ..changeWalls(false, ElevatorWallType.SOUTH)
+        ..changeWalls(true, ElevatorWallType.EAST)
+        ..changeWalls(true, ElevatorWallType.WEST)
     CreateTrigger()
         ..registerRectEnterEventSource(Rects.elevatorGenerator1)
         ..addCondition(notFlying)
@@ -63,12 +79,12 @@ init
                 let t = GetTriggeringTrigger()
                 t.disable()
                 doAfter(2.5) -> 
-                    Dests.elevatorGenerator1.changeHeight(3)
+                    Dests.elevatorGenerator1.setHeight(3)
                     doAfter(0.7) -> 
                         Dests.elevatorGenerator1.changeWalls(false, ElevatorWallType.ALL)
                         Dests.elevatorGenerator1.changeWalls(true, ElevatorWallType.SOUTH)
                         doAfter(2.5) -> 
-                            Dests.elevatorGenerator1.changeHeight(1)
+                            Dests.elevatorGenerator1.setHeight(1)
                             Dests.elevatorGenerator1.changeWalls(false, ElevatorWallType.SOUTH)
                             doAfter(0.7) -> 
                                 Dests.elevatorGenerator1.changeWalls(true, ElevatorWallType.EAST)
@@ -77,6 +93,11 @@ init
                                 t.enable()
         end)
     // To the generator 2
+    Dests.elevatorGenerator2
+        ..changeWalls(false, ElevatorWallType.NORTH)
+        ..changeWalls(true, ElevatorWallType.SOUTH)
+        ..changeWalls(true, ElevatorWallType.EAST)
+        ..changeWalls(true, ElevatorWallType.WEST)
     CreateTrigger()
         ..registerRectEnterEventSource(Rects.elevatorGenerator2)
         ..addCondition(notFlying)
@@ -84,12 +105,12 @@ init
             let t = GetTriggeringTrigger()
             t.disable()
             doAfter(2.5) -> 
-                Dests.elevatorGenerator2.changeHeight(2)
+                Dests.elevatorGenerator2.setHeight(2)
                 doAfter(0.5) -> 
                     Dests.elevatorGenerator2.changeWalls(false, ElevatorWallType.ALL)
                     Dests.elevatorGenerator2.changeWalls(true, ElevatorWallType.NORTH)
                     doAfter(2.5) -> 
-                        Dests.elevatorGenerator2.changeHeight(1)
+                        Dests.elevatorGenerator2.setHeight(1)
                         Dests.elevatorGenerator2.changeWalls(false, ElevatorWallType.NORTH)
                         doAfter(0.5) -> 
                             Dests.elevatorGenerator2.changeWalls(true, ElevatorWallType.EAST)
@@ -114,41 +135,53 @@ init
         ..registerDeathEvent(Dests.leverSecret)
         ..addAction(() -> begin
             QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The secret route in the dungeon has been open.")
-            //TODO:forDestructablesInRect(gg_rct_Bajen, d -> d.changeHeight(1))
+            forDestructablesInRect(Rects.elevatorsSecret, d -> elevator(d).setHeight(1))
             doAfter(0.5) -> 
-                //forDestructablesInRect(gg_rct_Bajen, d -> d.changeWalls(true, ElevatorWallType.ALL))
+                forDestructablesInRect(Rects.elevatorsSecret, d -> elevator(d).changeWalls(true, ElevatorWallType.ALL))
         end)
-/*TODO     
+
     // Elevator
+    Dests.elevatorSecret
+        ..changeWalls(false, ElevatorWallType.NORTH)
+        ..changeWalls(false, ElevatorWallType.SOUTH)
+        ..changeWalls(false, ElevatorWallType.EAST)
+        ..changeWalls(true, ElevatorWallType.WEST)
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Ascensor_Secreto)
+        ..registerRectEnterEventSource(Rects.elevatorSecret)
         ..addCondition(notFlying)
         ..addAction(() -> begin
             let t = GetTriggeringTrigger()
             t.disable()
             doAfter(2.5) -> 
-                gg_dest_DTrx_1712.changeHeight(3)
+                Dests.elevatorSecret.setHeight(3)
                 doAfter(0.7) -> 
-                    gg_dest_DTrx_1712.changeWalls(false, ElevatorWallType.WEST)
-                    gg_dest_DTrx_1712.changeWalls(true, ElevatorWallType.SOUTH)
+                    Dests.elevatorSecret.changeWalls(false, ElevatorWallType.WEST)
+                    Dests.elevatorSecret.changeWalls(true, ElevatorWallType.SOUTH)
+                    Dests.elevatorSecret.changeWalls(true, ElevatorWallType.EAST)
                     doAfter(2.5) -> 
-                        gg_dest_DTrx_1712.changeHeight(1)
-                        gg_dest_DTrx_1712.changeWalls(false, ElevatorWallType.SOUTH)
+                        Dests.elevatorSecret.setHeight(1)
+                        Dests.elevatorSecret.changeWalls(false, ElevatorWallType.SOUTH)
+                        Dests.elevatorSecret.changeWalls(false, ElevatorWallType.EAST)
                         doAfter(0.7) -> 
-                            gg_dest_DTrx_1712.changeWalls(true, ElevatorWallType.WEST)
+                            Dests.elevatorSecret.changeWalls(true, ElevatorWallType.WEST)
                             t.enable()
         end)
 
     // Hide dungeon walls
     CreateTrigger()
-        ..registerDeathEvent(gg_dest_B002_0035)
-        ..registerDeathEvent(gg_dest_B002_0241)
-        ..registerDeathEvent(gg_dest_B002_1062)
-        ..registerDeathEvent(gg_dest_B002_1060)
-        ..registerDeathEvent(gg_dest_B002_0012)
-        ..registerDeathEvent(gg_dest_B002_0009)
-        ..addAction(() -> ShowDestructable(GetTriggerDestructable(), false))
+        ..registerDeathEvent(Dests.dungeonWalls[0])
+        ..registerDeathEvent(Dests.dungeonWalls[1])
+        ..registerDeathEvent(Dests.dungeonWalls[2])
+        ..registerDeathEvent(Dests.dungeonWalls[3])
+        ..addAction(() -> GetTriggerDestructable().show(false))
+    onReset(false, () -> begin
+        for i = 0 to 3
+            Dests.dungeonWalls[i]
+                ..restoreLife(250, false)
+                ..show(true)
+    end)
 
+/*TODO     
 // YOU SHALL NOT PASS
 
 boolean actived1 = false
@@ -160,13 +193,13 @@ init
         ..addAction(() -> begin
             if not actived1
                 forDestructablesInRect(gg_rct_Plataformas, d -> begin
-                    d.changeHeight(3)
+                    d.setHeight(3)
                     d.changeWalls(false, ElevatorWallType.ALL)
                 end)
                 gg_unit_n00X_0259.setColor(PLAYER_COLOR_GREEN)
             else
                 forDestructablesInRect(gg_rct_Plataformas, d -> begin
-                    d.changeHeight(1)
+                    d.setHeight(1)
                     d.changeWalls(true, ElevatorWallType.ALL)
                 end)
                 gg_unit_n00X_0259.setColor(PLAYER_COLOR_BLACK_PASSIVE)
@@ -189,7 +222,7 @@ init
                 gg_unit_n00X_0232.setColor(PLAYER_COLOR_GREEN)
                 DisplayTextToPlayer(GetTriggerUnit().getOwner(), 0., 0., "I wonder what this will do.")
                 forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> begin
-                    d.changeHeight(3)
+                    d.setHeight(3)
                     d.changeWalls(true, ElevatorWallType.ALL)
                 end)
                 doAfter(0.7) -> 
@@ -199,7 +232,7 @@ init
                 gg_unit_n00X_0232.setColor(PLAYER_COLOR_BLACK_PASSIVE)
                 DisplayTextToPlayer(GetTriggerUnit().getOwner(), 0., 0., "Yes, better leave it at that.")
                 forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> begin
-                    d.changeHeight(1)
+                    d.setHeight(1)
                     d.changeWalls(false, ElevatorWallType.EAST)
                     d.changeWalls(false, ElevatorWallType.WEST)
                 end)

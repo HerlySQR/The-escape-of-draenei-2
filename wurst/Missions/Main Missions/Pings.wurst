@@ -3,6 +3,7 @@ package Pings
 import Functions
 import initlater Missions
 import PlayerData
+import GeneratedValues
 
 public trigger pings = CreateTrigger()..disable()
 

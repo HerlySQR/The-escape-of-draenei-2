@@ -436,7 +436,7 @@ init
     DARK_ASSASSIN
         ..setAcquisitionRange(500.)
         ..setAttack1ProjectileHomingEnabled(false)
-        ..setAttack1Range(750)
+        ..setAttack1Range(100)
         ..setAttack1Animation(0.33, 0.64)
         ..setAttack1ProjectileArc(0)
         ..setAttack1Damage(53, 2, 8)
@@ -480,7 +480,7 @@ init
         ..setSpeedBase(300)
         ..setTurnRate(0.6)
         ..setCollisionSize(32.)
-        ..setUnitSoundSet(Soundsets.dranai)
+        ..setUnitSoundSet("Draenei")
         ..setProperNames("Kajind")
         ..setName("Draenei Dark Assassin")
 
@@ -531,7 +531,7 @@ init
         ..setSpeedBase(340)
         ..setTurnRate(0.6)
         ..setCollisionSize(31.)
-        ..setUnitSoundSet(Soundsets.dranaiAkama)
+        ..setUnitSoundSet("Akama")
         ..setProperNames("Akama")
         ..setName("Elder Sage")
 
@@ -582,7 +582,7 @@ init
         ..setSpeedBase(290)
         ..setTurnRate(0.6)
         ..setCollisionSize(32.)
-        ..setUnitSoundSet(Soundsets.dranai)
+        ..setUnitSoundSet("Draenei")
         ..setProperNames("Bale Bleakstare")
         ..setName("Draenei Seer")
 
@@ -633,7 +633,7 @@ init
         ..setSpeedBase(310)
         ..setTurnRate(0.6)
         ..setCollisionSize(32.)
-        ..setUnitSoundSet(Soundsets.dranai)
+        ..setUnitSoundSet("Draenei")
         ..setProperNames("Negal Fireye")
         ..setName("Draenei Herald")
 

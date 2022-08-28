@@ -347,9 +347,6 @@ public enum ElevatorWallType
     WEST
     ALL
 
-public function destructable.changeHeight(int height)
-    ChangeElevatorHeight(this, height)
-
 function rect.nudgeObjects()
     forUnitsInRect(this, u -> u.setPos(u.getPos()))
     EnumItemsInRect(this, null, () -> GetEnumItem().setPos(GetEnumItem().getPos()))
@@ -361,10 +358,10 @@ function changeWallBlocker(real x, real y, real facing, boolean open)
     let nudgeLength   = 4.25 * bj_CELLWIDTH
     let nudgeWidth    = 1.25 * bj_CELLWIDTH
     // Search for the pathing blocker within the general area.
-    var r = Rect(x - findThreshold, y - findThreshold, x + findThreshold, y + findThreshold)
+    let r = Rect(x - findThreshold, y - findThreshold, x + findThreshold, y + findThreshold)
     blocker = null
-    forDestructablesInRect(r, d -> begin
-        blocker = d
+    EnumDestructablesInRect(r, null, () -> begin
+        blocker = GetEnumDestructable()
     end)
     r.remove()
 
@@ -388,13 +385,13 @@ function changeWallBlocker(real x, real y, real facing, boolean open)
 
         // Nudge any objects standing in the blocker's way.
         if facing == 0
-            r = Rect(x - nudgeWidth/2, y - nudgeLength/2, x + nudgeWidth/2, y + nudgeLength/2)
-            NudgeObjectsInRect(r)
-            r.remove()
+            Rect(x - nudgeWidth/2, y - nudgeLength/2, x + nudgeWidth/2, y + nudgeLength/2)
+                ..nudgeObjects()
+                ..remove()
         else if facing == 90
-            r = Rect(x - nudgeLength/2, y - nudgeWidth/2, x + nudgeLength/2, y + nudgeWidth/2)
-            NudgeObjectsInRect(r)
-            r.remove()
+            Rect(x - nudgeLength/2, y - nudgeWidth/2, x + nudgeLength/2, y + nudgeWidth/2)
+                ..nudgeObjects()
+                ..remove()
 
 destructable elevatorNeighbor
 
@@ -403,17 +400,17 @@ function nearbyElevatorExists(real x, real y) returns boolean
     // If another elevator is overlapping this one, ignore the wall.
     let r = Rect(x - findThreshold, y - findThreshold, x + findThreshold, y + findThreshold)
     elevatorNeighbor = null
-    forDestructablesInRect(r, d -> begin
-        let dType = d.getTypeId()
+    EnumDestructablesInRect(r, null, () -> begin
+        let dType = GetEnumDestructable().getTypeId()
         if dType == bj_ELEVATOR_CODE01 or dType == bj_ELEVATOR_CODE02
-            elevatorNeighbor = d
+            elevatorNeighbor = GetEnumDestructable()
     end)
     r.remove()
     return elevatorNeighbor != null
 
-public function destructable.changeWalls(boolean open, ElevatorWallType walls)
-    let x = this.getX()
-    let y = this.getY()
+public function elevator.changeWalls(boolean open, ElevatorWallType walls)
+    let x = this.elevatable.getX()
+    let y = this.elevatable.getY()
     let distToBlocker = 192
     let distToNeighbor = 256
 

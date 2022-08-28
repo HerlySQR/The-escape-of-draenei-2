@@ -6,6 +6,7 @@ import PlayerData
 import initlater Missions
 import HeroSelection
 import Towers
+import GeneratedValues
 
 import ClosureEvents
 import UnitIndexer
@@ -19,9 +20,12 @@ import ObjectIds
 import Assets
 import Annotations
 
+import BountyController
+
 public constant BARREL = compiletime(ITEM_ID_GEN.next())
 
 public boolean generatorAlive = true
+public boolean wallDestroyed = false
 public trigger placeBarrel = CreateTrigger()
 public unit array heroWithBarrel
 
@@ -39,10 +43,71 @@ let dustPoint = [
 let GOBLIN_SHOP = compiletime(UNIT_ID_GEN.next())
 let goblinShop = createUnit(players[PLAYER_NEUTRAL_PASSIVE], GOBLIN_SHOP, Rects.lookTheGoblin.getCenter(), UNIT_FACING)
 
+let GENERATOR = compiletime(UNIT_ID_GEN.next())
+var generator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
+let powerFieldEnter1 = CreateTrigger()
+let powerFieldEnter2 = CreateTrigger()
+CallbackPeriodic powerFieldAnimation = null
+
 init
+    // Wall generator
+    powerFieldEnter1
+        ..registerRectEnterEventSource(Rects.powerField1)
+        ..registerRectEnterEventSource(Rects.powerField3)
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            if THE_DRAENEI.has(u)
+                u.setY(u.getY() + 25.)
+        end)
+    powerFieldEnter2
+        ..registerRectEnterEventSource(Rects.powerField2)
+        ..registerRectEnterEventSource(Rects.powerField4)
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            if THE_DRAENEI.has(u)
+                u.setY(u.getY() - 25.)
+        end)
+    onReset(true, () -> begin
+        if powerFieldAnimation == null
+            powerFieldAnimation = doPeriodically(3., cb -> begin
+                for i = 0 to 9
+                    Dests.powerField[i].setAnimation("stand")
+            end)
+    end)
     onReset(false, () -> begin
         goblinShop.show()
+        if not generatorAlive
+            generatorAlive = true
+            generator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
+            for i = 0 to 9
+                Dests.powerField[i]
+                    ..restoreLife(50., true)
+                    ..queueAnimation("stand")
+            powerFieldEnter1.enable()
+            powerFieldEnter2.enable()
+        else
+            generator.setLife(generator.getMaxHP())
+        
+        // Wall
+        if not wallDestroyed
+            wallDestroyed = true
+            forDestructablesInRect(Rects.DESTROY, d -> d.restoreLife(250., false))
+        forDestructablesInRect(Rects.barrel1, d -> d.remove())
+        forDestructablesInRect(Rects.barrel2, d -> d.remove())
+        forDestructablesInRect(Rects.barrel3, d -> d.remove())
     end)
+    EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        if EventData.getDyingUnit() == generator
+            generatorAlive = false
+            powerFieldEnter1.disable()
+            powerFieldEnter2.disable()
+            destroy powerFieldAnimation
+            powerFieldAnimation = null
+            for i = 0 to 9
+                Dests.powerField[i].kill()
+            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator was destroyed")
+    end)
+
     // Get barrel
     EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
         let u = EventData.getTriggerUnit()
@@ -117,6 +182,7 @@ init
             barrelEffect[i].destr()
             barrelEffect[i] = null
         end)
+    Bounty.set(GENERATOR, 100, 3, 3)
 
 function destroyWall()
     if whatMode[1] == VARIOUS_TIMERS
@@ -139,10 +205,10 @@ function destroyWall()
     actDrSpawn = Rects.respawn3
     actDeSpawn = Rects.respawn4
     mission[2].setState(QuestState.COMPLETED)
-    /*TODO forUnitsInRect(gg_rct_Tiendas_2, u -> begin
+    forUnitsInRect(Rects.shops3, u -> begin
         if u.isType(UNIT_TYPE_STRUCTURE)
             u.setOwner(DRAENEI, true)
-    end)*/
+    end)
     ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.voidTravellerDoor)
     /* TODO
     gg_trg_Viajero_del_vacio.enable()
@@ -157,6 +223,7 @@ function destroyWall()
         for i = 1 to 11
             CameraSetEQNoiseForPlayer(players[i], 20.)
         doAfter(0.2) ->
+            wallDestroyed = true
             forDestructablesInRect(Rects.DESTROY, d -> d.kill())
             fire1.destr()
             fire2.destr()
@@ -198,3 +265,11 @@ function destroyWall()
         ..setItemsSold(BARREL.toRawCode())
         ..setUnitSoundSet(Soundsets.goblinSapper)
         ..setName("Goblin Sapper")
+    
+    new BuildingDefinition(GENERATOR, UnitIds.powergenerator)
+        ..setHitPointsRegenerationType("always")
+        ..setHitPointsRegenerationRate(1.)
+        ..setModelFile(Doodads.crystalShield)
+        ..setTintingColorGreen(100)
+        ..setTintingColorBlue(100)
+        ..setName("Batery")

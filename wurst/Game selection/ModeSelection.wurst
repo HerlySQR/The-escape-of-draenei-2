@@ -2,11 +2,12 @@ package ModeSelection
 
 import TimerDialog
 import LinkedList
+import StringUtils
 
-import Functions
 import initlater HeroSelection
 import initlater MyBoard
 import initlater Missions
+import GeneratedValues
 
 public player selector
 public trigger select = CreateTrigger()..disable()
@@ -18,6 +19,7 @@ public enum Mode
     // 1
     SINGLE_TIMER
     VARIOUS_TIMERS
+    KILL_COUNTER
     // 2
     YES_CREEPS
     ONLY_DE_AND_DR
@@ -110,6 +112,15 @@ texttag array modes2 = [
     createTTEx(vec3(-4176, -6592, 100), "  |cff0080ff-lu|r: Hero (Leveling up). (Def)", 12),
     createTTEx(vec3(-4176, -6640, 100), "  |cff0080ff-nl|r: Classic (Not levelling up).", 12)
 ]
+
+let modesCenter = Rects.selectorDraenei.getCenter()
+let modesLeft = Rects.selectorDraenei.getMinX()
+let modesRight = Rects.selectorDraenei.getMaxX()
+let modesTop = Rects.selectorDraenei.getMaxY()
+let lineHeight = 48.
+let zOffset = 100.
+
+let modesInformation = [createCenteredTexttag(vec3(modesCenter.x, modesTop - 6*lineHeight, zOffset), "|cff7777aaGAMEMODES:|r", 15)]
 
 string chat
 
@@ -333,18 +344,15 @@ public function actionsSelect()
         end)
     end)
 
-    printTimedToPlayer("|cff7777aaGAMEMODES:|r", 15., localPlayer)
-    printTimedToPlayer("|cffffcc00Timers:|r " + modes[1], 15., localPlayer)
-    printTimedToPlayer("|cffffcc00Creeps:|r " + modes[2], 15., localPlayer)
-    printTimedToPlayer("|cffffcc00Shops:|r " + modes[3], 15., localPlayer)
-    printTimedToPlayer("|cffffcc00Selection:|r " + modes[4], 15., localPlayer)
-    printTimedToPlayer("|cffffcc00Heros:|r  " + modes[5], 15., localPlayer)
+    printTimed("|cff7777aaGAMEMODES:|r", 15.)
+    printTimed("|cffffcc00Timers:|r " + modes[1], 15.)
+    printTimed("|cffffcc00Creeps:|r " + modes[2], 15.)
+    printTimed("|cffffcc00Shops:|r " + modes[3], 15.)
+    printTimed("|cffffcc00Selection:|r " + modes[4], 15.)
+    printTimed("|cffffcc00Heros:|r  " + modes[5], 15.)
 
     for cb in callbacks
         cb.run()
-
-    /* TODO
-    EnableTrigger(gg_trg_Surrender)*/
 
     select.disable()
 
@@ -358,9 +366,10 @@ public function didntChose()
     actionsSelect()
 
 init
-    for i = 0 to 29
-        modes1[i].setVisibility(THE_DEMONS.has(localPlayer))
-        modes2[i].setVisibility(THE_DRAENEI.has(localPlayer))
+    nullTimer() -> 
+        for i = 0 to 29
+            modes1[i].setVisibility(THE_DEMONS.has(localPlayer))
+            modes2[i].setVisibility(THE_DRAENEI.has(localPlayer))
 
     for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE
         select.registerPlayerChatEvent(players[i], "-", false)

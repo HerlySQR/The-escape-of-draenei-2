@@ -18,7 +18,7 @@ import DrAndDeSpawn
 import NeutralSpawn
 import Towers
 import Surrender
-import public GeneratedValues
+import GeneratedValues
 
 public int actMission = 0
 
@@ -185,7 +185,7 @@ public function draeneiWin()
     stopActTimer()
     disableNeutralSpawn()
     pings.disable()
-    // TODO: surrender
+    
     if theySurrender
         QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
         QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
@@ -220,7 +220,7 @@ public function demonsWin()
     exitCave.disable()
     destroyGenerators.disable()
     mainExit.disable()
-    // TODO: surrender
+
     if theySurrender
         QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_FAILED, "|cffffcc00TIME IS OVER|r\nDemons have won")
         QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00TIME IS OVER|r\nDemons have won")

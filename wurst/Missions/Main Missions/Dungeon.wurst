@@ -4,11 +4,26 @@ import initlater Missions
 import Towers
 import HeroSelection
 import PlayerData
+import Reset
+import GeneratedValues
+
+import Orders
 
 public boolean doorDestroyed = false
 public trigger destroyDoor = CreateTrigger()
 
 init
+    onModesSelected(() -> begin
+        doAfter(5.) -> 
+            forUnitsInRect(Rects.draeneiSpawn, u -> begin
+                u.issueTargetOrderById(Orders.attack, Dests.dungeonDoor1)
+            end)
+    end)
+    onReset(false, () -> begin
+        Dests.dungeonDoor1.restoreLife(500., false)
+        Dests.dungeonExitDoor1.restoreLife(500., false)
+        Dests.dungeonExitDoor2.restoreLife(500., false)
+    end)
     destroyDoor
         ..registerDeathEvent(Dests.dungeonExitDoor2)
         ..addAction(() -> begin
@@ -31,14 +46,14 @@ init
             mission[1].setState(QuestState.COMPLETED)
             actDrSpawn = Rects.respawn2
             actDeSpawn = Rects.respawn3
-            /*TODO forUnitsInRect(gg_rct_Tiendas_1, u -> begin
+            forUnitsInRect(Rects.shops2, u -> begin
                 if u.isType(UNIT_TYPE_STRUCTURE)
                     u.setOwner(DRAENEI, true)
             end)
-            forDestructablesInRect(gg_rct_Objetivo_1, d -> begin
+            /*TODOforDestructablesInRect(gg_rct_Objetivo_1, d -> begin
                 if d.getTypeId() == 'B00E'
                     d.kill()
-            end)
-            SetDestructableInvulnerable(gg_dest_B000_1722, false)*/
+            end)*/
+            Dests.leverSecret.setInvulnerable(false)
             doAfter(5., () -> startMission2())
         end)
