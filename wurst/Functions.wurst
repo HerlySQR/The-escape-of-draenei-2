@@ -519,27 +519,33 @@ public class FlashLightning
 
 // Camera
 
-public function fadeOut(string fadetype, real duration)
+public function fadeOut(force f, string fadetype, real duration)
     SetCineFilterTexture(fadetype)
     SetCineFilterBlendMode(BLEND_MODE_BLEND)
     SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
     SetCineFilterStartUV(0, 0, 1, 1)
     SetCineFilterEndUV(0, 0, 1, 1)
     SetCineFilterStartColor(255, 255, 255, 0)
-    SetCineFilterEndColor(255, 255, 255, 255)
+    SetCineFilterEndColor(255, 255, 255, f.has(localPlayer) ? 255 : 0)
     SetCineFilterDuration(duration)
     DisplayCineFilter(true)
 
-public function fadeIn(string fadetype, real duration)
+public function fadeOut(string fadetype, real duration)
+    fadeOut(bj_FORCE_ALL_PLAYERS, fadetype, duration)
+
+public function fadeIn(force f, string fadetype, real duration)
     SetCineFilterTexture(fadetype)
     SetCineFilterBlendMode(BLEND_MODE_BLEND)
     SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
     SetCineFilterStartUV(0, 0, 1, 1)
     SetCineFilterEndUV(0, 0, 1, 1)
     SetCineFilterStartColor(255, 255, 255, 255)
-    SetCineFilterEndColor(255, 255, 255, 0)
+    SetCineFilterEndColor(255, 255, 255, f.has(localPlayer) ? 0 : 255)
     SetCineFilterDuration(duration)
     DisplayCineFilter(true)
+
+public function fadeIn(string fadetype, real duration)
+    fadeIn(bj_FORCE_ALL_PLAYERS, fadetype, duration)
 
 // Buff
 

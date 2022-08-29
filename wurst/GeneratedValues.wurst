@@ -72,6 +72,8 @@ public class Dests
 
     static constant dungeonWalls = [gg_dest_B00K_6627, gg_dest_B00K_5690, gg_dest_B00K_5689, gg_dest_B00K_4875]
 
+    static constant bigRock = gg_dest_B001_3343
+
     // Missions
 
     static constant entranceForceWall1 = gg_dest_Dofw_6525
@@ -265,6 +267,8 @@ public class Rects
 
     static constant secretMerchantEntrance = gg_rct_Secret_Merchant_Entrance
 
+    static constant rockPieces = gg_rct_RockPieces
+
     // Index (dummy rect)
     static constant index = gg_rct_Index
 
@@ -352,3 +356,8 @@ public class Cams
     static constant draeneiWin = gg_cam_DraeneiWin
     static constant demonsWin1 = gg_cam_DemonsWin1
     static constant demonsWin2 = gg_cam_DemonsWin2
+
+    // Misc
+    
+    static constant bigRock1 = gg_cam_BigRock1
+    static constant bigRock2 = gg_cam_BigRock2

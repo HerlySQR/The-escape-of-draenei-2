@@ -6,12 +6,14 @@ import PlayerData
 import HeroSelection
 import DontPlaySmart
 import GeneratedValues
+import Reset
 
 import EventHelper
 import Orders
 import ObjectIdGenerator
 import AbilityObjEditing
 import DummyRecycler
+import Camera
 import Annotations
 
 public boolean herosCanByPass = false
@@ -94,4 +96,69 @@ init
         ..addAction(-> begin
             TerrainDeformStop(earthQuake, 1000)
             earthQuake = createRipple(5., false, Rects.quake.getCenter(), 592.00, 592.00, 64, 1, 512)
+        end)
+
+// Big rock
+
+init
+    onReset(false, () -> begin
+        Dests.bigRock.restoreLife(250., false)
+    end)
+    onReset(true, () -> begin
+        forDestructablesInRect(Rects.rockPieces, d -> begin
+            if d.getTypeId() == 'B002'
+                d..kill()..show(false)
+        end)
+        let f1 = createFogModifier(DRAENEI, FOG_OF_WAR_VISIBLE, Rects.rockPieces, true, true)
+        let f2 = createFogModifier(DEMON, FOG_OF_WAR_VISIBLE, Rects.rockPieces, true, true)
+        doAfter(0.1) -> 
+            f1.destr()
+            f2.destr()
+    end)
+    CreateTrigger()
+        ..registerDeathEvent(Dests.bigRock)
+        ..addAction(() -> begin
+            let t = GetTriggeringTrigger()
+            let pos = Dests.bigRock.getPos()
+            let camera = GetCurrentCameraSetup()
+            let inRange = CreateForce()
+
+            t.disable()
+
+            forUnitsInRange(pos, 2000. , u -> begin
+                inRange.add(u.getOwner())
+            end)
+                
+            let alpha = inRange.has(localPlayer) ? 0. : 100.
+            
+            Dests.bigRock.restoreLife(500., false)
+
+            CinematicFadeBJ(bj_CINEFADETYPE_FADEOUTIN, 0.80, "ReplaceableTextures\\CameraMasks\\Black_mask.blp", 0, 0, 0, alpha)
+
+            doAfter(0.2) -> 
+                CinematicModeBJ(true, inRange)
+                inCinematic = true
+                if inRange.has(localPlayer)
+                    CameraSetTargetNoiseEx(30., 1000000., true)
+                    CameraSetSourceNoiseEx(30., 1000000., true)
+                    Cams.bigRock1.applyForceDuration(true, 0.)
+                    Cams.bigRock2.applyForceDuration(true, 4.)
+                
+                doAfter(3.4) -> 
+                    Dests.bigRock.kill()
+                    doAfter(0.4) -> 
+                        forDestructablesInRect(Rects.rockPieces, d -> begin
+                            if d.getTypeId() == 'B002'
+                                d..restoreLife(25., true)..show(true)
+                        end)
+                        CinematicFadeBJ(bj_CINEFADETYPE_FADEOUTIN, 0.80, "ReplaceableTextures\\CameraMasks\\Black_mask.blp", 0, 0, 0, alpha)
+                        doAfter(0.2) -> 
+                            CinematicModeBJ(false, inRange)
+                            inCinematic = false
+                            if inRange.has(localPlayer)
+                                CameraSetSourceNoise(0, 0)
+                                CameraSetTargetNoise(0, 0)
+                                camera.apply(true, true)
+                            inRange.destr()
+                            t.enable()
         end)
