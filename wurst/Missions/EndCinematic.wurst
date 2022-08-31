@@ -14,8 +14,8 @@ import EventHelper
 import Orders
 import ClosureTimers
 
-trigger toLeave = CreateTrigger()..disable()
-trigger toNotSeeThem = CreateTrigger()..disable()
+let toLeave = CreateTrigger()..disable()
+let toNotSeeThem = CreateTrigger()..disable()
 
 public function draeneiCinematic()
     ClearSelection()
@@ -40,28 +40,32 @@ public function draeneiCinematic()
     StopMusic(true)
     PlayMusic("Sound\\Music\\mp3Music\\DarkVictory.mp3")
     inCinematic = true
+
+    FogMaskEnable(false)
+    FogEnable(false)
+    
     new Cinematic(
-        new LinkedList<CineSeq>()
-            ..add(Cinematic.doNothingSeq(0.3.seconds()))
-            ..add(Cinematic.applyCameraSetupSeq(Cams.draeneiWin))
-            ..add(Cinematic.doNothingSeq(1..seconds()))
-            ..add(() -> begin
-                    toLeave.enable()
-                    toNotSeeThem.enable()
-                    createNUnits(DRAENEI, 4, DRAENEI_WORKER, Rects.whereTheDraeneiAppear1.getCenter(), UNIT_FACING)
-                    createNUnits(DRAENEI, 3, 'ndrt', Rects.whereTheDraeneiAppear2.getCenter(), UNIT_FACING)
-                    forUnitsInRect(Rects.whereTheDraeneiAppear1, u -> u.issuePointOrderById(Orders.move, Rects.exitPoint.getCenter()))
-                    forUnitsInRect(Rects.whereTheDraeneiAppear2, u -> u.issuePointOrderById(Orders.attack, Rects.exitPoint.getCenter()))
-                    if not theySurrender
-                        createNUnits(DEMON, 3, 'nfgb', Rects.whereTheDemonsAppear.getCenter(), UNIT_FACING)
-                        forUnitsInRect(Rects.whereTheDemonsAppear, u -> u.issuePointOrderById(Orders.attack, Rects.exitPoint.getCenter()))
-                    return 12..seconds()
-                end)
-            ..add(Cinematic.fadeOutSeq(9.85.seconds()))
-            ..add(() -> begin
-                    Cinematic.fadeIn(9.85.seconds())
-                    return 4.5.seconds()
-                end),
+        asList(
+            Cinematic.doNothingSeq(0.3.seconds()),
+            Cinematic.applyCameraSetupSeq(Cams.draeneiWin),
+            Cinematic.doNothingSeq(1..seconds()),
+            () -> begin
+                toLeave.enable()
+                toNotSeeThem.enable()
+                createNUnits(DRAENEI, 4, DRAENEI_WORKER, Rects.whereTheDraeneiAppear1.getCenter(), UNIT_FACING)
+                createNUnits(DRAENEI, 3, 'ndrt', Rects.whereTheDraeneiAppear2.getCenter(), UNIT_FACING)
+                forUnitsInRect(Rects.whereTheDraeneiAppear1, u -> u.issuePointOrderById(Orders.move, Rects.exitPoint.getCenter()))
+                forUnitsInRect(Rects.whereTheDraeneiAppear2, u -> u.issuePointOrderById(Orders.attack, Rects.exitPoint.getCenter()))
+                if not theySurrender
+                    createNUnits(DEMON, 3, 'nfgb', Rects.whereTheDemonsAppear.getCenter(), UNIT_FACING)
+                    forUnitsInRect(Rects.whereTheDemonsAppear, u -> u.issuePointOrderById(Orders.attack, Rects.exitPoint.getCenter()))
+                return 12..seconds()
+            end,
+            Cinematic.fadeOutSeq(9.85.seconds()),
+            () -> begin
+                Cinematic.fadeIn(9.85.seconds())
+                return 4.5.seconds()
+            end),
         () -> begin
             inCinematic = false
             toLeave.disable()
@@ -72,6 +76,10 @@ public function draeneiCinematic()
                     u.remove()
             end)
             ResetToGameCamera(0.)
+            
+            FogMaskEnable(true)
+            FogEnable(true)
+            
             doAfter(14.5) -> 
                 StopMusic(true)
                 PlayMusic("music")
@@ -128,26 +136,36 @@ public function demonsCinematic()
     createUnit(DEMON, 'nbal', Rects.guard1.getCenter(), UNIT_FACING).issuePointOrderById(Orders.patrol, Rects.guard2.getCenter())
     createUnit(DEMON, 'nbal', Rects.guard3.getCenter(), UNIT_FACING)
     createUnit(DEMON, 'nbal', Rects.guard4.getCenter(), UNIT_FACING)
+
+    FogMaskEnable(false)
+    FogEnable(false)
+    
     new Cinematic(
-        new LinkedList<CineSeq>()
-            ..add(Cinematic.doNothingSeq(0.3.seconds()))
-            ..add(Cinematic.applyCameraSetupSeq(Cams.demonsWin1))
-            ..add(() -> begin
+        asList(
+            Cinematic.doNothingSeq(0.3.seconds()),
+            Cinematic.applyCameraSetupSeq(Cams.demonsWin1),
+            () -> begin
                 CameraSetupApplyForceDuration(Cams.demonsWin2, true, 11.00)
                 return 12..seconds()
-            end)
-            ..add(Cinematic.fadeOutSeq(9.85.seconds()))
-            ..add(() -> begin
-                    Cinematic.fadeIn(9.85.seconds())
-                    return 4.5.seconds()
-                end),
+            end,
+            Cinematic.fadeOutSeq(9.85.seconds()),
+            () -> begin
+                Cinematic.fadeIn(9.85.seconds())
+                return 4.5.seconds()
+            end),
         () -> begin
             // TODO: First person
             forUnitsInRect(Rects.dungeon, u -> begin
-                if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getTypeId() == DRAENEI_WORKER or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
+                if not (u.isType(UNIT_TYPE_STRUCTURE) or u.getTypeId() == DRAENEI_WORKER or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
                     u.remove()
+                if u.isType(UNIT_TYPE_HERO)
+                    u.hide()
             end)
             ResetToGameCamera(0.)
+            
+            FogMaskEnable(true)
+            FogEnable(true)
+            
             doAfter(14.5) -> 
                 StopMusic(true)
                 PlayMusic("music")

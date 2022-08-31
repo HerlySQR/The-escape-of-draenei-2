@@ -69,16 +69,19 @@ init
             doAfter(20, () -> begin
                 print("\nYou can only repick until 2 minutes.")
                 bj_questHintSound.play()
-            end)
 
-            doAfter(120, () -> begin
-                print("\n|cffff0000You cannot longer repick.|r")
-                disableRepick()
+                doAfter(120, () -> begin
+                    print("\n|cffff0000You cannot longer repick.|r")
+                    disableRepick()
+                end)
             end)
     end)
 
     onReset(false, () -> begin
         enableRepick()
+        
+        for i = 1 to 10
+            inCombat[i] = 0
     end)
 
     noRepick = DamageEvent.addListener(() -> begin

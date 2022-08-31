@@ -8,7 +8,7 @@ import GeneratedValues
 
 import EventHelper
 
-let receiverPoint = vec2(4736.00, 512.00)
+let receiverPoint = Rects.entranceReceiver.getCenter()
 
 let cond = Condition(() -> begin
     return not GetEnteringUnit().isType(UNIT_TYPE_FLYING) and not GetEnteringUnit().isNotCollidable()
@@ -59,14 +59,6 @@ Tp back3
 Tp back4
 
 init
-    onModesSelected(() -> begin
-        dungeon.textTag.setColor(0, 255, 230, 255)
-
-        doAfter(100, () -> begin
-            dungeon.textTag.setColor(255, 255, 255, 255)
-        end)
-    end)
-
     dungeon = new Tp(GUnits.tpEntranceToDungeon, Rects.dungeonReceiver.getCenter(), "Dungeon",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",
@@ -76,12 +68,7 @@ init
         "Models\\Void Teleport Red To.mdl",
         "Models\\Void Teleport Red Target.mdl",
         "Models\\Void Teleport Red Caster.mdl",
-        Rects.tpEntranceToConstruction, () -> begin
-            if actMission < 3 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
-                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
-            else
-                construction.move(GetEnteringUnit())
-        end)
+        Rects.tpEntranceToConstruction, () -> construction.move(GetEnteringUnit()))
     pavilion = new Tp(GUnits.tpEntranceToPavilion, Rects.pavilionReceiver.getCenter(), "Pavilion",
         "Models\\Void Teleport Blue To.mdl",
         "Models\\Void Teleport Blue Target.mdl",
@@ -91,18 +78,13 @@ init
         "Models\\Void Teleport Orange To.mdl",
         "Models\\Void Teleport Orange Target.mdl",
         "Models\\Void Teleport Orange Caster.mdl",
-        Rects.tpEntranceToHabitat, () -> begin
-            if actMission < 4 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
-                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
-            else
-                habitat.move(GetEnteringUnit())
-        end)
+        Rects.tpEntranceToHabitat, () -> habitat.move(GetEnteringUnit()))
     back1 = new Tp(GUnits.tpDungeonToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Teal To.mdl",
         "Models\\Void Teleport Teal Target.mdl",
         "Models\\Void Teleport Teal Caster.mdl",
         Rects.tpDungeonToEntrance, () -> begin
-            if actMission == 1 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
+            if actMission < 4 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
                 DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
             else
                 back1.move(GetEnteringUnit())
@@ -111,12 +93,22 @@ init
         "Models\\Void Teleport Blue To.mdl",
         "Models\\Void Teleport Blue Target.mdl",
         "Models\\Void Teleport Blue Caster.mdl",
-        Rects.tpPavilionToEntrance, () -> back2.move(GetEnteringUnit()))
+        Rects.tpPavilionToEntrance, () -> begin
+            if actMission < 4 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                back2.move(GetEnteringUnit())
+        end)
     back3 = new Tp(GUnits.tpConstructionToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Red To.mdl",
         "Models\\Void Teleport Red Target.mdl",
         "Models\\Void Teleport Red Caster.mdl",
-        Rects.tpConstructionToEntrance, () -> back3.move(GetEnteringUnit()))
+        Rects.tpConstructionToEntrance, () -> begin
+            if actMission < 4 and THE_DRAENEI.has(GetEnteringUnit().getOwner())
+                DisplayTextToPlayer(GetEnteringUnit().getOwner(), 0., 0., "You are not authorized to use this teleporter.")
+            else
+                back3.move(GetEnteringUnit())
+        end)
     back4 = new Tp(GUnits.tpHabitatToEntrance, receiverPoint, "Entrance",
         "Models\\Void Teleport Orange To.mdl",
         "Models\\Void Teleport Orange Target.mdl",

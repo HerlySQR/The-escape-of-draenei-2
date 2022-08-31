@@ -5,9 +5,13 @@ import Repick
 import MyBoard
 import ChatEnter
 import GeneratedValues
+import Reset
+import WhoSelect
 
+import Camera
 import Dialog
 import ClosureForGroups
+import ClosureTimers
 
 let endSwitch = CreateTimer()
 let switchWindow = createDialog()
@@ -90,6 +94,10 @@ init
                     j++
             if j == 1
                 changePlayers()
+                print("The switch has been succesful.")
+                switchSuccesful = true
+                endSwitch.pause()
+                youCantVote()
             else
                 whoVoted.add(p)
                 print("|cff879cdc" + swp1.getName() + " wants switch with " + swp2.getName() + "|r")
@@ -135,6 +143,8 @@ function changePlayers()
     repick(swp2)
     yesOrYes = false
     switchMembers(swp1, swp2)
+    swp1.panCameraToTimed(THE_DEMONS.has(swp1) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
+    swp2.panCameraToTimed(THE_DEMONS.has(swp2) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
     /* TODO
     udg_Si_lo_mataste[GetPlayerId(udg_swp1)+1] = false
     udg_Si_lo_mataste[GetPlayerId(udg_swp2)+1] = false
@@ -201,7 +211,6 @@ function changeAlliance(player p)
                 noAllies(p, players[i])
         THE_DRAENEI.add(p)
     playersOrder()
-        // TODO udg_Listo=true
 
 function noAllies(player p1, player p2)
     SetPlayerAllianceStateBJ(p1, p2, bj_ALLIANCE_UNALLIED)
@@ -210,3 +219,17 @@ function noAllies(player p1, player p2)
 function yesAllies(player p1, player p2)
     SetPlayerAllianceStateBJ(p1, p2, bj_ALLIANCE_ALLIED_VISION)
     SetPlayerAllianceStateBJ(p2, p1, bj_ALLIANCE_ALLIED_VISION)
+
+init
+    // Interchange teams at the end
+    onReset(false, () -> begin
+        EnumItemsInRect(bj_mapInitialPlayableArea, null, () -> GetEnumItem().remove())
+        doAfter(17.) -> 
+            for i = 1 to 5
+                swp1 = playerM(i)
+                swp2 = playerM(i+5)
+                swc1 = circle[i].getPos()
+                swc2 = circle[i+5].getPos()
+                changePlayers()
+            whoSelect()
+    end)

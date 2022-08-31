@@ -84,14 +84,14 @@ init
     end)
 
     let owners = [DRAENEI, DEMON, players[PLAYER_NEUTRAL_AGGRESSIVE], DEMON, DEMON]
-    let angles = [270..fromDeg(), 315..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
+    let angles = [270..fromDeg(), 0..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
     for i = 0 to 4
         createUnit(owners[i], MERCHANT, Rects.merchant[i].getCenter(), angles[i])
         createUnit(owners[i], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])
         createUnit(owners[i], SPECIAL_MERCHANT, Rects.specialMerchant[i].getCenter(), angles[i])
         createUnit(owners[i], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])
     
-    for i = 0 to 3
+    for i = 0 to 2
         createUnit(players[PLAYER_NEUTRAL_PASSIVE], BOOK_STORE, Rects.bookStore[i].getCenter(), UNIT_FACING)
     
     CreateTrigger()
@@ -103,9 +103,7 @@ init
                 Dests.secretMerchantLever[1].isAliveTrick() or
                 Dests.secretMerchantLever[2].isAliveTrick())
 
-                forDestructablesInRect(Rects.secretMerchantEntrance, d -> begin
-                    elevator(d).setHeight(1)
-                end)
+                forDestructablesInRect(Rects.secretMerchantEntrance, d -> elevator(d).setHeight(1))
                 
                 SetDoodadAnimationRect(Rects.secretMerchantEntrance, 'D00Q', "hide", false)
 
@@ -162,6 +160,10 @@ init
         removeItemFromStock(RUNIC_BRACERS_RECIPE)
         removeItemFromStock(STAFF_OF_SILENCE_RECIPE)
         removeItemFromStock(SHIELD_RUNE)
+
+        forUnitsInRect(Rects.shops2, u -> u.setOwner(DEMON, true))
+        forUnitsInRect(Rects.shops3, u -> u.setOwner(players[PLAYER_NEUTRAL_AGGRESSIVE], true))
+        forUnitsInRect(Rects.shops4, u -> u.setOwner(DEMON, true))
     end)
 
 function BuildingDefinition.defaultSettings()

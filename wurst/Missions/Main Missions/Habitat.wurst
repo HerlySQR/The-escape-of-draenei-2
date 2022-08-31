@@ -6,7 +6,6 @@ import PlayerData
 import HeroSelection
 import DontPlaySmart
 import GeneratedValues
-import Reset
 
 import EventHelper
 import Orders
@@ -27,25 +26,25 @@ init
         .addAction(() -> begin
             if whatMode[1] == VARIOUS_TIMERS
                 stopActTimer()
-                seeDeSpawn[2].stop()
-                seeDrSpawn[4].start()
-                moveCircles(4)
-                actDrSpawn = Rects.respawn4
-                actDeSpawn = Rects.respawn5
-                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETED|r\nYou managed to get out of the cave.")
-                QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00MISSION FAILED|r\nThey managed to get out of the cave.")
-                mission[3].setState(QuestState.COMPLETED)
-                /*TODO forUnitsInRect(gg_rct_Tiendas_3, u -> begin
-                    if u.isType(UNIT_TYPE_STRUCTURE)
-                        u.setOwner(DRAENEI, true)
-                end)
-                gg_unit_nhhr_0207.show()*/
-                generator1.setInvulnerable(false)
-                generator2.setInvulnerable(false)
-                DONT_PASS.disable()
-                exitCave.disable()
-                doAfter(5.) -> 
-                    startMission4()
+            seeDeSpawn[2].stop()
+            seeDrSpawn[4].start()
+            moveCircles(4)
+            actDrSpawn = Rects.respawn4
+            actDeSpawn = Rects.respawn5
+            QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETED|r\nYou managed to get out of the cave.")
+            QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00MISSION FAILED|r\nThey managed to get out of the cave.")
+            mission[3].setState(QuestState.COMPLETED)
+            forUnitsInRect(Rects.shops4, u -> begin
+                if u.isType(UNIT_TYPE_STRUCTURE)
+                    u.setOwner(DRAENEI, true)
+            end)
+            /*TODO gg_unit_nhhr_0207.show()*/
+            generator1.setInvulnerable(false)
+            generator2.setInvulnerable(false)
+            DONT_PASS.disable()
+            exitCave.disable()
+            doAfter(5.) -> 
+                startMission4()
         end)
 
 // Obstacles in the habitat

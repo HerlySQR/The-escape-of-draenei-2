@@ -5,7 +5,6 @@ import initlater Missions
 import PlayerData
 import Towers
 import DrAndDeSpawn
-import Reset
 import GeneratedValues
 
 import ObjectIdGenerator
@@ -15,9 +14,7 @@ public unit generator1 = null
 public unit generator2 = null
 public vec2 generatorPos1 = Rects.generator1.getCenter()
 public vec2 generatorPos2 = Rects.generator2.getCenter()
-public boolean generator1IsAlive = true
-public boolean generator2IsAlive = true
-public boolean generatorsDestroyed = false
+public boolean generatorsDestroyed
 public int generatorsLeft
 public trigger destroyGenerators = CreateTrigger()
 
@@ -31,17 +28,12 @@ init
             generator2 = createUnit(DEMON, GENERATOR, generatorPos2, UNIT_FACING)
         generator1.setInvulnerable(true)
         generator2.setInvulnerable(true)
+        generatorsDestroyed = false
         generatorsLeft = 2
     end)
     onReset(false, () -> begin
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall1)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall2)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall3)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall4)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall5)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall6)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall7)
-        ModifyGateBJ(bj_GATEOPERATION_CLOSE, Dests.entranceForceWall8)
+        for i = 0 to 7
+            Dests.entranceForceWall[i].close()
     end)
 
     destroyGenerators
@@ -51,10 +43,8 @@ init
             generatorsLeft--
             if GetDyingUnit() == generator1
                 generator1 = null
-                generator1IsAlive = false
             else if GetDyingUnit() == generator2
                 generator2 = null
-                generator2IsAlive = false
             
             if generatorsLeft == 1
                 QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_UPDATED, "A generator was destroyed.")
@@ -66,15 +56,9 @@ init
                 forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
                     if u.getTypeId() == ADVANCE_DEATH_TOWER
                         u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
-                    // TODO: wall generator
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall1)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall2)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall3)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall4)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall5)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall6)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall7)
-                    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall8)
+                    wallGenerator.kill()
+                    for i = 0 to 7
+                        Dests.entranceForceWall[i].open()
                 end)
                 startMission5()
         end)

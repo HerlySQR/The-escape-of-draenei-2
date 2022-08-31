@@ -10,7 +10,6 @@ import ObjectIds
 import Abilities
 
 import Functions
-import Reset
 import PlayerData
 import initlater Missions
 import GeneratedValues
@@ -99,9 +98,9 @@ init
     // Create the towers
     for i = 0 to 8
         createUnit(DEMON, ADVANCE_DEATH_TOWER, Rects.advanceDeathTower[i].getCenter(), UNIT_FACING)
-    for i = 0 to 8
+    for i = 0 to 6
         createUnit(DEMON, DEATH_TOWER_1, Rects.deathTower1[i].getCenter(), UNIT_FACING)
-    for i = 0 to 11
+    for i = 0 to 13
         createUnit(DEMON, DEATH_TOWER_2, Rects.deathTower2[i].getCenter(), UNIT_FACING)
     for i = 0 to 13
         createUnit(DEMON, DEATH_TOWER_3, Rects.deathTower3[i].getCenter(), UNIT_FACING)
@@ -159,13 +158,12 @@ init
     attack
         ..registerTimerEvent(2., true)
         .addAction(() -> begin
-            attackers.forEachIn(u -> begin
+            for u in attackers
                 if not u.isAlive()
                     attackers.remove(u)
                 else if u.getCurrentOrder() != Orders.attack or theyGo.has(u)
                     u.issuePointOrderById(Orders.attack, target[u.getIndex()])
                     theyGo.remove(u)
-            end)
         end)
     // If a creep wanna go back for taking damage from an ally
     theyAreCowards = () -> begin

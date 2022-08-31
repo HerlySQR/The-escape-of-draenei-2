@@ -1,0 +1,27 @@
+package ReferenceSystem
+
+import Matrices
+
+public class ReferenceSystem
+    private mat3 translation
+    private mat3 rotation
+    private mat3 scalar
+    private mat3 transform
+
+    construct(vec2 center, angle rotation, real scale)
+        translation = mat3(1., 0., center.x,
+                           0., 1., center.y,
+                           0., 0., 1.)
+        this.rotation = mat3(rotation.cos(), -rotation.sin(), 0.,
+				             rotation.sin(), rotation.cos(),  0.,
+                             0.,             0.,              1.)
+        scalar = mat3(scale, 0.,    0.,
+                      0.,    scale, 0.,
+                      0.,    0.,    1.)
+        transform = translation * this.rotation * scalar
+
+    function convertVec2(vec2 what) returns vec2
+        return (transform * what.withZ(1.)).toVec2()
+
+    function revertVec2(vec2 what) returns vec2
+        return (transform.inverse().matrix * what.withZ(1.)).toVec2()

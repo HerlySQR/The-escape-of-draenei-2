@@ -105,7 +105,7 @@ init
             let t = GetTriggeringTrigger()
             t.disable()
             doAfter(2.5) -> 
-                Dests.elevatorGenerator2.setHeight(2)
+                Dests.elevatorGenerator2.setHeight(3)
                 doAfter(0.5) -> 
                     Dests.elevatorGenerator2.changeWalls(false, ElevatorWallType.ALL)
                     Dests.elevatorGenerator2.changeWalls(true, ElevatorWallType.NORTH)
@@ -121,15 +121,15 @@ init
 
 // Secret passage
 
-function blockPassage()
-    SetDestructableInvulnerable(Dests.leverSecret, true)
-    forDestructablesInRect(Rects.elevatorsSecret, d -> begin
-        ChangeElevatorHeight(d, 3)
-        ChangeElevatorWalls(false, bj_ELEVATOR_WALL_TYPE_ALL, d)
-    end)
-
 init
-    blockPassage()
+    onReset(true, () -> begin
+        Dests.leverSecret.setInvulnerable(true)
+        forDestructablesInRect(Rects.elevatorsSecret, d -> begin
+            elevator(d)
+                ..setHeight(3)
+                ..changeWalls(false, ElevatorWallType.ALL)
+        end)
+    end)
 
     CreateTrigger()
         ..registerDeathEvent(Dests.leverSecret)

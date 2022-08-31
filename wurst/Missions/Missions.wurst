@@ -19,6 +19,7 @@ import NeutralSpawn
 import Towers
 import Surrender
 import GeneratedValues
+import public Reset
 
 public int actMission = 0
 
@@ -37,6 +38,13 @@ init
     seeDeSpawn[3] = createVision(DEMON, Rects.items5, true)..start()
 
     onModesSelected(() -> startMission1())
+
+    onReset(false, () -> begin
+        seeDrSpawn[2].stop()
+        seeDrSpawn[3].stop()
+        seeDrSpawn[4].stop()
+        seeDeSpawn[2].start()
+    end)
 
     bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_CAP, 5))
 
@@ -87,11 +95,9 @@ public function startMission2()
 
             mission[2].setState(QuestState.DISCOVERED)
             QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 2:|r The wall")
-            doAfter(5.) -> 
-                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cffffce33The telepoter to the entry of the Main Hall has been unlocked.|r")
-                doAfter(15.) -> 
-                    if whatMode[5] == NOT_LEVELING
-                        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
+            doAfter(20.) -> 
+                if whatMode[5] == NOT_LEVELING
+                    QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
 // Mission 3
 
 public function startMission3()
@@ -233,3 +239,8 @@ public function demonsWin()
     
     doAfter(5.) -> 
         demonsCinematic()
+
+init
+    onReset(false, () -> begin
+        timeIsOver = false
+    end)

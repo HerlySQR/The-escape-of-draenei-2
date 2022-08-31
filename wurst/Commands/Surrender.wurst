@@ -45,14 +45,8 @@ function surrender(player p)
         endSurrender = null
 
         if wannaSurrenderDr == drPlayers
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall1)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall2)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall3)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall4)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall5)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall6)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall7)
-            ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.entranceForceWall8)
+            for i = 0 to 7
+                Dests.entranceForceWall[i].open()
             draeneiWin()
         else
             demonsWin()

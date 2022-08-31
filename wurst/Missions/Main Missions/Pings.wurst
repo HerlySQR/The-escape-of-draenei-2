@@ -37,9 +37,9 @@ init
                 case 3
                     pingMinimap(mission3Objective, 1.)
                 case 4
-                    if generator1IsAlive
+                    if generator1 != null
                         pingMinimap(mission4Objective1, 1.)
-                    if generator2IsAlive
+                    if generator2 != null
                         pingMinimap(mission4Objective2, 1.)
                 case 5
                     pingMinimap(mission5Objective, 1.)

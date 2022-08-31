@@ -6,6 +6,7 @@ import Camera
 import HashMap
 import Fx
 import Abilities
+import ErrorHandling
 
 import GeneratedValues
 import ModeSelection
@@ -13,6 +14,7 @@ import Reset
 import public HeroType
 import initlater MyBoard
 import ArrayList
+import ReferenceSystem
 
 public rect actDrSpawn
 public rect actDeSpawn
@@ -30,13 +32,15 @@ boolean array youSelected
 Fx array arrow
 
 init
+    for i = 1 to 11
+        if i != 6
+            arrow[i] = new Fx(ZERO2, UNIT_FACING, Abilities.aneuTarget)..setZ(240.)
+            arrow[i].getDummy().hide()
+
     onModesSelected(() -> begin
         if whatMode[4] == TRAITOR
             seeDraenei.start()
             seeDemons.start()
-
-        actDrSpawn = Rects.respawn1
-        actDeSpawn = Rects.respawn2
 
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             if u.isType(UNIT_TYPE_HERO)
@@ -71,6 +75,15 @@ init
     onReset(true, () -> begin
         seeDraenei.stop()
         seeDemons.stop()
+
+        actDrSpawn = Rects.respawn1
+        actDeSpawn = Rects.respawn2
+    end)
+
+    onReset(false, () -> begin
+        for i = 1 to 10
+            for m in hero[i].inventory()
+                m.remove()
     end)
 
     createVision(DRAENEI, Rects.selectorDraenei, true).start()
@@ -125,9 +138,10 @@ init
             
             if not youSelected[id]
                 youSelected[id] = true
-                arrow[id] = new Fx(heroSelected.getPos(), UNIT_FACING, Abilities.aneuTarget)
-                    ..setZ(240.)
-                    ..setPlayerColor(playerSelector.getColor())
+                arrow[id].getDummy()
+                    ..setColor(playerSelector.getColor())
+                    ..setXY(heroSelected.getPos())
+                    ..show()
             
             doAfter(0.95, () -> begin
                 if clicks[id] > 0
@@ -143,9 +157,7 @@ init
     ..addAction(() -> begin
         let id = GetTriggerPlayer().getId()
         youSelected[id] = false
-        if arrow[id] != null
-            destroy arrow[id]
-            arrow[id] = null
+        arrow[id].getDummy().hide()
         clicks[id] = 0
     end)
 
@@ -162,24 +174,79 @@ function vec2List.dstr()
     destroy this.xVals
     destroy this.yVals
 
-function getLongestRowSize(int max) returns int
-    var result = 1
-    var quantity = max
-    while quantity > 1
-        result++
-        quantity -= 2*(result - 1)
-    return result
-
 function createDistribution(int quantity, real dist, vec2 center) returns vec2List
+    if quantity == 0
+        error("You are distributing 0 elements")
+    
+    //let ref = new ReferenceSystem(center, angle(0), dist)
     let xVals = new ArrayList<real>()
     let yVals = new ArrayList<real>()
-
+    let rows = new HashMap<int, int>()
     let maxSize = (MAX_DIST/dist).toInt() + 1
-    int longestRowSize = min(maxSize, getLongestRowSize(quantity))
 
-    //if quantity == 1
-    xVals.add(center.x)
-    yVals.add(center.y)
+    var remain = quantity
+    
+    rows.put(0, 1)
+    remain--
+
+    // Create the distribution
+
+    var rowsNumber = 0
+
+    while remain > 0
+        if rows.get(0) < maxSize
+            var isSpace = false
+            for i = 0 to rowsNumber - 1
+                let nextRow = i+1
+                if rows.get(nextRow) < rows.get(i) - nextRow
+                    isSpace = true
+                    rows.put(nextRow, rows.get(nextRow) + 1)
+                    remain--
+                    break
+                else if rows.get(-nextRow) < rows.get(i) - nextRow
+                    isSpace = true
+                    rows.put(-nextRow, rows.get(-nextRow) + 1)
+                    remain--
+                    break
+            if not isSpace
+                if rows.get(rowsNumber + 1) < rows.get(rowsNumber) - (rowsNumber + 1)
+                    rowsNumber++
+                else
+                    rows.put(0, rows.get(0) + 1)
+                    remain--
+        else
+            for i = 1 to rowsNumber
+                if rows.get(i) < rows.get(i-1)
+                    rows.put(i, rows.get(i) + 1)
+                    remain--
+                else if rows.get(-i) < rows.get(i+1)
+                    rows.put(-i, rows.get(-i) + 1)
+                    remain--
+                else
+                    rowsNumber++
+
+    // Place the locations
+
+    for row = rowsNumber downto -rowsNumber
+        let size = rows.get(row)
+        if size != 0
+            if size.isOdd()
+                let width = (size - 1) div 2
+                for j = -width to width
+                    let pos = dist * vec2(j.toReal(), row.toReal()) + center//ref.convertVec2(vec2(j.toReal(), row.toReal()))
+                    xVals.add(pos.x)
+                    yVals.add(pos.y)
+            else
+                let width = (size - 1) / 2
+                var j = -width - 1.
+                while j < width
+                    j += 1.
+                    let pos = dist * vec2(j, row.toReal()) + center//ref.convertVec2(vec2(j, row.toReal()))
+                    xVals.add(pos.x)
+                    yVals.add(pos.y)
+
+    //destroy ref
+    destroy rows
 
     return vec2List(xVals, yVals)
 
@@ -194,20 +261,20 @@ init
             maxDe++
     
     let drPoints = createDistribution(maxDr, 256., vec2(-6400., -8784.))
-    let dePoints = createDistribution(maxDr, 256., vec2(-8448., -8784.))
+    let dePoints = createDistribution(maxDe, 256., vec2(-8448., -8784.))
 
     var i = 1
+    var j = 1
     for hero in HeroType
-        unit u = null
         if hero.getRace() == Orc
-            u = createUnit(DRAENEI, hero.getL(), drPoints.get(1), UNIT_FACING)
+            createUnit(DRAENEI, hero.getL(), drPoints.get(i), UNIT_FACING).setInvulnerable(true)
+            i++
         else if hero.getRace() == Undead
-            u = createUnit(DEMON, hero.getL(), dePoints.get(1), UNIT_FACING)
-
-        if u != null
-            u.setInvulnerable(true)
-        
-        i++
+            createUnit(DEMON, hero.getL(), dePoints.get(j), UNIT_FACING).setInvulnerable(true)
+            j++
     
-    drPoints.dstr()
+    nullTimer() -> 
+        for k = 1 to drPoints.xVals.size()
+            print(drPoints.get(k).toString())
+        drPoints.dstr()
     dePoints.dstr()

@@ -112,12 +112,12 @@ init
             
             camp.enumUnitsInRect(Rects.creepCamp13, filt)
             if camp.isEmpty()
-                createNUnits(OWNER, 3, WILD_DRAGON, Rects.creepCamp11.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 3, WILD_DRAGON, Rects.creepCamp13.getCenter(), UNIT_FACING)
             camp.clear()
             
             camp.enumUnitsInRect(Rects.creepCamp14, filt)
             if camp.isEmpty()
-                createNUnits(OWNER, 3, WILD_DRAGON, Rects.creepCamp11.getCenter(), UNIT_FACING)
+                createNUnits(OWNER, 3, WILD_DRAGON, Rects.creepCamp14.getCenter(), UNIT_FACING)
             camp.clear()
             
             camp.enumUnitsInRect(Rects.creepCamp15, filt)

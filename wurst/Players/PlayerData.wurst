@@ -6,6 +6,8 @@ import Reset
 public constant player DRAENEI = players[0]
 public constant player DEMON = players[6]
 
+public trigger giveGold = CreateTrigger()..disable()
+
 init
     createFogModifier(DRAENEI, FOG_OF_WAR_VISIBLE, bj_mapInitialPlayableArea, true, true).destr()
     createFogModifier(DEMON, FOG_OF_WAR_VISIBLE, bj_mapInitialPlayableArea, true, true).destr()
@@ -33,6 +35,14 @@ init
             deaths[i] = 0
             assists[i] = 0
             spree[i] = 0
+        
+        giveGold.disable()
+
+        for i = 0 to 11
+            players[i]
+                ..setGold(0)
+                ..setLumber(0)
+                ..setState(PLAYER_STATE_RESOURCE_FOOD_USED, 0)
     end)
 
 public function switchMembers(player p1, player p2)
@@ -84,8 +94,6 @@ public function switchMembers(player p1, player p2)
     
     p1.setNumber(i2)
     p2.setNumber(i1)
-
-public trigger giveGold = CreateTrigger()..disable()
 
 init
     THE_DRAENEI.add(players[0])

@@ -1,7 +1,6 @@
 package Barrels
 
 import Functions
-import Reset
 import PlayerData
 import initlater Missions
 import HeroSelection
@@ -29,27 +28,29 @@ public boolean wallDestroyed = false
 public trigger placeBarrel = CreateTrigger()
 public unit array heroWithBarrel
 
+let GENERATOR = compiletime(UNIT_ID_GEN.next())
+public unit wallGenerator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
+
 rect place = Rects.barrel1
 int barrelNumber = 1
 effect array barrelEffect
 let earthquake = new SoundDefinition(Sounds.earthquake, false, true)
 
 let dustPoint = [
-    vec2(-4368.00, -608.00),
-    vec2(-4192.00, -1248.00),
-    vec2(-3360.00, -1504.00)
+    Rects.dustPoint[0].getCenter(),
+    Rects.dustPoint[1].getCenter(),
+    Rects.dustPoint[2].getCenter()
 ]
 
 let GOBLIN_SHOP = compiletime(UNIT_ID_GEN.next())
 let goblinShop = createUnit(players[PLAYER_NEUTRAL_PASSIVE], GOBLIN_SHOP, Rects.lookTheGoblin.getCenter(), UNIT_FACING)
 
-let GENERATOR = compiletime(UNIT_ID_GEN.next())
-var generator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
 let powerFieldEnter1 = CreateTrigger()
 let powerFieldEnter2 = CreateTrigger()
 CallbackPeriodic powerFieldAnimation = null
 
 init
+    forDestructablesInRect(Rects.DESTROY, d -> d.setInvulnerable(true))
     // Wall generator
     powerFieldEnter1
         ..registerRectEnterEventSource(Rects.powerField1)
@@ -69,7 +70,7 @@ init
         end)
     onReset(true, () -> begin
         if powerFieldAnimation == null
-            powerFieldAnimation = doPeriodically(3., cb -> begin
+            powerFieldAnimation = doPeriodically(3., _ -> begin
                 for i = 0 to 9
                     Dests.powerField[i].setAnimation("stand")
             end)
@@ -78,7 +79,7 @@ init
         goblinShop.show()
         if not generatorAlive
             generatorAlive = true
-            generator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
+            wallGenerator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
             for i = 0 to 9
                 Dests.powerField[i]
                     ..restoreLife(50., true)
@@ -86,7 +87,7 @@ init
             powerFieldEnter1.enable()
             powerFieldEnter2.enable()
         else
-            generator.setLife(generator.getMaxHP())
+            wallGenerator.setLife(wallGenerator.getMaxHP())
         
         // Wall
         if not wallDestroyed
@@ -97,7 +98,7 @@ init
         forDestructablesInRect(Rects.barrel3, d -> d.remove())
     end)
     EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
-        if EventData.getDyingUnit() == generator
+        if EventData.getDyingUnit() == wallGenerator
             generatorAlive = false
             powerFieldEnter1.disable()
             powerFieldEnter2.disable()
@@ -105,7 +106,8 @@ init
             powerFieldAnimation = null
             for i = 0 to 9
                 Dests.powerField[i].kill()
-            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator was destroyed")
+            if EventData.getKillingUnit() != null
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator was destroyed")
     end)
 
     // Get barrel
@@ -192,7 +194,6 @@ function destroyWall()
     let fire2 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel2.getCenter())
     let fire3 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel3.getCenter())
     seeDrSpawn[3].start()
-    seeDeSpawn[2].start()
     goblinShop.hide()
     forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
         if u.hasItemById(BARREL)
@@ -209,7 +210,7 @@ function destroyWall()
         if u.isType(UNIT_TYPE_STRUCTURE)
             u.setOwner(DRAENEI, true)
     end)
-    ModifyGateBJ(bj_GATEOPERATION_OPEN, Dests.voidTravellerDoor)
+    Dests.voidTravellerDoor.open()
     /* TODO
     gg_trg_Viajero_del_vacio.enable()
     gg_trg_Para_ser_justos.disable()

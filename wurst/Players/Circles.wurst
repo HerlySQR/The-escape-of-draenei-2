@@ -49,16 +49,28 @@ init
             circle[8].removeAbility(MANA_REGEN)
     end)
 
-    circleRegion[1] = Rects.circle11
-    circleRegion[2] = Rects.circle12
-    circleRegion[3] = Rects.circle13
-    circleRegion[4] = Rects.circle14
-    circleRegion[5] = Rects.circle15
-    circleRegion[6] = Rects.circle21
-    circleRegion[7] = Rects.circle22
-    circleRegion[8] = Rects.circle23
-    circleRegion[9] = Rects.circle24
-    circleRegion[10] = Rects.circle25
+    onReset(true, () -> begin
+        itemDraenei = Rects.items1
+        itemDemons = Rects.items2
+
+        circleRegion[1] = Rects.circle11
+        circleRegion[2] = Rects.circle12
+        circleRegion[3] = Rects.circle13
+        circleRegion[4] = Rects.circle14
+        circleRegion[5] = Rects.circle15
+        circleRegion[6] = Rects.circle21
+        circleRegion[7] = Rects.circle22
+        circleRegion[8] = Rects.circle23
+        circleRegion[9] = Rects.circle24
+        circleRegion[10] = Rects.circle25
+    end)
+
+    onReset(false, () -> begin
+        for i = 1 to 10
+            circle[i].setPos(circleRegion[i].getCenter())
+            for m in circle[i].inventory()
+                m.remove()
+    end)
 
     circle[1] = createUnit(players[1], CIRCLE, circleRegion[1].getCenter(), UNIT_FACING)
     circle[2] = createUnit(players[2], CIRCLE, circleRegion[2].getCenter(), UNIT_FACING)
@@ -92,32 +104,16 @@ init
     pointCircle[4].add(Rects.circle41)
     pointCircle[4].add(Rects.circle42)
     pointCircle[4].add(Rects.circle43)
+    pointCircle[4].add(Rects.circle44)
     pointCircle[4].add(Rects.circle45)
-    pointCircle[4].add(Rects.circle51)
+    pointCircle[5].add(Rects.circle51)
     pointCircle[5].add(Rects.circle52)
     pointCircle[5].add(Rects.circle53)
     pointCircle[5].add(Rects.circle54)
     pointCircle[5].add(Rects.circle55)
 
-    onReset(true, () -> begin
-        itemDraenei = Rects.items1
-        itemDemons = Rects.items2
-
-        circleRegion[1] = Rects.circle11
-        circleRegion[2] = Rects.circle12
-        circleRegion[3] = Rects.circle13
-        circleRegion[4] = Rects.circle14
-        circleRegion[5] = Rects.circle15
-        circleRegion[6] = Rects.circle21
-        circleRegion[7] = Rects.circle22
-        circleRegion[8] = Rects.circle23
-        circleRegion[9] = Rects.circle24
-        circleRegion[10] = Rects.circle25
-    end)
-
 @compiletime function gen()
     new UnitDefinition(CIRCLE, 'ncop')
-        ..setFoodProduced(5) // 5 missions
         ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory))
         ..setName("Circle of power")
     

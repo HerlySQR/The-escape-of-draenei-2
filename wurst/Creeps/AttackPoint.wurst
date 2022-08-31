@@ -45,10 +45,7 @@ init
         ..addAction(() -> begin
             let enter = GetEnteringUnit()
             if enter.getOwner() == DRAENEI
-                if generatorAlive
-                    target[enter.getIndex()] = attackPoint2
-                else
-                    target[enter.getIndex()] = attackPoint3
+                target[enter.getIndex()] = attackPoint3
             else
                 target[enter.getIndex()] = attackPoint1
             enter.issuePointOrderById(Orders.attack, target[enter.getIndex()])

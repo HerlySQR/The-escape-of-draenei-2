@@ -35,14 +35,14 @@ public class Dests
     static constant dungeonDoor1 = gg_dest_B00E_0020
     static constant dungeonExitDoor1 = gg_dest_B00C_0042
     static constant dungeonExitDoor2 = gg_dest_B00B_1128
-    static constant constructionEntranceDoor1 = gg_dest_LTg2_2727
-    static constant constructionEntranceDoor2 = gg_dest_LTg1_2771
-    static constant voidTravellerDoor = gg_dest_LTe3_4731
-    static constant habitatDoor = gg_dest_DTg2_4451
-    static constant automaticDoor1 = gg_dest_B007_6355
-    static constant automaticDoor2 = gg_dest_B007_6354
-    static constant entranceDoor1 = gg_dest_YTce_5536
-    static constant entranceDoor2 = gg_dest_YTcx_5537
+    static constant constructionEntranceDoor1 = gate(gg_dest_LTg2_2727)
+    static constant constructionEntranceDoor2 = gate(gg_dest_LTg1_2771)
+    static constant voidTravellerDoor = gate(gg_dest_LTe3_4731)
+    static constant habitatDoor = gate(gg_dest_DTg2_4451)
+    static constant automaticDoor1 = gate(gg_dest_B007_6355)
+    static constant automaticDoor2 = gate(gg_dest_B007_6354)
+    static constant entranceDoor1 = gate(gg_dest_YTce_5536)
+    static constant entranceDoor2 = gate(gg_dest_YTcx_5537)
     static constant mainEntranceDoor = gg_dest_DTg6_5527
 
     static constant footSwitch1 = gg_dest_DTfx_2142
@@ -76,14 +76,8 @@ public class Dests
 
     // Missions
 
-    static constant entranceForceWall1 = gg_dest_Dofw_6525
-    static constant entranceForceWall2 = gg_dest_Dofw_6524
-    static constant entranceForceWall3 = gg_dest_Dofv_6521
-    static constant entranceForceWall4 = gg_dest_Dofw_6519
-    static constant entranceForceWall5 = gg_dest_Dofw_6520
-    static constant entranceForceWall6 = gg_dest_Dofw_6595
-    static constant entranceForceWall7 = gg_dest_Dofv_6526
-    static constant entranceForceWall8 = gg_dest_Dofw_6594
+    static constant entranceForceWall = [gate(gg_dest_Dofw_6525), gate(gg_dest_Dofw_6524), gate(gg_dest_Dofv_6521), gate(gg_dest_Dofw_6519),
+                                         gate(gg_dest_Dofw_6520), gate(gg_dest_Dofw_6595), gate(gg_dest_Dofv_6526), gate(gg_dest_Dofw_6594)]
 
     // Power shield
     static constant powerField = [gg_dest_B00J_6607, gg_dest_B00J_6608, gg_dest_B00J_2611, gg_dest_B00J_6606,
@@ -260,6 +254,8 @@ public class Rects
 
     static constant elevatorsSecret = gg_rct_ElevatorsSecret
 
+    static constant dustPoint = [gg_rct_DustPoint0, gg_rct_DustPoint1, gg_rct_DustPoint2]
+
     static constant DONT_PASS = gg_rct_DONT_PASS
 
     static constant quake = gg_rct_Quake
@@ -331,7 +327,7 @@ public class Rects
                                    gg_rct_DeathTower105, gg_rct_DeathTower106]
     static constant deathTower2 = [gg_rct_DeathTower200, gg_rct_DeathTower201, gg_rct_DeathTower202, gg_rct_DeathTower203, gg_rct_DeathTower204,
                                    gg_rct_DeathTower205, gg_rct_DeathTower206, gg_rct_DeathTower207, gg_rct_DeathTower208, gg_rct_DeathTower209,
-                                   gg_rct_DeathTower210, gg_rct_DeathTower211]
+                                   gg_rct_DeathTower210, gg_rct_DeathTower211, gg_rct_DeathTower212, gg_rct_DeathTower213]
     static constant deathTower3 = [gg_rct_DeathTower300, gg_rct_DeathTower301, gg_rct_DeathTower302, gg_rct_DeathTower303, gg_rct_DeathTower304,
                                    gg_rct_DeathTower305, gg_rct_DeathTower306, gg_rct_DeathTower307, gg_rct_DeathTower308, gg_rct_DeathTower309,
                                    gg_rct_DeathTower310, gg_rct_DeathTower311, gg_rct_DeathTower312, gg_rct_DeathTower313]

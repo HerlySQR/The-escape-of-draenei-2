@@ -8,26 +8,28 @@ import PlayerData
 import ModeSelection
 import GeneratedValues
 
-init
-    nullTimer() ->
-        forUnitsInRect(Rects.selectorDraenei, u -> u.pause())
-        forUnitsInRect(Rects.selectorDemon, u -> u.pause())
-        for i = 0 to 11
-            if players[i].isIngame()
-                selector = players[i]
-                DisplayTextToForce(bj_FORCE_ALL_PLAYERS, "Wait "+ playerName[selector.getNumber()] + " select the modes.")
-                select.enable()
+public function whoSelect()
+    forUnitsInRect(Rects.selectorDraenei, u -> u.pause())
+    forUnitsInRect(Rects.selectorDemon, u -> u.pause())
+    for i = 0 to 11
+        if players[i].isIngame()
+            selector = players[i]
+            DisplayTextToForce(bj_FORCE_ALL_PLAYERS, "Wait "+ playerName[selector.getNumber()] + " select the modes.")
+            select.enable()
 
-                if localPlayer == selector
-                    ClearTextMessages()
-                    DisplayTimedTextToPlayer(localPlayer, 0, 0, 30, "To select a mode you must chat '-' followed the characters of a specific mode (In order), if you don't specific a mode (not type the characters) the game automatically select the default modes.")
-                    bj_questHintSound.play()
-                
-                // Window of the timer
-                window..setTitle("The Selection ends in: ")
-                      ..setTitleColor(0, 128, 255, 255)
-                      ..setTimeColor(0, 128, 255, 255)
-                      ..display(true)
-                maxSelection.start(60.00, function didntChose)
+            if localPlayer == selector
+                //TODOClearTextMessages()
+                DisplayTimedTextToPlayer(localPlayer, 0, 0, 30, "To select a mode you must chat '-' followed the characters of a specific mode (In order), if you don't specific a mode (not type the characters) the game automatically select the default modes.")
+                bj_questHintSound.play()
             
-                break
+            // Window of the timer
+            window..setTitle("The Selection ends in: ")
+                    ..setTitleColor(0, 128, 255, 255)
+                    ..setTimeColor(0, 128, 255, 255)
+                    ..display(true)
+            maxSelection.start(60.00, function didntChose)
+        
+            break
+
+init
+    nullTimer(() -> whoSelect())
