@@ -10,6 +10,7 @@ import DamageEvent
 import initlater Dungeon
 import initlater Barrels
 import GeneratedValues
+import Reset
 
 import LinkedList
 import OnUnitEnterLeave
@@ -184,8 +185,16 @@ init
     // This towers don't work
     onEnter(function disableTower)
     // Run the first
-    for _ = 1 to 8
-        createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), GetRandomReal(0, PI2).asAngleRadians())
+    onReset(false, () -> begin
+        forUnitsOfPlayer(DRAENEI, u -> begin
+            if u.getTypeId() == DRAENEI_WORKER
+                u.remove()
+        end)
+    end)
+    onReset(true, () -> begin 
+        for _ = 1 to 8
+            createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), GetRandomReal(0, PI2).asAngleRadians())
+    end)
     nullTimer(() -> defensiveTowers1())
     // If a tower is destroyed
     CreateTrigger()

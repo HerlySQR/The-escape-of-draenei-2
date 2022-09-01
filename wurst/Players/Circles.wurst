@@ -121,10 +121,10 @@ init
         ..setAmountofHitPointsRegenerated(1, 0.02)
         ..setPercentage(1, true)
         ..setTargetsAllowed(1, "air,allies,invulnerable,organic,ground,player,vulnerable")
-        ..setAreaofEffect(1, 700.)
+        ..setAreaofEffect(1, 600.)
     
     new AbilityDefinitionNeutralRegenmanaonly(MANA_REGEN)
         ..setAmountRegenerated(1, 0.02)
         ..setPercentage(1, true)
         ..setTargetsAllowed(1, "air,allies,invulnerable,organic,ground,player,vulnerable")
-        ..setAreaofEffect(1, 700.)
+        ..setAreaofEffect(1, 600.)

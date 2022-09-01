@@ -124,7 +124,7 @@ let modesInformation = [createCenteredTexttag(vec3(modesCenter.x, modesTop - 6*l
 
 string chat
 
-public function actionsSelect()
+function actionsSelect()
     var mode = chat
     var m2 = true
     var m3 = true

@@ -65,7 +65,16 @@ init
                     u.hide()
             
             if whatMode[5] == LEVELING
-                if id == RECIPES_MERCHANT
+                if id == MERCHANT
+                    RemoveItemFromStock(u, HEALING_POTION.getNewId())
+                    AddItemToStock(u, HEALING_SALVE.getNewId(), 1, 5)
+                    RemoveItemFromStock(u, MANA_POTION.getNewId())
+                    AddItemToStock(u, CLARITY_POTION.getNewId(), 1, 5)
+                    RemoveItemFromStock(u, GREATER_HEALING_POTION.getNewId())
+                    AddItemToStock(u, POTION_OF_RESTORATION.getNewId(), 1, 3)
+                    RemoveItemFromStock(u, GREATER_MANA_POTION.getNewId())
+                    AddItemToStock(u, GREATER_POTION_OF_RESTORATION.getNewId(), 1, 3)
+                else if id == RECIPES_MERCHANT
                     RemoveItemFromStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem())
                     AddItemToStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem(), 1, 1)
                     RemoveItemFromStock(u, SOBI_MASK_1_RECIPE.getDummyItem())
@@ -73,7 +82,16 @@ init
                 else if id == BOOK_STORE
                     u.show()
             else if whatMode[5] == NOT_LEVELING
-                if id == RECIPES_MERCHANT
+                if id == MERCHANT
+                    RemoveItemFromStock(u, HEALING_SALVE.getNewId())
+                    AddItemToStock(u, HEALING_POTION.getNewId(), 1, 5)
+                    RemoveItemFromStock(u, CLARITY_POTION.getNewId())
+                    AddItemToStock(u, MANA_POTION.getNewId(), 1, 5)
+                    RemoveItemFromStock(u, POTION_OF_RESTORATION.getNewId())
+                    AddItemToStock(u, GREATER_HEALING_POTION.getNewId(), 1, 3)
+                    RemoveItemFromStock(u, GREATER_POTION_OF_RESTORATION.getNewId())
+                    AddItemToStock(u, GREATER_MANA_POTION.getNewId(), 1, 3)
+                else if id == RECIPES_MERCHANT
                     RemoveItemFromStock(u, RING_OF_REGENERATION_2_RECIPE.getDummyItem())
                     AddItemToStock(u, RING_OF_REGENERATION_1_RECIPE.getDummyItem(), 1, 1)
                     RemoveItemFromStock(u, SOBI_MASK_2_RECIPE.getDummyItem())
@@ -84,7 +102,7 @@ init
     end)
 
     let owners = [DRAENEI, DEMON, players[PLAYER_NEUTRAL_AGGRESSIVE], DEMON, DEMON]
-    let angles = [270..fromDeg(), 0..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
+    let angles = [90..fromDeg(), 0..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
     for i = 0 to 4
         createUnit(owners[i], MERCHANT, Rects.merchant[i].getCenter(), angles[i])
         createUnit(owners[i], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])
@@ -164,6 +182,9 @@ init
         forUnitsInRect(Rects.shops2, u -> u.setOwner(DEMON, true))
         forUnitsInRect(Rects.shops3, u -> u.setOwner(players[PLAYER_NEUTRAL_AGGRESSIVE], true))
         forUnitsInRect(Rects.shops4, u -> u.setOwner(DEMON, true))
+
+        for i = 0 to 2
+            Dests.secretMerchantLever[i].restoreLife(5, false)
     end)
 
 function BuildingDefinition.defaultSettings()

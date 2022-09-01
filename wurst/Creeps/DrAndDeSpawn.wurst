@@ -102,7 +102,7 @@ init
         createUnit(DEMON, DEATH_TOWER_1, Rects.deathTower1[i].getCenter(), UNIT_FACING)
     for i = 0 to 13
         createUnit(DEMON, DEATH_TOWER_2, Rects.deathTower2[i].getCenter(), UNIT_FACING)
-    for i = 0 to 13
+    for i = 0 to 16
         createUnit(DEMON, DEATH_TOWER_3, Rects.deathTower3[i].getCenter(), UNIT_FACING)
 
     // Create the draenei warriors

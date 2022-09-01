@@ -14,7 +14,8 @@ import Reset
 import public HeroType
 import initlater MyBoard
 import ArrayList
-import ReferenceSystem
+import Imports
+//import ReferenceSystem
 
 public rect actDrSpawn
 public rect actDeSpawn
@@ -32,10 +33,6 @@ boolean array youSelected
 Fx array arrow
 
 init
-    for i = 1 to 11
-        if i != 6
-            arrow[i] = new Fx(ZERO2, UNIT_FACING, Abilities.aneuTarget)..setZ(240.)
-            arrow[i].getDummy().hide()
 
     onModesSelected(() -> begin
         if whatMode[4] == TRAITOR
@@ -138,10 +135,9 @@ init
             
             if not youSelected[id]
                 youSelected[id] = true
-                arrow[id].getDummy()
-                    ..setColor(playerSelector.getColor())
-                    ..setXY(heroSelected.getPos())
-                    ..show()
+                arrow[id] = new Fx(heroSelected.getPos(), UNIT_FACING, Abilities.aneuTarget)
+                    ..setPlayerColor(playerSelector.getColor())
+                    ..setZ(240.)
             
             doAfter(0.95, () -> begin
                 if clicks[id] > 0
@@ -157,7 +153,9 @@ init
     ..addAction(() -> begin
         let id = GetTriggerPlayer().getId()
         youSelected[id] = false
-        arrow[id].getDummy().hide()
+        if arrow[id] != null
+            arrow[id].hiddenDestroy()
+            arrow[id] = null
         clicks[id] = 0
     end)
 
@@ -230,20 +228,13 @@ function createDistribution(int quantity, real dist, vec2 center) returns vec2Li
     for row = rowsNumber downto -rowsNumber
         let size = rows.get(row)
         if size != 0
-            if size.isOdd()
-                let width = (size - 1) div 2
-                for j = -width to width
-                    let pos = dist * vec2(j.toReal(), row.toReal()) + center//ref.convertVec2(vec2(j.toReal(), row.toReal()))
-                    xVals.add(pos.x)
-                    yVals.add(pos.y)
-            else
-                let width = (size - 1) / 2
-                var j = -width - 1.
-                while j < width
-                    j += 1.
-                    let pos = dist * vec2(j, row.toReal()) + center//ref.convertVec2(vec2(j, row.toReal()))
-                    xVals.add(pos.x)
-                    yVals.add(pos.y)
+            let width = (size - 1) / 2
+            var j = -width - 1.
+            while j < width
+                j += 1.
+                let pos = dist * vec2(j, row.toReal()) + center//ref.convertVec2(vec2(j, row.toReal()))
+                xVals.add(pos.x)
+                yVals.add(pos.y)
 
     //destroy ref
     destroy rows
@@ -267,14 +258,15 @@ init
     var j = 1
     for hero in HeroType
         if hero.getRace() == Orc
-            createUnit(DRAENEI, hero.getL(), drPoints.get(i), UNIT_FACING).setInvulnerable(true)
+            let pos = drPoints.get(i)
+            createUnit(DRAENEI, hero.getL(), pos, UNIT_FACING).setInvulnerable(true)
+            addEffect(Imports.attakAura, pos)
             i++
         else if hero.getRace() == Undead
-            createUnit(DEMON, hero.getL(), dePoints.get(j), UNIT_FACING).setInvulnerable(true)
+            let pos = dePoints.get(j)
+            createUnit(DEMON, hero.getL(), pos, UNIT_FACING).setInvulnerable(true)
+            addEffect(Imports.attakAura, pos)
             j++
     
-    nullTimer() -> 
-        for k = 1 to drPoints.xVals.size()
-            print(drPoints.get(k).toString())
-        drPoints.dstr()
+    drPoints.dstr()
     dePoints.dstr()

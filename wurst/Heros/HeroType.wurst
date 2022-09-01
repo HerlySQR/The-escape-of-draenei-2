@@ -1346,7 +1346,7 @@ init
         ..setElevationSample(0, 50.)
         ..setSelectionScale(1.4)
         ..setArtSpecial(Objects.undeadLargeDeathExplode)
-        ..setIcon(Icons.bTNBlueDemoness)
+        ..setIcon(Icons.bTNDemoness)
         ..setShadowImageSize(140.)
         ..setShadowImageCenter(60.)
         ..setProjectileImpactZ(60.)

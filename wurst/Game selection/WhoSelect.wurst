@@ -18,7 +18,7 @@ public function whoSelect()
             select.enable()
 
             if localPlayer == selector
-                //TODOClearTextMessages()
+                ClearTextMessages()
                 DisplayTimedTextToPlayer(localPlayer, 0, 0, 30, "To select a mode you must chat '-' followed the characters of a specific mode (In order), if you don't specific a mode (not type the characters) the game automatically select the default modes.")
                 bj_questHintSound.play()
             

@@ -330,7 +330,8 @@ public class Rects
                                    gg_rct_DeathTower210, gg_rct_DeathTower211, gg_rct_DeathTower212, gg_rct_DeathTower213]
     static constant deathTower3 = [gg_rct_DeathTower300, gg_rct_DeathTower301, gg_rct_DeathTower302, gg_rct_DeathTower303, gg_rct_DeathTower304,
                                    gg_rct_DeathTower305, gg_rct_DeathTower306, gg_rct_DeathTower307, gg_rct_DeathTower308, gg_rct_DeathTower309,
-                                   gg_rct_DeathTower310, gg_rct_DeathTower311, gg_rct_DeathTower312, gg_rct_DeathTower313]
+                                   gg_rct_DeathTower310, gg_rct_DeathTower311, gg_rct_DeathTower312, gg_rct_DeathTower313, gg_rct_DeathTower314,
+                                   gg_rct_DeathTower315, gg_rct_DeathTower316]
     
     // Draenei warriors
     static constant draeneiWarrior = [gg_rct_DraeneiWarrior0, gg_rct_DraeneiWarrior1, gg_rct_DraeneiWarrior2]

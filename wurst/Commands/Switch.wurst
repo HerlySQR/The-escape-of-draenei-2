@@ -7,6 +7,7 @@ import ChatEnter
 import GeneratedValues
 import Reset
 import WhoSelect
+import HeroSelection
 
 import Camera
 import Dialog
@@ -231,5 +232,7 @@ init
                 swc1 = circle[i].getPos()
                 swc2 = circle[i+5].getPos()
                 changePlayers()
+                canPick.remove(swp1)
+                canPick.remove(swp2)
             whoSelect()
     end)
