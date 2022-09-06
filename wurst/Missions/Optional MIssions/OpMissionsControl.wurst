@@ -1,0 +1,34 @@
+package OpMissionsControl
+
+import public DefineMissions
+import public GeneratedValues
+import public Imports
+import public Reset
+import HeroType
+import initlater VoidTraveller
+
+import public EventHelper
+import public ClosureTimers
+import public Dialog
+
+import public UnitTransmission
+
+public force array theyKnowYou
+public force array disturbed
+
+public constant isHero = Condition(() -> GetEnteringUnit().isType(UNIT_TYPE_HERO))
+
+public function unit.isAnimal() returns bool
+    return HeroType.get(this) == SALAMANDER or
+           HeroType.get(this) == SPIRIT_WOLF
+
+public function disturbing(player p, int index)
+    if theyKnowYou[index].has(p) and not disturbed[index].has(p)
+        var message = ""
+        switch index
+            case voidTravellerIndex
+                message = "|cff32cd32HELP:|r He can see your soul."
+        
+        doAfter(2.) -> 
+            QuestMessageBJ(theyKnowYou[index], bj_QUESTMESSAGE_HINT, message)
+            disturbed[index].add(p)

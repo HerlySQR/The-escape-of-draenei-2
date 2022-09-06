@@ -26,6 +26,8 @@ public class GUnits
 
     // Missions
     
+    // Optional Missions
+    static constant voidTraveller = gg_unit_nvde_0006
 
 /** The generated destructables. */
 public class Dests
@@ -345,6 +347,15 @@ public class Rects
     // Generators
     static constant generator1 = gg_rct_Generator1
     static constant generator2 = gg_rct_Generator2
+
+    /* Optional missions */
+
+    // Void traveller
+    static constant voidTravellerRoom = gg_rct_VoidTravellerRoom
+    static constant voidTravellerDoor = gg_rct_VoidTravellerDoor
+    static constant voidTravellerEnter = gg_rct_VoidTravellerEnter
+    static constant voidTravellerCauldron = gg_rct_VoidTravellerCauldron
+    
 
 /** The generated cameras. */
 public class Cams

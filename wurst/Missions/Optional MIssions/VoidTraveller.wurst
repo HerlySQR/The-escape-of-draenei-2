@@ -1,0 +1,95 @@
+package VoidTraveller
+
+import OpMissionsControl
+
+public constant voidTravellerIndex = 0
+let voidTraveller = GUnits.voidTraveller
+let whoAre = CreateForce()
+let isSeeYou = CreateForce()
+dialog menu
+button yes
+button no
+effect mark = null
+unit paralized
+trigger enter
+trigger returning
+trigger returningBefore
+
+// Enter region
+
+init
+    theyKnowYou[voidTravellerIndex] = CreateForce()
+    disturbed[voidTravellerIndex] = CreateForce()
+
+    nullTimer() -> 
+        menu = createDialog()
+        yes = menu.addButton("Yes")
+        no = menu.addButton("No")
+
+    onReset(true, () -> begin
+        if mark == null
+            mark = voidTraveller.addEffect(Imports.questMarking, "origin")
+    end)
+
+    enter = CreateTrigger()
+        ..registerRectEnterEventSource(Rects.voidTravellerEnter)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            enter.disable()
+            let p = GetOwningPlayer(paralized)
+            whoAre.add(p)
+            isSeeYou.add(p)
+
+            paralized = GetEnteringUnit()
+                ..setInvulnerable(true)
+                ..pause()
+            mark.destr()
+            mark = null
+
+            let trans = new Transmission(whoAre, 0)
+            if isSeeYou.has(p)
+                trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello, you again.", TTime.SET, 3., true)
+                trans.addLine(voidTraveller, null, "Void Traveller", null, "Did you think about my deal?", TTime.SET, 3.5, true)
+            else
+                if paralized.isAnimal()
+                    trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello.", TTime.SET, 4., true)
+                else
+                    trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor.", TTime.SET, 4., true)
+                trans.addLine(voidTraveller, null, "Void Traveller", null, "If you wanna know what am i doing here, I'm just a traveller.", TTime.SET, 5.5, true)
+                trans.addLine(voidTraveller, null, "Void Traveller", null, "In this moment I'm doing a potion, if you help me I'll give you 600 of gold.", TTime.SET, 5.5, true)
+            trans.addEnd(() -> begin
+                menu.display(p, true)
+                disturbing(p, voidTravellerIndex)
+            end)
+            trans.start()
+        end)
+
+    // Accept or not
+    CreateTrigger()
+        ..registerDialogEvent(menu)
+        ..addAction(() -> begin
+            let p = GetTriggerPlayer()
+            if GetClickedButton() == yes
+                QuestMessageBJ(whoAre, bj_QUESTMESSAGE_DISCOVERED,"|cffffcc00VOID TRAVELLER|r\n\n"
+                                                                + "-Colect an egg of the dragons.\n"
+                                                                + "-Colect a skull.\n"
+                                                                + "-Colect a fire pictogram.\n"
+                                                                + "-Give this items to the Void Traveller.\n")
+                returning.enable()
+                returningBefore.enable()
+            else
+                new Transmission(whoAre, 0)
+                    ..addLine(voidTraveller, null, "Void Traveller", null, "Ok, you are busy, I understand.", TTime.SET, 2., true)
+                    ..addEnd(() -> begin
+                        mark = voidTraveller.addEffect(Imports.questMarking, "origin")
+                        enter.enable()
+                    end)
+                    ..start()
+                whoAre.remove(p)
+                isSeeYou.add(p)
+            paralized
+                ..setInvulnerable(false)
+                ..unpause()
+        end)
+
+        

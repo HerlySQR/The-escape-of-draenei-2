@@ -154,7 +154,7 @@ init
         let id = GetTriggerPlayer().getId()
         youSelected[id] = false
         if arrow[id] != null
-            arrow[id].hiddenDestroy()
+            destroy arrow[id]
             arrow[id] = null
         clicks[id] = 0
     end)
@@ -168,7 +168,7 @@ tuple vec2List(ArrayList<real> xVals, ArrayList<real> yVals)
 function vec2List.get(int index) returns vec2
     return vec2(this.xVals.get(index), this.yVals.get(index))
 
-function vec2List.dstr()
+function vec2List.destr()
     destroy this.xVals
     destroy this.yVals
 
@@ -268,5 +268,5 @@ init
             addEffect(Imports.attakAura, pos)
             j++
     
-    drPoints.dstr()
-    dePoints.dstr()
+    drPoints.destr()
+    dePoints.destr()
