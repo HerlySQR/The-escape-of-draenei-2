@@ -29,6 +29,7 @@ public class GUnits
     // Optional Missions
     static constant voidTraveller = gg_unit_nvde_0006
     static constant theReader = gg_unit_nssn_0013
+    static constant thePrisoner = gg_unit_ndrl_0015
 
 /** The generated destructables. */
 public class Dests
@@ -362,6 +363,20 @@ public class Rects
     static constant theReaderEnter = gg_rct_TheReaderEnter
     static constant theReaderOtherPos = gg_rct_TheReaderOtherPos
     static constant bookPlace = gg_rct_BookPlace
+
+    // The Fountain
+    static constant theFountainEnter = gg_rct_TheFountainEnter
+    static constant theFountainEffect = [gg_rct_TheFountainEffect0, gg_rct_TheFountainEffect1, gg_rct_TheFountainEffect2, gg_rct_TheFountainEffect3]
+    static constant waterPlace = [gg_rct_WaterPlace00, gg_rct_WaterPlace01, gg_rct_WaterPlace02, gg_rct_WaterPlace03, gg_rct_WaterPlace04,
+                                  gg_rct_WaterPlace05, gg_rct_WaterPlace06, gg_rct_WaterPlace07, gg_rct_WaterPlace08, gg_rct_WaterPlace09,
+                                  gg_rct_WaterPlace10, gg_rct_WaterPlace11, gg_rct_WaterPlace12, gg_rct_WaterPlace13, gg_rct_WaterPlace14, 
+                                  gg_rct_WaterPlace15, gg_rct_WaterPlace16, gg_rct_WaterPlace17, gg_rct_WaterPlace18, gg_rct_WaterPlace19,
+                                  gg_rct_WaterPlace20, gg_rct_WaterPlace21, gg_rct_WaterPlace22, gg_rct_WaterPlace23, gg_rct_WaterPlace24, 
+                                  gg_rct_WaterPlace25, gg_rct_WaterPlace26, gg_rct_WaterPlace27, gg_rct_WaterPlace28, gg_rct_WaterPlace29,
+                                  gg_rct_WaterPlace30, gg_rct_WaterPlace31]
+
+    // The Prisoner
+    static constant thePrisoner = gg_rct_ThePrisoner
 
 /** The generated cameras. */
 public class Cams

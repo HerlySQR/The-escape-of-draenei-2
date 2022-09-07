@@ -1,0 +1,359 @@
+package TheFountain
+
+import OpMissionsControl
+import HolyLight
+
+import SoundUtils
+
+public constant theFountainIndex = 2
+public unit fountainRestorer
+let thePrisoner = GUnits.thePrisoner
+let whoAre = CreateForce()
+let iSeeYou = CreateForce()
+let objective = Rects.thePrisoner.getCenter()
+let lightningHit = new SoundDefinition(Sounds.monsoonLightningHit, false, true)
+
+let WATER_PICTOGRAM = compiletime(ITEM_ID_GEN.next())
+let WATER_PICTOGRAM_NO_POWER = compiletime(ITEM_ID_GEN.next())
+let WATER_PICTOGRAM_DUMMY = compiletime(UNIT_ID_GEN.next())
+let HOLY_WATER = compiletime(ITEM_ID_GEN.next())
+let HOLY_WATER_SPELL = compiletime(ABIL_ID_GEN.next())
+let FOUNTAIN_HEALER = compiletime(UNIT_ID_GEN.next())
+
+dialog menu
+button yes
+button no
+unit paralized
+trigger enter
+trigger ping
+trigger returning
+trigger takePictogram
+trigger returningAfter
+effect fountain = null
+unit healer = null
+
+// Enter region
+
+init
+    theyKnowYou[theFountainIndex] = CreateForce()
+    disturbed[theFountainIndex] = CreateForce()
+
+    nullTimer() -> 
+        menu = createDialog()
+        yes = menu.addButton("Yes")
+        no = menu.addButton("No")
+
+    onReset(false, () -> begin
+        whoAre.clear()
+        iSeeYou.clear()
+        menu.display(localPlayer, false)
+        returning.disable()
+        takePictogram.disable()
+        returningAfter.disable()
+        ping.disable()
+        if fountain != null
+            fountain.destr()
+            fountain = null
+        if healer != null
+            healer.remove()
+            healer = null
+    end)
+
+    enter = CreateTrigger()
+        ..registerRectEnterEventSource(Rects.theFountainEnter)
+        ..addCondition(Condition(() -> HeroType.get(EventData.getEnteringUnit()) == SEER))
+        ..addAction(() -> begin
+            fountainRestorer = EventData.getEnteringUnit()
+            enter.disable()
+            new Transmission(fountainRestorer.getOwner().getForce(), 0)
+                ..addLine(fountainRestorer, null, "You", null, "This fountain looks awful.", TTime.SET, 3.5, true)
+                ..addLine(fountainRestorer, null, "You", null, "Maybe I can do something.", TTime.SET, 3.5, true)
+                ..addEnd(() -> menu.display(fountainRestorer.getOwner(), true))
+                ..start()
+        end)
+
+    // Accept or not
+    CreateTrigger()
+        ..registerDialogEvent(menu)
+        ..addAction(() -> begin
+            let p = GetTriggerPlayer()
+            if GetClickedButton() == yes
+                string message
+                let t = new Transmission(whoAre, 0)
+                if THE_DRAENEI.has(p)
+                    message = "|cffffcc00THE FOUNTAIN|r\n\n"
+                            + "-Talk with the draenei.\n"
+                            + "-Obtain the water pictogram.\n"
+                            + "-Bring the water pictogram to the fountain.\n"
+                    t.addLine(paralized, null, "You", null, "I remember someone in the prison who talk us of the water pictogram or something, maybe he can help me.", TTime.SET, 4.5, true)
+                else
+                    message = "|cffffcc00THE FOUNTAIN|r\n\n"
+                            + "-Go with the draenei.\n"
+                            + "-Claim the water pictogram.\n"
+                            + "-Bring the water pictogram to the fountain.\n"
+                    t.addLine(paralized, null, "You", null, "I remember that some of the prisoners stole the water pictogram, I will have to claim it.", TTime.SET, 4., true)
+                t.addEnd(() -> begin
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_DISCOVERED, message)
+                    ping.enable()
+                    takePictogram.enable()
+                end)
+                t.start()
+            else
+                whoAre.remove(p)
+                enter.enable()
+        end)
+    
+
+    // Pings
+    ping = CreateTrigger()
+        ..disable()
+        ..registerTimerEvent(6., true)
+        ..addAction(() -> pingMinimap(whoAre, objective, 1., COLOR_WHITE.withoutAlpha(), false))
+    
+    let cond = And(isHero, Condition(() -> whoAre.has(GetEnteringUnit())))
+    
+    // Going with the prisioner
+    takePictogram = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.thePrisoner)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            returningAfter.enable()
+            ping.disable()
+            paralized = GetEnteringUnit()
+                ..setInvulnerable(true)
+                ..pause()
+
+            let p = paralized.getOwner()
+            let face = thePrisoner.getFacingAngle()
+            thePrisoner.setFacing(thePrisoner.getPos().angleTo(paralized.getPos()))
+            let haveItem = new Reference(false)
+            TransmissionCallback giveItem = () -> begin
+                haveItem.val = true
+                paralized.addItemById(WATER_PICTOGRAM_NO_POWER)
+            end
+            let t = new Transmission(whoAre, 0)
+            if THE_DRAENEI.has(p)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Hello.", TTime.SET, 3., true)
+                t.addLine(paralized, null, "You", null, "Greetings, I come for the water pictogram.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Oh.", TTime.SET, 3., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "I have it, I stole it just in case.", TTime.SET, 4., true)
+                t.addLine(paralized, null, "You", null, "I need it to restoure a foutain.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "This thing not only restoures a fountain, make its water have healing powers.", TTime.SET, 5.5, true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "But if you do that, the demons can use it too.", TTime.SET, 4.5, true)
+                t.addLine(paralized, null, "You", null, "That's won't be a problem.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Hmm... ok, I'm going to give it to you", TTime.SET, 4., true)
+                t.addActions(giveItem)
+                t.addLine(paralized, null, "You", null, "Hey, it looks without power.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Oh, I miss it, for doing it work you must put it in water and bless it with the power of light.", TTime.SET, 5., true)
+                t.addLine(paralized, null, "You", null, "I get it.", TTime.SET, 3., true)
+            else
+                t.addLine(thePrisoner, null, "Prisoner", null, "Hello, How can I help yo...", TTime.SET, 3., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Oh, wait, YOU ARE ONE OF THE TRAITORS.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Why did you come?", TTime.SET, 3., true)
+                t.addLine(paralized, null, "You", null, "I know you have the water pictogram, I came to claim it", TTime.SET, 5., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "I do not know what are you talking about.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "And even if I did, I wouldn't give it to you.", TTime.SET, 4., true)
+                t.addLine(paralized, null, "You", null, "I know you have it, I will use it to restore a fountain.", TTime.SET, 4.5, true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Why? To help your demon friends with their healing powers? As if allowing it.", TTime.SET, 5.5, true)
+                t.addLine(paralized, null, "You", null, "So... healing powers, interesting, and I just wanted to restore the font.", TTime.SET, 5., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Aj, whatever... you won't have it...", TTime.SET, 3.5, true)
+                t.addLine(paralized, null, "You", null, "I found it, you're bad at hiding things.", TTime.SET, 3.5, true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "...", TTime.SET, 1., true)
+                t.addActions(giveItem)
+                t.addLine(paralized, null, "You", null, "Hey!, It looks without power, how can I power it?", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Go to hell!", TTime.SET, 3., true)
+                t.addActions(() -> paralized.setFacing(paralized.getFacingAngle() * -1.))
+                t.addLine(paralized, null, "You", null, "It doesn't matter, I'll find out myself.", TTime.SET, 4., true)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Bah.", TTime.SET, 2., true)
+            t.addEnd(() -> begin
+                takePictogram.disable()
+                if not haveItem.val
+                    giveItem.run()
+                destroy haveItem
+                thePrisoner.setFacing(face)
+                disturbing(p, theFountainIndex)
+                paralized..unpause()..setInvulnerable(false)
+                
+                if THE_DRAENEI.has(p)
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_UPDATED, "|cffffcc00UPDATE: THE FOUNTAIN|r\n"
+                                                                  + "-Bless the water pictogram.\n"
+                                                                  + "-Bring the water pictogram to the fountain.\n")
+                else
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_UPDATED, "|cffffcc00UPDATE: THE FOUNTAIN|r\n"
+                                                                  + "-Charge the water pictogram.\n"
+                                                                  + "-Bring the water pictogram to the fountain.\n")
+            end)
+            t.start()
+        end)
+    
+    returningAfter = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.thePrisoner)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let face = thePrisoner.getFacingAngle()
+            let p = fountainRestorer.getOwner()
+            let t = new Transmission(whoAre, 0)
+            if THE_DRAENEI.has(p)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Hey, I hope you had restoured the fountain.", TTime.SET, 3., true)
+            else
+                t.addLine(thePrisoner, null, "Prisoner", null, "What?, Did you come to take something else from me?", TTime.SET, 3., true)
+            t.addEnd(() -> begin
+                thePrisoner.setFacing(face)
+                disturbing(p, theFountainIndex)
+            end)
+            t.start()
+        end)
+    
+    // Enter in water with the pictogram
+
+    code actions = () -> begin
+        let u = EventData.getEnteringUnit()
+        if u.hasItemById(WATER_PICTOGRAM_NO_POWER)
+            u.removeItemById(WATER_PICTOGRAM_NO_POWER)
+            createUnit(players[PLAYER_NEUTRAL_PASSIVE], WATER_PICTOGRAM_DUMMY, u.getPos(), UNIT_FACING)
+    end
+
+    for i = 0 to 31
+        CreateTrigger()
+            ..registerRectEnterEventSource(Rects.waterPlace[i])
+            ..addCondition(cond)
+            ..addAction(actions)
+    
+    // Bless the pictogram
+    code onCast = () -> begin
+        let u = EventData.getSpellTargetUnit()
+        if u.getTypeId() == WATER_PICTOGRAM_DUMMY
+            let pos = EventData.getSpellTargetUnit().getPos()
+            doPeriodicallyCounted(0.5, 4, cb -> begin
+                addEffect(Doodads.lightningbolt, pos).destroyAfter(1.)
+                lightningHit.playOnPoint(pos.toVec3())
+                if cb.isLast()
+                    doAfter(2.) ->
+                        u.remove()
+                        createItem(WATER_PICTOGRAM, pos)
+            end)
+    end 
+    registerSpellEffectEvent(HOLY_LIGHT_NL, onCast)
+    //TODO registerSpellEffectEvent(HOLY_LIGHT_L, onCast)
+
+    // Don't touch the pictogram
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ATTACKED, () -> begin
+        if EventData.getTriggerUnit().getTypeId() == WATER_PICTOGRAM_DUMMY
+            EventData.getAttackerUnit().issueTargetOrderById(Orders.attack, EventData.getAttackerUnit())
+    end)
+
+    // Bless fountain
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.theFountainEnter)
+        ..addCondition(Condition(() -> EventData.getEnteringUnit().hasItemById(WATER_PICTOGRAM)))
+        ..addAction(() -> begin
+            addEffect(Abilities.unsummonTarget, Rects.theFountainEnter.getCenter()).destroyAfter(3.)
+            for i = 0 to 3
+                flashEffect(Abilities.darkRitualTarget, Rects.theFountainEffect[i].getCenter())
+            flashEffect(Objects.uDeathSmall, Rects.theFountainEnter.getCenter())
+            doAfter(0.5) -> 
+                flashEffect(Objects.uDeathSmall, Rects.theFountainEnter.getCenter())
+                doAfter(0.5) -> 
+                    flashEffect(Objects.uDeathSmall, Rects.theFountainEnter.getCenter())
+                    for i = 0 to 3
+                        flashEffect(Abilities.darkRitualTarget, Rects.theFountainEffect[i].getCenter())
+                    doAfter(2.) -> 
+                        fountain = addEffect(Doodads.sunWell, Rects.theFountainEnter.getCenter())
+                        QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                        + "The fountain\n")
+                        theFountainQuest.complete(true)
+                        fountainRestorer.flashEffect(Abilities.darkPortalTarget, "origin")
+                        fountainRestorer.addItemById(HOLY_WATER)
+                        healer = createUnit(players[PLAYER_NEUTRAL_PASSIVE], FOUNTAIN_HEALER, Rects.theFountainEnter.getCenter(), UNIT_FACING)..hide()
+                        doAfter(3.) -> 
+                            QuestMessageBJ(whoAre, bj_QUESTMESSAGE_ITEMACQUIRED, "|cffff0000NEW ITEM ACQUIRED:|r Holy Water")
+        end)
+
+
+@compiletime function gen()
+    new ItemDefinition(WATER_PICTOGRAM_NO_POWER, 'glsk')
+        ..setHitPoints(100000)
+        ..setTintingColor1Red(0)
+        ..setTintingColor2Green(0)
+        ..setTintingColor3Blue(0)
+        ..setInterfaceIcon(Icons.bTNRune)
+        ..setModelUsed(Objects.rune1)
+        ..setAbilities("")
+        ..setTooltipExtended("This item will restoure the fountain")
+        ..setTooltipBasic("Water Pictogram (No power)")
+        ..setDescription("This item will restoure the fountain")
+        ..setName("Water Pictogram (No power)")
+    
+    new ItemDefinition(WATER_PICTOGRAM, 'glsk')
+        ..setHitPoints(100000)
+        ..setTintingColor1Red(100)
+        ..setTintingColor2Green(100)
+        ..setTintingColor3Blue(255)
+        ..setInterfaceIcon(Icons.bTNRune)
+        ..setModelUsed(Objects.rune1)
+        ..setAbilities("")
+        ..setTooltipExtended("This item will restoure the fountain")
+        ..setTooltipBasic("Water Pictogram")
+        ..setDescription("This item will restoure the fountain")
+        ..setName("Water Pictogram")
+    
+    new UnitDefinition(WATER_PICTOGRAM_DUMMY, 'hpea')
+        ..setAttacksEnabled(0)
+        ..setSightRadiusDay(0)
+        ..setSightRadiusNight(0)
+        ..setUnitClassification("")
+        ..setFoodCost(0)
+        ..setHitPointsRegenerationType("none")
+        ..setModelFile(Objects.rune1)
+        ..setTintingColorRed(0)
+        ..setTintingColorGreen(0)
+        ..setTintingColorBlue(0)
+        ..setIconGameInterface(Icons.bTNRune)
+        ..setNormalAbilities("")
+        ..setMovementType(MovementType.None)
+        ..setUpgradesUsed("")
+        ..setStructuresBuilt("")
+        ..setUnitSoundSet("")
+        ..setName("Water Pictogram (No power)")
+    
+    new ItemDefinition(HOLY_WATER, 'bzbf')
+        ..setNumberofCharges(10)
+        ..setHitPoints(100000)
+        ..setTintingColor1Red(200)
+        ..setTintingColor2Green(255)
+        ..setTintingColor3Blue(255)
+        ..setInterfaceIcon(Icons.bTNRune)
+        ..setModelUsed(Objects.rune1)
+        ..setAbilities(HOLY_WATER_SPELL.toRawCode())
+        ..setTooltipExtended("This holy water heals you 200 of life and restoures 150 of mana.")
+        ..setTooltipBasic("Holy Water")
+        ..setDescription("This holy water heals you 200 of life and restoures 150 of mana.")
+        ..setName("Holy Water")
+    
+    new AbilityDefinitionItemRestore(HOLY_WATER_SPELL)
+        ..setHitPointsRestored(1, 200)
+        ..setManaPointsRestored(1, 150)
+        ..setCooldown(1, 30.)
+        ..setArtTarget(Abilities.moonWellCasterArt)
+    
+    new UnitDefinition(FOUNTAIN_HEALER, 'hpea')
+        ..setAttacksEnabled(0)
+        ..setSightRadiusDay(0)
+        ..setSightRadiusNight(0)
+        ..setUnitClassification("")
+        ..setFoodCost(0)
+        ..setHitPointsRegenerationType("none")
+        ..setModelFile(Objects.rune1)
+        ..setTintingColorRed(0)
+        ..setTintingColorGreen(0)
+        ..setTintingColorBlue(0)
+        ..setIconGameInterface(Icons.bTNFountainOfLife)
+        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.lifeRegenerationAura, AbilityIds.manaRegenerationAura))
+        ..setMovementType(MovementType.Fly)
+        ..setUpgradesUsed("")
+        ..setStructuresBuilt("")
+        ..setCollisionSize(0.)
+        ..setUnitSoundSet("")
+        ..setName("Healer")

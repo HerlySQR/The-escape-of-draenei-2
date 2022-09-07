@@ -46,6 +46,7 @@ init
         returning.disable()
         returningBefore.disable()
         returningAfter.disable()
+        ping.disable()
     end)
 
     onModesSelected(() -> begin
@@ -166,7 +167,6 @@ init
             u.issueTargetOrderById(Orders.attack, u)
     end)
 
-init
     // Returning to complete the mission
     returning = CreateTrigger()
         ..disable()

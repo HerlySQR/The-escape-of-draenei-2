@@ -8,7 +8,7 @@ import public GeneratedValues
 import public Imports
 import public Reset
 import public Missions
-import HeroType
+import public HeroType
 import initlater VoidTraveller
 import initlater TheReader
 
@@ -20,10 +20,13 @@ import public Orders
 import public Assets
 import public UnitObjEditing
 import public ItemObjEditing
+import public AbilityObjEditing
 import public ObjectIdGenerator
+import public ObjectIds
 import public Reference
 
 import public UnitTransmission
+import public BountyController
 
 public force array theyKnowYou
 public force array disturbed

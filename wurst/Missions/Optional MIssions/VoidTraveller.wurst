@@ -2,9 +2,6 @@ package VoidTraveller
 
 import OpMissionsControl
 
-import BountyController
-import ObjectIds
-
 public constant voidTravellerIndex = 0
 let voidTraveller = GUnits.voidTraveller
 let whoAre = CreateForce()
@@ -57,6 +54,9 @@ init
         returning.disable()
         returningBefore.disable()
         returningAfter.disable()
+
+        for i = 0 to 2
+            pings[i].disable()
     end)
 
     onModesSelected(() -> begin
