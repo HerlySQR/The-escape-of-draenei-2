@@ -99,6 +99,7 @@ public function group.issueImmediateOrder(int order)
 
 sound errorSound
 sound warningSound
+sound successSound
 
 public function message(string what, string message, player whatPlayer)
     sound whatSound = null
@@ -110,6 +111,10 @@ public function message(string what, string message, player whatPlayer)
         if warningSound == null
             warningSound = CreateSoundFromLabel("InterfaceWarning", false, false, false, 10, 10)
         whatSound = warningSound
+    else if what == "success"
+        if successSound == null
+            successSound = CreateSoundFromLabel("InterfaceGoodJob", false, false, false, 10, 10)
+        whatSound = successSound
     else
         error("Invalid type")
 

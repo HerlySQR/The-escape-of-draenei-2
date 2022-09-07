@@ -3,16 +3,17 @@ package DefineMissions
 import public Quest
 import QuestItem
 import Icons
+import Reset
 
 public Quest array mission
 
-public QuestItem voidTraveller
-public QuestItem theReader
-public QuestItem theFountain
-public QuestItem thePrisioner
-public QuestItem lordOfFire
-public QuestItem theMonster
-public QuestItem theGems
+public QuestItem voidTravellerQuest
+public QuestItem theReaderQuest
+public QuestItem theFountainQuest
+public QuestItem thePrisionerQuest
+public QuestItem lordOfFireQuest
+public QuestItem theMonsterQuest
+public QuestItem theGemsQuest
 
 init
     for i = 0 to bj_MAX_PLAYERS
@@ -77,13 +78,25 @@ init
         ..setTitle("Opcional Missions")
         ..setDescription("If you use -repick, you won't lost the missions (yes the encommenders are phyquics), but if is a mission for an especific group, it will be lost if you used -switch.")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
-    voidTraveller = q.addObjective("There is some acient void traveller, maybe he wanna some help.")
-    theReader = q.addObjective("Somewhere, a reader hides in a place that only few people can enter.")
-    theFountain = q.addObjective("The fountain looks too awful, maybe someone can help (Only Draenei Seer).")
-    thePrisioner = q.addObjective("A draenei prisioner have some money for someone who can prove himself (Only Draenei).")
-    lordOfFire = q.addObjective("The Lord of Fire wants more efficience, he thinks give some money for that (Only Demons).")
-    theMonster = q.addObjective("And old man will give a bounty for someone who kills a big Monster and gives him its head.")
-    theGems = q.addObjective("There are 3 powerful gems and it is said that if you return them to their obelisks, they will grant you their powers.")
+    voidTravellerQuest = q.addObjective("There is some acient void traveller, maybe he wanna some help.")
+    theReaderQuest = q.addObjective("Somewhere, a reader hides in a place that only few people can enter.")
+    theFountainQuest = q.addObjective("The fountain looks too awful, maybe someone can help (Only Draenei Seer).")
+    thePrisionerQuest = q.addObjective("A draenei prisioner have some money for someone who can prove himself (Only Draenei).")
+    lordOfFireQuest = q.addObjective("The Lord of Fire wants more efficience, he thinks give some money for that (Only Demons).")
+    theMonsterQuest = q.addObjective("And old man will give a bounty for someone who kills a big Monster and gives him its head.")
+    theGemsQuest = q.addObjective("There are 3 powerful gems and it is said that if you return them to their obelisks, they will grant you their powers.")
+
+    onReset(false, () -> begin
+        for i = 1 to 5
+            mission[i].q.completed(false)
+        voidTravellerQuest.complete(false)
+        theReaderQuest.complete(false)
+        theFountainQuest.complete(false)
+        thePrisionerQuest.complete(false)
+        lordOfFireQuest.complete(false)
+        theMonsterQuest.complete(false)
+        theGemsQuest.complete(false)
+    end)
 
     new Quest(false)
         ..setTitle("Gamemodes")

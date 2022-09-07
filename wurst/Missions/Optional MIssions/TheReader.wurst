@@ -1,0 +1,272 @@
+package TheReader
+
+import OpMissionsControl
+
+public constant theReaderIndex = 1
+let theReader = GUnits.theReader
+let whoAre = CreateForce()
+let iSeeYou = CreateForce()
+let itemPos = Rects.bookPlace.getCenter()
+
+let BOOK = compiletime(ITEM_ID_GEN.next())
+
+dialog menu
+button yes
+button no
+effect mark = null
+unit paralized
+trigger enter
+trigger ping
+trigger returning
+trigger returningBefore
+trigger returningAfter
+bool objectGathered
+
+// Enter region
+
+init
+    theyKnowYou[theReaderIndex] = CreateForce()
+    disturbed[theReaderIndex] = CreateForce()
+
+    nullTimer() -> 
+        menu = createDialog()
+        yes = menu.addButton("Yes")
+        no = menu.addButton("No")
+
+    onReset(true, () -> begin
+        if mark == null
+            mark = theReader.addEffect(Imports.questMarking, "origin")
+        objectGathered = false
+    end)
+
+    onReset(false, () -> begin
+        whoAre.clear()
+        iSeeYou.clear()
+        menu.display(localPlayer, false)
+        returning.disable()
+        returningBefore.disable()
+        returningAfter.disable()
+    end)
+
+    onModesSelected(() -> begin
+        createItem(BOOK, itemPos)
+    end)
+
+    enter = CreateTrigger()
+        ..registerRectEnterEventSource(Rects.theReaderEnter)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            enter.disable()
+            let p = GetOwningPlayer(paralized)
+            whoAre.add(p)
+
+            paralized = GetEnteringUnit()
+                ..setInvulnerable(true)
+                ..pause()
+            mark.destr()
+            mark = null
+
+            let trans = new Transmission(whoAre, 0)
+            if iSeeYou.has(p)
+                trans.addLine(theReader, null, "Reader", null, "Ah, it's you again.", TTime.SET, 3., true)
+                trans.addLine(theReader, null, "Reader", null, "Do you wanna do for me the favor?", TTime.SET, 4., true)
+            else if iSeeYou.count() > 1
+                trans.addLine(theReader, null, "Reader", null, "Another one?", TTime.SET, 2., true)
+                trans.addLine(theReader, null, "Reader", null, "I have to reconsider moving somewhere else.", TTime.SET, 4.5, true)
+                trans.addLine(theReader, null, "Reader", null, "Anyway, I offer you 5 of lumber if you find my lost book. Do you want?", TTime.SET, 6., true)
+            else
+                trans.addLine(theReader, null, "Reader", null, "What?, How can you...?", TTime.SET, 5., true)
+                if paralized.isAnimal()
+                    trans.addLine(theReader, null, "Reader", null, "Even the animals come here.", TTime.SET, 4., true)
+                else
+                    trans.addLine(theReader, null, "Reader", null, "I just want a private place to ready and someone came here.", TTime.SET, 4.5, true)
+                trans.addActions(1., () -> theReader.issuePointOrderById(Orders.move, Rects.theReaderOtherPos.getCenter()))
+                trans.addActions(() -> theReader.setFacing(theReader.getPos().angleTo(paralized.getPos())))
+                if paralized.isAnimal()
+                    trans.addLine(theReader, null, "Reader", null, "But, thinking better, you can do a labor for me.", TTime.SET, 4., true)
+                else
+                    trans.addLine(theReader, null, "Reader", null, "But, thinking better, I need a favor.", TTime.SET, 4., true)
+                trans.addLine(theReader, null, "Reader", null, "In the search of a place, I lost some of my books, and I don't know where is it, if you bring it me i will give you 5 of lumber.", TTime.SET, 6.5, true)
+            trans.addEnd(() -> begin
+                menu.display(p, true)
+                disturbing(p, theReaderIndex)
+                theReader.setFacing(theReader.getPos().angleTo(paralized.getPos()))
+            end)
+            trans.start()
+
+            iSeeYou.add(p)
+        end)
+
+    // Accept or not
+    CreateTrigger()
+        ..registerDialogEvent(menu)
+        ..addAction(() -> begin
+            let p = GetTriggerPlayer()
+            if GetClickedButton() == yes
+                QuestMessageBJ(whoAre, bj_QUESTMESSAGE_DISCOVERED,"|cffffcc00THE READER|r\n\n"
+                                                                + "-Find the book of the reader.\n"
+                                                                + "-Give her the book.\n")
+                ping.enable()
+                returning.enable()
+                returningBefore.enable()
+            else
+                new Transmission(whoAre, 0)
+                    ..addLine(theReader, null, "Reader", null, "So please, don't disturb me when I'm reading.", TTime.SET, 4., true)
+                    ..addEnd(() -> begin
+                        mark = theReader.addEffect(Imports.questMarking, "origin")
+                        enter.enable()
+                    end)
+                    ..start()
+                whoAre.remove(p)
+            doAfter(2., () -> theReader.setFacing(270..asAngleDegrees()))
+            paralized
+                ..setInvulnerable(false)
+                ..unpause()
+        end)
+
+    // Pings
+    ping = CreateTrigger()
+        ..disable()
+        ..registerTimerEvent(6., true)
+        ..addAction(() -> pingMinimap(whoAre, itemPos, 1., COLOR_WHITE.withoutAlpha(), false))
+    
+    // Returning before completing the mission
+    returningBefore = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.theReaderRoom)
+        ..addCondition(And(isHero, Condition(() -> not whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            let face = theReader.getFacingAngle()
+            theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
+            let t = new Transmission(u.getOwner().getForce(), 0)
+            // TODO Lord of fire
+            t.addLine(theReader, null, "Reader", null, "What?, Another person?, I have to find a better place.", TTime.SET, 5., true)
+            t.addEnd(() -> theReader.setFacing(face))
+            t.start()
+        end)
+    
+    // Adquire items
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        let m = EventData.getManipulatedItem()
+        if m.getTypeId() == BOOK
+            let p = EventData.getTriggerUnit().getOwner()
+            if whoAre.has(p)
+                message("success", "Mission Objective Completed", p)
+                objectGathered = true
+                m.remove()
+    end)
+
+    // Don't pick the item if you aren't in the mission
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
+        let u = EventData.getTriggerUnit()
+        let p = u.getOwner()
+        if not whoAre.has(p) and EventData.getManipulatedItem().getTypeId() == BOOK
+            message("error", "No time to read, besides boring.", p)
+            u.issueTargetOrderById(Orders.attack, u)
+    end)
+
+init
+    // Returning to complete the mission
+    returning = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.theReaderEnter)
+        ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
+            theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
+            if objectGathered
+                paralized = u..pause()..setInvulnerable(true)
+                returning.disable()
+                returningBefore.disable()
+                var given = new Reference(false)
+                var messageTaken = new Reference(false)
+                let t = new Transmission(whoAre, 0)
+                t.addLine(theReader, null, "Reader", null, "Oh my book thanks, take your bounty.", TTime.SET, 3.5, true)
+                TransmissionCallback first = () -> begin
+                    given.val = true
+                    paralized.getOwner().addLumber(5)
+                    paralized.flashEffect(Abilities.darkPortalTarget, "origin")
+                end
+                t.addActions(2., first)
+                TransmissionCallback second = () -> begin
+                    messageTaken.val = true
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                    + "Reader\n")
+                    paralized.flashEffect(Abilities.darkPortalTarget, "origin")
+                end
+                t.addActions(2., second)
+                TransmissionCallback third = () -> theReader.setFacing(0..asAngleDegrees())
+                t.addActions(third)
+                t.addLine(theReader, null, "Reader", null, "Now please, leave me alone.", TTime.SET, 3., true)
+                t.addLine(paralized, null, "You", null, "Uhmm.", TTime.SET, 5., true)
+                t.addEnd(() -> begin
+                    paralized..unpause().setInvulnerable(false)
+                    theReaderQuest.complete(true)
+                    returningAfter.enable()
+                    if t.wasSkipped()
+                        if not given.into()
+                            first.run()
+                        if not messageTaken.into()
+                            second.run()
+                        third.run()
+                    else
+                        destroy first
+                        destroy second
+                    disturbing(paralized.getOwner(), theReaderIndex)
+                end)
+                t.start()
+            else
+                let face = theReader.getFacingAngle()
+                new Transmission(whoAre, 0)
+                    ..addLine(theReader, null, "Reader", null, "Oh it's you and you don't have my book, so what do you want here?", TTime.SET, 2., true)
+                    ..addEnd(() -> begin
+                        theReader.setFacing(face)
+                        disturbing(paralized.getOwner(), theReaderIndex)
+                    end)
+                    ..start()
+        end)
+    
+    // Returning after completing the mission
+    returningAfter = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.theReaderRoom)
+        ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            let face = theReader.getFacingAngle()
+            let u = EventData.getEnteringUnit()
+            let p = u.getOwner()
+            let t = new Transmission(p.getForce(), 0)
+            let actions = new TransmissionActions()..setActions(() -> begin
+                if not Rects.theReaderRoom.contains(u.getPos())
+                    t.getTargetForce().clear()
+            end)
+            t.addLine(theReader, null, "Reader", null, "I gave you the bounty, what do you want?", TTime.SET, 3.5, true)
+            t.addActions(actions)
+            // TODO: Lord of fire
+            if wallDestroyed
+                t.addLine(theReader, null, "Reader", null, "By the way. What was that explosion?, it didn't come from the construction zone.", TTime.SET, 5., true)
+                t.addActions(actions)
+                t.addLine(theReader, null, "Reader", null, "I just hope none of those barrels are anywhere near here.", TTime.SET, 3.5, true)
+                t.addActions(actions)
+                t.addLine(theReader, null, "Reader", null, "Specially because they are fixed to the ground and there is no choice but to destroy them.", TTime.SET, 5.5, true)
+                t.addActions(actions)
+            t.addEnd(() -> begin
+                theReader.setFacing(face)
+                disturbing(paralized.getOwner(), theReaderIndex)
+            end)
+            t.start()
+        end)
+    
+    // TODO: Infernals
+
+@compiletime function gen()
+    new ItemDefinition(BOOK, 'glsk')
+        ..setHitPoints(100000)
+        ..setInterfaceIcon(Icons.bTNSpellBookBLS)
+        ..setModelUsed(Objects.tome1)
+        ..setAbilities("")
+        ..setTooltipExtended("Maybe you want to read it, but I don't recommend it, too boring.")
+        ..setTooltipBasic("Especial Book")
+        ..setDescription("Maybe you want to read it, but I don't recommend it, too boring.")
+        ..setName("Especial Book")

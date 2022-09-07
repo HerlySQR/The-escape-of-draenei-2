@@ -1,15 +1,27 @@
 package OpMissionsControl
 
+import public Functions
+import public ModeSelection
+import public PlayerData
 import public DefineMissions
 import public GeneratedValues
 import public Imports
 import public Reset
+import public Missions
 import HeroType
 import initlater VoidTraveller
+import initlater TheReader
 
 import public EventHelper
+import public RegisterEvents
 import public ClosureTimers
 import public Dialog
+import public Orders
+import public Assets
+import public UnitObjEditing
+import public ItemObjEditing
+import public ObjectIdGenerator
+import public Reference
 
 import public UnitTransmission
 
@@ -28,6 +40,8 @@ public function disturbing(player p, int index)
         switch index
             case voidTravellerIndex
                 message = "|cff32cd32HELP:|r He can see your soul."
+            case theReaderIndex
+                message = "|cff32cd32HELP:|r Maybe she learnt something about voodoo in her books."
         
         doAfter(2.) -> 
             QuestMessageBJ(theyKnowYou[index], bj_QUESTMESSAGE_HINT, message)

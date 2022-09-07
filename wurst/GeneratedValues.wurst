@@ -28,6 +28,7 @@ public class GUnits
     
     // Optional Missions
     static constant voidTraveller = gg_unit_nvde_0006
+    static constant theReader = gg_unit_nssn_0013
 
 /** The generated destructables. */
 public class Dests
@@ -246,12 +247,6 @@ public class Rects
     static constant habitatExit1 = gg_rct_HabitatExit1
     static constant habitatExit2 = gg_rct_HabitatExit2
 
-    // Optional missions
-    static constant skullPlace = gg_rct_SkullPlace
-    static constant eggPlace = gg_rct_EggPlace
-    static constant firePlace = gg_rct_FirePlace
-    static constant bookPlace = gg_rct_BookPlace
-
     // Misc
 
     static constant elevatorsSecret = gg_rct_ElevatorsSecret
@@ -351,11 +346,22 @@ public class Rects
     /* Optional missions */
 
     // Void traveller
+    static constant voidTravellerOriginalPos = gg_rct_VoidTravellerOriginalPos
     static constant voidTravellerRoom = gg_rct_VoidTravellerRoom
     static constant voidTravellerDoor = gg_rct_VoidTravellerDoor
     static constant voidTravellerEnter = gg_rct_VoidTravellerEnter
     static constant voidTravellerCauldron = gg_rct_VoidTravellerCauldron
-    
+    static constant skullPlace = gg_rct_SkullPlace
+    static constant eggPlace = gg_rct_EggPlace
+    static constant firePlace = gg_rct_FirePlace
+    static constant netherDrakeMother = gg_rct_NetherDrakeMother
+
+    // Reader
+    static constant theReaderOriginalPos = gg_rct_TheReaderOriginalPos
+    static constant theReaderRoom = gg_rct_TheReaderRoom
+    static constant theReaderEnter = gg_rct_TheReaderEnter
+    static constant theReaderOtherPos = gg_rct_TheReaderOtherPos
+    static constant bookPlace = gg_rct_BookPlace
 
 /** The generated cameras. */
 public class Cams

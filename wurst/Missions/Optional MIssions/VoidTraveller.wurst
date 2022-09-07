@@ -2,18 +2,33 @@ package VoidTraveller
 
 import OpMissionsControl
 
+import BountyController
+import ObjectIds
+
 public constant voidTravellerIndex = 0
 let voidTraveller = GUnits.voidTraveller
 let whoAre = CreateForce()
-let isSeeYou = CreateForce()
+let iSeeYou = CreateForce()
+let itemsPos = [Rects.eggPlace.getCenter(), Rects.skullPlace.getCenter(), Rects.firePlace.getCenter()]
+let youKilledTheMother = CreateForce()
+
+let EGG = compiletime(ITEM_ID_GEN.next())
+let SKULL = compiletime(ITEM_ID_GEN.next())
+let FIRE_PICTOGRAM = compiletime(ITEM_ID_GEN.next())
+let NETHERDRAKE = compiletime(UNIT_ID_GEN.next())
+
+unit netherDrake
 dialog menu
 button yes
 button no
 effect mark = null
 unit paralized
 trigger enter
+trigger array pings
 trigger returning
 trigger returningBefore
+trigger returningAfter
+int objectsGathered
 
 // Enter region
 
@@ -29,6 +44,25 @@ init
     onReset(true, () -> begin
         if mark == null
             mark = voidTraveller.addEffect(Imports.questMarking, "origin")
+        objectsGathered = 0
+        netherDrake = createUnit(DEMON, NETHERDRAKE, Rects.netherDrakeMother.getCenter(), UNIT_FACING)
+    end)
+
+    onReset(false, () -> begin
+        voidTraveller..setPos(Rects.voidTravellerOriginalPos.getCenter())..setFacing(270..asAngleDegrees())
+        whoAre.clear()
+        iSeeYou.clear()
+        youKilledTheMother.clear()
+        menu.display(localPlayer, false)
+        returning.disable()
+        returningBefore.disable()
+        returningAfter.disable()
+    end)
+
+    onModesSelected(() -> begin
+        createItem(EGG, itemsPos[0])
+        createItem(SKULL, itemsPos[1])
+        createItem(FIRE_PICTOGRAM, itemsPos[2])
     end)
 
     enter = CreateTrigger()
@@ -38,7 +72,6 @@ init
             enter.disable()
             let p = GetOwningPlayer(paralized)
             whoAre.add(p)
-            isSeeYou.add(p)
 
             paralized = GetEnteringUnit()
                 ..setInvulnerable(true)
@@ -47,7 +80,7 @@ init
             mark = null
 
             let trans = new Transmission(whoAre, 0)
-            if isSeeYou.has(p)
+            if iSeeYou.has(p)
                 trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello, you again.", TTime.SET, 3., true)
                 trans.addLine(voidTraveller, null, "Void Traveller", null, "Did you think about my deal?", TTime.SET, 3.5, true)
             else
@@ -62,6 +95,8 @@ init
                 disturbing(p, voidTravellerIndex)
             end)
             trans.start()
+            
+            iSeeYou.add(p)
         end)
 
     // Accept or not
@@ -75,6 +110,8 @@ init
                                                                 + "-Colect a skull.\n"
                                                                 + "-Colect a fire pictogram.\n"
                                                                 + "-Give this items to the Void Traveller.\n")
+                for i = 0 to 2
+                    pings[i].enable()
                 returning.enable()
                 returningBefore.enable()
             else
@@ -86,10 +123,230 @@ init
                     end)
                     ..start()
                 whoAre.remove(p)
-                isSeeYou.add(p)
             paralized
                 ..setInvulnerable(false)
                 ..unpause()
         end)
 
-        
+    // Pings
+    pings[0] = CreateTrigger()
+        ..disable()
+        ..registerTimerEvent(6., true)
+        ..addAction(() -> pingMinimap(whoAre, itemsPos[0], 1., COLOR_WHITE.withoutAlpha(), false))
+    pings[1] = CreateTrigger()
+        ..disable()
+        ..registerTimerEvent(6., true)
+        ..addAction(() -> pingMinimap(whoAre, itemsPos[1], 1., COLOR_WHITE.withoutAlpha(), false))
+    pings[2] = CreateTrigger()
+        ..disable()
+        ..registerTimerEvent(6., true)
+        ..addAction(() -> pingMinimap(whoAre, itemsPos[2], 1., COLOR_WHITE.withoutAlpha(), false))
+    
+    // Returning before completing the mission
+    returningBefore = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.voidTravellerRoom)
+        ..addCondition(And(isHero, Condition(() -> not whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            let face = voidTraveller.getFacingAngle()
+            voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
+            let t = new Transmission(u.getOwner().getForce(), 0)
+            t.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor.", TTime.SET, 3., true)
+            t.addActions(() -> begin
+                if not Rects.voidTravellerRoom.contains(u.getPos())
+                    t.getTargetForce().clear()
+            end)
+            t.addLine(voidTraveller, null, "Void Traveller", null, "I would offer you my special potion, but I don't have the ingredents, but don't worry someone is searching it for me.", TTime.SET, 6.5, true)
+            t.addEnd(() -> voidTraveller.setFacing(face))
+            t.start()
+        end)
+    
+    // Adquire items
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        let m = EventData.getManipulatedItem()
+        let typ = m.getTypeId()
+        if typ == EGG or typ == SKULL or typ == FIRE_PICTOGRAM
+            let u = EventData.getTriggerUnit()
+            let p = u.getOwner()
+            if whoAre.has(p)
+                message("success", "Mission Objective Completed", p)
+                objectsGathered++
+                m.remove()
+                if typ == EGG
+                    pings[0].disable()
+                    if youKilledTheMother.has(p)
+                        doAfter(2.) -> 
+                            DisplayTextToPlayer(p, 0, 0, "Wait, that dragon that you killed, was the mother????")
+                    else if THE_DEMONS.has(p)
+                        doAfter(2.) -> 
+                            DisplayTextToPlayer(p, 0, 0, "Are you stealing an egg of a dragon of your own? You don't have soul (or you are a demon).")
+                else if typ == SKULL
+                    pings[1].disable()
+                    if GetUnitRace(u) == RACE_ORC
+                        doAfter(2.) -> 
+                            DisplayTextToPlayer(p, 0, 0, "You know that the skull is for someone of your own race, what a morbid.")
+                else if typ == FIRE_PICTOGRAM
+                    pings[2].disable()
+                    // TODO pictogram stealed
+                    if GetUnitRace(u) == RACE_UNDEAD
+                        doAfter(2.) -> 
+                            DisplayTextToPlayer(p, 0, 0, "You must be very brave or very foolish to do that.")
+    end)
+
+    // Don't pick the item if you aren't in the mission
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
+        let u = EventData.getTriggerUnit()
+        let p = u.getOwner()
+        if not whoAre.has(p)
+            let typ = EventData.getManipulatedItem().getTypeId()
+            if typ == EGG
+                message("error", "How cruel it would be to steal an egg without reason.", p)
+            else if typ == SKULL
+                message("error", "What do you want to grab that for? You crazy.", p)
+            else if typ == FIRE_PICTOGRAM
+                message("error", "Better to leave it there, there is no need to get into unnecessary danger.", p)
+            u.issueTargetOrderById(Orders.attack, u)
+    end)
+
+    // Killed the mother?
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        if EventData.getDyingUnit() == netherDrake
+            youKilledTheMother.add(EventData.getKillingUnit().getOwner())
+    end)
+
+function endVoidTraveller()
+    voidTraveller.setFacing(270..asAngleDegrees())
+    paralized.flashEffect(Abilities.darkPortalTarget, "origin")
+    paralized.getOwner().addGold(600)
+
+init
+    // Returning to complete the mission
+    returning = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.voidTravellerEnter)
+        ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
+            voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
+            if objectsGathered == 3
+                paralized = u..pause()..setInvulnerable(true)
+                returning.disable()
+                returningBefore.disable()
+                var moved = new Reference(false)
+                let t = new Transmission(whoAre, 0)
+                    ..addLine(voidTraveller, null, "Void Traveller", null, "Oh, you're back, and you have the items. Nice.", TTime.SET, 5., true)
+                    ..addLine(voidTraveller, null, "Void Traveller", null, "Now I can prepare my poition.", TTime.SET, 5., true)
+                    ..addActions(1.5, () -> begin
+                        moved.val = true
+                        voidTraveller.issuePointOrderById(Orders.move, Rects.voidTravellerCauldron.getCenter())
+                    end)
+                    ..addActions(2., () -> begin
+                        addEffect(Abilities.spiritLinkZapTarget, Rects.voidTravellerCauldron.getCenter()).destroyAfter(2.)
+                    end)
+                    ..addActions(() -> voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos())))
+                    ..addLine(voidTraveller, null, "Void Traveller", null, "My potion it's done, thanks for help, I'll do my promise.", TTime.SET, 5., true)
+                    ..addActions(2., () -> endVoidTraveller())
+                t.addEnd(() -> begin
+                    paralized..unpause().setInvulnerable(false)
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                           + "Void Traveller\n")
+                    voidTravellerQuest.complete(true)
+                    returningAfter.enable()
+                    if not moved.into()
+                        voidTraveller.issuePointOrderById(Orders.move, Rects.voidTravellerCauldron.getCenter())
+                        doAfter(2., () -> voidTraveller.setFacing(270..asAngleDegrees()))
+                    if t.wasSkipped()
+                        endVoidTraveller()
+                    disturbing(paralized.getOwner(), voidTravellerIndex)
+                end)
+                t.start()
+            else
+                let face = voidTraveller.getFacingAngle()
+                new Transmission(whoAre, 0)
+                    ..addLine(voidTraveller, null, "Void Traveller", null, "Oh, you're back, but you don't have all the items, no problem, I can wait.", TTime.SET, 2., true)
+                    ..addEnd(() -> begin
+                        voidTraveller.setFacing(face)
+                        disturbing(paralized.getOwner(), voidTravellerIndex)
+                    end)
+                    ..start()
+        end)
+    
+    // Returning after completing the mission
+    returningAfter = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.voidTravellerRoom)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            let face = voidTraveller.getFacingAngle()
+            let p = EventData.getEnteringUnit().getOwner()
+            let t = new Transmission(p.getForce(), 0)
+            if whoAre.has(p)
+                t.addLine(voidTraveller, null, "Void Traveller", null, "Oh you are back, do you wanna prove my potion?", TTime.SET, 4., true)
+            else
+                t.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor, Do you wanna prove my potion?", TTime.SET, 4., true)
+            t.addEnd(() -> begin
+                voidTraveller.setFacing(face)
+                disturbing(paralized.getOwner(), voidTravellerIndex)
+                QuestMessageBJ(t.getTargetForce(), bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r Nobody wants his potion.")
+            end)
+            t.start()
+        end)
+    
+    // Enter before time
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.voidTravellerDoor)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            if actMission < 3
+                QuestMessageBJ(EventData.getEnteringUnit().getOwner().getForce(), bj_QUESTMESSAGE_HINT, "This mission is only avalaible in the 3rd stage (It's to be fair with the draenei.")
+        end)
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.voidTravellerRoom)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            if actMission < 3
+                QuestMessageBJ(EventData.getEnteringUnit().getOwner().getForce(), bj_QUESTMESSAGE_HINT, "Hey! I said is only avalaible in the 3rd stage, this guys...")
+        end)
+    
+    Bounty.set(NETHERDRAKE, 155, 8, 3)
+
+@compiletime function gen()
+    new ItemDefinition(EGG, 'glsk')
+        ..setHitPoints(100000)
+        ..setTintingColor1Red(0)
+        ..setTintingColor2Green(0)
+        ..setTintingColor3Blue(100)
+        ..setInterfaceIcon(Icons.bTNThunderLizardEgg)
+        ..setModelUsed(Units.phoenixEgg)
+        ..setAbilities("")
+        ..setTooltipExtended("One of the items of the void traveller.")
+        ..setTooltipBasic("Dragon Egg")
+        ..setDescription("One of the items of the void traveller.")
+        ..setName("Dragon Egg")
+    
+    new ItemDefinition(SKULL, 'glsk')
+        ..setHitPoints(100000)
+        ..setModelUsed(Doodads.skull0)
+        ..setAbilities("")
+        ..setTooltipExtended("One of the items of the void traveller.")
+        ..setTooltipBasic("Skull")
+        ..setDescription("One of the items of the void traveller.")
+        ..setName("Skull")
+    
+    new ItemDefinition(FIRE_PICTOGRAM, 'glsk')
+        ..setHitPoints(100000)
+        ..setInterfaceIcon(Icons.bTNGlyph)
+        ..setModelUsed(Objects.glyph1)
+        ..setAbilities("")
+        ..setTooltipExtended("One of the items of the void traveller.")
+        ..setTooltipBasic("Fire Pictogram")
+        ..setDescription("One of the items of the void traveller.")
+        ..setName("Fire Pictogram")
+    
+    new UnitDefinition(NETHERDRAKE, 'nndr')
+        ..setAcquisitionRange(300)
+        ..setFoodCost(0)
+        ..setLevel(5)
+        ..setHitPointsMaximumBase(1300)
+        ..setNormalAbilities(AbilityIds.cripplecreep.toRawCode())
