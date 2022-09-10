@@ -1,0 +1,125 @@
+package TheMonster
+
+import OpMissionsControl
+
+public unit theMonster = null
+let theWarlock = GUnits.theWarlock
+
+let MONSTER = compiletime(UNIT_ID_GEN.next())
+let MONSTER_HEAD = compiletime(ITEM_ID_GEN.next())
+
+trigger enter
+effect mark = null
+trigger death
+
+init
+    onReset(true, () -> begin
+        if mark == null
+            mark = theWarlock.addEffect(Imports.questMarking, "origin")
+        if theMonster == null
+            theMonster = createUnit(players[PLAYER_NEUTRAL_AGGRESSIVE], MONSTER, Rects.theMonster.getCenter(), 315..asAngleDegrees())
+        else
+            theMonster
+                ..setLife(theMonster.getMaxHP())
+                ..setPos(Rects.theMonster.getCenter())
+                ..setFacing(315..asAngleDegrees())
+    end)
+
+    onReset(false, () -> begin
+        enter.enable()
+        death.enable()
+    end)
+
+    enter = CreateTrigger()
+        ..registerRectEnterEventSource(Rects.theWarlock)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
+            let p = u.getOwner()
+
+            let t = new Transmission(p.getForce(), 0)
+            if u.hasItemById(MONSTER_HEAD)
+                mark.destr()
+                mark = null
+                enter.disable()
+                t.addLine(theWarlock, null, "Old Man", null, "Oh you have the head, It means your its strong, As i said I will give you your bounty.", TTime.SET, 6., true)
+                t.addEnd(() -> begin
+                    int start
+                    int finish
+                    if THE_DRAENEI.has(p)
+                        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                             + "The Monster\n")
+                        start = 1
+                        finish = 5
+                    else
+                        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                            + "The Monster\n")
+                        start = 6
+                        finish = 10
+                    for i = start to finish
+                        playerM(i)..addGold(500)..addLumber(5)
+                        if hero[i].isAlive()
+                            hero[i].flashEffect(Abilities.darkPortalTarget, "origin")
+                    theMonsterQuest.complete(true)
+                end)
+            else
+                t.addLine(theWarlock, null, "Old Man", null, "There is a big monster, if someone defeats him and give me his head like proof, I will give to his team 500 of gold and 5 of lumber.", TTime.SET, 7., true)
+            t.start()
+        end)
+    
+    // Monster dies
+    death = CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addAction(() -> begin
+            if EventData.getDyingUnit() == theMonster
+                let pos = theMonster.getPos()
+                death.disable()
+                theMonster = null
+                createItem(MONSTER_HEAD, pos)
+                createItem('ankh', pos)
+
+                DisplayTextToPlayer(localPlayer, 0, 0, playerName[EventData.getKillingUnit().getOwner().getNumber()] + " was killed |cffffcc00The Monster|r")
+
+                new Bounty()
+                    ..setAmount(GetRandomInt(250, 310))
+                    ..setPos(pos)
+                    ..setSize(15.)
+                    ..setColor(color(255, 57, 33))
+                    ..setReceiver(EventData.getKillingUnit().getOwner(), true)
+                    ..run()
+        end)
+    
+    // Adquire the head
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        if EventData.getManipulatedItem().getTypeId() == MONSTER_HEAD
+            let p = EventData.getManipulatingUnit().getOwner()
+            DisplayTextToPlayer(localPlayer, 0, 0, colorId[THE_DRAENEI.has(p) ? 11 : 12] + p.getName() + " took the |cffffcc00Monster Head|r")
+    end)
+
+@compiletime function gen()
+    new UnitDefinition(MONSTER, 'nfgl')
+        ..setAcquisitionRange(300.)
+        ..setAttack1Range(125)
+        ..setAttack1DamageBase(85)
+        ..setAttack1AttackType(AttackType.Chaos)
+        ..setDefenseBase(10)
+        ..setUnitClassification("ancient,undead")
+        ..setLevel(20)
+        ..setHitPointsMaximumBase(10000)
+        ..setTintingColorGreen(100)
+        ..setTintingColorBlue(100)
+        ..setNormalAbilities(commaList(AbilityIds.shockwave, AbilityIds.cripplecreep, AbilityIds.slam1, AbilityIds.bashBeastmasterBear))
+        ..setSpeedBase(250)
+        ..setName("Monster")
+
+    new ItemDefinition(MONSTER_HEAD, 'glsk')
+        ..setDroppedWhenCarrierDies(true)
+        ..setTintingColor1Red(100)
+        ..setTintingColor2Green(100)
+        ..setTintingColor3Blue(100)
+        ..setInterfaceIcon(Icons.bTNFleshGolem)
+        ..setScalingValue(1.5)
+        ..setTooltipExtended("The proof of your success.|n|n|cffff0000It drops if you die.|r")
+        ..setTooltipBasic("Monster Head")
+        ..setDescription("The proof of your success.|n|n|cffff0000It drops if you die.|r")
+        ..setName("Monster Head")

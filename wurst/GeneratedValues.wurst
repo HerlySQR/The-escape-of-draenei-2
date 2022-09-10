@@ -30,6 +30,9 @@ public class GUnits
     static constant voidTraveller = gg_unit_nvde_0006
     static constant theReader = gg_unit_nssn_0013
     static constant thePrisoner = gg_unit_ndrl_0015
+    static constant lordOfFire = gg_unit_Nfir_0016
+    static constant heretic = gg_unit_nhhr_0017
+    static constant theWarlock = gg_unit_nsrw_0018
 
 /** The generated destructables. */
 public class Dests
@@ -377,6 +380,25 @@ public class Rects
 
     // The Prisoner
     static constant thePrisoner = gg_rct_ThePrisoner
+
+    // Lord of Fire
+    static constant lordOfFireEnter = gg_rct_LordOfFireEnter
+    static constant lordOfFireRoom = gg_rct_LordOfFireRoom
+    static constant lordOfFireDefensePos = gg_rct_LordOfFireDefensePos
+
+    // The gems
+    static constant gemsHeretic = gg_rct_GemsHeretic
+    static constant gemObelisks = gg_rct_GemObelisks
+    static constant bloodGemObelisk = gg_rct_BloodGemObelisk
+    static constant skyGemObelisk = gg_rct_SkyGemObelisk
+    static constant poisonGemObelisk = gg_rct_PoisonGemObelisk
+    static constant bloodGemPlace = [gg_rct_BloodGemPlace0, gg_rct_BloodGemPlace1, gg_rct_BloodGemPlace2]
+    static constant skyGemPlace = [gg_rct_SkyGemPlace0, gg_rct_SkyGemPlace1, gg_rct_SkyGemPlace2]
+    static constant poisonGemPlace = [gg_rct_PoisonGemPlace0, gg_rct_PoisonGemPlace1, gg_rct_PoisonGemPlace2]
+
+    // The monster
+    static constant theWarlock = gg_rct_TheWarlock
+    static constant theMonster = gg_rct_TheMonster
 
 /** The generated cameras. */
 public class Cams

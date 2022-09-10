@@ -1,0 +1,348 @@
+package ThePrisioner
+
+import OpMissionsControl
+
+public constant thePrisonerIndex = 3
+let thePrisoner = GUnits.thePrisoner..setInvulnerable(true)
+let whoAre = CreateForce()
+let iSeeYou = CreateForce()
+var inDialog = false
+
+dialog menu
+button yes
+button no
+effect mark = null
+unit paralized
+trigger enter
+trigger returning
+trigger getKills
+trigger returningAfter
+bool array youKilledHim
+leaderboard table = null
+int kills
+
+// Enter region
+
+init
+    theyKnowYou[thePrisonerIndex] = CreateForce()
+    disturbed[thePrisonerIndex] = CreateForce()
+
+    nullTimer() -> 
+        menu = createDialog()
+        yes = menu.addButton("Yes")
+        no = menu.addButton("No")
+
+    onReset(true, () -> begin
+        if mark == null
+            mark = thePrisoner.addEffect(Imports.questMarking, "origin")
+        kills = 0
+    end)
+
+    onReset(false, () -> begin
+        whoAre.clear()
+        iSeeYou.clear()
+        enter.enable()
+        menu.display(localPlayer, false)
+        returning.disable()
+        getKills.disable()
+        returningAfter.disable()
+        for i = 1 to 10
+            youKilledHim[i] = false
+        if table != null
+            DestroyLeaderboard(table)
+            table = null
+    end)
+
+    let cond = And(isHero, Condition(() -> GetEnteringUnit() != fountainRestorer))
+
+    enter = CreateTrigger()
+        ..registerRectEnterEventSource(Rects.thePrisoner)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                enter.disable()
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
+
+                paralized = GetEnteringUnit()
+                    ..setInvulnerable(true)
+                    ..pause()
+                mark.destr()
+                mark = null
+
+                thePrisoner.setFacing(thePrisoner.getPos().angleTo(paralized.getPos()))
+
+                let trans = new Transmission(whoAre, 0)
+                if iSeeYou.has(p)
+                    trans.addLine(thePrisoner, null, "Prisoner", null, "You are back, and well?", TTime.SET, 4., true)
+                else
+                    if paralized.isAnimal()
+                        trans.addLine(thePrisoner, null, "Prisoner", null, "Ahhh, what do you want?", TTime.SET, 3., true)
+                        trans.addLine(thePrisoner, null, "Prisoner", null, "Oh wait, you are one of our animals.", TTime.SET, 4., true)
+                        trans.addLine(thePrisoner, null, "Prisoner", null, "Hmm, I don't know if you understand me, but if you get 5 kills, I will give you a reward.", TTime.SET, 6., true)
+                    else
+                        if GetUnitRace(paralized) == RACE_ORC
+                            trans.addLine(thePrisoner, null, "Prisoner", null, "Ahhh, what do you want?", TTime.SET, 3., true)
+                            trans.addLine(thePrisoner, null, "Prisoner", null, "Oh wait, you are a draenei.", TTime.SET, 2., true)
+                            trans.addLine(thePrisoner, null, "Prisoner", null, "What are you doing here?", TTime.SET, 3., true)
+                        else
+                            trans.addLine(thePrisoner, null, "Prisoner", null, "What?, What do you want?", TTime.SET, 3., true)
+                            trans.addLine(thePrisoner, null, "Prisoner", null, "Didn't you have enough?", TTime.SET, 3., true)
+                            trans.addLine(paralized, null, "You", null, "I'm not your enemy, I'm one of the deserters.", TTime.SET, 4.5, true)
+                            if youKilledHim[p.getNumber()]
+                                trans.addLine(thePrisoner, null, "Prisoner", null, "Oh, I already remember you...", TTime.SET, 3., true)
+                                trans.addLine(thePrisoner, null, "Prisoner", null, "Wait, won't you have killed one of ours?", TTime.SET, 4., true)
+                                trans.addLine(paralized, null, "You", null, "No.", TTime.SET, 3., true)
+                                trans.addLine(thePrisoner, null, "Prisoner", null, "Hmm, ok. What do you want?", TTime.SET, 3., true)
+                            else if paralized.isMachine()
+                                trans.addLine(thePrisoner, null, "Prisoner", null, "Oh, but carrying that machine anyone gets confused, What do you want?", TTime.SET, 5.5, true)
+                            else
+                                trans.addLine(thePrisoner, null, "Prisoner", null, "Oh, I already remember you, you are brave, What do you want?", TTime.SET, 5., true)
+                        trans.addLine(paralized, null, "You", null, "We'll escape from here.", TTime.SET, 3.5, true)
+                        trans.addLine(thePrisoner, null, "Prisoner", null, "Good luck in that, I'm here for annoying the guards (too delicated |cff32cd32(:|r )", TTime.SET, 5., true)
+                        trans.addLine(thePrisoner, null, "Prisoner", null, "Hey I steal them some money, if you get 5 kills from now I'll give you 300 of gold, what do you say?", TTime.SET, 6., true)
+                trans.addEnd(() -> begin
+                    menu.display(p, true)
+                    disturbing(p, thePrisonerIndex)
+                    thePrisoner.setFacing(thePrisoner.getPos().angleTo(paralized.getPos()))
+                end)
+                trans.start()
+
+                iSeeYou.add(p)
+        end)
+    
+    // Kill an allied draenei being demon
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let u = EventData.getKillingUnit()
+        if GetUnitRace(u) == RACE_UNDEAD and THE_DRAENEI.has(u.getOwner()) and GetUnitRace(EventData.getDyingUnit()) == RACE_UNDEAD
+            youKilledHim[u.getOwner().getNumber()] = true
+    end)
+
+    // Accept or not
+    CreateTrigger()
+        ..registerDialogEvent(menu)
+        ..addAction(() -> begin
+            let p = GetTriggerPlayer()
+            if GetClickedButton() == yes
+                TransmissionCallback accept = () -> begin
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_DISCOVERED,"|cffffcc00PROVING YOURSELF|r\n\n"
+                                                                    + "-Get 5 Hero kills.\n"
+                                                                    + "-Back with the prisioner.\n")
+                    returning.enable()
+                    returningAfter.enable()
+                    getKills.enable()
+
+                    table = CreateLeaderboardBJ(whoAre, "")
+                    LeaderboardAddItemBJ(p, table, "Kills", 0)
+                    LeaderboardSetPlayerItemLabelColorBJ(p, table, 100, 80, 20, 0)
+                    LeaderboardSetPlayerItemValueColorBJ(p, table, 100, 100, 100, 0)
+                    LeaderboardDisplay(table, true)
+
+                    inDialog = false
+                end
+                if paralized.isAnimal()
+                    new Transmission(whoAre, 0)
+                        ..addLine(thePrisoner, null, "Prisoner", null, "I will take it as a yes.", TTime.SET, 4., true)
+                        ..addEnd(accept)
+                        ..start()
+                else
+                    accept.run()
+            else
+                let t = new Transmission(whoAre, 0)
+                if paralized.isAnimal()
+                    t.addLine(thePrisoner, null, "Prisoner", null, "I will take it as a no.", TTime.SET, 4., true)
+                else
+                    t.addLine(thePrisoner, null, "Prisoner", null, "Oh I see, yeah it's too difficult do that.", TTime.SET, 4., true)
+                t.addEnd(() -> begin
+                    mark = thePrisoner.addEffect(Imports.questMarking, "origin")
+                    enter.enable()
+                    inDialog = false
+                end)
+                t.start()
+                whoAre.remove(p)
+            doAfter(2., () -> thePrisoner.setFacing(270..asAngleDegrees()))
+            paralized
+                ..setInvulnerable(false)
+                ..unpause()
+        end)
+    
+    // Kill an enemy hero
+    getKills = CreateTrigger()
+        ..disable()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addAction(() -> begin
+            let p = EventData.getKillingUnit().getOwner()
+            let u = EventData.getDyingUnit()
+            if u.isType(UNIT_TYPE_HERO) and whoAre.has(p) and p.isEnemyOf(u.getOwner())
+                kills++
+                LeaderboardSetPlayerItemValueBJ(p, table, kills)
+                if kills == 5
+                    DestroyLeaderboard(table)
+                    table = null
+                    getKills.disable()
+        end)
+
+    // Returning to complete the mission
+    returning = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.thePrisoner)
+        ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let u = EventData.getEnteringUnit()
+                let face = thePrisoner.getFacingAngle()
+                paralized = u
+                thePrisoner.setFacing(thePrisoner.getPos().angleTo(u.getPos()))
+                let t = new Transmission(whoAre, 0)
+                t.addLine(thePrisoner, null, "Prisoner", null, "Hello again.", TTime.SET, 3.5, true)
+                if kills == 5
+                    paralized..pause()..setInvulnerable(true)
+                    returning.disable()
+                    var given = new Reference(false)
+                    t.addLine(thePrisoner, null, "Prisoner", null, "I see you get 5 kills, you are too strong, as I said I'll give you the gold.", TTime.SET, 5.5, true)
+                    TransmissionCallback first = () -> begin
+                        given.val = true
+                        paralized.getOwner().addGold(300)
+                        paralized.flashEffect(Abilities.darkPortalTarget, "origin")
+                        QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                        + "Proving yourself\n")
+                    end
+                    t.addActions(2., first)
+                    t.addLine(thePrisoner, null, "Prisoner", null, "Now go to give to the demons That they deserve!", TTime.SET, 5., true)
+                    t.addEnd(() -> begin
+                        paralized..unpause().setInvulnerable(false)
+                        thePrisonerQuest.complete(true)
+                        if t.wasSkipped()
+                            if not given.into()
+                                first.run()
+                        else
+                            destroy given
+                        disturbing(paralized.getOwner(), thePrisonerIndex)
+                        thePrisoner.setFacing(face)
+                        inDialog = false
+                    end)
+                else
+                    t.addLine(thePrisoner, null, "Prisoner", null, "What, you don't have enough kills, I know, its a hard job.", TTime.SET, 4., true)
+                    t.addEnd(() -> begin
+                        thePrisoner.setFacing(face)
+                        disturbing(paralized.getOwner(), thePrisonerIndex)
+                        inDialog = false
+                    end)
+                t.start()
+        end)
+    
+    // Returning after completing the mission
+    returningAfter = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.thePrisoner)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let face = thePrisoner.getFacingAngle()
+                let u = EventData.getEnteringUnit()
+                let p = u.getOwner()
+
+                thePrisoner.setFacing(thePrisoner.getPos().angleTo(u.getPos()))
+
+                let t = new Transmission(p.getForce(), 0)
+                TransmissionCallback actions = () -> begin
+                    if not Rects.thePrisoner.contains(u.getPos())
+                        t.getTargetForce().clear()
+                end
+                if THE_DRAENEI.has(p)
+                    if whoAre.has(p) and not returning.isEnabled()
+                        if lordOfFirePissed
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I think you pissed off the Fire Lord.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I would hate to be those demons now.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                        else
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I hope you are doing a good job.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                    else if u.isAnimal()
+                        t.addLine(thePrisoner, null, "Prisoner", null, "Sorry, I will not talk to animals, I want to keep my sanity.", TTime.SET, 4.5, true)
+                        t.addActions(actions)
+                    else if GetUnitRace(u) == RACE_ORC
+                        if lordOfFirePissed
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I think you pissed off the Fire Lord.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I would hate to be those demons now.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                        else
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Ah, hi, I hope the plans to escape are in order.", TTime.SET, 4., true)
+                            t.addActions(actions)
+                    else
+                        if lordOfFirePissed
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I think your boss was pissed off.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I feel sorry for you.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(u, null, "You", null, "But I'm your side.", TTime.SET, 3., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Oh.", TTime.SET, 1.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Anyway", TTime.SET, 2., true)
+                            t.addActions(actions)
+                        else
+                            t.addLine(thePrisoner, null, "Prisoner", null, "What?, What do you want?", TTime.SET, 3., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Didn't you have enough?", TTime.SET, 3., true)
+                            t.addActions(actions)
+                            t.addLine(u, null, "You", null, "I'm not your enemy, I'm one of the deserters.", TTime.SET, 4.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Oh, sorry you look very similar.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(u, null, "You", null, "Look who says that.", TTime.SET, 3., true)
+                            t.addActions(actions)
+                else
+                    if u.isAnimal()
+                        t.addLine(thePrisoner, null, "Prisoner", null, "Hey!, Aren't you one of our animals that went with the enemy, Get out of here disloyal!", TTime.SET, 6., true)
+                        t.addActions(actions)
+                    else if GetUnitRace(u) == RACE_ORC
+                        if lordOfFirePissed
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I think you pissed off the Fire Lord.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I would hate to be those demons now.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Oh wait, you are one of those desertors.", TTime.SET, 4., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I hope you suffer.", TTime.SET, 3., true)
+                        else
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Ah, hi, so you have escap...", TTime.SET, 3., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Oh wait, YOU ARE ONE OF THE TRAITORS.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "YOU DIRTY COWARD.", TTime.SET, 2.5, true)
+                            t.addActions(actions)
+                            t.addLine(u, null, "You", null, "I had no choice, I didn't want to rot in this jail.", TTime.SET, 4., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "That's no excuse, you can't do this to your pe...", TTime.SET, 4., true)
+                            t.addActions(actions)
+                            t.addLine(u, null, "You", null, "I don't want to hear it", TTime.SET, 3., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Just go.", TTime.SET, 2., true)
+                            t.addActions(actions)
+                    else
+                        if lordOfFirePissed
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I think you pissed off the Fire Lord.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "I feel sorry for you.", TTime.SET, 3., true)
+                            t.addActions(actions)
+                        else
+                            t.addLine(thePrisoner, null, "Prisoner", null, "What?, What do you want?", TTime.SET, 3., true)
+                            t.addActions(actions)
+                            t.addLine(thePrisoner, null, "Prisoner", null, "Didn't you have enough?", TTime.SET, 3., true)
+                            t.addActions(actions)
+
+                t.addEnd(() -> begin
+                    thePrisoner.setFacing(face)
+                    disturbing(paralized.getOwner(), thePrisonerIndex)
+                    inDialog = false
+                end)
+                t.start()
+        end)
+    
+    // TODO: Infernals

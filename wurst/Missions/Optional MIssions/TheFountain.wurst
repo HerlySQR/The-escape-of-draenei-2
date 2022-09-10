@@ -46,6 +46,7 @@ init
     onReset(false, () -> begin
         whoAre.clear()
         iSeeYou.clear()
+        enter.enable()
         menu.display(localPlayer, false)
         returning.disable()
         takePictogram.disable()

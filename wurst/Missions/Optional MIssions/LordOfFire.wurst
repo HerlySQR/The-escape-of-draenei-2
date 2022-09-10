@@ -1,0 +1,347 @@
+package LordOfFire
+
+import OpMissionsControl
+
+public constant lordOfFireIndex = 4
+public bool lordOfFirePissed = false
+let lordOfFire = GUnits.lordOfFire..pause()..setInvulnerable(true)
+let originPos = lordOfFire.getPos()
+let originFace = lordOfFire.getFacingAngle()
+let whoAre = CreateForce()
+let iSeeYou = CreateForce()
+var draeneiSaw = 0
+var inDialog = false
+
+dialog menu
+button yes
+button no
+effect mark = null
+unit paralized
+trigger enter
+trigger returning
+trigger getKills
+trigger returningAfter
+bool array youKilledHim
+leaderboard table = null
+int kills
+
+// Enter region
+
+init
+    theyKnowYou[lordOfFireIndex] = CreateForce()
+    disturbed[lordOfFireIndex] = CreateForce()
+
+    nullTimer() -> 
+        menu = createDialog()
+        yes = menu.addButton("Yes")
+        no = menu.addButton("No")
+
+    onReset(true, () -> begin
+        if mark == null
+            mark = lordOfFire.addEffect(Imports.questMarking, "origin")
+        kills = 0
+    end)
+
+    onReset(false, () -> begin
+        whoAre.clear()
+        iSeeYou.clear()
+        enter.enable()
+        menu.display(localPlayer, false)
+        returning.disable()
+        getKills.disable()
+        returningAfter.disable()
+        for i = 1 to 10
+            youKilledHim[i] = false
+        if table != null
+            DestroyLeaderboard(table)
+            table = null
+        if lordOfFirePissed
+            lordOfFirePissed = false
+            if not lordOfFire.isAlive()
+                lordOfFire.setPos(originPos)
+            else
+                lordOfFire.revive(originPos, false)
+            lordOfFire
+                ..setFacing(originFace)
+                ..pause()
+                ..setInvulnerable(true)
+        draeneiSaw = 0
+    end)
+
+    let cond = And(isHero, Condition(() -> GetEnteringUnit() != fountainRestorer))
+
+    enter = CreateTrigger()
+        ..registerRectEnterEventSource(Rects.lordOfFireEnter)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                enter.disable()
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
+
+                paralized = GetEnteringUnit()
+                    ..setInvulnerable(true)
+                    ..pause()
+                mark.destr()
+                mark = null
+
+                lordOfFire.setFacing(lordOfFire.getPos().angleTo(paralized.getPos()))
+
+                let trans = new Transmission(whoAre, 0)
+                if iSeeYou.has(p)
+                    if draeneiSaw > 0
+                        trans.addLine(lordOfFire, null, "Lord of Fire", null, "AND NOW?", TTime.SET, 3., true)
+                    else
+                        trans.addLine(lordOfFire, null, "Lord of Fire", null, "Ha!, Did you get the valor?", TTime.SET, 4., true)
+                else
+                    if draeneiSaw > 0
+                        trans.addLine(lordOfFire, null, "Lord of Fire", null, "I saw a Draenei before, I see that you don't have the motivation.", TTime.SET, 5., true)
+                        trans.addLine(lordOfFire, null, "Lord of Fire", null, "Get 5 kills and I'll give you 300 of gold.", TTime.SET, 3., true)
+                    else
+                        if paralized.isAnimal()
+                            trans.addLine(lordOfFire, null, "Lord of Fire", null, "You! Animal! If you get 5 kills I will give you 300 of gold.", TTime.SET, 5., true)
+                            trans.addLine(lordOfFire, null, "Lord of Fire", null, "(Giving money to an animal will make the guards feel bad for being incompetent).", TTime.SET, 5., true)
+                        else
+                            trans.addLine(lordOfFire, null, "Lord of Fire", null, "Hey, What are you doing here?, it supose you have to look at the prisioners.", TTime.SET, 5., true)
+                            if GetUnitRace(paralized) == RACE_ORC
+                                trans.addLine(lordOfFire, null, "Lord of Fire", null, "I have you here only because you were able to betray your race.", TTime.SET, 4., true)
+                            else if HeroType.get(paralized) == LAVA_ELEMENTAL
+                                trans.addLine(lordOfFire, null, "Lord of Fire", null, "Don't believe you have special treatment.", TTime.SET, 3., true)
+                            trans.addLine(paralized, null, "You", null, "It's a hard job, they try to escape a lot of times.", TTime.SET, 3.5, true)
+                            trans.addLine(lordOfFire, null, "Lord of Fire", null, "It's because you are too weak, I can't believe you can't with them.", TTime.SET, 4.5, true)
+                            trans.addLine(lordOfFire, null, "Lord of Fire", null, "But well, you only need an incentive for this, if you get 5 kills I'll give you 300 of gold, at least it was much for you.", TTime.SET, 6., true)
+                trans.addEnd(() -> begin
+                    menu.display(p, true)
+                    disturbing(p, lordOfFireIndex)
+                    lordOfFire.setFacing(lordOfFire.getPos().angleTo(paralized.getPos()))
+                end)
+                trans.start()
+
+                iSeeYou.add(p)
+        end)
+
+    // Accept or not
+    CreateTrigger()
+        ..registerDialogEvent(menu)
+        ..addAction(() -> begin
+            let p = GetTriggerPlayer()
+            if GetClickedButton() == yes
+                TransmissionCallback accept = () -> begin
+                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_DISCOVERED,"|cffffcc00PROVING YOURSELF|r\n\n"
+                                                                    + "-Get 5 Hero kills.\n"
+                                                                    + "-Back with the Lord of Fire.\n")
+                    returning.enable()
+                    returningAfter.enable()
+                    getKills.enable()
+
+                    table = CreateLeaderboardBJ(whoAre, "")
+                    LeaderboardAddItemBJ(p, table, "Kills", 0)
+                    LeaderboardSetPlayerItemLabelColorBJ(p, table, 100, 80, 20, 0)
+                    LeaderboardSetPlayerItemValueColorBJ(p, table, 100, 100, 100, 0)
+                    LeaderboardDisplay(table, true)
+
+                    inDialog = false
+                end
+                if paralized.isAnimal()
+                    new Transmission(whoAre, 0)
+                        ..addLine(lordOfFire, null, "Lord of Fire", null, "(To take what they deserve)", TTime.SET, 3., true)
+                        ..addEnd(accept)
+                        ..start()
+                else
+                    accept.run()
+            else
+                let t = new Transmission(whoAre, 0)
+                if paralized.isAnimal()
+                    t.addLine(lordOfFire, null, "Lord of Fire", null, "I don't even know why I'm trying, GET OUT OF HERE!", TTime.SET, 4.5, true)
+                else
+                    if draeneiSaw > 0
+                        t.addLine(lordOfFire, null, "Lord of Fire", null, "I DON'T CARE! DO SOMETHING WITH THEM! (YOU MAKE ME ANGRY)", TTime.SET, 4., true)
+                    else
+                        t.addLine(lordOfFire, null, "Lord of Fire", null, "Ha! Too much for you? I don't care, GO BACK.", TTime.SET, 3.5, true)
+                t.addEnd(() -> begin
+                    mark = lordOfFire.addEffect(Imports.questMarking, "origin")
+                    enter.enable()
+                    inDialog = false
+                end)
+                t.start()
+                whoAre.remove(p)
+            doAfter(2., () -> lordOfFire.setFacing(180..asAngleDegrees()))
+            paralized
+                ..setInvulnerable(false)
+                ..unpause()
+        end)
+    
+    // Kill an enemy hero
+    getKills = CreateTrigger()
+        ..disable()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addAction(() -> begin
+            let p = EventData.getKillingUnit().getOwner()
+            let u = EventData.getDyingUnit()
+            if u.isType(UNIT_TYPE_HERO) and whoAre.has(p) and p.isEnemyOf(u.getOwner())
+                kills++
+                LeaderboardSetPlayerItemValueBJ(p, table, kills)
+                if kills == 5
+                    DestroyLeaderboard(table)
+                    table = null
+                    getKills.disable()
+        end)
+
+    // Returning to complete the mission
+    returning = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.lordOfFireEnter)
+        ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
+        ..addAction(() -> begin
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let u = EventData.getEnteringUnit()
+                let face = lordOfFire.getFacingAngle()
+                paralized = u
+                lordOfFire.setFacing(lordOfFire.getPos().angleTo(u.getPos()))
+                let t = new Transmission(whoAre, 0)
+                t.addLine(lordOfFire, null, "Lord of Fire", null, "Hello again.", TTime.SET, 3.5, true)
+                if kills == 5
+                    paralized..pause()..setInvulnerable(true)
+                    returning.disable()
+                    var given = new Reference(false)
+                    t.addLine(lordOfFire, null, "Lord of Fire", null, "Yes, good job, As I said the only thing you need is an incentive.", TTime.SET, 5., true)
+                    TransmissionCallback first = () -> begin
+                        given.val = true
+                        paralized.getOwner().addGold(300)
+                        paralized.flashEffect(Abilities.darkPortalTarget, "origin")
+                        QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                        + "Proving yourself\n")
+                    end
+                    t.addActions(2., first)
+                    t.addLine(lordOfFire, null, "Lord of Fire", null, "And now, GO BACK.", TTime.SET, 4., true)
+                    t.addActions(() -> paralized.setFacing(paralized.getFacingAngle() * -1))
+                    t.addLine(paralized, null, "You", null, "This money isn't enough.", TTime.SET, 4., true)
+                    t.addEnd(() -> begin
+                        paralized..unpause().setInvulnerable(false)
+                        lordOfFireQuest.complete(true)
+                        if t.wasSkipped()
+                            if not given.into()
+                                first.run()
+                        else
+                            destroy given
+                        disturbing(paralized.getOwner(), lordOfFireIndex)
+                        lordOfFire.setFacing(face)
+                        inDialog = false
+                    end)
+                else
+                    t.addLine(lordOfFire, null, "Lord of Fire", null, "What are you doing here?! You didn't get enough kills!", TTime.SET, 4., true)
+                    t.addEnd(() -> begin
+                        lordOfFire.setFacing(face)
+                        disturbing(paralized.getOwner(), lordOfFireIndex)
+                        inDialog = false
+                    end)
+                t.start()
+        end)
+    
+    // Returning after completing the mission
+    returningAfter = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.lordOfFireRoom)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let face = lordOfFire.getFacingAngle()
+                let u = EventData.getEnteringUnit()
+                let p = u.getOwner()
+
+                if draeneiSaw < 3
+                    lordOfFire.setFacing(lordOfFire.getPos().angleTo(u.getPos()))
+
+                    let t = new Transmission(p.getForce(), 0)
+                    if THE_DEMONS.has(p)
+                        TransmissionCallback actions = () -> begin
+                            if not Rects.lordOfFireEnter.contains(u.getPos())
+                                let list = t.getSteps()
+                                let line = list.get(list.indexOf(t.getElements()) + 1) castTo TransmissionLine
+                                if line != null
+                                    line.setText("Yes, go.")
+                                    line.setDuration(2.)
+                                    doAfter(2.) ->
+                                        t.getTargetForce().clear()
+                        end
+                        if whoAre.has(p) and not returning.isEnabled()
+                            t.addLine(lordOfFire, null, "Lord of Fire", null, "Hey go back, I won't give more incentives.", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            if firePictogramPicked
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "Maybe if you catch the idiot who steal my fire pictogram.", TTime.SET, 5., true)
+                                t.addActions(actions)
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "Or told me where is that useless guardian, she only thinks in read.", TTime.SET, 5., true)
+                            else
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "Maybe if you told me where is that useless guardian, she only thinks in read.", TTime.SET, 5.5, true)
+                            t.addActions(actions)
+                        else if draeneiSaw > 0
+                            t.addLine(lordOfFire, null, "Lord of Fire", null, "Hey fool, I saw a prisoner before, WHY IS IT HERE?", TTime.SET, 4., true)
+                            t.addActions(actions)
+                        else
+                            t.addLine(lordOfFire, null, "Lord of Fire", null, "Hey! Go back to your position", TTime.SET, 3.5, true)
+                            t.addActions(actions)
+                            t.addLine(lordOfFire, null, "Lord of Fire", null, "Some maggot stole my fire pictogram and you are here.", TTime.SET, 5., true)
+                            t.addActions(actions)
+                    else
+                        draeneiSaw++
+                        TransmissionCallback actions = () -> begin
+                            if not Rects.lordOfFireEnter.contains(u.getPos())
+                                t.getTargetForce().clear()
+                        end
+                        if iSeeYou.has(p)
+                            t.addLine(lordOfFire, null, "Lord of Fire", null, "You again! Hey don't run!", TTime.SET, 3., true)
+                            t.addActions(actions)
+                        else if draeneiSaw > 0
+                            t.addLine(lordOfFire, null, "Lord of Fire", null, "WHAT?! ANOTHER! I WILL KILL THOSE STUPID GUARDIANS!!!", TTime.SET, 3., true)
+                            t.addActions(actions)
+                        else
+                            if GetUnitRace(u) == RACE_ORC
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "What?, You are here, Ay this men are so incompetent.", TTime.SET, 4., true)
+                                t.addActions(actions)
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "I would do it for myself, but I'm too old for this things.", TTime.SET, 4.5, true)
+                                t.addActions(actions)
+                            else
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "Hey! Go back to your positio...", TTime.SET, 4., true)
+                                t.addActions(actions)
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "Wait a second, YOU ARE ONE OF THE TRAITORS, I KNEW I SHOULD KILL YOU.", TTime.SET, 4.5, true)
+                                t.addActions(actions)
+                            if u.hasItemById(FIRE_PICTOGRAM)
+                                t.addLine(lordOfFire, null, "Lord of Fire", null, "Wait a minute, DID YOU STOLE MY PICTOGRAM???!!!", TTime.SET, 4., true)
+                                t.addActions(actions)
+                        iSeeYou.add(p)
+
+                    t.addEnd(() -> begin
+                        lordOfFire.setFacing(face)
+                        disturbing(paralized.getOwner(), lordOfFireIndex)
+                        inDialog = false
+                    end)
+                    t.start()
+                else
+                    lordOfFirePissed = true
+                    mark.destr()
+                    enter.disable()
+                    if table != null
+                        DestroyLeaderboard(table)
+                        table = null
+                    getKills.disable()
+                    returning.disable()
+                    returningAfter.disable()
+                    menu.display(localPlayer, false)
+                    ForceUICancel()
+                    doAfter(0.27) -> 
+                        new Transmission()
+                            ..addLine(lordOfFire, null, "Lord of Fire", null, "ENOUGH, I'LL TAKE CARE MYSELF.", TTime.SET, 5., true)
+                            ..addEnd(() -> lordOfFire..unpause()..issuePointOrderById(Orders.move, Rects.lordOfFireDefensePos.getCenter()))
+                            ..start()
+        end)
+    
+    // TODO When is in defense mode
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.lordOfFireDefensePos)
+        ..addCondition(Condition(() -> EventData.getEnteringUnit() == lordOfFire))
+        ..addAction(() -> begin
+            lordOfFire.setInvulnerable(false)
+        end)

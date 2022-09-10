@@ -1,0 +1,246 @@
+package TheGems
+
+import OpMissionsControl
+
+import Fx
+import DamageEvent
+import DummyRecycler
+
+let heretic = GUnits.heretic..setInvulnerable(true)
+let whoAre = CreateForce()
+var returnedGems = 0
+
+let bloodGemBearer = CreateForce()
+let skyGemBearer = CreateForce()
+let poisonGemBearer = CreateForce()
+
+let BLOOD_GEM = compiletime(ITEM_ID_GEN.next())
+let SKY_GEM = compiletime(ITEM_ID_GEN.next())
+let POISON_GEM = compiletime(ITEM_ID_GEN.next())
+
+let POISON_DAMAGE = compiletime(ABIL_ID_GEN.next())
+
+trigger skyGemRun
+trigger obelisks
+effect mark = null
+
+let theBloodGem = new Fx(Rects.bloodGemObelisk.getCenter(), Imports.gem)
+    ..setZ(240.)
+    ..setPlayerColor(PLAYER_COLOR_RED)
+let theSkyGem = new Fx(Rects.skyGemObelisk.getCenter(), Imports.gem)
+    ..setZ(240.)
+    ..setPlayerColor(PLAYER_COLOR_LIGHT_BLUE)
+let thePoisonGem = new Fx(Rects.poisonGemObelisk.getCenter(), Imports.gem)
+    ..setZ(240.)
+    ..setPlayerColor(PLAYER_COLOR_GREEN)
+
+init
+    onReset(true, () -> begin
+        if mark == null
+            mark = heretic.addEffect(Imports.questMarking, "origin")
+        theBloodGem.getDummy().hide()
+        theSkyGem.getDummy().hide()
+        thePoisonGem.getDummy().hide()
+    end)
+
+    onReset(false, () -> begin
+        returnedGems = 0
+        skyGemRun.disable()
+    end)
+    let random = doPeriodically(0.1, _ -> GetRandomInt(1, 3))
+    
+    onModesSelected(() -> begin
+        destroy random
+        createItem(BLOOD_GEM, Rects.bloodGemPlace[GetRandomInt(0, 2)].getCenter())
+            ..setPlayer(players[0], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+        createItem(SKY_GEM, Rects.skyGemPlace[GetRandomInt(0, 2)].getCenter())
+            ..setPlayer(playerM(9), true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+        createItem(POISON_GEM, Rects.poisonGemPlace[GetRandomInt(0, 2)].getCenter())
+            ..setPlayer(players[6], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+    end)
+
+    obelisks = CreateTrigger()
+        ..disable()
+        ..registerRectEnterEventSource(Rects.gemsHeretic)
+        ..addCondition(isHero)
+        ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
+            let p = u.getOwner()
+
+            let t = new Transmission()
+            if returnedGems < 3
+                whoAre.add(p)
+                t.addLine(heretic, null, "Keeper", null, "The gems that are supposed to be on the obelisks are missing.", TTime.SET, 4., true)
+                if u.isAnimal()
+                    t.addLine(heretic, null, "Keeper", null, "But I don't know what you would do with that information.", TTime.SET, 3.5, true)
+                else
+                    t.addLine(u, null, "You", null, "What does that have to do with me?", TTime.SET, 3., true)
+                    t.addLine(heretic, null, "Keeper", null, "Those gems have special powers.", TTime.SET, 3., true)
+                    t.addLine(heretic, null, "Keeper", null, "And if someone returns them, these powers will be granted.", TTime.SET, 4., true)
+                    t.addLine(u, null, "You", null, "Interesting...", TTime.SET, 2., true)
+            else
+                t.addLine(heretic, null, "Keeper", null, "I'm glad that the gems were returned.", TTime.SET, 3., true)
+                t.addLine(heretic, null, "Keeper", null, "But it worries me to think what they will do with those powers.", TTime.SET, 4., true)
+                t.addLine(heretic, null, "Keeper", null, "Nah, I think there will be no problem.", TTime.SET, 3., true)
+            t.start()
+        end)
+
+    // Don't pick the item if you aren't in the mission
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
+        let u = EventData.getTriggerUnit()
+        let p = u.getOwner()
+        if not whoAre.has(p)
+            let typ = EventData.getManipulatedItem().getTypeId()
+            if typ == BLOOD_GEM or typ == SKY_GEM or typ == POISON_GEM
+                message("error", "Why should I do that?", p)
+            u.issueTargetOrderById(Orders.attack, u)
+    end)
+
+    // Pick the gems
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        let u = EventData.getManipulatingUnit()
+        let m = EventData.getManipulatedItem()
+        let typ = m.getTypeId()
+        if ((u.hasItemById(BLOOD_GEM) or u.hasItemById(SKY_GEM)) and typ == POISON_GEM) or
+            ((u.hasItemById(POISON_GEM) or u.hasItemById(SKY_GEM)) and typ == BLOOD_GEM) or
+            ((u.hasItemById(POISON_GEM) or u.hasItemById(BLOOD_GEM)) and typ == SKY_GEM)
+
+            QuestMessageBJ(u.getOwner().getForce(), bj_QUESTMESSAGE_WARNING, "The gems are so powerful to carry more than one at a time.")
+            u.dropItemPoint(m, u.getPos())
+        else
+            if typ == BLOOD_GEM
+                DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " grabbed the |cffb90000Blood Gem|r.")
+            else if typ == SKY_GEM
+                DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " grabbed the |cff00e4ffSky Gem|r.")
+            else if typ == POISON_GEM
+                DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " grabbed the |cff57ff59Poison Gem|r.")
+    end)
+
+    // Lose the gems
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let u = EventData.getManipulatingUnit()
+        if u.hasItemById(BLOOD_GEM)
+            DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " lost the |cffb90000Blood Gem|r.")
+        else if u.hasItemById(SKY_GEM)
+            DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " lost the |cff00e4ffSky Gem|r.")
+        else if u.hasItemById(POISON_GEM)
+            DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " lost the |cff57ff59Poison Gem|r.")
+    end)
+
+    // Returning the gems
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.gemObelisks)
+        ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
+            let blood = u.hasItemById(BLOOD_GEM)
+            let sky = u.hasItemById(SKY_GEM)
+            let poison = u.hasItemById(POISON_GEM)
+
+            if blood or sky or poison
+                let p = u.getOwner()
+                let i = p.getNumber()
+
+                if hero[i].isAlive()
+                    hero[i].flashEffect(Abilities.darkPortalTarget, "origin")
+                
+                returnedGems++
+
+                if blood
+                    u.getItemById(BLOOD_GEM).remove()
+                    theBloodGem.getDummy().show()
+                    bloodGemBearer.add(p)
+                    DisplayTextToPlayer(localPlayer, 0, 0, playerName[i] + " returned the |cffb90000Blood Gem|r.")
+                    doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cffb90000Blood Gem Ability:|r When your hero kills another unit, it heals for 17% of that unit's maximum life."))
+                else if sky
+                    skyGemRun.enable()
+                    u.getItemById(SKY_GEM).remove()
+                    theSkyGem.getDummy().show()
+                    skyGemBearer.add(p)
+                    DisplayTextToPlayer(localPlayer, 0, 0, playerName[i] + " returned the |cff00e4ffSky Gem|r.")
+                    doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cff00e4ffSky Gem Ability:|r Your hero will be +30 speed and will have no obstruction in vision."))
+                else if poison
+                    u.getItemById(POISON_GEM).remove()
+                    thePoisonGem.getDummy().show()
+                    poisonGemBearer.add(p)
+                    DisplayTextToPlayer(localPlayer, 0, 0, playerName[i] + " returned the |cff57ff59Poison Gem|r.")
+                    doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cff57ff59Poison Gem Ability:|r When your hero is attacked, whoever attacked will receive a poison effect (20 dps, 20% slow)."))
+                
+                if returnedGems == 3
+                    mark.destr()
+                    mark = null
+                    theGemsQuest.complete(true)
+        end)
+    
+    // Blood Gem buff
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let u = EventData.getKillingUnit()
+        let d = EventData.getDyingUnit()
+        if bloodGemBearer.has(u.getOwner()) and not d.isType(UNIT_TYPE_STRUCTURE)
+            u.setLife(u.getLife() + 0.17 * d.getMaxHP())
+            u.addEffect(Imports.vampiricAuraTarget, "origin").destroyAfter(0.4)
+            u.addEffect(Objects.humanBloodFootman, "origin").destroyAfter(0.4)
+    end)
+
+    // Sky Gem buff
+    skyGemRun = CreateTrigger()
+        ..registerTimerEvent(1., true)
+        ..addAction(() -> begin
+            skyGemBearer.forEach(() -> begin
+                let p = GetEnumPlayer()
+                forUnitsOfPlayer(p, u -> begin
+                    let f = createFogModifier(p, FOG_OF_WAR_VISIBLE, u.getPos(), 1800., true, false)..start()
+                    doAfter(1., () -> f.destr())
+                end)
+            end)
+        end)
+    
+    // Poison Gem buff
+    DamageEvent.addListener(() -> begin
+        let u = DamageEvent.getTarget()
+        if poisonGemBearer.has(u.getOwner())
+            let s = DamageEvent.getSource()
+            let dummy = DummyRecycler.get(u.getPos(), u.getPos().angleTo(s.getPos()))
+                ..addAbility(POISON_DAMAGE)
+                ..issueTargetOrderById(Orders.attackonce, s)
+            doAfter(0.5) ->
+                dummy.removeAbility(POISON_DAMAGE)
+                DummyRecycler.recycle(dummy)
+    end)        
+
+function ItemDefinition.gemGeneral()
+    this
+        ..setDroppedWhenCarrierDies(true)
+        ..setClassification("Campaign")
+        ..setCanBeDropped(true)
+        ..setHitPoints(100000)
+        ..setModelUsed(Imports.gem)
+        ..setTooltipExtended("This is one of the gems.")
+        ..setDescription("This is one of the gems.")
+
+@compiletime function gen()
+    new ItemDefinition(BLOOD_GEM, 'soul')
+        ..gemGeneral()
+        ..setInterfaceIcon(Imports.bTNA7XBloodDiamond)
+        ..setTooltipBasic("Blood Gem")
+        ..setName("Blood Gem")
+    
+    new ItemDefinition(SKY_GEM, 'soul')
+        ..gemGeneral()
+        ..setInterfaceIcon(Imports.bTNA7XMoonDiamond)
+        ..setTooltipBasic("Sky Gem")
+        ..setName("Sky Gem")
+    
+    new ItemDefinition(POISON_GEM, 'soul')
+        ..gemGeneral()
+        ..setInterfaceIcon(Imports.bTNA7XPoisonDiamond)
+        ..setTooltipBasic("Poison Gem")
+        ..setName("Poison Gem")
+    
+    new AbilityDefinitionPoisonAttack(POISON_DAMAGE)
+        ..setDamageperSecond(1, 0)
+        ..setAttackSpeedFactor(1, 0.2)
+        ..setMovementSpeedFactor(1, 0.2)
+        ..setStackingType(1, 0)
+        ..setBuffs(1, "Bpoi,Bpsd")
+        ..setDurationHero(1, 5.)
+        ..setDurationNormal(1, 5.)

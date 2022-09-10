@@ -3,10 +3,11 @@ package TheReader
 import OpMissionsControl
 
 public constant theReaderIndex = 1
-let theReader = GUnits.theReader
+let theReader = GUnits.theReader..setInvulnerable(true)
 let whoAre = CreateForce()
 let iSeeYou = CreateForce()
 let itemPos = Rects.bookPlace.getCenter()
+var inDialog = false
 
 let BOOK = compiletime(ITEM_ID_GEN.next())
 
@@ -42,6 +43,7 @@ init
     onReset(false, () -> begin
         whoAre.clear()
         iSeeYou.clear()
+        enter.enable()
         menu.display(localPlayer, false)
         returning.disable()
         returningBefore.disable()
@@ -57,45 +59,47 @@ init
         ..registerRectEnterEventSource(Rects.theReaderEnter)
         ..addCondition(isHero)
         ..addAction(() -> begin
-            enter.disable()
-            let p = GetOwningPlayer(paralized)
-            whoAre.add(p)
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                enter.disable()
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
 
-            paralized = GetEnteringUnit()
-                ..setInvulnerable(true)
-                ..pause()
-            mark.destr()
-            mark = null
+                paralized = GetEnteringUnit()
+                    ..setInvulnerable(true)
+                    ..pause()
+                mark.destr()
+                mark = null
 
-            let trans = new Transmission(whoAre, 0)
-            if iSeeYou.has(p)
-                trans.addLine(theReader, null, "Reader", null, "Ah, it's you again.", TTime.SET, 3., true)
-                trans.addLine(theReader, null, "Reader", null, "Do you wanna do for me the favor?", TTime.SET, 4., true)
-            else if iSeeYou.count() > 1
-                trans.addLine(theReader, null, "Reader", null, "Another one?", TTime.SET, 2., true)
-                trans.addLine(theReader, null, "Reader", null, "I have to reconsider moving somewhere else.", TTime.SET, 4.5, true)
-                trans.addLine(theReader, null, "Reader", null, "Anyway, I offer you 5 of lumber if you find my lost book. Do you want?", TTime.SET, 6., true)
-            else
-                trans.addLine(theReader, null, "Reader", null, "What?, How can you...?", TTime.SET, 5., true)
-                if paralized.isAnimal()
-                    trans.addLine(theReader, null, "Reader", null, "Even the animals come here.", TTime.SET, 4., true)
+                let trans = new Transmission(whoAre, 0)
+                if iSeeYou.has(p)
+                    trans.addLine(theReader, null, "Reader", null, "Ah, it's you again.", TTime.SET, 3., true)
+                    trans.addLine(theReader, null, "Reader", null, "Do you wanna do for me the favor?", TTime.SET, 4., true)
+                else if iSeeYou.count() > 1
+                    trans.addLine(theReader, null, "Reader", null, "Another one?", TTime.SET, 2., true)
+                    trans.addLine(theReader, null, "Reader", null, "I have to reconsider moving somewhere else.", TTime.SET, 4.5, true)
+                    trans.addLine(theReader, null, "Reader", null, "Anyway, I offer you 5 of lumber if you find my lost book. Do you want?", TTime.SET, 6., true)
                 else
-                    trans.addLine(theReader, null, "Reader", null, "I just want a private place to ready and someone came here.", TTime.SET, 4.5, true)
-                trans.addActions(1., () -> theReader.issuePointOrderById(Orders.move, Rects.theReaderOtherPos.getCenter()))
-                trans.addActions(() -> theReader.setFacing(theReader.getPos().angleTo(paralized.getPos())))
-                if paralized.isAnimal()
-                    trans.addLine(theReader, null, "Reader", null, "But, thinking better, you can do a labor for me.", TTime.SET, 4., true)
-                else
-                    trans.addLine(theReader, null, "Reader", null, "But, thinking better, I need a favor.", TTime.SET, 4., true)
-                trans.addLine(theReader, null, "Reader", null, "In the search of a place, I lost some of my books, and I don't know where is it, if you bring it me i will give you 5 of lumber.", TTime.SET, 6.5, true)
-            trans.addEnd(() -> begin
-                menu.display(p, true)
-                disturbing(p, theReaderIndex)
-                theReader.setFacing(theReader.getPos().angleTo(paralized.getPos()))
-            end)
-            trans.start()
+                    trans.addLine(theReader, null, "Reader", null, "What?, How can you...?", TTime.SET, 5., true)
+                    if paralized.isAnimal()
+                        trans.addLine(theReader, null, "Reader", null, "Even the animals come here.", TTime.SET, 4., true)
+                    else
+                        trans.addLine(theReader, null, "Reader", null, "I just want a private place to ready and someone came here.", TTime.SET, 4.5, true)
+                    trans.addActions(1., () -> theReader.issuePointOrderById(Orders.move, Rects.theReaderOtherPos.getCenter()))
+                    trans.addActions(() -> theReader.setFacing(theReader.getPos().angleTo(paralized.getPos())))
+                    if paralized.isAnimal()
+                        trans.addLine(theReader, null, "Reader", null, "But, thinking better, you can do a labor for me.", TTime.SET, 4., true)
+                    else
+                        trans.addLine(theReader, null, "Reader", null, "But, thinking better, I need a favor.", TTime.SET, 4., true)
+                    trans.addLine(theReader, null, "Reader", null, "In the search of a place, I lost some of my books, and I don't know where is it, if you bring it me i will give you 5 of lumber.", TTime.SET, 6.5, true)
+                trans.addEnd(() -> begin
+                    menu.display(p, true)
+                    disturbing(p, theReaderIndex)
+                    theReader.setFacing(theReader.getPos().angleTo(paralized.getPos()))
+                end)
+                trans.start()
 
-            iSeeYou.add(p)
+                iSeeYou.add(p)
         end)
 
     // Accept or not
@@ -110,12 +114,14 @@ init
                 ping.enable()
                 returning.enable()
                 returningBefore.enable()
+                inDialog = false
             else
                 new Transmission(whoAre, 0)
                     ..addLine(theReader, null, "Reader", null, "So please, don't disturb me when I'm reading.", TTime.SET, 4., true)
                     ..addEnd(() -> begin
                         mark = theReader.addEffect(Imports.questMarking, "origin")
                         enter.enable()
+                        inDialog = false
                     end)
                     ..start()
                 whoAre.remove(p)
@@ -137,14 +143,19 @@ init
         ..registerRectEnterEventSource(Rects.theReaderRoom)
         ..addCondition(And(isHero, Condition(() -> not whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            let u = GetEnteringUnit()
-            let face = theReader.getFacingAngle()
-            theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
-            let t = new Transmission(u.getOwner().getForce(), 0)
-            // TODO Lord of fire
-            t.addLine(theReader, null, "Reader", null, "What?, Another person?, I have to find a better place.", TTime.SET, 5., true)
-            t.addEnd(() -> theReader.setFacing(face))
-            t.start()
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let u = GetEnteringUnit()
+                let face = theReader.getFacingAngle()
+                theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
+                let t = new Transmission(u.getOwner().getForce(), 0)
+                // TODO Lord of fire
+                t.addLine(theReader, null, "Reader", null, "What?, Another person?, I have to find a better place.", TTime.SET, 5., true)
+                t.addEnd(() -> begin
+                    theReader.setFacing(face)
+                    inDialog = true
+                end)
+                t.start()
         end)
     
     // Adquire items
@@ -173,58 +184,61 @@ init
         ..registerRectEnterEventSource(Rects.theReaderEnter)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            let u = EventData.getEnteringUnit()
-            theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
-            if objectGathered
-                paralized = u..pause()..setInvulnerable(true)
-                returning.disable()
-                returningBefore.disable()
-                var given = new Reference(false)
-                var messageTaken = new Reference(false)
-                let t = new Transmission(whoAre, 0)
-                t.addLine(theReader, null, "Reader", null, "Oh my book thanks, take your bounty.", TTime.SET, 3.5, true)
-                TransmissionCallback first = () -> begin
-                    given.val = true
-                    paralized.getOwner().addLumber(5)
-                    paralized.flashEffect(Abilities.darkPortalTarget, "origin")
-                end
-                t.addActions(2., first)
-                TransmissionCallback second = () -> begin
-                    messageTaken.val = true
-                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
-                                                                    + "Reader\n")
-                    paralized.flashEffect(Abilities.darkPortalTarget, "origin")
-                end
-                t.addActions(2., second)
-                TransmissionCallback third = () -> theReader.setFacing(0..asAngleDegrees())
-                t.addActions(third)
-                t.addLine(theReader, null, "Reader", null, "Now please, leave me alone.", TTime.SET, 3., true)
-                t.addLine(paralized, null, "You", null, "Uhmm.", TTime.SET, 5., true)
-                t.addEnd(() -> begin
-                    paralized..unpause().setInvulnerable(false)
-                    theReaderQuest.complete(true)
-                    returningAfter.enable()
-                    if t.wasSkipped()
-                        if not given.into()
-                            first.run()
-                        if not messageTaken.into()
-                            second.run()
-                        third.run()
-                    else
-                        destroy first
-                        destroy second
-                    disturbing(paralized.getOwner(), theReaderIndex)
-                end)
-                t.start()
-            else
-                let face = theReader.getFacingAngle()
-                new Transmission(whoAre, 0)
-                    ..addLine(theReader, null, "Reader", null, "Oh it's you and you don't have my book, so what do you want here?", TTime.SET, 2., true)
-                    ..addEnd(() -> begin
-                        theReader.setFacing(face)
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let u = EventData.getEnteringUnit()
+                theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
+                if objectGathered
+                    paralized = u..pause()..setInvulnerable(true)
+                    returning.disable()
+                    returningBefore.disable()
+                    var given = new Reference(false)
+                    var messageTaken = new Reference(false)
+                    let t = new Transmission(whoAre, 0)
+                    t.addLine(theReader, null, "Reader", null, "Oh my book thanks, take your bounty.", TTime.SET, 3.5, true)
+                    TransmissionCallback first = () -> begin
+                        given.val = true
+                        paralized.getOwner().addLumber(5)
+                        paralized.flashEffect(Abilities.darkPortalTarget, "origin")
+                    end
+                    t.addActions(2., first)
+                    TransmissionCallback second = () -> begin
+                        messageTaken.val = true
+                        QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                        + "Reader\n")
+                    end
+                    t.addActions(2., second)
+                    TransmissionCallback third = () -> theReader.setFacing(0..asAngleDegrees())
+                    t.addActions(third)
+                    t.addLine(theReader, null, "Reader", null, "Now please, leave me alone.", TTime.SET, 3., true)
+                    t.addLine(paralized, null, "You", null, "Uhmm.", TTime.SET, 5., true)
+                    t.addEnd(() -> begin
+                        paralized..unpause().setInvulnerable(false)
+                        theReaderQuest.complete(true)
+                        returningAfter.enable()
+                        if t.wasSkipped()
+                            if not given.into()
+                                first.run()
+                            if not messageTaken.into()
+                                second.run()
+                            third.run()
+                        else
+                            destroy given
+                            destroy messageTaken
                         disturbing(paralized.getOwner(), theReaderIndex)
+                        inDialog = false
                     end)
-                    ..start()
+                    t.start()
+                else
+                    let face = theReader.getFacingAngle()
+                    new Transmission(whoAre, 0)
+                        ..addLine(theReader, null, "Reader", null, "Oh it's you and you don't have my book, so what do you want here?", TTime.SET, 2., true)
+                        ..addEnd(() -> begin
+                            theReader.setFacing(face)
+                            disturbing(paralized.getOwner(), theReaderIndex)
+                            inDialog = false
+                        end)
+                        ..start()
         end)
     
     // Returning after completing the mission
@@ -233,29 +247,36 @@ init
         ..registerRectEnterEventSource(Rects.theReaderRoom)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            let face = theReader.getFacingAngle()
-            let u = EventData.getEnteringUnit()
-            let p = u.getOwner()
-            let t = new Transmission(p.getForce(), 0)
-            let actions = new TransmissionActions()..setActions(() -> begin
-                if not Rects.theReaderRoom.contains(u.getPos())
-                    t.getTargetForce().clear()
-            end)
-            t.addLine(theReader, null, "Reader", null, "I gave you the bounty, what do you want?", TTime.SET, 3.5, true)
-            t.addActions(actions)
-            // TODO: Lord of fire
-            if wallDestroyed
-                t.addLine(theReader, null, "Reader", null, "By the way. What was that explosion?, it didn't come from the construction zone.", TTime.SET, 5., true)
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let face = theReader.getFacingAngle()
+                let u = EventData.getEnteringUnit()
+                let p = u.getOwner()
+                let t = new Transmission(p.getForce(), 0)
+                TransmissionCallback actions = () -> begin
+                    if not Rects.theReaderRoom.contains(u.getPos())
+                        t.getTargetForce().clear()
+                end
+                t.addLine(theReader, null, "Reader", null, "I gave you the bounty, what do you want?", TTime.SET, 3.5, true)
                 t.addActions(actions)
-                t.addLine(theReader, null, "Reader", null, "I just hope none of those barrels are anywhere near here.", TTime.SET, 3.5, true)
-                t.addActions(actions)
-                t.addLine(theReader, null, "Reader", null, "Specially because they are fixed to the ground and there is no choice but to destroy them.", TTime.SET, 5.5, true)
-                t.addActions(actions)
-            t.addEnd(() -> begin
-                theReader.setFacing(face)
-                disturbing(paralized.getOwner(), theReaderIndex)
-            end)
-            t.start()
+                if lordOfFirePissed
+                    t.addLine(theReader, null, "Reader", null, "And the boss got angry, but, What did you do?!", TTime.SET, 3.5, true)
+                    t.addActions(actions)
+                    t.addLine(theReader, null, "Reader", null, "I hope you haven't told him where I am at least.", TTime.SET, 3.5, true)
+                    t.addActions(actions)
+                else if wallDestroyed
+                    t.addLine(theReader, null, "Reader", null, "By the way. What was that explosion?, it didn't come from the construction zone.", TTime.SET, 5., true)
+                    t.addActions(actions)
+                    t.addLine(theReader, null, "Reader", null, "I just hope none of those barrels are anywhere near here.", TTime.SET, 3.5, true)
+                    t.addActions(actions)
+                    t.addLine(theReader, null, "Reader", null, "Specially because they are fixed to the ground and there is no choice but to destroy them.", TTime.SET, 5.5, true)
+                    t.addActions(actions)
+                t.addEnd(() -> begin
+                    theReader.setFacing(face)
+                    disturbing(paralized.getOwner(), theReaderIndex)
+                    inDialog = false
+                end)
+                t.start()
         end)
     
     // TODO: Infernals

@@ -3,15 +3,17 @@ package VoidTraveller
 import OpMissionsControl
 
 public constant voidTravellerIndex = 0
-let voidTraveller = GUnits.voidTraveller
+public bool firePictogramPicked = false
+let voidTraveller = GUnits.voidTraveller..setInvulnerable(true)
 let whoAre = CreateForce()
 let iSeeYou = CreateForce()
 let itemsPos = [Rects.eggPlace.getCenter(), Rects.skullPlace.getCenter(), Rects.firePlace.getCenter()]
 let youKilledTheMother = CreateForce()
+var inDialog = false
 
 let EGG = compiletime(ITEM_ID_GEN.next())
 let SKULL = compiletime(ITEM_ID_GEN.next())
-let FIRE_PICTOGRAM = compiletime(ITEM_ID_GEN.next())
+public constant FIRE_PICTOGRAM = compiletime(ITEM_ID_GEN.next())
 let NETHERDRAKE = compiletime(UNIT_ID_GEN.next())
 
 unit netherDrake
@@ -54,6 +56,7 @@ init
         returning.disable()
         returningBefore.disable()
         returningAfter.disable()
+        firePictogramPicked = true
 
         for i = 0 to 2
             pings[i].disable()
@@ -69,34 +72,36 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerEnter)
         ..addCondition(isHero)
         ..addAction(() -> begin
-            enter.disable()
-            let p = GetOwningPlayer(paralized)
-            whoAre.add(p)
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                enter.disable()
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
 
-            paralized = GetEnteringUnit()
-                ..setInvulnerable(true)
-                ..pause()
-            mark.destr()
-            mark = null
+                paralized = GetEnteringUnit()
+                    ..setInvulnerable(true)
+                    ..pause()
+                mark.destr()
+                mark = null
 
-            let trans = new Transmission(whoAre, 0)
-            if iSeeYou.has(p)
-                trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello, you again.", TTime.SET, 3., true)
-                trans.addLine(voidTraveller, null, "Void Traveller", null, "Did you think about my deal?", TTime.SET, 3.5, true)
-            else
-                if paralized.isAnimal()
-                    trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello.", TTime.SET, 4., true)
+                let trans = new Transmission(whoAre, 0)
+                if iSeeYou.has(p)
+                    trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello, you again.", TTime.SET, 3., true)
+                    trans.addLine(voidTraveller, null, "Void Traveller", null, "Did you think about my deal?", TTime.SET, 3.5, true)
                 else
-                    trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor.", TTime.SET, 4., true)
-                trans.addLine(voidTraveller, null, "Void Traveller", null, "If you wanna know what am i doing here, I'm just a traveller.", TTime.SET, 5.5, true)
-                trans.addLine(voidTraveller, null, "Void Traveller", null, "In this moment I'm doing a potion, if you help me I'll give you 600 of gold.", TTime.SET, 5.5, true)
-            trans.addEnd(() -> begin
-                menu.display(p, true)
-                disturbing(p, voidTravellerIndex)
-            end)
-            trans.start()
-            
-            iSeeYou.add(p)
+                    if paralized.isAnimal()
+                        trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello.", TTime.SET, 4., true)
+                    else
+                        trans.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor.", TTime.SET, 4., true)
+                    trans.addLine(voidTraveller, null, "Void Traveller", null, "If you wanna know what am i doing here, I'm just a traveller.", TTime.SET, 5.5, true)
+                    trans.addLine(voidTraveller, null, "Void Traveller", null, "In this moment I'm doing a potion, if you help me I'll give you 600 of gold.", TTime.SET, 5.5, true)
+                trans.addEnd(() -> begin
+                    menu.display(p, true)
+                    disturbing(p, voidTravellerIndex)
+                end)
+                trans.start()
+                
+                iSeeYou.add(p)
         end)
 
     // Accept or not
@@ -114,12 +119,14 @@ init
                     pings[i].enable()
                 returning.enable()
                 returningBefore.enable()
+                inDialog = false
             else
                 new Transmission(whoAre, 0)
                     ..addLine(voidTraveller, null, "Void Traveller", null, "Ok, you are busy, I understand.", TTime.SET, 2., true)
                     ..addEnd(() -> begin
                         mark = voidTraveller.addEffect(Imports.questMarking, "origin")
                         enter.enable()
+                        inDialog = false
                     end)
                     ..start()
                 whoAre.remove(p)
@@ -148,18 +155,23 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerRoom)
         ..addCondition(And(isHero, Condition(() -> not whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            let u = GetEnteringUnit()
-            let face = voidTraveller.getFacingAngle()
-            voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
-            let t = new Transmission(u.getOwner().getForce(), 0)
-            t.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor.", TTime.SET, 3., true)
-            t.addActions(() -> begin
-                if not Rects.voidTravellerRoom.contains(u.getPos())
-                    t.getTargetForce().clear()
-            end)
-            t.addLine(voidTraveller, null, "Void Traveller", null, "I would offer you my special potion, but I don't have the ingredents, but don't worry someone is searching it for me.", TTime.SET, 6.5, true)
-            t.addEnd(() -> voidTraveller.setFacing(face))
-            t.start()
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let u = GetEnteringUnit()
+                let face = voidTraveller.getFacingAngle()
+                voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
+                let t = new Transmission(u.getOwner().getForce(), 0)
+                t.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor.", TTime.SET, 3., true)
+                t.addActions(() -> begin
+                    if not Rects.voidTravellerRoom.contains(u.getPos())
+                        t.getTargetForce().clear()
+                end)
+                t.addLine(voidTraveller, null, "Void Traveller", null, "I would offer you my special potion, but I don't have the ingredents, but don't worry someone is searching it for me.", TTime.SET, 6.5, true)
+                t.addEnd(() -> begin
+                    voidTraveller.setFacing(face)
+                    inDialog = false
+                end)
+                t.start()
         end)
     
     // Adquire items
@@ -187,6 +199,7 @@ init
                         doAfter(2.) -> 
                             DisplayTextToPlayer(p, 0, 0, "You know that the skull is for someone of your own race, what a morbid.")
                 else if typ == FIRE_PICTOGRAM
+                    firePictogramPicked = true
                     pings[2].disable()
                     // TODO pictogram stealed
                     if GetUnitRace(u) == RACE_UNDEAD
@@ -227,49 +240,53 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerEnter)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            let u = EventData.getEnteringUnit()
-            voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
-            if objectsGathered == 3
-                paralized = u..pause()..setInvulnerable(true)
-                returning.disable()
-                returningBefore.disable()
-                var moved = new Reference(false)
-                let t = new Transmission(whoAre, 0)
-                    ..addLine(voidTraveller, null, "Void Traveller", null, "Oh, you're back, and you have the items. Nice.", TTime.SET, 5., true)
-                    ..addLine(voidTraveller, null, "Void Traveller", null, "Now I can prepare my poition.", TTime.SET, 5., true)
-                    ..addActions(1.5, () -> begin
-                        moved.val = true
-                        voidTraveller.issuePointOrderById(Orders.move, Rects.voidTravellerCauldron.getCenter())
-                    end)
-                    ..addActions(2., () -> begin
-                        addEffect(Abilities.spiritLinkZapTarget, Rects.voidTravellerCauldron.getCenter()).destroyAfter(2.)
-                    end)
-                    ..addActions(() -> voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos())))
-                    ..addLine(voidTraveller, null, "Void Traveller", null, "My potion it's done, thanks for help, I'll do my promise.", TTime.SET, 5., true)
-                    ..addActions(2., () -> endVoidTraveller())
-                t.addEnd(() -> begin
-                    paralized..unpause().setInvulnerable(false)
-                    QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
-                                                                           + "Void Traveller\n")
-                    voidTravellerQuest.complete(true)
-                    returningAfter.enable()
-                    if not moved.into()
-                        voidTraveller.issuePointOrderById(Orders.move, Rects.voidTravellerCauldron.getCenter())
-                        doAfter(2., () -> voidTraveller.setFacing(270..asAngleDegrees()))
-                    if t.wasSkipped()
-                        endVoidTraveller()
-                    disturbing(paralized.getOwner(), voidTravellerIndex)
-                end)
-                t.start()
-            else
-                let face = voidTraveller.getFacingAngle()
-                new Transmission(whoAre, 0)
-                    ..addLine(voidTraveller, null, "Void Traveller", null, "Oh, you're back, but you don't have all the items, no problem, I can wait.", TTime.SET, 2., true)
-                    ..addEnd(() -> begin
-                        voidTraveller.setFacing(face)
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let u = EventData.getEnteringUnit()
+                voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
+                if objectsGathered == 3
+                    paralized = u..pause()..setInvulnerable(true)
+                    returning.disable()
+                    returningBefore.disable()
+                    var moved = new Reference(false)
+                    let t = new Transmission(whoAre, 0)
+                        ..addLine(voidTraveller, null, "Void Traveller", null, "Oh, you're back, and you have the items. Nice.", TTime.SET, 5., true)
+                        ..addLine(voidTraveller, null, "Void Traveller", null, "Now I can prepare my poition.", TTime.SET, 5., true)
+                        ..addActions(1.5, () -> begin
+                            moved.val = true
+                            voidTraveller.issuePointOrderById(Orders.move, Rects.voidTravellerCauldron.getCenter())
+                        end)
+                        ..addActions(2., () -> begin
+                            addEffect(Abilities.spiritLinkZapTarget, Rects.voidTravellerCauldron.getCenter()).destroyAfter(2.)
+                        end)
+                        ..addActions(() -> voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos())))
+                        ..addLine(voidTraveller, null, "Void Traveller", null, "My potion it's done, thanks for help, I'll do my promise.", TTime.SET, 5., true)
+                        ..addActions(2., () -> endVoidTraveller())
+                    t.addEnd(() -> begin
+                        paralized..unpause().setInvulnerable(false)
+                        QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
+                                                                            + "Void Traveller\n")
+                        voidTravellerQuest.complete(true)
+                        returningAfter.enable()
+                        if not moved.into()
+                            voidTraveller.issuePointOrderById(Orders.move, Rects.voidTravellerCauldron.getCenter())
+                            doAfter(2., () -> voidTraveller.setFacing(270..asAngleDegrees()))
+                        if t.wasSkipped()
+                            endVoidTraveller()
                         disturbing(paralized.getOwner(), voidTravellerIndex)
+                        inDialog = false
                     end)
-                    ..start()
+                    t.start()
+                else
+                    let face = voidTraveller.getFacingAngle()
+                    new Transmission(whoAre, 0)
+                        ..addLine(voidTraveller, null, "Void Traveller", null, "Oh, you're back, but you don't have all the items, no problem, I can wait.", TTime.SET, 2., true)
+                        ..addEnd(() -> begin
+                            voidTraveller.setFacing(face)
+                            disturbing(paralized.getOwner(), voidTravellerIndex)
+                            inDialog = false
+                        end)
+                        ..start()
         end)
     
     // Returning after completing the mission
@@ -278,19 +295,22 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerRoom)
         ..addCondition(isHero)
         ..addAction(() -> begin
-            let face = voidTraveller.getFacingAngle()
-            let p = EventData.getEnteringUnit().getOwner()
-            let t = new Transmission(p.getForce(), 0)
-            if whoAre.has(p)
-                t.addLine(voidTraveller, null, "Void Traveller", null, "Oh you are back, do you wanna prove my potion?", TTime.SET, 4., true)
-            else
-                t.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor, Do you wanna prove my potion?", TTime.SET, 4., true)
-            t.addEnd(() -> begin
-                voidTraveller.setFacing(face)
-                disturbing(paralized.getOwner(), voidTravellerIndex)
-                QuestMessageBJ(t.getTargetForce(), bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r Nobody wants his potion.")
-            end)
-            t.start()
+            waitUntil(() -> not inDialog) -> 
+                inDialog = true
+                let face = voidTraveller.getFacingAngle()
+                let p = EventData.getEnteringUnit().getOwner()
+                let t = new Transmission(p.getForce(), 0)
+                if whoAre.has(p)
+                    t.addLine(voidTraveller, null, "Void Traveller", null, "Oh you are back, do you wanna prove my potion?", TTime.SET, 4., true)
+                else
+                    t.addLine(voidTraveller, null, "Void Traveller", null, "Hello visitor, Do you wanna prove my potion?", TTime.SET, 4., true)
+                t.addEnd(() -> begin
+                    voidTraveller.setFacing(face)
+                    disturbing(paralized.getOwner(), voidTravellerIndex)
+                    QuestMessageBJ(t.getTargetForce(), bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r Nobody wants his potion.")
+                    inDialog = false
+                end)
+                t.start()
         end)
     
     // Enter before time
