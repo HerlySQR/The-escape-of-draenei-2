@@ -4,6 +4,9 @@ import AbilityData
 import PseudoWindWalk
 
 public constant ANIMAL_FORCE_NL = compiletime(ABIL_ID_GEN.next())
+public constant ANIMAL_FORCE_L = compiletime(ABIL_ID_GEN.next())
+public constant ANIMAL_FORCE_S = compiletime(ABIL_ID_GEN.next())
+
 constant ANIMAL_FORCE_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

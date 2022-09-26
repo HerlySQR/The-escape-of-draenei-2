@@ -6,6 +6,7 @@ import DummyDamager
 public constant EXPLOSIVE_FLARES_NL = compiletime(ABIL_ID_GEN.next())
 public constant EXPLOSIVE_FLARES_L = compiletime(ABIL_ID_GEN.next())
 public constant EXPLOSIVE_FLARES_S = compiletime(ABIL_ID_GEN.next())
+
 constant EXPLOSIVE_FLARES_FIRE = compiletime(ABIL_ID_GEN.next())
 
 // General

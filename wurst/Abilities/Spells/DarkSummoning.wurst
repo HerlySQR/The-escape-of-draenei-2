@@ -6,6 +6,8 @@ import HeroSelection
 import PlayerData
 
 public constant DARK_SUMMONING_NL = compiletime(ABIL_ID_GEN.next())
+public constant DARK_SUMMONING_L = compiletime(ABIL_ID_GEN.next())
+public constant DARK_SUMMONING_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let AREA = 700.

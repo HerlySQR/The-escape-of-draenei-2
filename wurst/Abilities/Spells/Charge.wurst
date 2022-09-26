@@ -4,6 +4,8 @@ import AbilityData
 import MoveSpeedX
 
 public constant CHARGE_NL = compiletime(ABIL_ID_GEN.next())
+public constant CHARGE_L = compiletime(ABIL_ID_GEN.next())
+public constant CHARGE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 10.

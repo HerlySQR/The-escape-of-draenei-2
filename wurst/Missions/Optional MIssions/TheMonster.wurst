@@ -3,7 +3,7 @@ package TheMonster
 import OpMissionsControl
 
 public unit theMonster = null
-let theWarlock = GUnits.theWarlock
+let theWarlock = GUnits.theWarlock..setInvulnerable(true)
 
 let MONSTER = compiletime(UNIT_ID_GEN.next())
 let MONSTER_HEAD = compiletime(ITEM_ID_GEN.next())
@@ -39,6 +39,7 @@ init
 
             let t = new Transmission(p.getForce(), 0)
             if u.hasItemById(MONSTER_HEAD)
+                u.getItemById(MONSTER_HEAD).remove()
                 mark.destr()
                 mark = null
                 enter.disable()
@@ -93,7 +94,7 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
         if EventData.getManipulatedItem().getTypeId() == MONSTER_HEAD
             let p = EventData.getManipulatingUnit().getOwner()
-            DisplayTextToPlayer(localPlayer, 0, 0, colorId[THE_DRAENEI.has(p) ? 11 : 12] + p.getName() + " took the |cffffcc00Monster Head|r")
+            DisplayTextToPlayer(localPlayer, 0, 0, colorId[THE_DRAENEI.has(p) ? 11 : 12] + p.getName() + "|r took the |cffffcc00Monster Head|r")
     end)
 
 @compiletime function gen()

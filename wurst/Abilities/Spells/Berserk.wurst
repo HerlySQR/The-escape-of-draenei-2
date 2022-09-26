@@ -3,6 +3,8 @@ package Berserk
 import AbilityData
 
 public constant BERSERK_NL = compiletime(ABIL_ID_GEN.next())
+public constant BERSERK_L = compiletime(ABIL_ID_GEN.next())
+public constant BERSERK_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let DURATION = 8.

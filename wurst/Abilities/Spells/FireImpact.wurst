@@ -3,6 +3,9 @@ package FireImpact
 import AbilityData
 
 public constant FIRE_IMPACT_NL = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_IMPACT_L = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_IMPACT_S = compiletime(ABIL_ID_GEN.next())
+
 constant FIRE_IMPACT_BUFF = compiletime(BUFF_ID_GEN.next())
 constant FIRE_IMPACT_STUN = compiletime(ABIL_ID_GEN.next())
 

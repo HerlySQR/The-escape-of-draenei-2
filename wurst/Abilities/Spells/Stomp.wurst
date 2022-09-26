@@ -3,6 +3,8 @@ package Stomp
 import AbilityData
 
 public constant STOMP_NL = compiletime(ABIL_ID_GEN.next())
+public constant STOMP_L = compiletime(ABIL_ID_GEN.next())
+public constant STOMP_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 12.

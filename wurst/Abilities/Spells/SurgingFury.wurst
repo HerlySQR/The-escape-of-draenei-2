@@ -8,6 +8,7 @@ import UnitIndexer
 public constant SURGING_FURY_NL = compiletime(ABIL_ID_GEN.next())
 public constant SURGING_FURY_L = compiletime(ABIL_ID_GEN.next())
 public constant SURGING_FURY_S = compiletime(ABIL_ID_GEN.next())
+
 constant SURGING_FURY_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

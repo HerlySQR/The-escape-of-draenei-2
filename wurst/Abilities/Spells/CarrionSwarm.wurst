@@ -3,6 +3,8 @@ package CarrionSwarm
 import AbilityData
 
 public constant CARRION_SWARM_NL = compiletime(ABIL_ID_GEN.next())
+public constant CARRION_SWARM_L = compiletime(ABIL_ID_GEN.next())
+public constant CARRION_SWARM_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let RANGE = 700.

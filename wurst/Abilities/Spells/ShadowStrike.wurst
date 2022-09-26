@@ -3,6 +3,8 @@ package ShadowStrike
 import AbilityData
 
 public constant SHADOW_STRIKE_NL = compiletime(ABIL_ID_GEN.next())
+public constant SHADOW_STRIKE_L = compiletime(ABIL_ID_GEN.next())
+public constant SHADOW_STRIKE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let RANGE = 400.

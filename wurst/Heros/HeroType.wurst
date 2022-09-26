@@ -1517,7 +1517,7 @@ init
         ..setSpeedBase(320)
         ..setTurnRate(0.6)
         ..setCollisionSize(32.)
-        ..setUnitSoundSet(Soundsets.hellscream)
+        ..setUnitSoundSet("Grom")
         ..setProperNames("Yozshura")
         ..setName("Axemaster")
 

@@ -67,10 +67,6 @@ public function startMission1()
 
         gameBoard.display(true)
         gameBoard.minimize()
-        forUnitsInRect(Rects.draeneiSpawn, u -> begin
-            if u.getOwner() == DRAENEI
-                u.issueTargetOrderById(Orders.attack, Dests.dungeonDoor1)
-        end)
         if whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_DE_AND_DR
             doAfter(5, () -> begin
                 spawnRun = true

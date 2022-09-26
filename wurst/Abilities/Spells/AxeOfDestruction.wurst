@@ -3,6 +3,9 @@ package AxeOfDestruction
 import AbilityData
 
 public constant AXE_OF_DESTRUCTION_NL = compiletime(ABIL_ID_GEN.next())
+public constant AXE_OF_DESTRUCTION_L = compiletime(ABIL_ID_GEN.next())
+public constant AXE_OF_DESTRUCTION_S = compiletime(ABIL_ID_GEN.next())
+
 constant AXE_OF_DESTRUCTION_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

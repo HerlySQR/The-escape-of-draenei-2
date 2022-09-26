@@ -3,6 +3,8 @@ package FireRay
 import AbilityData
 
 public constant FIRE_RAY_NL = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_RAY_L = compiletime(ABIL_ID_GEN.next())
+public constant FIRE_RAY_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 14.

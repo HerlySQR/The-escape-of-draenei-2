@@ -3,6 +3,8 @@ package FlameStrike
 import AbilityData
 
 public constant FLAME_STRIKE_NL = compiletime(ABIL_ID_GEN.next())
+public constant FLAME_STRIKE_L = compiletime(ABIL_ID_GEN.next())
+public constant FLAME_STRIKE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 21.

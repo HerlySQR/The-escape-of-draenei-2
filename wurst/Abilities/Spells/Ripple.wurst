@@ -7,6 +7,7 @@ import Simulate3dSound
 public constant RIPLE_NL = compiletime(ABIL_ID_GEN.next())
 public constant RIPLE_L = compiletime(ABIL_ID_GEN.next())
 public constant RIPLE_S = compiletime(ABIL_ID_GEN.next())
+
 constant DUMMY_STUN = compiletime(ABIL_ID_GEN.next())
 
 // General

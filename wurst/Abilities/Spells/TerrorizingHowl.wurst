@@ -3,6 +3,8 @@ package TerrorizingHowl
 import AbilityData
 
 public constant TERRORIZING_HOWL_NL = compiletime(ABIL_ID_GEN.next())
+public constant TERRORIZING_HOWL_L = compiletime(ABIL_ID_GEN.next())
+public constant TERRORIZING_HOWL_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 8.

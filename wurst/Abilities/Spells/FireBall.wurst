@@ -5,6 +5,7 @@ import AbilityData
 public constant FIRE_BALL_NL = compiletime(ABIL_ID_GEN.next())
 public constant FIRE_BALL_L = compiletime(ABIL_ID_GEN.next())
 public constant FIRE_BALL_S = compiletime(ABIL_ID_GEN.next())
+
 constant FIRE_BALL_SLOW = compiletime(ABIL_ID_GEN.next())
 constant FIRE_BALL_BUFF = compiletime(BUFF_ID_GEN.next())
 

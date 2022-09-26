@@ -5,6 +5,7 @@ import AbilityData
 public constant PURGE_SOUL_NL = compiletime(ABIL_ID_GEN.next())
 public constant PURGE_SOUL_L = compiletime(ABIL_ID_GEN.next())
 public constant PURGE_SOUL_S = compiletime(ABIL_ID_GEN.next())
+
 constant PURGE_SOUL_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

@@ -4,6 +4,7 @@ import AbilityData
 
 public constant MANA_FLARE_NL = compiletime(ABIL_ID_GEN.next())
 public constant MANA_FLARE_L = compiletime(ABIL_ID_GEN.next())
+
 constant MANA_FLARE_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

@@ -3,6 +3,8 @@ package Cripple
 import AbilityData
 
 public constant CRIPPLE_NL = compiletime(ABIL_ID_GEN.next())
+public constant CRIPPLE_L = compiletime(ABIL_ID_GEN.next())
+public constant CRIPPLE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let RANGE = 600.

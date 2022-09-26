@@ -7,6 +7,7 @@ import DummyDamager
 public constant RAIN_OF_FIRE_NL = compiletime(ABIL_ID_GEN.next())
 public constant RAIN_OF_FIRE_L = compiletime(ABIL_ID_GEN.next())
 public constant RAIN_OF_FIRE_S = compiletime(ABIL_ID_GEN.next())
+
 constant DUMMY_RAIN_OF_FIRE = compiletime(ABIL_ID_GEN.next())
 
 // General

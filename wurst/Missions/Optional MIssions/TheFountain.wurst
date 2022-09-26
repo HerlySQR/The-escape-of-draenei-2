@@ -38,8 +38,9 @@ init
     theyKnowYou[theFountainIndex] = CreateForce()
     disturbed[theFountainIndex] = CreateForce()
 
+    menu = createDialog()
     nullTimer() -> 
-        menu = createDialog()
+        menu.setMessage("Accept the mission?")
         yes = menu.addButton("Yes")
         no = menu.addButton("No")
 
@@ -80,6 +81,7 @@ init
             let p = GetTriggerPlayer()
             if GetClickedButton() == yes
                 string message
+                whoAre.add(p)
                 let t = new Transmission(whoAre, 0)
                 if THE_DRAENEI.has(p)
                     message = "|cffffcc00THE FOUNTAIN|r\n\n"
@@ -100,7 +102,6 @@ init
                 end)
                 t.start()
             else
-                whoAre.remove(p)
                 enter.enable()
         end)
     

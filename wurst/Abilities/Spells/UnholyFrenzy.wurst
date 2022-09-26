@@ -3,6 +3,8 @@ package UnholyFrenzy
 import AbilityData
 
 public constant UNHOLY_FRENZY_NL = compiletime(ABIL_ID_GEN.next())
+public constant UNHOLY_FRENZY_L = compiletime(ABIL_ID_GEN.next())
+public constant UNHOLY_FRENZY_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 1.

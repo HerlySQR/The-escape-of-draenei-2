@@ -3,6 +3,9 @@ package DemonicRain
 import AbilityData
 
 public constant DEMONIC_RAIN_NL = compiletime(ABIL_ID_GEN.next())
+public constant DEMONIC_RAIN_L = compiletime(ABIL_ID_GEN.next())
+public constant DEMONIC_RAIN_S = compiletime(ABIL_ID_GEN.next())
+
 constant DEMONIC_RAIN_BUFF = compiletime(BUFF_ID_GEN.next())
 constant DEMONIC_RAIN_EFF = 'X000'//compiletime(BUFF_ID_GEN.next())
 

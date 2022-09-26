@@ -3,6 +3,9 @@ package SummonWaterElemental
 import AbilityData
 
 public constant SUMMON_WATER_ELEMENTAL_NL = compiletime(ABIL_ID_GEN.next())
+public constant SUMMON_WATER_ELEMENTAL_L = compiletime(ABIL_ID_GEN.next())
+public constant SUMMON_WATER_ELEMENTAL_S = compiletime(ABIL_ID_GEN.next())
+
 constant ELEM_BASH = compiletime(ABIL_ID_GEN.next())
 constant ELEM_ZEST = compiletime(ABIL_ID_GEN.next())
 constant ZEST_BUFF = compiletime(BUFF_ID_GEN.next())

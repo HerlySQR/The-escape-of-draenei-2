@@ -4,6 +4,8 @@ import AbilityData
 import MoveSpeedX
 
 public constant HAMMER_CRUSH_NL = compiletime(ABIL_ID_GEN.next())
+public constant HAMMER_CRUSH_L = compiletime(ABIL_ID_GEN.next())
+public constant HAMMER_CRUSH_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let DURATION = 1.5

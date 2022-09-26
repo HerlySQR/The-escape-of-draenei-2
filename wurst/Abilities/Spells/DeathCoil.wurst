@@ -3,6 +3,8 @@ package DeathCoil
 import AbilityData
 
 public constant DEATH_COIL_NL = compiletime(ABIL_ID_GEN.next())
+public constant DEATH_COIL_L = compiletime(ABIL_ID_GEN.next())
+public constant DEATH_COIL_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 5.

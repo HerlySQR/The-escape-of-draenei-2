@@ -3,6 +3,9 @@ package ScorchingHeat
 import AbilityData
 
 public constant SCORCHING_HEAT_NL = compiletime(ABIL_ID_GEN.next())
+public constant SCORCHING_HEAT_L = compiletime(ABIL_ID_GEN.next())
+public constant SCORCHING_HEAT_S = compiletime(ABIL_ID_GEN.next())
+
 constant SCORCHING_HEAT_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

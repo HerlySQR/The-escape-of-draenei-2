@@ -35,8 +35,9 @@ init
     theyKnowYou[voidTravellerIndex] = CreateForce()
     disturbed[voidTravellerIndex] = CreateForce()
 
+    menu = createDialog()
     nullTimer() -> 
-        menu = createDialog()
+        menu.setMessage("Accept the mission?")
         yes = menu.addButton("Yes")
         no = menu.addButton("No")
 
@@ -72,15 +73,17 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerEnter)
         ..addCondition(isHero)
         ..addAction(() -> begin
+            paralized = GetEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 enter.disable()
-                let p = GetOwningPlayer(paralized)
-                whoAre.add(p)
 
-                paralized = GetEnteringUnit()
+                paralized
                     ..setInvulnerable(true)
                     ..pause()
+                
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
                 mark.destr()
                 mark = null
 
@@ -155,9 +158,9 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerRoom)
         ..addCondition(And(isHero, Condition(() -> not whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
+            let u = GetEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
-                let u = GetEnteringUnit()
                 let face = voidTraveller.getFacingAngle()
                 voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
                 let t = new Transmission(u.getOwner().getForce(), 0)
@@ -201,7 +204,6 @@ init
                 else if typ == FIRE_PICTOGRAM
                     firePictogramPicked = true
                     pings[2].disable()
-                    // TODO pictogram stealed
                     if GetUnitRace(u) == RACE_UNDEAD
                         doAfter(2.) -> 
                             DisplayTextToPlayer(p, 0, 0, "You must be very brave or very foolish to do that.")
@@ -215,11 +217,13 @@ init
             let typ = EventData.getManipulatedItem().getTypeId()
             if typ == EGG
                 message("error", "How cruel it would be to steal an egg without reason.", p)
+                u.issueTargetOrderById(Orders.attack, u)
             else if typ == SKULL
                 message("error", "What do you want to grab that for? You crazy.", p)
+                u.issueTargetOrderById(Orders.attack, u)
             else if typ == FIRE_PICTOGRAM
                 message("error", "Better to leave it there, there is no need to get into unnecessary danger.", p)
-            u.issueTargetOrderById(Orders.attack, u)
+                u.issueTargetOrderById(Orders.attack, u)
     end)
 
     // Killed the mother?
@@ -240,9 +244,9 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerEnter)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
-                let u = EventData.getEnteringUnit()
                 voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
                 if objectsGathered == 3
                     paralized = u..pause()..setInvulnerable(true)
@@ -295,10 +299,11 @@ init
         ..registerRectEnterEventSource(Rects.voidTravellerRoom)
         ..addCondition(isHero)
         ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 let face = voidTraveller.getFacingAngle()
-                let p = EventData.getEnteringUnit().getOwner()
+                let p = u.getOwner()
                 let t = new Transmission(p.getForce(), 0)
                 if whoAre.has(p)
                     t.addLine(voidTraveller, null, "Void Traveller", null, "Oh you are back, do you wanna prove my potion?", TTime.SET, 4., true)

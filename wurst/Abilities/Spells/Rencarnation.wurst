@@ -3,6 +3,7 @@ package Rencarnation
 import AbilityData
 
 public constant REENCARNATION_NL = compiletime(ABIL_ID_GEN.next())
+public constant REENCARNATION_L = compiletime(ABIL_ID_GEN.next())
 
 // General
 // Not leveling

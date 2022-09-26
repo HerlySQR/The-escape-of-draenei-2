@@ -3,6 +3,8 @@ package LigthningShot
 import AbilityData
 
 public constant LIGTHNING_SHOT_NL = compiletime(ABIL_ID_GEN.next())
+public constant LIGTHNING_SHOT_L = compiletime(ABIL_ID_GEN.next())
+public constant LIGTHNING_SHOT_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 7.

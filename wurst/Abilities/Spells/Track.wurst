@@ -3,6 +3,9 @@ package Track
 import AbilityData
 
 public constant TRACK_NL = compiletime(ABIL_ID_GEN.next())
+public constant TRACK_L = compiletime(ABIL_ID_GEN.next())
+public constant TRACK_S = compiletime(ABIL_ID_GEN.next())
+
 constant TRACK_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

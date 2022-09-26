@@ -3,6 +3,7 @@ package CleavingAttack
 import AbilityData
 
 public constant CLEAVE_ATTACK_NL = compiletime(ABIL_ID_GEN.next())
+public constant CLEAVE_ATTACK_L = compiletime(ABIL_ID_GEN.next())
 
 // General
 let AREA = 400.

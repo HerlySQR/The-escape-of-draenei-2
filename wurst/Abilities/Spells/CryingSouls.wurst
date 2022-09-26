@@ -3,6 +3,9 @@ package CryingSouls
 import AbilityData
 
 public constant CRYING_SOULS_NL = compiletime(ABIL_ID_GEN.next())
+public constant CRYING_SOULS_L = compiletime(ABIL_ID_GEN.next())
+public constant CRYING_SOULS_S = compiletime(ABIL_ID_GEN.next())
+
 constant CRYING_SOULS_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

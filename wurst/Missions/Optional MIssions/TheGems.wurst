@@ -90,10 +90,10 @@ init
         let u = EventData.getTriggerUnit()
         let p = u.getOwner()
         if not whoAre.has(p)
-            let typ = EventData.getManipulatedItem().getTypeId()
+            let typ = EventData.getOrderTargetItem().getTypeId()
             if typ == BLOOD_GEM or typ == SKY_GEM or typ == POISON_GEM
                 message("error", "Why should I do that?", p)
-            u.issueTargetOrderById(Orders.attack, u)
+                u.issueTargetOrderById(Orders.attack, u)
     end)
 
     // Pick the gems

@@ -3,6 +3,9 @@ package Incinerate
 import AbilityData
 
 public constant INCINERATE_NL = compiletime(ABIL_ID_GEN.next())
+public constant INCINERATE_L = compiletime(ABIL_ID_GEN.next())
+public constant INCINERATE_S = compiletime(ABIL_ID_GEN.next())
+
 constant INCINERATE_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

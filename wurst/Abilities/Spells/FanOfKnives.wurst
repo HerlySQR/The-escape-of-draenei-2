@@ -3,6 +3,8 @@ package FanOfKnives
 import AbilityData
 
 public constant FAN_OF_KNIVES_NL = compiletime(ABIL_ID_GEN.next())
+public constant FAN_OF_KNIVES_L = compiletime(ABIL_ID_GEN.next())
+public constant FAN_OF_KNIVES_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 13.

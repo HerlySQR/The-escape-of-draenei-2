@@ -77,6 +77,6 @@ public function waitUntil(real tolerance, ConditionClosure condition, ActionClos
                 destroy actions
     end)
 
-/** Runs the actions when the condition returns true, but before the 5 seconds passes, else is discarded.*/
+/** Runs the actions when the condition returns true, but before the 2 seconds passes, else is discarded.*/
 public function waitUntil(ConditionClosure condition, ActionClosure actions)
-    waitUntil(5., condition, actions)
+    waitUntil(2., condition, actions)

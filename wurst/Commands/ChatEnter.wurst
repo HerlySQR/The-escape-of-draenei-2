@@ -26,13 +26,14 @@ init
         ..registerPlayerChatEvent(players[11], "-", false)
         ..addCondition(Condition(() -> GetEventPlayerChatString().substring(0, 1) == "-"))
         .addAction(() -> begin
-            let c = GetEventPlayerChatString().substring(1)
+            var c = GetEventPlayerChatString()
+            let f = c.indexOf(" ")
+            c = c.substring(1, f == -1 ? c.length() : f)
+
             let cb = callbacks.get(c)
 
             if cb != null
-                let f = c.indexOf(" ")
-                let extra = f != -1 ? "" : c.subString(f + 1, c.length())
-                cb.run(GetTriggerPlayer(), extra)
+                cb.run(GetTriggerPlayer(), f == -1 ? "" : c.subString(f + 1, c.length()))
         end)
     
     onChatCommand("clear", (p, _) -> begin

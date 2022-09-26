@@ -2,10 +2,12 @@ package BreathOfFire
 
 import AbilityData
 
-public constant CARRION_SWARM_NL = compiletime(ABIL_ID_GEN.next())
+public constant BREATH_OF_FIRE_NL = compiletime(ABIL_ID_GEN.next())
+public constant BREATH_OF_FIRE_L = compiletime(ABIL_ID_GEN.next())
+public constant BREATH_OF_FIRE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
-let RANGE = 700.
+let RANGE = 700.    
 let DISTANCE = 800.
 let CD = 11.
 let AREA = 150.
@@ -17,7 +19,7 @@ let DMG_NL = 160.
 let MANA_NL = 100
 
 @compiletime function gen()
-    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_NL)
+    new AbilityDefinitionDreadlordCarrionSwarm(BREATH_OF_FIRE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a cone of fire at the enemy units."))
         ..setLevels(2)
         ..presetButtonPosNormal(0, 2)

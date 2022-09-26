@@ -3,6 +3,7 @@ package BrillianceAura
 import AbilityData
 
 public constant BRILLIANCE_AURA_NL = compiletime(ABIL_ID_GEN.next())
+public constant BRILLIANCE_AURA_L = compiletime(ABIL_ID_GEN.next())
 
 // General
 // Not leveling

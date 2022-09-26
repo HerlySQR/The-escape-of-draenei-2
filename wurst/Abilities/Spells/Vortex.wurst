@@ -5,6 +5,9 @@ import AbilityData
 import Fx
 
 public constant VORTEX_NL = compiletime(ABIL_ID_GEN.next())
+public constant VORTEX_L = compiletime(ABIL_ID_GEN.next())
+public constant VORTEX_S = compiletime(ABIL_ID_GEN.next())
+
 constant SHIELD = compiletime(ABIL_ID_GEN.next())
 constant SHIELD_BUFF = compiletime(BUFF_ID_GEN.next())
 

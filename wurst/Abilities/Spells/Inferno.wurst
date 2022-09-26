@@ -3,6 +3,9 @@ package Inferno
 import AbilityData
 
 public constant INFERNO_NL = compiletime(ABIL_ID_GEN.next())
+public constant INFERNO_L = compiletime(ABIL_ID_GEN.next())
+public constant INFERNO_S = compiletime(ABIL_ID_GEN.next())
+
 constant INFERNAL_NL = compiletime(UNIT_ID_GEN.next())
 
 // General

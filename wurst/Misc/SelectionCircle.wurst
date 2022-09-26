@@ -1,0 +1,145 @@
+package SelectionCircle
+
+import Towers
+import DrAndDeSpawn
+import Circles
+
+import ClosureTimers
+import ClosureForGroups
+import RegisterEvents
+import UnitIndexer
+import OnUnitEnterLeave
+import Orders
+
+// Based on SelectionCircle by Aniki https://www.hiveworkshop.com/threads/show-me-the-ranges.299681/#post-3201943
+
+public class SelectionCircle
+    /** SelectionCircle(s) attached to units are updated this frequently*/
+    protected static constant udpateDelay = 0.03125
+    
+    private boolean once = true
+    private string fileName
+    private image img
+    private real radius
+    private colorA col
+    private vec2 pos
+
+    protected CallbackPeriodic cb
+
+    function setRadius(real radius)
+        this.radius = radius
+
+        /* we can't use the check
+         *   if sc.img != null
+         *   because the first image's handle-id is 0 (gj blizzard...)
+         *   and 0 == null :/ */
+        if once
+            once = false
+        else
+            img.remove()
+
+        img = createImage(fileName, pos, 2.*radius, 2.*radius, ImageLayer.L2)
+        img.show()
+        img.setColor(col)
+
+    construct(vec2 pos, real radius, colorA col)
+        this.pos = pos
+        this.col = col
+
+        fileName = "ReplaceableTextures\\Selection\\SelectionCircleLarge.blp"
+        setRadius(radius)
+    
+    ondestroy
+        img.remove()
+        if cb != null
+            destroy cb
+            cb = null
+    
+    function setColor(colorA col)
+        this.col = col
+        img.setColor(col)
+    
+    function setPos(vec2 pos)
+        this.pos = pos
+        img.setPos(pos)
+    
+    function dotted(bool flag)
+        if flag
+            fileName = "ReplaceableTextures\\Selection\\SelectionCircleLargeDotted.blp"
+        else
+            fileName = "ReplaceableTextures\\Selection\\SelectionCircleLarge.blp"
+        setRadius(radius)
+    
+    function show(bool flag)
+        if flag
+            img.show()
+        else
+            img.hide()
+    
+public function unit.attachSelectionCircle(real radius, colorA col) returns SelectionCircle
+    let sc = new SelectionCircle(this.getPos(), radius, col)
+    
+    sc.cb = doPeriodically(SelectionCircle.udpateDelay, cb -> begin
+        if this.isAlive()
+            sc.setPos(this.getPos())
+        else
+            destroy sc
+    end)
+
+    return sc
+
+// Tower ranges
+
+let circleColor = colorA(0, 255, 0, 127)
+SelectionCircle array ranges
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_FINISH, () -> begin
+        let u = GetConstructedStructure()
+        if u.getTypeId() == DRAENEI_TOWER
+            ranges[u.getIndex()] = new SelectionCircle(u.getPos(), 832, circleColor)..show(false)
+    end)
+    onUnitIndex(() -> begin
+        let u = getIndexingUnit()
+        let typ = u.getTypeId()
+        if typ == ADVANCE_DEATH_TOWER or typ == DEMON_TOWER or typ == DEATH_TOWER_1 or typ == DEATH_TOWER_2 or typ == DEATH_TOWER_3
+            real range // *1.66
+            if typ == ADVANCE_DEATH_TOWER or typ == DEMON_TOWER
+                range = 832.
+            else
+                range = 700.
+            ranges[u.getIndex()] = new SelectionCircle(u.getPos(), range, circleColor)..show(false)
+    end)
+
+    // Remove
+    code c = () -> begin
+        let u = GetTriggerUnit()
+        let typ = u.getTypeId()
+        if typ == ADVANCE_DEATH_TOWER or typ == DRAENEI_TOWER or typ == DEMON_TOWER or typ == DEATH_TOWER_1 or typ == DEATH_TOWER_2 or typ == DEATH_TOWER_3
+            let id = u.getIndex()
+            if ranges[id] != null
+                destroy ranges[id]
+                ranges[id] = null
+    end
+    onLeave(c)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, c)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_CHANGE_OWNER, c)
+
+    // Show / Hide
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, () -> begin
+        if GetOrderedUnit().getTypeId() == CIRCLE
+            if GetIssuedOrderId() == Orders.immolation
+                let b = GetOrderedUnit().getOwner() == localPlayer
+                forUnitsAll(u -> begin
+                    if ranges[u.getIndex()] != null
+                        if b
+                            ranges[u.getIndex()].show(true)
+                end)
+            else if GetIssuedOrderId() == Orders.unimmolation
+                let b = GetOrderedUnit().getOwner() == localPlayer
+                forUnitsAll(u -> begin
+                    if ranges[u.getIndex()] != null
+                        if b
+                            ranges[u.getIndex()].show(false)
+                end)
+    end)

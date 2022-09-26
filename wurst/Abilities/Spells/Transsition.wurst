@@ -6,6 +6,9 @@ import PseudoWindWalk
 import LinkedList
 
 public constant TRANSSITION_NL = compiletime(ABIL_ID_GEN.next())
+public constant TRANSSITION_L = compiletime(ABIL_ID_GEN.next())
+public constant TRANSSITION_S = compiletime(ABIL_ID_GEN.next())
+
 constant TRANSSITION_CANCEL = compiletime(ABIL_ID_GEN.next())
 constant TRANSSITION_SHADE = compiletime(UNIT_ID_GEN.next())
 

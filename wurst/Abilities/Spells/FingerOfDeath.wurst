@@ -3,6 +3,8 @@ package FingerOfDeath
 import AbilityData
 
 public constant FINGER_OF_DEATH_NL = compiletime(ABIL_ID_GEN.next())
+public constant FINGER_OF_DEATH_L = compiletime(ABIL_ID_GEN.next())
+public constant FINGER_OF_DEATH_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 25.

@@ -6,6 +6,7 @@ import MoveSpeedX
 public constant QUELL_NL = compiletime(ABIL_ID_GEN.next())
 public constant QUELL_L = compiletime(ABIL_ID_GEN.next())
 public constant QUELL_S = compiletime(ABIL_ID_GEN.next())
+
 constant QUELL_BUFF = compiletime(createDummyBuffObject("Quell", "This unit is quelled: its movement speed has been reduced.", Imports.bTNANA_HolyEnergy))
 
 // General

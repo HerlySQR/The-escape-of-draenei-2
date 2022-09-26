@@ -2,7 +2,7 @@ package AssassinMastery
 
 import AbilityData
 
-public constant ASSASSIN_MASTERY_ID = compiletime(ABIL_ID_GEN.next())
+public constant ASSASSIN_MASTERY = compiletime(ABIL_ID_GEN.next())
 constant ASSASSIN_MASTERY_BUFF = compiletime(BUFF_ID_GEN.next())
 constant DUMMY_EVASION = compiletime(ABIL_ID_GEN.next())
 
@@ -11,7 +11,7 @@ let CD = 16.
 let MANA = 45
 
 init
-    registerSpellEffectEvent(ASSASSIN_MASTERY_ID, () -> begin
+    registerSpellEffectEvent(ASSASSIN_MASTERY, () -> begin
         let caster = GetSpellAbilityUnit()
         caster.addAbility(DUMMY_EVASION)
         doAfter(compiletime(DURATION + 0.01)) -> 
@@ -20,7 +20,7 @@ init
     end)
 
 @compiletime function gen()
-    new AbilityDefinitionBerserk(ASSASSIN_MASTERY_ID)
+    new AbilityDefinitionBerserk(ASSASSIN_MASTERY)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the Assassin's concentration making him evade all physical attacks he receives."))
         ..setLevels(1)
         ..presetButtonPosNormal(2, 1)

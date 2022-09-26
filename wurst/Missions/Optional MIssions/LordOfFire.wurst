@@ -31,8 +31,9 @@ init
     theyKnowYou[lordOfFireIndex] = CreateForce()
     disturbed[lordOfFireIndex] = CreateForce()
 
+    menu = createDialog()
     nullTimer() -> 
-        menu = createDialog()
+        menu.setMessage("Accept the mission?")
         yes = menu.addButton("Yes")
         no = menu.addButton("No")
 
@@ -49,7 +50,7 @@ init
         menu.display(localPlayer, false)
         returning.disable()
         getKills.disable()
-        returningAfter.disable()
+        returningAfter.enable()
         for i = 1 to 10
             youKilledHim[i] = false
         if table != null
@@ -72,17 +73,19 @@ init
 
     enter = CreateTrigger()
         ..registerRectEnterEventSource(Rects.lordOfFireEnter)
-        ..addCondition(cond)
+        ..addCondition(And(cond, Condition(() -> THE_DEMONS.has(EventData.getEnteringUnit().getOwner()))))
         ..addAction(() -> begin
+            paralized = GetEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 enter.disable()
-                let p = GetOwningPlayer(paralized)
-                whoAre.add(p)
 
-                paralized = GetEnteringUnit()
+                paralized
                     ..setInvulnerable(true)
                     ..pause()
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
+                
                 mark.destr()
                 mark = null
 
@@ -132,7 +135,6 @@ init
                                                                     + "-Get 5 Hero kills.\n"
                                                                     + "-Back with the Lord of Fire.\n")
                     returning.enable()
-                    returningAfter.enable()
                     getKills.enable()
 
                     table = CreateLeaderboardBJ(whoAre, "")
@@ -183,6 +185,7 @@ init
                 kills++
                 LeaderboardSetPlayerItemValueBJ(p, table, kills)
                 if kills == 5
+                    message("success", "Mission Objective Completed", p)
                     DestroyLeaderboard(table)
                     table = null
                     getKills.disable()
@@ -194,9 +197,9 @@ init
         ..registerRectEnterEventSource(Rects.lordOfFireEnter)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            waitUntil(() -> not inDialog) -> 
+            let u = EventData.getEnteringUnit()
+            waitUntil(() -> not inDialog) ->
                 inDialog = true
-                let u = EventData.getEnteringUnit()
                 let face = lordOfFire.getFacingAngle()
                 paralized = u
                 lordOfFire.setFacing(lordOfFire.getPos().angleTo(u.getPos()))
@@ -242,14 +245,13 @@ init
     
     // Returning after completing the mission
     returningAfter = CreateTrigger()
-        ..disable()
         ..registerRectEnterEventSource(Rects.lordOfFireRoom)
-        ..addCondition(cond)
+        ..addCondition(And(cond, Condition(() -> not whoAre.has(EventData.getEnteringUnit()) or not returning.isEnabled())))
         ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 let face = lordOfFire.getFacingAngle()
-                let u = EventData.getEnteringUnit()
                 let p = u.getOwner()
 
                 if draeneiSaw < 3
@@ -267,7 +269,7 @@ init
                                     doAfter(2.) ->
                                         t.getTargetForce().clear()
                         end
-                        if whoAre.has(p) and not returning.isEnabled()
+                        if whoAre.has(p)
                             t.addLine(lordOfFire, null, "Lord of Fire", null, "Hey go back, I won't give more incentives.", TTime.SET, 3.5, true)
                             t.addActions(actions)
                             if firePictogramPicked

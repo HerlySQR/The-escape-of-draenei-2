@@ -3,6 +3,7 @@ package HardenedSkin
 import AbilityData
 
 public constant HARDENED_SKIN_NL = compiletime(ABIL_ID_GEN.next())
+public constant HARDENED_SKIN_L = compiletime(ABIL_ID_GEN.next())
 
 // General
 let TARGETS = "enemy,ally"

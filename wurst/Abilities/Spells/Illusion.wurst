@@ -3,6 +3,8 @@ package Illusion
 import AbilityData
 
 public constant ILLUSION_NL = compiletime(ABIL_ID_GEN.next())
+public constant ILLUSION_L = compiletime(ABIL_ID_GEN.next())
+public constant ILLUSION_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 50.

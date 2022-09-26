@@ -3,6 +3,8 @@ package InnerFire
 import AbilityData
 
 public constant INNER_FIRE_NL = compiletime(ABIL_ID_GEN.next())
+public constant INNER_FIRE_L = compiletime(ABIL_ID_GEN.next())
+public constant INNER_FIRE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 5.

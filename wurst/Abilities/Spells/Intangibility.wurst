@@ -7,6 +7,9 @@ import PlayerData
 import Execute
 
 public constant INTANGIBILITY_NL = compiletime(ABIL_ID_GEN.next())
+public constant INTANGIBILITY_L = compiletime(ABIL_ID_GEN.next())
+public constant INTANGIBILITY_S = compiletime(ABIL_ID_GEN.next())
+
 constant INTANGIBILITY_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

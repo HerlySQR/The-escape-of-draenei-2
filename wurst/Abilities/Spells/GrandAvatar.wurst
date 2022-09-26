@@ -3,6 +3,8 @@ package GrandAvatar
 import AbilityData
 
 public constant GRAND_AVATAR_NL = compiletime(ABIL_ID_GEN.next())
+public constant GRAND_AVATAR_L = compiletime(ABIL_ID_GEN.next())
+public constant GRAND_AVATAR_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 75.

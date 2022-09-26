@@ -13,7 +13,7 @@ public trigger destroyDoor = CreateTrigger()
 
 init
     onModesSelected(() -> begin
-        doAfter(5.) -> 
+        doAfter(5.) ->
             forUnitsInRect(Rects.draeneiSpawn, u -> begin
                 u.issueTargetOrderById(Orders.attack, Dests.dungeonDoor1)
             end)

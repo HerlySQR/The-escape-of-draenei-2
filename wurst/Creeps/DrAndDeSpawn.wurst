@@ -107,7 +107,7 @@ init
 
     // Create the draenei warriors
     for i = 0 to 2
-        createUnit(DRAENEI, DRAENEI_WARRIOR[0], Rects.draeneiWarrior[i].getCenter(), GetRandomReal(0, PI2).asAngleRadians())
+        createUnit(DRAENEI, DRAENEI_WARRIOR[0], Rects.draeneiWarrior[i].getCenter(), GetRandomReal(0, 360).asAngleDegrees())
     
     // Create the chaos grunts
     for i = 0 to 2

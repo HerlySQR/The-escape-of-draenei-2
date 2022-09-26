@@ -4,6 +4,10 @@ import AbilityData
 
 public constant LIQUID_FIRE_ACT_NL = compiletime(ABIL_ID_GEN.next())
 public constant LIQUID_FIRE_PAS_NL = compiletime(ABIL_ID_GEN.next())
+public constant LIQUID_FIRE_ACT_L = compiletime(ABIL_ID_GEN.next())
+public constant LIQUID_FIRE_PAS_L = compiletime(ABIL_ID_GEN.next())
+public constant LIQUID_FIRE_ACT_S = compiletime(ABIL_ID_GEN.next())
+
 constant LIQUID_FIRE_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General

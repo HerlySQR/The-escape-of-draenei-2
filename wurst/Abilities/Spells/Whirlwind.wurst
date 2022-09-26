@@ -3,6 +3,8 @@ package Whirlwind
 import AbilityData
 
 public constant WHIRLWIND_NL = compiletime(ABIL_ID_GEN.next())
+public constant WHIRLWIND_L = compiletime(ABIL_ID_GEN.next())
+public constant WHIRLWIND_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let TARGETS = "ground,structure,debris,enemy,neutral"

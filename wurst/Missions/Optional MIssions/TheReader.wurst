@@ -29,8 +29,9 @@ init
     theyKnowYou[theReaderIndex] = CreateForce()
     disturbed[theReaderIndex] = CreateForce()
 
+    menu = createDialog()
     nullTimer() -> 
-        menu = createDialog()
+        menu.setMessage("Accept the mission?")
         yes = menu.addButton("Yes")
         no = menu.addButton("No")
 
@@ -59,15 +60,17 @@ init
         ..registerRectEnterEventSource(Rects.theReaderEnter)
         ..addCondition(isHero)
         ..addAction(() -> begin
+            paralized = GetEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 enter.disable()
-                let p = GetOwningPlayer(paralized)
-                whoAre.add(p)
 
-                paralized = GetEnteringUnit()
+                paralized
                     ..setInvulnerable(true)
                     ..pause()
+                
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
                 mark.destr()
                 mark = null
 
@@ -143,9 +146,9 @@ init
         ..registerRectEnterEventSource(Rects.theReaderRoom)
         ..addCondition(And(isHero, Condition(() -> not whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
+            let u = GetEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
-                let u = GetEnteringUnit()
                 let face = theReader.getFacingAngle()
                 theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
                 let t = new Transmission(u.getOwner().getForce(), 0)
@@ -184,9 +187,9 @@ init
         ..registerRectEnterEventSource(Rects.theReaderEnter)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
-                let u = EventData.getEnteringUnit()
                 theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
                 if objectGathered
                     paralized = u..pause()..setInvulnerable(true)
@@ -247,10 +250,10 @@ init
         ..registerRectEnterEventSource(Rects.theReaderRoom)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 let face = theReader.getFacingAngle()
-                let u = EventData.getEnteringUnit()
                 let p = u.getOwner()
                 let t = new Transmission(p.getForce(), 0)
                 TransmissionCallback actions = () -> begin

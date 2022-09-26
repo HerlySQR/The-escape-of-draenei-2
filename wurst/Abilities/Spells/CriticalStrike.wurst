@@ -3,6 +3,7 @@ package CriticalStrike
 import AbilityData
 
 public constant CRITICAL_STRIKE_NL = compiletime(ABIL_ID_GEN.next())
+public constant CRITICAL_STRIKE_L = compiletime(ABIL_ID_GEN.next())
 
 // General
 // Not leveling

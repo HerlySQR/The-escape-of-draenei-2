@@ -3,6 +3,8 @@ package SwordDance
 import AbilityData
 
 public constant SWORD_DANCE_NL = compiletime(ABIL_ID_GEN.next())
+public constant SWORD_DANCE_L = compiletime(ABIL_ID_GEN.next())
+public constant SWORD_DANCE_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 15.

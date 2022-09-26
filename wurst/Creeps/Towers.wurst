@@ -271,6 +271,7 @@ init
             DamageEvent.setAmount(0.)
     end)
 
+
 @compiletime function gen()
     new UnitDefinition(DRAENEI_WORKER, 'ndrl')
         ..setAttacksEnabled(0)

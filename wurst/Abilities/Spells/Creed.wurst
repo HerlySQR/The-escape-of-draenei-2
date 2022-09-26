@@ -5,6 +5,8 @@ import MoveSpeedX
 import UnitIndexer
 
 public constant CREED_NL = compiletime(ABIL_ID_GEN.next())
+public constant CREED_L = compiletime(ABIL_ID_GEN.next())
+
 constant CREED_BUFF = compiletime(createDummyBuffObject("Creed", "This unit is slowed: its movement speed has been reduced.", Imports.bTNSickle))
 
 // General

@@ -3,6 +3,8 @@ package Command
 import AbilityData
 
 public constant COMMAND_NL = compiletime(ABIL_ID_GEN.next())
+public constant COMMAND_L = compiletime(ABIL_ID_GEN.next())
+
 constant COMMAND_AURA = compiletime(ABIL_ID_GEN.next())
 constant COMMAND_BUFF = compiletime(BUFF_ID_GEN.next())
 

@@ -8,6 +8,7 @@ import UnitIndexer
 public constant MONSOON_NL = compiletime(ABIL_ID_GEN.next())
 public constant MONSOON_L = compiletime(ABIL_ID_GEN.next())
 public constant MONSOON_S = compiletime(ABIL_ID_GEN.next())
+
 constant DUMMY_MONSOON = compiletime(ABIL_ID_GEN.next())
 constant MONSOON_EFFECT = compiletime(BUFF_ID_GEN.next())
 

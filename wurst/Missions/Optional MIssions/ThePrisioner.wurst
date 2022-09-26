@@ -27,8 +27,9 @@ init
     theyKnowYou[thePrisonerIndex] = CreateForce()
     disturbed[thePrisonerIndex] = CreateForce()
 
+    menu = createDialog()
     nullTimer() -> 
-        menu = createDialog()
+        menu.setMessage("Accept the mission?")
         yes = menu.addButton("Yes")
         no = menu.addButton("No")
 
@@ -45,7 +46,6 @@ init
         menu.display(localPlayer, false)
         returning.disable()
         getKills.disable()
-        returningAfter.disable()
         for i = 1 to 10
             youKilledHim[i] = false
         if table != null
@@ -57,17 +57,20 @@ init
 
     enter = CreateTrigger()
         ..registerRectEnterEventSource(Rects.thePrisoner)
-        ..addCondition(cond)
+        ..addCondition(And(cond, Condition(() -> THE_DRAENEI.has(EventData.getEnteringUnit().getOwner()))))
         ..addAction(() -> begin
+            paralized = GetEnteringUnit()
+
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 enter.disable()
-                let p = GetOwningPlayer(paralized)
-                whoAre.add(p)
 
-                paralized = GetEnteringUnit()
+                paralized
                     ..setInvulnerable(true)
                     ..pause()
+                
+                let p = GetOwningPlayer(paralized)
+                whoAre.add(p)
                 mark.destr()
                 mark = null
 
@@ -130,7 +133,6 @@ init
                                                                     + "-Get 5 Hero kills.\n"
                                                                     + "-Back with the prisioner.\n")
                     returning.enable()
-                    returningAfter.enable()
                     getKills.enable()
 
                     table = CreateLeaderboardBJ(whoAre, "")
@@ -178,6 +180,7 @@ init
                 kills++
                 LeaderboardSetPlayerItemValueBJ(p, table, kills)
                 if kills == 5
+                    message("success", "Mission Objective Completed", p)
                     DestroyLeaderboard(table)
                     table = null
                     getKills.disable()
@@ -189,9 +192,9 @@ init
         ..registerRectEnterEventSource(Rects.thePrisoner)
         ..addCondition(And(isHero, Condition(() -> whoAre.has(GetEnteringUnit()))))
         ..addAction(() -> begin
-            waitUntil(() -> not inDialog) -> 
+            let u = EventData.getEnteringUnit()
+            waitUntil(() -> not inDialog) ->
                 inDialog = true
-                let u = EventData.getEnteringUnit()
                 let face = thePrisoner.getFacingAngle()
                 paralized = u
                 thePrisoner.setFacing(thePrisoner.getPos().angleTo(u.getPos()))
@@ -210,7 +213,7 @@ init
                                                                         + "Proving yourself\n")
                     end
                     t.addActions(2., first)
-                    t.addLine(thePrisoner, null, "Prisoner", null, "Now go to give to the demons That they deserve!", TTime.SET, 5., true)
+                    t.addLine(thePrisoner, null, "Prisoner", null, "Now go to give to the demons what they deserve!", TTime.SET, 5., true)
                     t.addEnd(() -> begin
                         paralized..unpause().setInvulnerable(false)
                         thePrisonerQuest.complete(true)
@@ -235,14 +238,13 @@ init
     
     // Returning after completing the mission
     returningAfter = CreateTrigger()
-        ..disable()
         ..registerRectEnterEventSource(Rects.thePrisoner)
-        ..addCondition(cond)
+        ..addCondition(And(cond, Condition(() -> not whoAre.has(EventData.getEnteringUnit()) or not returning.isEnabled())))
         ..addAction(() -> begin
+            let u = EventData.getEnteringUnit()
             waitUntil(() -> not inDialog) -> 
                 inDialog = true
                 let face = thePrisoner.getFacingAngle()
-                let u = EventData.getEnteringUnit()
                 let p = u.getOwner()
 
                 thePrisoner.setFacing(thePrisoner.getPos().angleTo(u.getPos()))
@@ -253,7 +255,7 @@ init
                         t.getTargetForce().clear()
                 end
                 if THE_DRAENEI.has(p)
-                    if whoAre.has(p) and not returning.isEnabled()
+                    if whoAre.has(p)
                         if lordOfFirePissed
                             t.addLine(thePrisoner, null, "Prisoner", null, "I think you pissed off the Fire Lord.", TTime.SET, 3.5, true)
                             t.addActions(actions)

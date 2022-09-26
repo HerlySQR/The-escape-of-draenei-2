@@ -3,6 +3,9 @@ package DisableSphere
 import AbilityData
 
 public constant DISABLE_SPHERE_NL = compiletime(ABIL_ID_GEN.next())
+public constant DISABLE_SPHERE_L = compiletime(ABIL_ID_GEN.next())
+public constant DISABLE_SPHERE_S = compiletime(ABIL_ID_GEN.next())
+
 constant DISABLE_SPHERE_SILENCE = compiletime(ABIL_ID_GEN.next())
 constant DISABLE_SPHERE_BUFF = compiletime(BUFF_ID_GEN.next())
 

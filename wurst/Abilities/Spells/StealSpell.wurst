@@ -1,0 +1,213 @@
+package StealSpell
+
+import AbilityData
+import initlater HeroSpells
+import ExtraSpells
+
+import Execute
+
+public constant STEAL_SPELL_NL = compiletime(ABIL_ID_GEN.next())
+public constant STEAL_SPELL_L = compiletime(ABIL_ID_GEN.next())
+
+// General
+let DURATION = [180., 240.]
+// Not leveling
+// Leveling
+
+let lastSpell = new HashMap<unit, int>()
+let stealSpell = new HashMap<unit, int>()
+let timerMap = new HashMap<unit, CallbackSingle>()
+
+let tailMaxLenghtSq = 400..pow(2)
+let tailSpeed = 600. * INTERVAL
+let tailMinCasterDistSq = 50..pow(2)
+
+init
+    gg_unit_Obla_0027.addAbility(STEAL_SPELL_NL)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(STEAL_SPELL_NL, STEAL_SPELL_L, 0)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            let target = GetSpellTargetUnit()
+            if caster.getTypeId() == target.getTypeId()
+                message("error", "Wait, Why?", caster.getOwner())
+            else
+                let duration = DURATION[data.lvl]
+                // Create the tail
+                var head = target.getPos()
+                var rear = head
+                var reached = false
+                let tail = addLightning(LIGHTNING_HEALING_WAWE_PRIMARY, true, head, rear)
+                addEffect(Abilities.darkRitualTarget, target, "origin").destroyAfter(compiletime(SquareRoot(tailMaxLenghtSq)/tailSpeed))
+                effect eff2 = null
+                tail.setColor(color(216, 0, 255))
+
+                // Move the tail
+                doPeriodically(INTERVAL, cb -> begin
+                    if head.distanceToSq(caster.getPos()) >= tailMinCasterDistSq
+                        head = head.moveTowards(caster.getPos(), tailSpeed)
+                        if head.distanceToSq(rear) >= tailMaxLenghtSq
+                            rear = rear.moveTowards(head, tailSpeed)
+                        else
+                            rear = target.getPos()
+                    else
+                        if not reached
+                            reached = true
+                            eff2 = addEffect(Abilities.darkRitualCaster, caster, "origin")
+                        head = caster.getPos()
+                        rear = rear.moveTowards(head, tailSpeed)
+                    
+                    tail.move(true, head, rear)
+
+                    // The tail reached completly the caster
+                    if reached and rear.distanceToSq(head) <= tailMinCasterDistSq
+                        tail.destr()
+                        eff2.destr()
+                        destroy cb
+
+                        let spellNew = lastSpell.get(target)
+                        
+                        if spellNew != 0
+                            let spellOld = stealSpell.get(caster)
+                            if spellOld != 0
+                                caster.removeAbility(spellOld)
+                            
+                            caster.addAbility(spellNew)
+                            stealSpell.put(caster, spellNew)
+
+                            try(() -> destroy timerMap.get(caster))
+                            timerMap.put(caster, doAfter(duration, () -> begin
+                                caster.removeAbility(spellNew)
+                                stealSpell.remove(caster)
+                            end))
+                end)
+    end)
+
+int array baseSpellNL
+int array baseSpellL
+int array stealedSpell
+
+var total = 0
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if GetSpellAbilityUnit().isType(UNIT_TYPE_HERO)
+            let id = GetSpellAbilityId()
+            for i = 0 to total
+                if id == baseSpellNL[i] or id == baseSpellL[i]
+                    lastSpell.put(GetSpellAbilityUnit(), stealedSpell[i])
+                    break
+    end)
+
+function initSpell(int baseNL, int baseL, int stealed)
+    stealedSpell[total] = stealed
+    baseSpellNL[total] = baseNL
+    baseSpellL[total] = baseL
+    total++
+
+function initSpell(int extra)
+    stealedSpell[total] = extra
+    baseSpellNL[total] = extra
+    baseSpellL[total] = extra
+    total++
+
+init
+    initSpell(ANIMAL_FORCE_NL, ANIMAL_FORCE_L, ANIMAL_FORCE_S)
+    initSpell(AXE_OF_DESTRUCTION_NL, AXE_OF_DESTRUCTION_L, AXE_OF_DESTRUCTION_S)
+    initSpell(BERSERK_NL, BERSERK_L, BERSERK_S)
+    initSpell(BREATH_OF_FIRE_NL, BREATH_OF_FIRE_L, BREATH_OF_FIRE_S)
+    initSpell(BURN_SOUL_NL, BURN_SOUL_L, BURN_SOUL_S)
+    initSpell(CARRION_SWARM_NL, CARRION_SWARM_L, CARRION_SWARM_S)
+    initSpell(CHARGE_NL, CHARGE_L, CHARGE_S)
+    initSpell(CRYING_SOULS_NL, CRYING_SOULS_L, CRYING_SOULS_S)
+    initSpell(DARK_SUMMONING_NL, DARK_SUMMONING_L, DARK_SUMMONING_S)
+    initSpell(DEATH_COIL_NL, DEATH_COIL_L, DEATH_COIL_S)
+    initSpell(DEMONIC_RAIN_NL, DEMONIC_RAIN_L, DEMONIC_RAIN_S)
+    initSpell(DISABLE_SPHERE_NL, BURN_SOUL_L, BURN_SOUL_S)
+    initSpell(EARTHQUAKE_NL, EARTHQUAKE_L, EARTHQUAKE_S)
+    initSpell(ENSNARE_NL, ENSNARE_L, ENSNARE_S)
+    initSpell(EXPLOSIVE_FLARES_NL, EXPLOSIVE_FLARES_L, EXPLOSIVE_FLARES_S)
+    initSpell(FAN_OF_KNIVES_NL, FAN_OF_KNIVES_L, FAN_OF_KNIVES_S)
+    initSpell(FAST_CUT_NL, FAST_CUT_L, FAST_CUT_S)
+    initSpell(FINGER_OF_DEATH_NL, FINGER_OF_DEATH_L, FINGER_OF_DEATH_S)
+    initSpell(FIRE_BALL_NL, FIRE_BALL_L, FIRE_BALL_S)
+    initSpell(FIRE_BLAST_NL, FIRE_BALL_L, FIRE_BLAST_S)
+    initSpell(FIRE_IMPACT_NL, FIRE_IMPACT_L, FIRE_IMPACT_S)
+    initSpell(FIRE_RAY_NL, FIRE_RAY_L, FIRE_RAY_S)
+    initSpell(FIRE_STORM_NL, FIRE_STORM_L, FIRE_STORM_S)
+    initSpell(FLAME_STRIKE_NL, FLAME_STRIKE_L, FLAME_STRIKE_S)
+    initSpell(GRAND_AVATAR_NL, GRAND_AVATAR_L, GRAND_AVATAR_S)
+    initSpell(HAMMER_CRUSH_NL, HAMMER_CRUSH_L, HAMMER_CRUSH_S)
+    initSpell(HOLY_LIGHT_NL, HOLY_LIGHT_L, HOLY_LIGHT_S)
+    initSpell(HOWL_OF_TERROR_NL, HOWL_OF_TERROR_L, HOWL_OF_TERROR_S)
+    initSpell(ILLUSION_NL, ILLUSION_L, ILLUSION_S)
+    initSpell(INCINERATE_NL, INCINERATE_L, INCINERATE_S)
+    initSpell(INFERNO_NL, INFERNO_L, INFERNO_S)
+    initSpell(INNER_FIRE_NL, INNER_FIRE_L, INNER_FIRE_S)
+    initSpell(INSTILL_FEAR_NL, INSTILL_FEAR_L, INSTILL_FEAR_S)
+    initSpell(INTANGIBILITY_NL, INTANGIBILITY_NL, INTANGIBILITY_S)
+    initSpell(LIGHTNING_SKIRT_NL, LIGHTNING_SKIRT_L, LIGHTNING_SKIRT_S)
+    initSpell(LIGTHNING_SHOT_NL, LIGTHNING_SHOT_L, LIGTHNING_SHOT_S)
+    initSpell(LIQUID_FIRE_ACT_NL, LIQUID_FIRE_ACT_L, LIQUID_FIRE_ACT_S)
+    initSpell(MAGIC_CHAINS_PULL_NL, MAGIC_CHAINS_PULL_L, MAGIC_CHAINS_PULL_S)
+    initSpell(MAGIC_CHAINS_GRASP_NL, MAGIC_CHAINS_GRASP_L, MAGIC_CHAINS_GRASP_S)
+    initSpell(MONSOON_NL, MONSOON_L, MONSOON_S)
+    initSpell(PORTAL_NL, PORTAL_L, PORTAL_S)
+    initSpell(POWER_OF_LIGHT_NL, POWER_OF_LIGHT_L, POWER_OF_LIGHT_S)
+    initSpell(PULSE_NOVA_NL, PULSE_NOVA_L, PULSE_NOVA_S)
+    initSpell(PURGE_SOUL_NL, PURGE_SOUL_L, PURGE_SOUL_S)
+    initSpell(QUELL_NL, QUELL_L, QUELL_S)
+    initSpell(RAIN_OF_FIRE_NL, RAIN_OF_FIRE_L, RAIN_OF_FIRE_S)
+    initSpell(RETRIBUTION_NL, RETRIBUTION_L, RETRIBUTION_S)
+    initSpell(RIPLE_NL, RIPLE_L, RIPLE_S)
+    initSpell(SHADOW_STRIKE_NL, SHADOW_STRIKE_L, SHADOW_STRIKE_S)
+    initSpell(SPARKY_EXPLOSIONS_NL, SPARKY_EXPLOSIONS_L, SPARKY_EXPLOSIONS_S)
+    initSpell(STEALTH_NL, STEALTH_L, STEALTH_S)
+    initSpell(STOMP_NL, STOMP_L, STOMP_S)
+    initSpell(SUMMON_WATER_ELEMENTAL_NL, SUMMON_WATER_ELEMENTAL_L, SUMMON_WATER_ELEMENTAL_S)
+    initSpell(SURGING_FURY_NL, SURGING_FURY_L, SURGING_FURY_S)
+    initSpell(SWORD_DANCE_NL, SWORD_DANCE_L, SWORD_DANCE_S)
+    initSpell(TERRORIZING_HOWL_NL, TERRORIZING_HOWL_L, TERRORIZING_HOWL_S)
+    initSpell(THROW_AXES_NL, THROW_AXES_L, THROW_AXES_S)
+    initSpell(THUNDER_BOLT_NL, THUNDER_BOLT_L, THUNDER_BOLT_S)
+    initSpell(THUNDER_CLAP_NL, THUNDER_CLAP_L, THUNDER_CLAP_S)
+    initSpell(THUNDER_STORM_NL, THUNDER_STORM_L, THUNDER_STORM_S)
+    initSpell(TOTAL_FREEZE_NL, TOTAL_FREEZE_L, TOTAL_FREEZE_S)
+    initSpell(TRACK_NL, TRACK_L, TRACK_S)
+    initSpell(TRANSSITION_NL, TRANSSITION_L, TRANSSITION_S)
+    initSpell(UNHOLY_FRENZY_NL, UNHOLY_FRENZY_L, UNHOLY_FRENZY_S)
+    initSpell(VORTEX_NL, VORTEX_L, VORTEX_S)
+    initSpell(WHIRLWIND_NL, WHIRLWIND_L, WHIRLWIND_S)
+    initSpell(WILD_ATTACK_NL, WILD_ATTACK_L, WILD_ATTACK_S)
+    initSpell(ASSASSIN_MASTERY)
+    initSpell(BANISH)
+    initSpell(CONSUME_LIFE_AND_MANA_ID)
+    initSpell(CURSE)
+    initSpell(FAR_SIGHT)
+    initSpell(UNHOLY_AURA)
+    initSpell(VAMPIRIC_AURA)
+
+function ChannelAbilityPreset.general()
+    this.presetBaseOrderID(lvl -> "steal")
+    this.presetOption(Option.VISIBLE, true)
+    this.presetButtonPosNormal(3, 2)
+    this.presetFollowThroughTime(lvl -> 0.75)
+    this.tooltipStartListen()
+    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Steal Spell")
+    this.presetTargetTypes(Targettype.UNIT)
+    this.presetCooldown(lvl -> 0)
+    this.presetTargetsAllowed(lvl -> "air,enemies,hero,invulnerable,neutral,notself,ground,vulnerable")
+    // Audiovisual
+    this.presetIcon(Imports.bTNStrands)
+    // Tooltip
+
+@compiletime function gen()
+    new ChannelAbilityPreset(STEAL_SPELL_NL, 1, true, new AbilityTooltipGenerator("The vindicator takes part of the essence of an enemy hero and studies it, learning its secrets and learning the last ability it casted. You can use it for " + (DURATION[0]/60).toInt().toString() + " minutes or until he dies."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION[lvl])
+        ..presetManaCost(lvl -> 0)
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Steal Spell")
