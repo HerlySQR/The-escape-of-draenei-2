@@ -13,15 +13,22 @@ let AREA = 700.
 let DMG_FACTOR_CHARGE = 0.05
 let CHARGE_DURATION = 10
 // Not leveling
-let MAX_CHARGES_NL = 6
+let MAX_CHARGES_NL = [6, 12]
+// Leveling
+let MAX_CHARGES_L = [4, 8, 12, 16]
 // Internal
 let chargeMap = new HashMap<unit, int>()
 
 init
     DamageEvent.addListener(() -> begin
-        let lvl = DamageEvent.getSource().getAbilityLevel(COMMAND_NL)
-        if lvl > 0
+        let data = DamageEvent.getSource().pasAbilityCond(COMMAND_NL, COMMAND_L)
+        if data.check
             let master = DamageEvent.getSource()
+            int maxCharges
+            if data.isNL
+                maxCharges = MAX_CHARGES_NL[data.lvl]
+            else
+                maxCharges = MAX_CHARGES_L[data.lvl]
             chargeMap.put(master, CHARGE_DURATION)
             if not master.hasAbility(COMMAND_AURA)
                 master.addAbility(COMMAND_AURA)
@@ -42,16 +49,12 @@ init
                         chargeMap.remove(master)
                         destroy cb
                 end)
-            else if master.getAbilityLevel(COMMAND_AURA) < MAX_CHARGES_NL
+            else if master.getAbilityLevel(COMMAND_AURA) < maxCharges
                 master.setAbilityLevel(COMMAND_AURA, master.getAbilityLevel(COMMAND_AURA) + 1)
     end)
 
-@compiletime function gen()
-    new AbilityDefinitionHardenedSkin(COMMAND_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The command of the Axemaster grows when he evidence his power, each time he attacks the Axemaster creates an aura of damage that increases by " + (DMG_FACTOR_CHARGE * 100.).toString(0) + "% with each attack.\nThe charges loses after " + CHARGE_DURATION.toString() + " seconds."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(2, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionHardenedSkin.general()
+    this
         ..presetIgnoredDamage(lvl -> 0.)
         ..presetMinimumDamage(lvl -> 0.)
         ..presetChancetoReduceDamage(lvl -> 0.)
@@ -61,10 +64,33 @@ init
         ..tooltipStartListen()
         ..setName("Command")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
-        // Stats
-        ..addTooltipProperty("Max charges", lvl -> MAX_CHARGES_NL)
-        // Audiovisual
         ..presetIcon(Imports.pASHellscreamBerserk)
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(COMMAND_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The command of the Axemaster grows when he evidence his power, each time he attacks the Axemaster creates an aura of damage that increases by " + (DMG_FACTOR_CHARGE * 100.).toString(0) + "% with each attack.\nThe charges loses after " + CHARGE_DURATION.toString() + " seconds."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Max charges", lvl -> MAX_CHARGES_NL[lvl-1])
+        // Audiovisual
+        // Tooltip
+        .tooltipStopListen()
+    
+    new AbilityDefinitionHardenedSkin(COMMAND_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The command of the Axemaster grows when he evidence his power, each time he attacks the Axemaster creates an aura of damage that increases by " + (DMG_FACTOR_CHARGE * 100.).toString(0) + "% with each attack.\nThe charges loses after " + CHARGE_DURATION.toString() + " seconds."))
+        ..setLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..setIconResearch(Imports.bTNHellscreamBerserk)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Max charges", lvl -> MAX_CHARGES_L[lvl-1])
+        // Audiovisual
         // Tooltip
         .tooltipStopListen()
     

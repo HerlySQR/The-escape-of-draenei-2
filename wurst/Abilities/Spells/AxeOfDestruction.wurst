@@ -15,16 +15,24 @@ let AREA = 500.
 // Not Leveling
 let MANA_NL = 160
 let DMG_NL = 300.
+// Leveling
+let MANA_L = [150, 250]
+let DMG_L = [250., 500.]
 // Internal
 let MAX_DURATION = 10.
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == AXE_OF_DESTRUCTION_NL
+        let data = abilityCond(AXE_OF_DESTRUCTION_NL, AXE_OF_DESTRUCTION_L, AXE_OF_DESTRUCTION_S)
+        if data.check
             let caster = GetSpellAbilityUnit()
             let target = GetSpellTargetUnit()
             var speed = 1800.
-            let damage = DMG_NL
+            real damage
+            if data.isNL
+                damage = DMG_NL
+            else
+                damage = DMG_L[data.lvl]
             flashEffect(Abilities.thunderclapCaster, target.getPos())
             target.addAbility(AbilityIds.stormCrowForm)
             target.removeAbility(AbilityIds.stormCrowForm)
@@ -56,11 +64,8 @@ init
             end)
     end)
 
-@compiletime function gen()
-    new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_NL)
-        ..setLevels(1)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
-        ..presetButtonPosNormal(3, 2)
+function AbilityDefinitionThunderBoltCreep.general()
+    this
         ..setHeroAbility(false)
         ..setAnimationNames("slam")
         ..presetTargetsAllowed(lvl -> "enemies,debris,neutral,organic,ground")
@@ -68,19 +73,62 @@ init
         ..presetDurationNormal(lvl -> MAX_DURATION)
         ..presetBuffs(lvl -> AXE_OF_DESTRUCTION_BUFF.toRawCode())
         ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Axe of Destruction")
+        ..setName("Axe of Destruction")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..addTooltipProperty("Damage", lvl -> DMG_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
         ..presetAreaofEffect(lvl -> AREA)
-        // Audiovisual
         ..presetIcon(Imports.bTNGromHellscreamsAxe)
+
+@compiletime function gen()
+    new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_NL)
+        ..setLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        // Audiovisual
         // Tooltip
-        ..presetHotkey("F")
+        ..presetHotkey("R")
         .tooltipStopListen()
+    
+    new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_L)
+        ..setLevels(2)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+
+    new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_S)
+        ..setLevels(3)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Axe of Destruction")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl - 2]
+            return "The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes {0} of damage to the nearby units and makes them lose concentration.".format(value.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
+        ..setName("Ult Axe of Destruction")
     
     new BuffDefinition(AXE_OF_DESTRUCTION_BUFF, 'BPSE')
         ..setIcon(Imports.bTNGromHellscreamsAxe)

@@ -86,14 +86,7 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Burn Soul")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
         ..presetTooltipNormalExtended(lvl -> begin
             real value
             if lvl < 2

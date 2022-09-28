@@ -6,6 +6,7 @@ import LinkedList
 
 public constant ADVANCED_ENGINEERING_NL = compiletime(ABIL_ID_GEN.next())
 public constant ADVANCED_ENGINEERING_L = compiletime(ABIL_ID_GEN.next())
+
 constant AE_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General
@@ -113,7 +114,6 @@ function AbilityDefinitionHardenedSkin.general()
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.tooltipStartListen()
     this.setName("Advanced Engineering")
-    this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
     this.addTooltipProperty("Duration", lvl -> DURATION)
     // Audiovisual
     this.presetIcon(Icons.pASBTNEngineeringUpgrade)
@@ -123,6 +123,7 @@ function AbilityDefinitionHardenedSkin.general()
     new AbilityDefinitionHardenedSkin(ADVANCED_ENGINEERING_NL)
         ..setLevels(2)
         ..setHeroAbility(false)
+        ..general()
         // Stats
         ..addTooltipProperty("Max. charges", lvl -> MAX_CHARGES_NL[lvl - 1])
         ..addTooltipProperty("Armor and life regeneration added", lvl -> ARMOR_AND_REGEN_INC_NL[lvl - 1])
@@ -133,6 +134,8 @@ function AbilityDefinitionHardenedSkin.general()
         ..setLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
+        ..setIconResearch(Icons.bTNEngineeringUpgrade)
+        ..general()
         // Stats
         ..addTooltipProperty("Max. charges", lvl -> MAX_CHARGES_L[lvl - 1])
         ..addTooltipProperty("Armor and life regeneration added", lvl -> ARMOR_AND_REGEN_INC_L[lvl - 1])

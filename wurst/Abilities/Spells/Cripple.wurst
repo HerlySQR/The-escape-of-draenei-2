@@ -11,34 +11,85 @@ let RANGE = 600.
 let TARGETS = "air,ground,enemy,organic,neutral"
 let DURATION = 8.
 // Not leveling
-let ATTACK_SPEED = 0.4
-let MOVE_SPEED = 0.65
+let ATTACK_SPEED_NL = [0.4, 0.6]
+let MOVE_SPEED_NL = [0.65, 0.8]
 let CD_NL = 17.
 let MANA_NL = 100
+// Not leveling
+let ATTACK_SPEED_L = [0.4, 0.6, 0.8, 0.8]
+let MOVE_SPEED_L = [0.45, 0.6, 0.75, 0.75]
+let CD_L = [17., 17., 17., 10.]
+let MANA_L = [100, 110, 120, 120]
 
-@compiletime function gen()
-    new AbilityDefinitionCripple(CRIPPLE_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the movement speed of an enemy unit and its attack rate. \nLasts " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(1, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionCripple.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetBuffs(lvl -> "Bcri")
         ..setRequirements("")
         ..presetDamageReduction(lvl -> 0.)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Cripple")
+        ..setName("Cripple")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetAttackSpeedReduction(lvl -> ATTACK_SPEED)
-        ..presetMovementSpeedReduction(lvl -> MOVE_SPEED)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetCastRange(lvl -> RANGE)
+        ..presetIcon(Icons.bTNCripple)
+
+@compiletime function gen()
+    new AbilityDefinitionCripple(CRIPPLE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the movement speed of an enemy unit and its attack rate. \nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetAttackSpeedReduction(lvl -> ATTACK_SPEED_NL[lvl-1])
+        ..presetMovementSpeedReduction(lvl -> MOVE_SPEED_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD_NL)
         // Audiovisual
         // Tooltip
         ..presetHotkey("E")
         ..tooltipStopListen()
-        .setName("Cripple")
+    
+    new AbilityDefinitionCripple(CRIPPLE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the movement speed of an enemy unit and its attack rate. \nLasts " + DURATION.toString(0) + " seconds."))
+        ..setLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetAttackSpeedReduction(lvl -> ATTACK_SPEED_L[lvl-1])
+        ..presetMovementSpeedReduction(lvl -> MOVE_SPEED_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+
+    new AbilityDefinitionCripple(CRIPPLE_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Cripple")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetAttackSpeedReduction(lvl -> lvl < 3 ? ATTACK_SPEED_NL[lvl-1] : ATTACK_SPEED_L[lvl-3])
+        ..presetMovementSpeedReduction(lvl -> lvl < 3 ? MOVE_SPEED_NL[lvl-1]: MOVE_SPEED_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = ATTACK_SPEED_NL[lvl-1]
+                value2 = MOVE_SPEED_NL[lvl-1]
+            else
+                value1 = ATTACK_SPEED_L[lvl-3]
+                value2 = MOVE_SPEED_L[lvl-3]
+            return "Reduces the movement speed of an enemy unit on {0}% and its attack rate in {1}%. \nLasts {2} seconds.".format((value1*100).toInt().toString(), (value2*100).toInt().toString(), DURATION.toInt().toString())
+        end)
+        ..setEditorSuffix("(Stealed)")

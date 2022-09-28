@@ -12,34 +12,78 @@ let DISTANCE = 800.
 let CD = 9.
 let AREA = 200.
 let AREA_FINAL = 300.
-let MAX_DMG = 1000.
+let MAX_DMG = [1000., 1500, 2000., 2500.]
 let TARGETS = "ground,air,organic"
 // Not leveling
-let DMG_NL = 150.
-let MANA_NL = 90
+let DMG_NL = [150., 210.]
+let MANA_NL = [100, 110]
+// Leveling
+let DMG_L = [75., 125., 200., 325.]
+let MANA_L = [90, 100, 120, 150]
 
-@compiletime function gen()
-    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Send a horde of bats that cause damage to each enemy unit in a cone."))
-        ..setLevels(2)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionDreadlordCarrionSwarm.general()
+    this
+        ..setName("Carrion Swarm")
         ..setAnimationNames("spell")
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..tooltipStartListen()
         ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Carrion Swarm")
         ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
-        // Stats
-        ..presetDamage(lvl -> DMG_NL)
-        ..presetMaxDamage(lvl -> MAX_DMG)
+        ..presetMaxDamage(lvl -> MAX_DMG[lvl-1])
         ..presetAreaofEffect(lvl -> AREA)
         ..presetFinalArea(lvl -> AREA_FINAL)
         ..presetDistance(lvl -> DISTANCE)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
+
+
+@compiletime function gen()
+    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Send a horde of bats that causes damage to each enemy unit in a cone."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Carrion Swarm")
+    
+    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Send a horde of bats that causes damage to each enemy unit in a cone."))
+        ..setLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Carrion Swarm")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL[lvl-1]
+            else
+                value = DMG_L[lvl-3]
+            return "Send a horde of bats that causes {0} of damage to each enemy unit in a cone.".format(value.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")

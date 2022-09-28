@@ -11,30 +11,80 @@ let DURATION = 8.
 let EXTRA_DMG = 0.2
 let CD = 24.
 // Not leveling
-let ATTACK_SPEED_NL = 0.35
-let MOVE_SPEED_NL = 0.4
+let ATTACK_SPEED_NL = [0.35, 0.8]
+let MOVE_SPEED_NL = [0.4, 0.5]
 let MANA_NL = 0
+// Leveling
+let ATTACK_SPEED_L = [0.25, 0.5, 0.75, 1.]
+let MOVE_SPEED_L = [0.15, 0.3, 0.45, 0.6]
+let MANA_L = 25
+
+function AbilityDefinitionBerserk.general()
+    this
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetDamageTakenIncrease(lvl -> EXTRA_DMG)
+        ..tooltipStartListen()
+        ..setName("Berserk")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetCooldown(lvl -> CD)
+        ..presetIcon(Icons.bTNBerserk)
+        
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(BERSERK_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes this unit to attack and move faster for " + DURATION.toString(0) + " seconds, but the hero takes " + (EXTRA_DMG * 100.).toString() + "% extra damage."))
         ..setLevels(2)
-        ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..presetDurationHero(lvl -> DURATION)
-        ..presetDurationNormal(lvl -> DURATION)
-        ..presetDamageTakenIncrease(lvl -> EXTRA_DMG)
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Berserk")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..general()
+        ..presetButtonPosNormal(1, 2)
         // Stats
-        ..addTooltipProperty("Duration", lvl -> DURATION)
-        ..presetAttackSpeedIncrease(lvl -> ATTACK_SPEED_NL)
-        ..presetMovementSpeedIncrease(lvl -> MOVE_SPEED_NL)
+        ..presetAttackSpeedIncrease(lvl -> ATTACK_SPEED_NL[lvl-1])
+        ..presetMovementSpeedIncrease(lvl -> MOVE_SPEED_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Berserk")
+    
+    new AbilityDefinitionBerserk(BERSERK_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes this unit to attack and move faster for " + DURATION.toString(0) + " seconds, but the hero takes " + (EXTRA_DMG * 100.).toString() + "% extra damage."))
+        ..setLevels(4)
+        ..setRequiredLevel(1)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        // Stats
+        ..presetAttackSpeedIncrease(lvl -> ATTACK_SPEED_L[lvl-1])
+        ..presetMovementSpeedIncrease(lvl -> MOVE_SPEED_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L)
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+
+    new AbilityDefinitionBerserk(BERSERK_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Berserk")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L)
+        ..presetAttackSpeedIncrease(lvl -> lvl < 3 ? ATTACK_SPEED_NL[lvl-1] : ATTACK_SPEED_L[lvl-3])
+        ..presetMovementSpeedIncrease(lvl -> lvl < 3 ? MOVE_SPEED_NL[lvl-1]: MOVE_SPEED_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = ATTACK_SPEED_NL[lvl-1]
+                value2 = MOVE_SPEED_NL[lvl-1]
+            else
+                value1 = ATTACK_SPEED_L[lvl-3]
+                value2 = MOVE_SPEED_L[lvl-3]
+            return "Causes this unit to attack {0} and move {1} faster for {2} seconds, but the hero takes {3}% extra damage.".format(value1.toString(), value2.toString(), DURATION.toString(), (EXTRA_DMG*100).toInt().toString())
+        end)
+        ..setEditorSuffix("(Stealed)")

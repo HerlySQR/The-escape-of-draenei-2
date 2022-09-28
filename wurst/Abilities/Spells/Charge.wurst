@@ -11,7 +11,7 @@ public constant CHARGE_S = compiletime(ABIL_ID_GEN.next())
 let CD = 10.
 let RANGE = 1000.
 let MANA = 70
-let DMG = 50.
+let DMG = [50., 80., 110., 140.]
 let SPEED = 600.
 // Not leveling
 // Internal
@@ -22,11 +22,12 @@ let INTERVAL = 0.05
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == CHARGE_NL
+        let data = abilityCond(CHARGE_NL, CHARGE_L, CHARGE_S)
+        if data.check
             let caster = GetSpellAbilityUnit()
             let target = GetSpellTargetUnit()
             let eff = caster.addEffect(Imports.valiantChargeRoyal, "origin")
-            let damage = DMG
+            let damage = DMG[data.lvl]
             var vision = createFogModifier(caster.getOwner(), FOG_OF_WAR_VISIBLE, target.getPos(), 150., true, false)
             caster.issueTargetOrderById(Orders.smart, target)
             caster.setBaseSpeed("charge", SPEED)
@@ -57,26 +58,58 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, func)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, func)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(CHARGE_NL, 1, true, new AbilityTooltipGenerator("The Zealot concentrate in a target so increase his speed and causing a damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped."))
+function ChannelAbilityPreset.general()
+    this
+        ..setName("Charge")
         ..presetBaseOrderID(lvl -> "chainlightning")
         ..presetOption(Option.PHYSICALSPELL, true)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("spell,channel")
         ..presetTargetsAllowed(lvl -> "air,enemies,neutral,ground")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00Q|r] Charge")
+        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Charge")
         ..presetTargetTypes(Targettype.UNIT)
         // Stats
-        ..addTooltipProperty("Damage", lvl -> DMG)
+        ..addTooltipProperty("Damage", lvl -> DMG[lvl-1])
         ..addTooltipProperty("Move speed", lvl -> SPEED)
         ..presetManaCost(lvl -> MANA)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..presetIcon(Imports.bTNCharge)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(CHARGE_NL, 2, true, new AbilityTooltipGenerator("The Zealot concentrate in a target so increase his speed and causing a damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped."))
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
         // Tooltip
         ..presetHotkey("Q")
         .tooltipStopListen()
+    
+    new ChannelAbilityPreset(CHARGE_L, 4, true, new AbilityTooltipGenerator("The Zealot concentrate in a target so increase his speed and causing a damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped."))
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Tooltip
+        ..presetHotkey("Q")
+        .tooltipStopListen()
+    
+    new ChannelAbilityPreset(CHARGE_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Charge")
+        ..presetHotkey("F")
+        // Stats
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG[lvl-1]
+            else
+                value = DMG[lvl-3]
+            return "The Zealot concentrate in a target so increase his speed and causing {0} of damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped.".format(value.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")

@@ -22,6 +22,10 @@ let tailMaxLenghtSq = 400..pow(2)
 let tailSpeed = 600. * INTERVAL
 let tailMinCasterDistSq = 50..pow(2)
 
+int array baseSpellNL
+int array baseSpellL
+int array stealedSpell
+
 init
     gg_unit_Obla_0027.addAbility(STEAL_SPELL_NL)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
@@ -41,6 +45,13 @@ init
                 addEffect(Abilities.darkRitualTarget, target, "origin").destroyAfter(compiletime(SquareRoot(tailMaxLenghtSq)/tailSpeed))
                 effect eff2 = null
                 tail.setColor(color(216, 0, 255))
+                
+                let index = lastSpell.get(target)
+                var level = 0
+                if whatMode[5] == NOT_LEVELING
+                    level = target.getAbilityLevel(baseSpellNL[index])
+                else if whatMode[5] == LEVELING
+                    level = target.getAbilityLevel(baseSpellL[index]) + 2
 
                 // Move the tail
                 doPeriodically(INTERVAL, cb -> begin
@@ -65,7 +76,7 @@ init
                         eff2.destr()
                         destroy cb
 
-                        let spellNew = lastSpell.get(target)
+                        let spellNew = stealedSpell[index]
                         
                         if spellNew != 0
                             let spellOld = stealSpell.get(caster)
@@ -73,6 +84,7 @@ init
                                 caster.removeAbility(spellOld)
                             
                             caster.addAbility(spellNew)
+                            caster.setAbilityLevel(spellNew, level)
                             stealSpell.put(caster, spellNew)
 
                             try(() -> destroy timerMap.get(caster))
@@ -83,9 +95,14 @@ init
                 end)
     end)
 
-int array baseSpellNL
-int array baseSpellL
-int array stealedSpell
+    // Remove stealed spell when dies
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let u = GetDyingUnit()
+        if stealSpell.has(u)
+            u.removeAbility(stealSpell.get(u))
+            stealSpell.remove(u)
+            try(() -> destroy timerMap.get(u))
+    end)
 
 var total = 0
 
@@ -93,10 +110,16 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         if GetSpellAbilityUnit().isType(UNIT_TYPE_HERO)
             let id = GetSpellAbilityId()
-            for i = 0 to total
-                if id == baseSpellNL[i] or id == baseSpellL[i]
-                    lastSpell.put(GetSpellAbilityUnit(), stealedSpell[i])
-                    break
+            if whatMode[5] == NOT_LEVELING
+                for i = 0 to total
+                    if id == baseSpellNL[i]
+                        lastSpell.put(GetSpellAbilityUnit(), i)
+                        break
+            else if whatMode[5] == LEVELING
+                for i = 0 to total
+                    if id == baseSpellL[i]
+                        lastSpell.put(GetSpellAbilityUnit(), i)
+                        break
     end)
 
 function initSpell(int baseNL, int baseL, int stealed)
@@ -192,22 +215,31 @@ function ChannelAbilityPreset.general()
     this.presetOption(Option.VISIBLE, true)
     this.presetButtonPosNormal(3, 2)
     this.presetFollowThroughTime(lvl -> 0.75)
+    this.presetManaCost(lvl -> 0)
+    this.presetCooldown(lvl -> 0)
+    this.presetTargetsAllowed(lvl -> "air,enemies,hero,invulnerable,neutral,notself,ground,vulnerable")
     this.tooltipStartListen()
     this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Steal Spell")
     this.presetTargetTypes(Targettype.UNIT)
-    this.presetCooldown(lvl -> 0)
-    this.presetTargetsAllowed(lvl -> "air,enemies,hero,invulnerable,neutral,notself,ground,vulnerable")
     // Audiovisual
     this.presetIcon(Imports.bTNStrands)
     // Tooltip
 
 @compiletime function gen()
-    new ChannelAbilityPreset(STEAL_SPELL_NL, 1, true, new AbilityTooltipGenerator("The vindicator takes part of the essence of an enemy hero and studies it, learning its secrets and learning the last ability it casted. You can use it for " + (DURATION[0]/60).toInt().toString() + " minutes or until he dies."))
+    new ChannelAbilityPreset(STEAL_SPELL_NL, 1, true, new AbilityTooltipGenerator("The vindicator takes part of the essence of an enemy hero and studies it, learning its secrets and learning the last ability it casted. You can use it for its duration or until he dies."))
         ..setHeroAbility(false)
         ..general()
         // Stats
-        ..addTooltipProperty("Duration", lvl -> DURATION[lvl])
-        ..presetManaCost(lvl -> 0)
+        ..addTooltipProperty("Duration", lvl -> DURATION[lvl - 1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+        .setName("Steal Spell")
+
+    new ChannelAbilityPreset(STEAL_SPELL_L, 2, true, new AbilityTooltipGenerator("The vindicator takes part of the essence of an enemy hero and studies it, learning its secrets and learning the last ability it casted. You can use it for its duration or until he dies."))
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Duration", lvl -> DURATION[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
         .setName("Steal Spell")

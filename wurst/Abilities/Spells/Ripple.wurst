@@ -69,6 +69,7 @@ init
     end)
 
 function ChannelAbilityPreset.general()
+    this.setName("Ripple")
     this.presetBaseOrderID(lvl -> "stomp")
     this.presetOption(Option.VISIBLE, true)
     this.presetButtonPosNormal(3, 2)
@@ -92,7 +93,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL)
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Ripple")
     
     new ChannelAbilityPreset(RIPLE_L, 2, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
         ..setHeroAbility(true)
@@ -106,7 +106,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Ripple")
 
     new ChannelAbilityPreset(RIPLE_S, 3, true)
         ..setHeroAbility(false)
@@ -135,7 +134,6 @@ function ChannelAbilityPreset.general()
             return "The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and dealing them " + value1.toString(0) + " of damage per second for " + value2.toString(0) + " seconds."
         end)
         ..setEditorSuffix("(Stealed)")
-        .setName("Ripple")
     
     new AbilityDefinitionFireBolt(DUMMY_STUN)
         ..setDamage(1, 0.)

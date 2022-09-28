@@ -13,17 +13,19 @@ constant CREED_BUFF = compiletime(createDummyBuffObject("Creed", "This unit is s
 let SLOW = 0.75
 let DURATION = 3.
 // Not Leveling
-let CD_NL = 20.
-let EXTRA_DMG_NL = 75.
+let CD_NL = [20., 10.]
+let EXTRA_DMG_NL = [75., 150.]
+// Leveling
+let CD_L = [26., 20., 14., 8.]
+let EXTRA_DMG_L = [50., 100., 150., 200.]
 // Internal
-let believers = CreateGroup()
 let availableMap = new HashMap<unit, boolean>()
 let effMap = new HashMap<unit, effect>()
 let cbMap = new HashMap<unit, CallbackSingle>()
 
-function addCreed(unit caster)
+function addCreed(unit caster, real delay)
     availableMap.put(caster, false)
-    cbMap.put(caster, doAfter(CD_NL, () -> begin
+    cbMap.put(caster, doAfter(delay, () -> begin
         availableMap.put(caster, true)
         effMap.put(caster, caster.addEffect(Abilities.illidanMissile, "weapon"))
         cbMap.remove(caster)
@@ -33,28 +35,44 @@ init
     DamageEvent.addUnreducedListener(() -> begin
         let caster = DamageEvent.getSource()
         let target = DamageEvent.getTarget()
-        if believers.has(caster)
+        let data = caster.pasAbilityCond(CREED_NL, CREED_L)
+        if data.check
             and availableMap.get(caster)
             and not target.isType(UNIT_TYPE_STRUCTURE)
             and not target.isType(UNIT_TYPE_MECHANICAL)
             and not target.isType(UNIT_TYPE_MAGIC_IMMUNE)
             and not DamageEvent.isSpell()
+
+            real damage
+            real delay
+            if data.isNL
+                damage = EXTRA_DMG_NL[data.lvl]
+                delay = CD_NL[data.lvl]
+            else
+                damage = EXTRA_DMG_L[data.lvl]
+                delay = CD_L[data.lvl]
+
             target.scaleSpeed("creed", SLOW)
             target.addBuff(CREED_BUFF, DURATION, () -> target.removeSpeedBuff("creed"))
             target.flashEffect(Objects.bloodElfSpellThiefBlood, "chest")
             effMap.get(caster).destr()
             effMap.remove(caster)
-            DamageEvent.addAmount(EXTRA_DMG_NL)
-            addCreed(caster)
+            DamageEvent.addAmount(damage)
+            addCreed(caster, delay)
     end)
     onUnitIndex(() -> begin
-        if getIndexingUnit().hasAbility(CREED_NL)
-            addCreed(getIndexingUnit())
+        let data = getIndexingUnit().pasAbilityCond(CREED_NL, CREED_L)
+        if data.check
+            real delay
+            if data.isNL
+                delay = CD_NL[data.lvl]
+            else
+                delay = CD_L[data.lvl]
+            addCreed(getIndexingUnit(), delay)
     end)
     onUnitDeindex(() -> begin
-        if believers.has(getIndexingUnit())
+        if getIndexingUnit().pasAbilityCond(CREED_NL, CREED_L).check
             let d = getIndexingUnit()
-            believers.remove(d)
             availableMap.remove(d)
             if effMap.has(d)
                 effMap.get(d).destr()
@@ -64,12 +82,8 @@ init
                 cbMap.remove(d)
     end)
 
-@compiletime function gen()
-    new AbilityDefinitionHardenedSkin(CREED_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Zealot's faith makes it capable of an attack that deals extra damage and slows the enemy by " + (1. - SLOW).toString(0) + " for " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(2, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionHardenedSkin.general()
+    this
         ..presetIgnoredDamage(lvl -> 0.)
         ..presetMinimumDamage(lvl -> 0.)
         ..presetChancetoReduceDamage(lvl -> 0.)
@@ -79,10 +93,34 @@ init
         ..tooltipStartListen()
         ..setName("Creed")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
-        // Stats
-        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
-        ..presetCooldown(lvl -> CD_NL)
-        // Audiovisual
         ..presetIcon(Imports.pASSickle)
+
+@compiletime function gen()
+    new AbilityDefinitionHardenedSkin(CREED_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Zealot's faith makes it capable of an attack that deals extra damage and slows the enemy by " + (1. - SLOW).toString(0) + " for " + DURATION.toString(0) + " seconds."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL[lvl-1])
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
+        // Audiovisual
+        // Tooltip
+        .tooltipStopListen()
+    
+    new AbilityDefinitionHardenedSkin(CREED_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Zealot's faith makes it capable of an attack that deals extra damage and slows the enemy by " + (1. - SLOW).toString(0) + " for " + DURATION.toString(0) + " seconds."))
+        ..setLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..setIconResearch(Imports.bTNSickle)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_L[lvl-1])
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        // Audiovisual
         // Tooltip
         .tooltipStopListen()

@@ -15,36 +15,77 @@ let MANA_PER_SEC = 31.
 let TARGETS = "air,ground,enemy,neutral,organic"
 // Not leveling
 let DMG_NL = 70.
+// Leveling
+let DMG_L = [85., 110.]
 
-@compiletime function gen()
-    new AbilityDefinitionDemonHunterImmolation(CRYING_SOULS_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("While activated, approaching souls will receive damage per second."))
-        ..setLevels(2)
-        ..presetButtonPosNormal(3, 2)
-        ..presetButtonPosTurnOff(3, 2)
+function AbilityDefinitionDemonHunterImmolation.general()
+    this
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetBufferManaRequired(lvl -> 0.)
         ..presetBuffs(lvl -> CRYING_SOULS_BUFF.toRawCode())
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Crying Souls")
+        ..setName("Crying Souls")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
-        // Stats
-        ..presetDamageperInterval(lvl -> DMG_NL)
-        ..presetManaDrainedperSecond(lvl -> MANA_PER_SEC)
         ..presetAreaofEffect(lvl -> AREA)
         ..presetManaCost(lvl -> MANA)
+        ..presetManaDrainedperSecond(lvl -> MANA_PER_SEC)
         // Audiovisual
         ..presetIcon(Icons.bTNDoom)
         ..setIconTurnOff(Icons.bTNCancel)
+        ..presetTooltipTurnOffExtended(lvl -> "Deactivate the Wailing of souls to stop mana consumption.")
+
+@compiletime function gen()
+    new AbilityDefinitionDemonHunterImmolation(CRYING_SOULS_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("While activated, approaching souls will receive damage per second."))
+        ..setLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosTurnOff(3, 2)
+        // Stats
+        ..presetDamageperInterval(lvl -> DMG_NL)
         // Tooltip
         ..presetHotkey("R")
         ..tooltipStopListen()
-        ..presetTooltipTurnOff(lvl -> "[|cffffcc00Q|r] Disable Crying Souls")
-        ..presetTooltipTurnOffExtended(lvl -> "Deactivate the Wailing of souls to stop mana consumption.")
-        .setName("Crying Souls")
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00R|r] Disable Crying Souls")
     
-    new BuffDefinition(CRYING_SOULS_BUFF, 'BPSE')
+    new AbilityDefinitionDemonHunterImmolation(CRYING_SOULS_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("While activated, approaching souls will receive damage per second."))
+        ..setLevels(2)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosTurnOff(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        // Stats
+        ..presetDamageperInterval(lvl -> DMG_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("R")
+        ..tooltipStopListen()
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00R|r] Disable Crying Souls")
+
+    new AbilityDefinitionDemonHunterImmolation(CRYING_SOULS_S)
+        ..setLevels(3)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetButtonPosTurnOff(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Crying Souls")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamageperInterval(lvl -> lvl < 2 ? DMG_NL : DMG_L[lvl - 2])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl - 2]
+            return "While activated, approaching souls will receive {0} damage per second.\nDrains {1} mana per second.".format(value.toString(0), MANA_PER_SEC.toString())
+        end)
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00F|r] Disable Crying Souls")
+        ..setEditorSuffix("(Stealed)")
+        ..setName("Ult Crying Souls")
+    
+    new BuffDefinition(CRYING_SOULS_BUFF, 'BEim')
         ..setArtSpecial(1, Abilities.doomDeath)
         ..setArtTarget(1, "")
         ..setSpecialAttachmentPoint(1, "origin")

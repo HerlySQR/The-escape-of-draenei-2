@@ -11,21 +11,31 @@ public constant DARK_SUMMONING_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let AREA = 700.
-let MANA_NL = 100
+let MANA = 100
 // Not leveling
-let DELAY_NL = 5.
-let CD_NL = 100.
+let DELAY_NL = [5., 3.]
+let CD_NL = [100., 80.]
+// Not leveling
+let DELAY_L = [5., 4., 3., 2.]
+let CD_L = [100., 80., 70., 70.]
 // Internal
 let SOUND_1 = new SoundDefinition(Sounds.possessionMissileLaunch1, false, true)
 let SOUND_2 = new SoundDefinition(Sounds.possessionMissileHit1, false, true)
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == DARK_SUMMONING_NL
+        let data = abilityCond(DARK_SUMMONING_NL, DARK_SUMMONING_L, DARK_SUMMONING_S)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             let vase = CreateGroup()
-            let delay = DELAY_NL
+
+            real delay
+            if data.isNL
+                delay = DELAY_NL[data.lvl]
+            else
+                delay = DELAY_L[data.lvl]
+
             let where = THE_DRAENEI.has(owner)? actDrSpawn : actDeSpawn
             forUnitsInRange(EventData.getSpellTargetPos(), AREA, u -> begin
                 if owner.isAllyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
@@ -60,26 +70,53 @@ init
                 vase.destr()
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(DARK_SUMMONING_NL, 1, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
-        ..setLevels(2)
+function ChannelAbilityPreset.general()
+    this
         ..presetOption(Option.TARGETIMAGE, true)
         ..presetBaseOrderID(lvl -> "inferno")
+        ..presetFollowThroughTime(lvl -> 0.75)
+        ..tooltipStartListen()
+        ..setName("Dark Summoning")
+        ..presetCastRange(lvl -> 99999.)
+        ..presetTargetTypes(Targettype.POINT)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetManaCost(lvl -> MANA)
+        ..presetIcon(Icons.bTNDarkSummoning)
+        ..setAnimationNames("spell")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(DARK_SUMMONING_NL, 2, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..presetFollowThroughTime(lvl -> 0.75)
-        ..presetCastRange(lvl -> 99999.)
-        ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Vortex")
-        ..presetTargetTypes(Targettype.POINT)
+        ..general()
         // Stats
-        ..addTooltipProperty("Delay", lvl -> DELAY_NL)
-        ..presetAreaofEffect(lvl -> AREA)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD_NL)
+        ..addTooltipProperty("Delay", lvl -> DELAY_NL[lvl-1])
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
         // Audiovisual
-        ..presetIcon(Icons.bTNDarkSummoning)
         // Tooltip
-        ..setAnimationNames("spell")
         ..presetHotkey("R")
         .tooltipStopListen()
+    
+    new ChannelAbilityPreset(DARK_SUMMONING_L, 4, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Delay", lvl -> DELAY_L[lvl-1])
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+
+    new ChannelAbilityPreset(DARK_SUMMONING_L, 6, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Dark Summoning")
+        ..presetHotkey("F")
+        // Stats
+        ..presetCooldown(lvl -> lvl < 3 ? CD_L[lvl-1]: CD_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Summon ally heros at the base.")
+        ..setEditorSuffix("(Stealed)")

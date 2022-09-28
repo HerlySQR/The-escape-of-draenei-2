@@ -9,22 +9,43 @@ public constant CLEAVE_ATTACK_L = compiletime(ABIL_ID_GEN.next())
 let AREA = 400.
 let TARGETS = "ground,enemy,neutral"
 // Not leveling
-let SPLASH_NL = 0.25
+let SPLASH_NL = [0.25, 0.5]
+// Leveling
+let SPLASH_L = [0.1, 0.25, 0.4, 0.55]
 
-@compiletime function gen()
-    new AbilityDefinitionPitLordCleavingAttack(CLEAVE_ATTACK_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The creature hits so hard that a percentage of its attack hits enemies near the attacked primary unit."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(2, 1)
-        ..setHeroAbility(false)
+function AbilityDefinitionPitLordCleavingAttack.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..tooltipStartListen()
         ..setName("Cleaving Attack")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
-        // Stats
-        ..presetDistributedDamageFactor(lvl -> SPLASH_NL)
         ..presetAreaofEffect(lvl -> AREA)
-        // Audiovisual
         ..presetIcon(Imports.pASAxeOfAshes)
+
+@compiletime function gen()
+    new AbilityDefinitionPitLordCleavingAttack(CLEAVE_ATTACK_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero hits so hard that a percentage of its attack hits enemies near the attacked primary unit."))
+        ..setLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDistributedDamageFactor(lvl -> SPLASH_NL[lvl-1])
+        // Audiovisual
+        // Tooltips
+        .tooltipStopListen()
+    
+    new AbilityDefinitionPitLordCleavingAttack(CLEAVE_ATTACK_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero hits so hard that a percentage of its attack hits enemies near the attacked primary unit."))
+        ..setLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..setIconResearch(Imports.bTNAxeOfAshes)
+        ..general()
+        // Stats
+        ..presetDistributedDamageFactor(lvl -> SPLASH_L[lvl-1])
+        // Audiovisual
         // Tooltips
         .tooltipStopListen()
