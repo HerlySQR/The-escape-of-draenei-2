@@ -235,6 +235,9 @@ public class Rects
     static constant draeneiTower4 = gg_rct_DraeneiTower4
     static constant draeneiTower5 = gg_rct_DraeneiTower5
 
+    static constant demonDefenseTower = [gg_rct_DemonDefenseTower0, gg_rct_DemonDefenseTower1, gg_rct_DemonDefenseTower2, gg_rct_DemonDefenseTower3,
+                                         gg_rct_DemonDefenseTower4, gg_rct_DemonDefenseTower5, gg_rct_DemonDefenseTower6, gg_rct_DemonDefenseTower7]
+
     // Missions
 
     static constant justHidePls = gg_rct_JustHidePls

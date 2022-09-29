@@ -13,7 +13,7 @@ let MANA_NL = 75
 @compiletime function gen()
     new AbilityDefinitionTaurenChieftainReincarnation(REENCARNATION_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("When the hero dies, it will be resurrected."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(3, 2)
         ..setHeroAbility(false)
         ..setRequirements("")

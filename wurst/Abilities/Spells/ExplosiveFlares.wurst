@@ -105,7 +105,8 @@ function ChannelAbilityPreset.general()
     
     new ChannelAbilityPreset(EXPLOSIVE_FLARES_L, 2, true, new AbilityTooltipGenerator("Create 5 explosions that causes initial damage, and they leave a flare deals damage per second."))
         ..setHeroAbility(true)
-        ..setRequiredLevel(1)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
         ..general()
         // Stats
         ..presetCooldown(lvl -> CD_NL)
@@ -119,19 +120,11 @@ function ChannelAbilityPreset.general()
     new ChannelAbilityPreset(EXPLOSIVE_FLARES_S, 3, true)
         ..setHeroAbility(false)
         ..general()
-        ..setLevels(3)
         ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Explosive Flares")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
         ..presetTooltipNormalExtended(lvl -> begin
             real value1
             real value2
@@ -147,7 +140,7 @@ function ChannelAbilityPreset.general()
         .setName("Ult Explosive Flares")
     
     new AbilityDefinitionFlameStrikeCreep(EXPLOSIVE_FLARES_FIRE)
-        ..setLevels(2)
+        ..presetLevels(2)
         ..setArtEffect("")
         ..presetCastingTime(lvl -> 0.)
         ..presetDurationHero(lvl -> DURATION)

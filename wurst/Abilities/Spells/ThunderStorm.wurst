@@ -4,7 +4,7 @@ import AbilityData
 
 public constant THUNDER_STORM_NL = compiletime(ABIL_ID_GEN.next())
 public constant THUNDER_STORM_L = compiletime(ABIL_ID_GEN.next())
-public constant THUNDER_STORM_S = compiletime(ABIL_ID_GEN.next())
+//public constant THUNDER_STORM_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 5.
@@ -18,7 +18,7 @@ let DMG_NL = 90.
 
 @compiletime function gen()
     new AbilityDefinitionFarseerChainLightning(THUNDER_STORM_NL)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a thunder storm that damage to nearby enemies."))
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)

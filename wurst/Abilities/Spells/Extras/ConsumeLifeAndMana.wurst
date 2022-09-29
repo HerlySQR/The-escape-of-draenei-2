@@ -59,7 +59,7 @@ init
         ..setHeroAbility(false)
         ..setAnimationNames("stand,channel")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00F|r] Consume life and mana")
+        ..setName("Consume life and mana")
         ..presetTargetTypes(Targettype.UNIT)
         // Stats
         ..presetFollowThroughTime(lvl -> DURATION)

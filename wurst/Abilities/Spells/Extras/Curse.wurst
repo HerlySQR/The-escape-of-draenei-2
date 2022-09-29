@@ -23,12 +23,12 @@ init
 @compiletime function gen()
     new AbilityDefinitionEntanglingRootscreep(CURSE)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes demonic hands to rise from the ground, immobilizing and disarming the targeted enemy, dealing damage per second, and then slows it for 1 second."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..presetBuffs(lvl -> CURSE_BUFF.toRawCode())
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Curse")
+        ..setName("Curse")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         // Stats
         ..presetDamageperSecond(lvl -> DMG_PER_SEC)
@@ -42,10 +42,9 @@ init
         // Tooltip
         ..presetHotkey("F")
         ..tooltipStopListen()
-        .setName("Ext Curse")
 
     new BuffDefinition(CURSE_BUFF, 'BEer')
         ..setIcon(Icons.bTNScourgeBuild)
-        ..setArtTarget(1, "Models\\Death Grip.mdl")
+        ..setArtTarget(1, Imports.deathGrip)
         ..setName(1, "Curse")
         ..setTooltipNormalExtended(1, "This unit has been hit by Curse: it cannot be moved and takes damage gradually.")

@@ -24,7 +24,7 @@ let DMG_NL = 50.
 @compiletime function gen()
     new AbilityDefinitionInferno(INFERNO_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw an infernal from the sky, it lasts " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

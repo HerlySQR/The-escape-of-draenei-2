@@ -14,13 +14,13 @@ let TARGETS = "allies,structure,invulnerable,neutral,nonhero,ground,player,vulne
     new AbilityDefinitionStaffoTeleportation(TELEPORT)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Teleports the hero to a ally unit."))
         ..setRace(Race.Naga)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 1)
         ..setHeroAbility(false)
         ..setItemAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00D|r] Teleport")
+        ..setName("Teleport")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         // Stats
         ..presetCastingDelay(lvl -> DELAY)
@@ -31,5 +31,4 @@ let TARGETS = "allies,structure,invulnerable,neutral,nonhero,ground,player,vulne
         // Tooltip
         ..presetHotkey("D")
         ..tooltipStopListen()
-        ..setName("Teleport")
         .setEditorSuffix("(Long)")

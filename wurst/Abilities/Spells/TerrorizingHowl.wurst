@@ -19,7 +19,7 @@ let DMG_NL = 80.
 @compiletime function gen()
     new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION)

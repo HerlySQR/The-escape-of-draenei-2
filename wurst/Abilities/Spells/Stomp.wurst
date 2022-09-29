@@ -18,7 +18,7 @@ let DMG_NL = 70.
 @compiletime function gen()
     new AbilityDefinitionTaurenChieftainWarStomp(STOMP_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground violently, causing damage and stuns nearby enemy land units."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

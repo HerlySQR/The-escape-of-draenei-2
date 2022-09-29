@@ -65,7 +65,7 @@ init
 @compiletime function gen()
     new AbilityDefinitionBerserk(INTANGIBILITY_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes intangible the hero and causes a damage to the nearby enemy units with a cooldown of " + DMG_CD.toString(0) + " seconds."))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetBuffs(lvl -> INTANGIBILITY_BUFF.toRawCode())

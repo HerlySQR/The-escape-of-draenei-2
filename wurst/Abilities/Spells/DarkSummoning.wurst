@@ -95,7 +95,8 @@ function ChannelAbilityPreset.general()
         // Audiovisual
         // Tooltip
         ..presetHotkey("R")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new ChannelAbilityPreset(DARK_SUMMONING_L, 4, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
         ..presetButtonPosNormal(1, 2)
@@ -108,15 +109,16 @@ function ChannelAbilityPreset.general()
         // Audiovisual
         // Tooltip
         ..presetHotkey("R")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
 
-    new ChannelAbilityPreset(DARK_SUMMONING_L, 6, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
+    new ChannelAbilityPreset(DARK_SUMMONING_S, 6, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
         ..setHeroAbility(false)
         ..general()
         ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Dark Summoning")
         ..presetHotkey("F")
         // Stats
-        ..presetCooldown(lvl -> lvl < 3 ? CD_L[lvl-1]: CD_L[lvl-3])
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1]: CD_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> "Summon ally heros at the base.")
         ..setEditorSuffix("(Stealed)")

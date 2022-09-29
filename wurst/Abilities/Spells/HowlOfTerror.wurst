@@ -19,7 +19,7 @@ let MANA_NL = 100
 @compiletime function gen()
     new AbilityDefinitionPitLordHowlofTerror(HOWL_OF_TERROR_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It emits a terrifying howl that reduces the attack damage of nearby enemy units and armor for " + DURATION.toString(0) + " seconds."))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

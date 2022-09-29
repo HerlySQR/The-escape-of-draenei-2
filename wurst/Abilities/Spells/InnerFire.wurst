@@ -19,7 +19,7 @@ let DMG_INC_NL = 0.25
 @compiletime function gen()
     new AbilityDefinitionInnerFire(INNER_FIRE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the damage infringed by the selected friendly unit and its armor.\nLasts " + DURATION_NL.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION_NL)

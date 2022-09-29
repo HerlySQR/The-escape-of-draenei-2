@@ -105,7 +105,6 @@ init
     end)
 
 function AbilityDefinitionHardenedSkin.general()
-    this.registerTooltipGenerator(new AbilityTooltipGenerator("The Demolisher's defense system means that when attacked, it increases its armor and regeneration."))
     this.presetButtonPosNormal(2, 2)
     this.setIgnoredDamage(1, 0.)
     this.setMinimumDamage(1, 0.)
@@ -121,7 +120,8 @@ function AbilityDefinitionHardenedSkin.general()
 
 @compiletime function gen()
     new AbilityDefinitionHardenedSkin(ADVANCED_ENGINEERING_NL)
-        ..setLevels(2)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Demolisher's defense system means that when attacked, it increases its armor and regeneration."))
+        ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -131,7 +131,8 @@ function AbilityDefinitionHardenedSkin.general()
         .setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionHardenedSkin(ADVANCED_ENGINEERING_L)
-        ..setLevels(4)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Demolisher's defense system means that when attacked, it increases its armor and regeneration."))
+        ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..setIconResearch(Icons.bTNEngineeringUpgrade)
@@ -144,7 +145,7 @@ function AbilityDefinitionHardenedSkin.general()
 
     for i = 0 to 1
         new AbilityDefinitionDefenseBonusPlus1(AE_ARMOR_NL[i])
-            ..setLevels(MAX_CHARGES_NL[i])
+            ..presetLevels(MAX_CHARGES_NL[i])
             ..presetDefenseBonus(lvl -> (lvl * ARMOR_AND_REGEN_INC_NL[i]).toInt())
             ..setItemAbility(true)
             ..presetButtonPosNormal(0, -11)
@@ -155,7 +156,7 @@ function AbilityDefinitionHardenedSkin.general()
 
     for i = 0 to 3
         new AbilityDefinitionDefenseBonusPlus1(AE_ARMOR_L[i])
-            ..setLevels(MAX_CHARGES_L[i])
+            ..presetLevels(MAX_CHARGES_L[i])
             ..presetDefenseBonus(lvl -> (lvl * ARMOR_AND_REGEN_INC_L[i]).toInt())
             ..setItemAbility(true)
             ..presetButtonPosNormal(0, -11)

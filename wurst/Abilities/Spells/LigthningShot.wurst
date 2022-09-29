@@ -17,7 +17,7 @@ let DMG_NL = 125.
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(LIGTHNING_SHOT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons an electric shot that attacks an enemy unit causing damage and stunning the target for " + DURATION.toString(1) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION)

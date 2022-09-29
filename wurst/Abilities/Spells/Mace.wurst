@@ -14,7 +14,7 @@ let DMG_BONUS_NL = 25.
 @compiletime function gen()
     new AbilityDefinitionMountainKingBash(MACE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Provides a chance for an attack to deal bonus damage and stun the opponent for " + DURATION.toString(0) + " second."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..setRequirements("")

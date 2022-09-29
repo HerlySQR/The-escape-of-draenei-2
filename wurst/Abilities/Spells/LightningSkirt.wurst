@@ -87,7 +87,7 @@ function ChannelAbilityPreset.general()
         .setName("Lightning Skirt")
     
     new ChannelAbilityPreset(LIGHTNING_SKIRT_S, 6, true)
-        ..setLevels(6)
+        ..presetLevels(6)
         ..setHeroAbility(false)
         ..general()
         ..presetButtonPosNormal(2, 1)

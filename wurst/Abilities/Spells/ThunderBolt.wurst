@@ -18,7 +18,7 @@ let DMG_NL = 100.
 @compiletime function gen()
     new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION)

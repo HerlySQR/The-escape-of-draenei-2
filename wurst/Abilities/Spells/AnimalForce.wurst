@@ -40,7 +40,6 @@ init
 
 function AbilityDefinitionBerserk.general()
     this
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
         ..presetBuffs(lvl -> ANIMAL_FORCE_BUFF.toRawCode())
         ..setEffectSound("StampedeCast")
         ..presetDurationHero(lvl -> DURATION)
@@ -61,16 +60,19 @@ function AbilityDefinitionBerserk.general()
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(ANIMAL_FORCE_NL)
-        ..setLevels(1)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..general()
         // Stats
         ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
         ..tooltipStopListen()
+        .setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionBerserk(ANIMAL_FORCE_L)
-        ..setLevels(2)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..presetButtonPosResearch(2, 0)
         ..setHeroAbility(true)
@@ -80,9 +82,10 @@ function AbilityDefinitionBerserk.general()
         // Stats
         ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_L[lvl - 1])
         ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
 
     new AbilityDefinitionBerserk(ANIMAL_FORCE_S)
-        ..setLevels(3)
+        ..presetLevels(3)
         ..setHeroAbility(false)
         ..general()
         ..presetButtonPosNormal(2, 1)

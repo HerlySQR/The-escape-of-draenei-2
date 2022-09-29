@@ -12,14 +12,14 @@ let AREA = 600.
 
 @compiletime function gen()
     new AbilityDefinitionFarseerFarSight(FAR_SIGHT)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Shows the area of the map on which it is cast for " + DURATION.toString(0) + " seconds. It also shows invisible units."))
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Far Sight")
+        ..setName("Far Sight")
         ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
         // Stats
         ..addTooltipProperty("Duration", lvl -> DURATION)
@@ -31,4 +31,3 @@ let AREA = 600.
         // Tooltip
         ..presetHotkey("F")
         ..tooltipStopListen()
-        .setName("Ext Far Sight")

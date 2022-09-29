@@ -24,3 +24,9 @@ import public ModeSelection
 import public Imports
 import public Missiles
 import public CheckLandNL
+
+public function AbilityDefinition.presetLevels(int lvl)
+    this
+        ..tooltipStartListen()
+        ..setLevels(lvl)
+        ..tooltipStopListen(false)

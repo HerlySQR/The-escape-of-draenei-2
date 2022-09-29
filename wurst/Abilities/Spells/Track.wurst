@@ -20,7 +20,7 @@ let ARMOR_DEC_NL = 10
 @compiletime function gen()
     new AbilityDefinitionFaerieFire(TRACK_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the armor of selected enemy unit and makes them visible.\nLasts " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetBuffs(lvl -> TRACK_BUFF.toRawCode())

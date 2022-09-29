@@ -53,7 +53,7 @@ init
 @compiletime function gen()
     new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. \nLasts 60 seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..setRequirements("")
@@ -75,7 +75,7 @@ init
         .setName("Summon Water Elemental")
 
     new AbilityDefinitionBashcreep(ELEM_BASH)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..setName("Mace")
@@ -88,7 +88,7 @@ init
         ..setDamageBonus(1, 0.)
     
     new AbilityDefinitionAuraEnduranceCreep(ELEM_ZEST)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setArtTarget("")
         ..setName("Zest")
@@ -101,7 +101,7 @@ init
         ..setTooltipNormalExtended(1, "Every time you hit the same target, it will do so 10% faster, but if you stop the charges will restart.")
     
     new AbilityDefinitionAttackSpeedIncrease(ZEST_CHARGES)
-        ..setLevels(9)
+        ..presetLevels(9)
         ..setItemAbility(false)
         ..setRace(Race.Naga)
         ..setName("Zest")

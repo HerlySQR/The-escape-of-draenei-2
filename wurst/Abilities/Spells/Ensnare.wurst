@@ -11,15 +11,14 @@ let RANGE = 500.
 let DURATION = 3.
 let TARGETS = "ground,air,enemy,neutral"
 // Not leveling
-let CD_NL = 8.5
-let MANA_NL = 40
+let CD_NL = [8.5, 7.]
+let MANA_NL = [40, 35]
+// Leveling
+let CD_L = [8.5, 7.5, 6.5, 5.5]
+let MANA_L = [50, 40, 30, 20]
 
-@compiletime function gen()
-    new AbilityDefinitionEnsnare(ENSNARE_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes the targeted enemy unit stuck to the ground and unable to move for " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionEnsnare.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..presetAirUnitHeight(lvl -> 200.)
@@ -27,16 +26,49 @@ let MANA_NL = 40
         ..presetMeleeAttackRange(lvl -> 128.)
         ..presetBuffs(lvl -> "Bena,Beng")
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Ensnare")
+        ..setName("Ensnare")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         // Stats
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD_NL)
+
+@compiletime function gen()
+    new AbilityDefinitionEnsnare(ENSNARE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes the targeted enemy unit stuck to the ground and unable to move for " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Ensnare")
+    
+    new AbilityDefinitionEnsnare(ENSNARE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes the targeted enemy unit stuck to the ground and unable to move for " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionEnsnare(ENSNARE_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Ensnare")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Makes the targeted enemy unit stuck to the ground and unable to move for " + DURATION.toString(0) + " seconds.")
+        ..setEditorSuffix("(Stealed)")

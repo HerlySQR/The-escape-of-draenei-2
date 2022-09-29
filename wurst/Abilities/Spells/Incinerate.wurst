@@ -23,7 +23,7 @@ let DMG_NL = 15.
 @compiletime function gen()
     new AbilityDefinitionFirelordSoulBurn(INCINERATE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Velen forces his target to repress his bad thoughts causing him to be slowed and this is expelled as a healing for nearby units, but this process causes him a damage, this amount is also the one that heals nearby units."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

@@ -18,7 +18,7 @@ let DMG_PER_SEC_NL = 100.
 @compiletime function gen()
     new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing damage per second to nearby enemy ground units. \nLast " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

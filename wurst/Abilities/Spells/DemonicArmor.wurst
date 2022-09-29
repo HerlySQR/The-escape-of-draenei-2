@@ -65,7 +65,7 @@ function AbilityDefinitionHardenedSkin.general()
 
 @compiletime function gen()
     new AbilityDefinitionHardenedSkin(DEMONIC_ARMOR_NL)
-        ..setLevels(2)
+        ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -74,7 +74,7 @@ function AbilityDefinitionHardenedSkin.general()
         .setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionHardenedSkin(DEMONIC_ARMOR_L)
-        ..setLevels(4)
+        ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..setIconResearch(Icons.bTNThickFur)

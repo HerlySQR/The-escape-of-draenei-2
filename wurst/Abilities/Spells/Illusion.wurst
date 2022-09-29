@@ -20,7 +20,7 @@ let MANA_NL = 150
     new AbilityDefinitionItemIllusion(ILLUSION_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates an illusion of a hero.\nLasts " + DURATION.toString(0) + " seconds."))
         ..setRace(Race.Naga)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(3, 2)
         ..setHeroAbility(false)
         ..setItemAbility(false)

@@ -82,9 +82,9 @@ function AbilityDefinitionThunderBoltCreep.general()
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_NL)
-        ..setLevels(1)
-        ..presetButtonPosNormal(3, 2)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
+        ..presetButtonPosNormal(3, 2)
+        ..presetLevels(1)
         ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_NL)
@@ -92,15 +92,16 @@ function AbilityDefinitionThunderBoltCreep.general()
         // Audiovisual
         // Tooltip
         ..presetHotkey("R")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_L)
-        ..setLevels(2)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
         ..setRequiredLevel(6)
         ..setLevelSkipRequirement(6)
         ..presetButtonPosNormal(3, 2)
         ..presetButtonPosResearch(3, 0)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
+        ..presetLevels(2)
         ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
@@ -108,10 +109,11 @@ function AbilityDefinitionThunderBoltCreep.general()
         // Audiovisual
         // Tooltip
         ..presetHotkey("R")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
 
     new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_S)
-        ..setLevels(3)
+        ..presetLevels(3)
         ..setHeroAbility(false)
         ..general()
         ..presetButtonPosNormal(2, 1)

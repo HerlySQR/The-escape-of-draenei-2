@@ -8,32 +8,78 @@ public constant FAN_OF_KNIVES_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let CD = 13.
-let AREA = 400.
-let MAX_DMG = 1000.
 let TARGETS = "air,ground,enemy,organic"
 // Not leveling
-let DMG_NL = 140.
-let MANA_NL = 90
+let DMG_NL = [140., 215.]
+let MAX_DMG_NL = [700., 1075.]
+let MANA_NL = [90, 100]
+let AREA_NL = [400., 450.]
+// Leveling
+let DMG_L = [130., 190., 250., 310.]
+let MAX_DMG_L = [650., 950., 1250., 1550.]
+let MANA_L = [90, 110, 130, 150]
+let AREA_L = [400., 450., 475., 500.]
 
-@compiletime function gen()
-    new AbilityDefinitionWardenFanofKnives(FAN_OF_KNIVES_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero launches a flurry of blades, dealing damage to nearby enemies. Each blade deals 140 damage."))
-        ..setLevels(2)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionWardenFanofKnives.general()
+    this
         ..setAnimationNames("spell,slam")
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Fan of knives")
+        ..setName("Fan of knives")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
-        // Stats
-        ..presetDamagePerTarget(lvl -> DMG_NL)
-        ..presetMaximumTotalDamage(lvl -> MAX_DMG)
-        ..presetAreaofEffect(lvl -> AREA)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+
+@compiletime function gen()
+    new AbilityDefinitionWardenFanofKnives(FAN_OF_KNIVES_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero launches a flurry of blades, dealing damage to nearby enemies."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        // Stats
+        ..presetDamagePerTarget(lvl -> DMG_NL[lvl-1])
+        ..presetMaximumTotalDamage(lvl -> MAX_DMG_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Fan of knives")
+    
+    new AbilityDefinitionWardenFanofKnives(FAN_OF_KNIVES_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero launches a flurry of blades, dealing damage to nearby enemies."))
+        ..presetLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(false)
+        // Stats
+        ..presetDamagePerTarget(lvl -> DMG_L[lvl-1])
+        ..presetMaximumTotalDamage(lvl -> MAX_DMG_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionWardenFanofKnives(FAN_OF_KNIVES_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fan of knives")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamagePerTarget(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetMaximumTotalDamage(lvl -> lvl < 3 ? MAX_DMG_NL[lvl-1] : MAX_DMG_L[lvl-3])
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_L[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_NL[lvl - 1]
+            else
+                value = DMG_L[lvl - 3]
+            return "The hero launches a flurry of blades, dealing damage to nearby enemies. Each blade causes {0} of damage.".format(value.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

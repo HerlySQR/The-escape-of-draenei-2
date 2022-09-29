@@ -64,9 +64,9 @@ function ChannelAbilityPreset.general()
     new ChannelAbilityPreset(EARTHQUAKE_NL, 2, true, new AbilityTooltipGenerator("Shakes the earth of the selected area causing and stunning them."))
         ..setHeroAbility(false)
         // Stats
-        ..addTooltipProperty("Duration", lvl -> DURATION_NL[lvl - 1])
-        ..presetAreaofEffect(lvl -> AREA_NL[lvl - 1])
-        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
         .setName("EarthQuake")
@@ -74,9 +74,9 @@ function ChannelAbilityPreset.general()
     new ChannelAbilityPreset(EARTHQUAKE_L, 4, true, new AbilityTooltipGenerator("Shakes the earth of the selected area causing and stunning them."))
         ..setHeroAbility(false)
         // Stats
-        ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl - 1])
-        ..presetAreaofEffect(lvl -> AREA_L[lvl - 1])
-        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
         .setName("EarthQuake")
@@ -88,22 +88,8 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] EarthQuake")
         ..presetHotkey("F")
         // Stats
-        ..presetAreaofEffect(lvl -> begin
-            real value
-            if lvl < 3
-                value = AREA_NL[lvl - 1]
-            else
-                value = AREA_L[lvl - 3]
-            return value
-        end)
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value1
             real value2
@@ -116,42 +102,13 @@ function ChannelAbilityPreset.general()
             return "Shakes the earth of the selected area causing {0} damage and stunning them for {1} seconds.".format(value1.toString(0), value2.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")
-        .setName("EarthQuake")
     
     new AbilityDefinitionWarStompcreep(DUMMY_EARTHQUAKE)
         ..setName("Dummy stomp")
         ..setEditorSuffix("(Earthquake)")
         ..setArtCaster("")
-        ..presetAreaofEffect(lvl -> begin
-            real value
-            if lvl < 3
-                value = AREA_NL[lvl - 1]
-            else
-                value = AREA_L[lvl - 3]
-            return value
-        end)
-        ..presetDamage(lvl -> begin
-            real value
-            if lvl < 3
-                value = DMG_NL[lvl - 1]
-            else
-                value = DMG_L[lvl - 3]
-            return value
-        end)
-        ..presetDurationHero(lvl -> begin
-            real value
-            if lvl < 3
-                value = DURATION_NL[lvl - 1]
-            else
-                value = DURATION_L[lvl - 3]
-            return value
-        end)
-        ..presetDurationNormal(lvl -> begin
-            real value
-            if lvl < 3
-                value = DURATION_NL[lvl - 1]
-            else
-                value = DURATION_L[lvl - 3]
-            return value
-        end)
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetDurationHero(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
         .setDummyAbility()

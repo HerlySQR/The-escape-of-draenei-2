@@ -13,7 +13,7 @@ let CD_NL = 10.
 @compiletime function gen()
     new AbilityDefinitionWardenBlink(BLINK_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Teleports the unit a short distance, allowing you to enter and exit combat."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..setRequirements("")

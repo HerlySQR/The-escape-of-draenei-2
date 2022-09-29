@@ -121,7 +121,7 @@ function ChannelAbilityPreset.general()
         .setName("Ult Power of light")
 
     new AbilityDefinitionAuraDevotionCreep(POWER_OF_LIGHT_ARMOR)
-        ..setLevels(3)
+        ..presetLevels(3)
         ..setArtTarget("")
         ..presetArmorBonus(lvl -> begin
             real value

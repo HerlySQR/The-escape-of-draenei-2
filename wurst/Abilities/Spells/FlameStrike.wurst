@@ -14,35 +14,80 @@ let DURATION_HERO = 2.67
 let DURATION_NORMAL = 9.
 let TARGETS = "air,enemies,structure,neutral,ground,tree"
 // Not leveling
-let MANA_NL = 115
-let AREA_NL = 200.
-let HALF_DMG_NL = 8.
-let FULL_DMG_NL = 36.67
-let MAX_DMG_NL = 220.
+let MANA_NL = [115, 175]
+let AREA_NL = [200., 200.]
+let HALF_DMG_NL = [8., 8.]
+let FULL_DMG_NL = [36.67, 50.]
+let MAX_DMG_NL = [220., 300.]
+// Leveling
+let MANA_L = [125, 180, 235, 290]
+let AREA_L = [200., 225., 250., 275.]
+let HALF_DMG_L = [4., 6., 8., 10.]
+let FULL_DMG_L = [30., 40., 50., 60.]
+let MAX_DMG_L = [180., 240., 300., 360.]
 
-@compiletime function gen()
-    new AbilityDefinitionFlameStrikeCreep(FLAME_STRIKE_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Conjure a pillar of flame that burns the nearby units. When the flame pillar begins to calm down, the units inside are still receiving minor damage."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(1, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionFlameStrikeCreep.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00W|r] Flame strike")
+        ..setName("Flame strike")
         ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
         // Stats
-        ..presetHalfDamageDealt(lvl -> HALF_DMG_NL)
-        ..presetFullDamageDealt(lvl -> FULL_DMG_NL)
-        ..presetMaximumDamage(lvl -> MAX_DMG_NL)
         ..presetDurationHero(lvl -> DURATION_HERO)
         ..presetDurationNormal(lvl -> DURATION_NORMAL)
         ..presetCastingTime(lvl -> CAST_TIME)
         ..presetCastRange(lvl -> RANGE)
-        ..presetAreaofEffect(lvl -> AREA_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+
+
+@compiletime function gen()
+    new AbilityDefinitionFlameStrikeCreep(FLAME_STRIKE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Conjure a pillar of flame that burns the nearby units. When the flame pillar begins to calm down, the units inside are still receiving minor damage."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetHalfDamageDealt(lvl -> HALF_DMG_NL[lvl-1])
+        ..presetFullDamageDealt(lvl -> FULL_DMG_NL[lvl-1])
+        ..presetMaximumDamage(lvl -> MAX_DMG_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         .tooltipStopListen()
+
+    new AbilityDefinitionFlameStrikeCreep(FLAME_STRIKE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Conjure a pillar of flame that burns the nearby units. When the flame pillar begins to calm down, the units inside are still receiving minor damage."))
+        ..presetLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..general()
+        ..presetHalfDamageDealt(lvl -> HALF_DMG_L[lvl-1])
+        ..presetFullDamageDealt(lvl -> FULL_DMG_L[lvl-1])
+        ..presetMaximumDamage(lvl -> MAX_DMG_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionFlameStrikeCreep(FLAME_STRIKE_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Flame strike")
+        ..presetHotkey("F")
+        // Stats
+        ..presetHalfDamageDealt(lvl -> lvl < 3 ? HALF_DMG_NL[lvl-1] : HALF_DMG_L[lvl-3])
+        ..presetFullDamageDealt(lvl -> lvl < 3 ? FULL_DMG_NL[lvl-1] : FULL_DMG_L[lvl-3])
+        ..presetMaximumDamage(lvl -> lvl < 3 ? MAX_DMG_NL[lvl-1] : MAX_DMG_L[lvl-3])
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Conjures a pillar of flame that burns ground units with {0} damage per second. When the flame pillar begins to calm down, units within it continue to take less damage.".format(((lvl < 3 ? FULL_DMG_NL[lvl-1] : FULL_DMG_L[lvl-3])/2).toString(0)))
+        ..setEditorSuffix("(Stealed)")

@@ -17,6 +17,9 @@ let DURATION = 5.
 // Not leveling
 let MANA_NL = 130
 let DMG_NL = 200.
+// Leveling
+let MANA_L = [130, 175]
+let DMG_L = [200., 350.]
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
@@ -42,35 +45,66 @@ init
                 m.launch()
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(DISABLE_SPHERE_NL, 1, true, new AbilityTooltipGenerator("The zealot creates an orb that when colides with the floor causes a damage and disarm and silence the affected enemy units.|nLasts " + DURATION.toString(0) + " seconds."))
+function ChannelAbilityPreset.general()
+    this
         ..presetBaseOrderID(lvl -> "silence")
         ..presetOption(Option.TARGETIMAGE, true)
-        ..presetButtonPosNormal(3, 2)
-        ..setHeroAbility(false)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("spell,channel")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Disable Sphere")
+        ..setName("Disable Sphere")
         ..presetTargetTypes(Targettype.POINT)
-        // Stats
-        ..addTooltipProperty("Damage", lvl -> DMG_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
         ..presetAreaofEffect(lvl -> AREA)
         // Audiovisual
         ..presetIcon(Imports.bTNStormSphere)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(DISABLE_SPHERE_NL, 1, true, new AbilityTooltipGenerator("The zealot creates an orb that when colides with the floor causes a damage and disarm and silence the affected enemy units.|nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+    
+    new ChannelAbilityPreset(DISABLE_SPHERE_L, 2, true, new AbilityTooltipGenerator("The zealot creates an orb that when colides with the floor causes a damage and disarm and silence the affected enemy units.|nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetButtonPosNormal(3, 2)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..setHeroAbility(true)
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Tooltip
         ..presetHotkey("R")
         .tooltipStopListen()
 
+    new ChannelAbilityPreset(DISABLE_SPHERE_S, 3, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Disable Sphere")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl-2]
+            return "The zealot creates an orb that when colides with the floor causes {0} of damage and disarm and silence the affected enemy units.\nLasts {1} seconds.".format(value.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        ..setName("Ult Disable Sphere")
+
     new AbilityDefinitionSilenceCreep(DISABLE_SPHERE_SILENCE)
-        ..setLevels(1)
-        ..setAttacksPrevented(1, 0)
-        ..setAttacksPrevented(1, 1)
-        ..setAttacksPrevented(1, 2)
-        ..setAttacksPrevented(1, 3)
+        ..presetLevels(1)
+        ..setAttacksPrevented(1, 15)
         ..setDurationHero(1, DURATION)
         ..setDurationNormal(1, DURATION)
         ..setBuffs(1, DISABLE_SPHERE_BUFF.toRawCode())

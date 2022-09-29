@@ -3,33 +3,59 @@ package DegenerationAura
 import AbilityData
 
 public constant DEGENERATION_AURA_NL = compiletime(ABIL_ID_GEN.next())
+public constant DEGENERATION_AURA_L = compiletime(ABIL_ID_GEN.next())
+
 constant DEGENERATION_AURA_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General
 let TARGETS = "air,enemies,invulnerable,ground,vulnerable"
 let AREA = 300.
 // Not leveling
-let SPEED_NL = -0.1
+let SPEED_NL = [-0.1, -0.2]
+// Leveling
+let SPEED_L = [-0.07, -0.14, -0.21, -0.28]
 
-@compiletime function gen()
-    new AbilityDefinitionAuraEnduranceCreep(DEGENERATION_AURA_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Vindicator will not let the culprits escape, reducing their movement speeds."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(2, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionAuraEnduranceCreep.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetAttackSpeedIncrease(lvl -> 0.)
-        ..presetMovementSpeedIncrease(lvl -> SPEED_NL)
         ..presetBuffs(lvl -> DEGENERATION_AURA_BUFF.toRawCode())
         ..tooltipStartListen()
         ..setName("Degeneration Aura")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
-        // Stats
-        ..addTooltipProperty("Movement Speed Decrease", lvl -> -SPEED_NL)
         ..presetAreaofEffect(lvl -> AREA)
         // Audiovisual
         ..setArtTarget(Imports.shockAura)
         ..presetIcon(Imports.pASSparkle)
+
+@compiletime function gen()
+    new AbilityDefinitionAuraEnduranceCreep(DEGENERATION_AURA_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Vindicator will not let the culprits escape, reducing their movement speeds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..tooltipStopListen(false)
+        ..presetMovementSpeedIncrease(lvl -> SPEED_NL[lvl-1])
+        ..tooltipStartListen()
+        ..addTooltipProperty("Movement Speed Decrease", lvl -> -SPEED_NL[lvl-1])
+        // Tooltips
+        .tooltipStopListen()
+    
+    new AbilityDefinitionAuraEnduranceCreep(DEGENERATION_AURA_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Vindicator will not let the culprits escape, reducing their movement speeds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..general()
+        ..setIconResearch(Imports.bTNSparkle)
+        // Stats
+        ..tooltipStopListen(false)
+        ..presetMovementSpeedIncrease(lvl -> SPEED_L[lvl-1])
+        ..tooltipStartListen()
+        ..addTooltipProperty("Movement Speed Decrease", lvl -> -SPEED_L[lvl-1])
         // Tooltips
         .tooltipStopListen()
     

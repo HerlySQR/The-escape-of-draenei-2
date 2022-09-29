@@ -28,7 +28,7 @@ let SLOW_ATTACK_NL = 0.4
 @compiletime function gen()
     new AbilityDefinitionAlchemistAcidBomb(LIQUID_FIRE_ACT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Slows the attack and the move speed, and make damage per second to the affected units.\nLasts " + DURATION_ACT.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..setRequirements("")
@@ -62,7 +62,7 @@ let SLOW_ATTACK_NL = 0.4
     
     new AbilityDefinitionLiquidFire(LIQUID_FIRE_PAS_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a volatile liquid that causes buildings to gradually take damage. Buildings that are receiving damage from Liquid Fire cannot be repaired and their attack rate is reduced.\nLasts " + DURATION_PAS.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..setRequirements("")

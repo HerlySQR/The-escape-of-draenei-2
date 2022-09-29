@@ -22,9 +22,10 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
 @compiletime function gen()
     new AbilityDefinitionBladeMasterCriticalStrike(CRITICAL_STRIKE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of multiplying the normal damage of an attack."))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
+        ..general()
         ..setRequirements("")
         // Stats
         ..presetChancetoCriticalStrike(lvl -> CHANCE_NL)
@@ -32,14 +33,16 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
         // Audiovisual
         // Tooltip
         ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionBladeMasterCriticalStrike(CRITICAL_STRIKE_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of multiplying the normal damage of an attack."))
-        ..setLevels(4)
+        ..presetLevels(4)
         ..setRequiredLevel(1)
         ..presetButtonPosNormal(2, 2)
         ..presetButtonPosResearch(2, 0)
         ..setHeroAbility(false)
+        ..general()
         ..setRequirements("")
         // Stats
         ..presetChancetoCriticalStrike(lvl -> CHANCE_L)
@@ -47,3 +50,4 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
         // Audiovisual
         // Tooltip
         ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")

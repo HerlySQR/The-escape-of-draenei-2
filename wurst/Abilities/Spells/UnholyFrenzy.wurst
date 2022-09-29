@@ -19,7 +19,7 @@ let LIFE_DRAIN_NL = 4.
 @compiletime function gen()
     new AbilityDefinitionUnholyFrenzy(UNHOLY_FRENZY_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the attack rate of a selected unit, but drains hit points per second. \nLasts " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

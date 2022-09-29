@@ -19,7 +19,7 @@ let MANA_NL = 75
 @compiletime function gen()
     new AbilityDefinitionWardenShadowStrike(SHADOW_STRIKE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a poisoned dagger at a selected enemy unit causing an initial damage and damage of every 3 seconds for " + DURATION.toString(0) + " seconds. The poison slows the movement speed of the selected unit for a short period of time."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

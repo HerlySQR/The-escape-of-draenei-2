@@ -9,32 +9,64 @@ public constant FINGER_OF_DEATH_S = compiletime(ABIL_ID_GEN.next())
 // General
 let CD = 25.
 let RANGE = 800.
-let DURATION = 0.6
-let DMG = 200.
 let TARGETS = "air,ground,enemy,organic,neutral"
 // Not leveling
-let MANA_NL = 125
+let MANA_NL = [125, 175]
+let DMG_NL = [200., 300.]
+// Leveling
+let MANA_L = [110, 145, 180, 225]
+let DMG_L = [200., 300., 400., 500.]
 
-@compiletime function gen()
-    new AbilityDefinitionFingerofDeath(FINGER_OF_DEATH_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw lightning that causes damage."))
+function AbilityDefinitionFingerofDeath.general()
+    this
+        ..presetIcon(Icons.bTNCorpseExplode)
         ..setRace(Race.Naga)
-        ..setLevels(1)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetGraphicDuration(lvl -> 1.)
         ..presetGraphicDelay(lvl -> 0.25)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Finger of death")
+        ..setName("Finger of death")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         // Stats
-        ..presetDamage(lvl -> DMG)
         ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+
+@compiletime function gen()
+    new AbilityDefinitionFingerofDeath(FINGER_OF_DEATH_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw lightning that causes damage."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Finger of death")
+
+    new AbilityDefinitionFingerofDeath(FINGER_OF_DEATH_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw lightning that causes damage."))
+        ..presetLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionFingerofDeath(FINGER_OF_DEATH_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Finger of death")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_L[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Throw lightning that causes {0} damage.".format((lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3]).toString()))
+        ..setEditorSuffix("(Stealed)")

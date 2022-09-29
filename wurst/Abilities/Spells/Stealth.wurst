@@ -17,7 +17,7 @@ let EXTRA_DMG_NL = 40.
 @compiletime function gen()
     new AbilityDefinitionWindWalk(STEALTH_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It returns invisible to the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION_NL)

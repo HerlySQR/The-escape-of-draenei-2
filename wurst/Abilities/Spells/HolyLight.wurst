@@ -17,7 +17,7 @@ let HEAL_NL = 175.
 @compiletime function gen()
     new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("A sacred light that can heal a living friendly unit or cause half damage to an enemy demon unit."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

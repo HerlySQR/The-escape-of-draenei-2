@@ -109,7 +109,7 @@ init
 
 @compiletime function gen()
     new ChannelAbilityPreset(VORTEX_NL, 1, false, new AbilityTooltipGenerator("Create a portal that pulls enemy units in an area and hurts every second, if a unit is close to the center, it we'll disappear and when the spells finish, that units will reappear and receive extra damage.|nThe portal lasts 10 seconds or if the Spectre is interrupted the spell finishes."))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetOption(Option.TARGETIMAGE, true)
         ..presetBaseOrderID(lvl -> "voodoo")
         ..presetDisableOtherAbilities(lvl -> false)

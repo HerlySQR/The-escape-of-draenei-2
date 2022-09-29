@@ -18,7 +18,7 @@ let AREA_NL = 300.
 @compiletime function gen()
     new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)

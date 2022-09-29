@@ -10,11 +10,11 @@ let AREA = 900.
 @compiletime function gen()
     new AbilityDefinitionDreadlordVampiricAura(VAMPIRIC_AURA)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Nearby melee units heal a percentage of their attack damage when they reach enemy units."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..tooltipStartListen()
-        ..setName("Brilliance Aura")
+        ..setName("Vampiric Aura")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
         // Stats
         ..presetAttackDamageStolen(lvl -> LIFE_STEAL)

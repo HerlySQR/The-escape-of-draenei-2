@@ -37,26 +37,31 @@ function AbilityDefinitionBallsofFire.general()
 @compiletime function gen()
     new AbilityDefinitionBallsofFire(BOILING_OIL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Soak the demolition's ammunition in boiling oil, causing it to burn the land and enemy units on it.\n\n|cffff0000Orb effects don't stack.|r"))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
+        ..general()
         // Stats
         ..presetHalfDamageDealt(lvl -> HALF_DMG_NL[lvl-1])
         ..presetFullDamageDealt(lvl -> FULL_DMG_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
 
     new AbilityDefinitionBallsofFire(BOILING_OIL_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Soak the demolition's ammunition in boiling oil, causing it to burn the land and enemy units on it.\n\n|cffff0000Orb effects don't stack.|r"))
-        ..setLevels(4)
+        ..presetLevels(4)
         ..presetButtonPosNormal(1, 2)
         ..presetButtonPosResearch(1, 0)
-        ..setHeroAbility(false)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..setIconResearch(Icons.bTNFireRocks)
+        ..general()
         // Stats
         ..presetHalfDamageDealt(lvl -> HALF_DMG_L[lvl-1])
         ..presetFullDamageDealt(lvl -> FULL_DMG_L[lvl-1])
         // Audiovisual
         // Tooltip
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")

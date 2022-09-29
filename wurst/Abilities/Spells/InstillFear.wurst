@@ -25,7 +25,7 @@ init
 
 @compiletime function gen()
     new AbilityDefinitionTaurenChieftainWarStomp(INSTILL_FEAR_NL)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("He gives a loud shout that stuns the enemy units that are still in rank of the Cacique and causing damage."))
         ..presetButtonPosNormal(3, 2)
         ..setHeroAbility(false)

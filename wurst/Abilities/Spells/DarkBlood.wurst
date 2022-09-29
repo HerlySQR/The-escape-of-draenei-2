@@ -27,7 +27,6 @@ init
     end)
 
 function AbilityDefinitionHardenedSkin.general()
-    this.registerTooltipGenerator(new AbilityTooltipGenerator("Pit lord feels each one of his wounds and channels the pain increasing his resistance, for every " + (LIFE_UNIT * 100.).toString(0) + "% of his life lost physical attacks received are reduced."))
     this.presetButtonPosNormal(2, 2)
     this.setHeroAbility(false)
     this.presetIgnoredDamage(lvl -> 0.)
@@ -46,7 +45,8 @@ function AbilityDefinitionHardenedSkin.general()
 
 @compiletime function gen()
     new AbilityDefinitionHardenedSkin(DARK_BLOOD_NL)
-        ..setLevels(2)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Pit lord feels each one of his wounds and channels the pain increasing his resistance, for every " + (LIFE_UNIT * 100.).toString(0) + "% of his life lost physical attacks received are reduced."))
+        ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -55,7 +55,8 @@ function AbilityDefinitionHardenedSkin.general()
         .setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionHardenedSkin(DARK_BLOOD_L)
-        ..setLevels(4)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Pit lord feels each one of his wounds and channels the pain increasing his resistance, for every " + (LIFE_UNIT * 100.).toString(0) + "% of his life lost physical attacks received are reduced."))
+        ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..setIconResearch(Imports.bTNElderBlood)

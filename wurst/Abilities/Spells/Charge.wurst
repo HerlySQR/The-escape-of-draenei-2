@@ -85,6 +85,7 @@ function ChannelAbilityPreset.general()
         ..general()
         // Tooltip
         ..presetHotkey("Q")
+        ..setEditorSuffix("(Not leveling)")
         .tooltipStopListen()
     
     new ChannelAbilityPreset(CHARGE_L, 4, true, new AbilityTooltipGenerator("The Zealot concentrate in a target so increase his speed and causing a damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped."))
@@ -95,7 +96,8 @@ function ChannelAbilityPreset.general()
         ..general()
         // Tooltip
         ..presetHotkey("Q")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
     
     new ChannelAbilityPreset(CHARGE_S, 6, true)
         ..setHeroAbility(false)

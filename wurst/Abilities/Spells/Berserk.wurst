@@ -30,14 +30,13 @@ function AbilityDefinitionBerserk.general()
         ..addTooltipProperty("Duration", lvl -> DURATION)
         ..presetCooldown(lvl -> CD)
         ..presetIcon(Icons.bTNBerserk)
-        
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(BERSERK_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes this unit to attack and move faster for " + DURATION.toString(0) + " seconds, but the hero takes " + (EXTRA_DMG * 100.).toString() + "% extra damage."))
-        ..setLevels(2)
         ..setHeroAbility(false)
         ..general()
+        ..presetLevels(2)
         ..presetButtonPosNormal(1, 2)
         // Stats
         ..presetAttackSpeedIncrease(lvl -> ATTACK_SPEED_NL[lvl-1])
@@ -47,13 +46,14 @@ function AbilityDefinitionBerserk.general()
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionBerserk(BERSERK_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Causes this unit to attack and move faster for " + DURATION.toString(0) + " seconds, but the hero takes " + (EXTRA_DMG * 100.).toString() + "% extra damage."))
-        ..setLevels(4)
         ..setRequiredLevel(1)
         ..setHeroAbility(false)
         ..general()
+        ..presetLevels(4)
         ..presetButtonPosNormal(1, 2)
         ..presetButtonPosResearch(1, 0)
         // Stats
@@ -64,9 +64,10 @@ function AbilityDefinitionBerserk.general()
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
 
     new AbilityDefinitionBerserk(BERSERK_S)
-        ..setLevels(6)
+        ..presetLevels(6)
         ..setHeroAbility(false)
         ..general()
         ..presetButtonPosNormal(2, 1)

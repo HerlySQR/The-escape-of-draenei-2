@@ -126,7 +126,7 @@ function ChannelAbilityPreset.general()
         .setName("Rain of Fire")
     
     new AbilityDefinitionRainofFire(DUMMY_RAIN_OF_FIRE)
-        ..setLevels(6)
+        ..presetLevels(6)
         ..presetDamage(lvl -> begin
             real value
             if lvl < 3

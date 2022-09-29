@@ -10,34 +10,75 @@ public constant FIRE_RAY_S = compiletime(ABIL_ID_GEN.next())
 let CD = 14.
 let TARGETS = "air,ground,organic,enemy,neutral"
 // Not leveling
-let RANGE_NL = 600.
-let MANA_NL = 75
-let DURATION_NL = 1.
-let DMG_NL = 90.
+let RANGE_NL = [600., 700.]
+let MANA_NL = [75, 90]
+let DURATION_NL = [1., 1.75]
+let DMG_NL = [90., 140]
+// Leveling
+let RANGE_L = [650., 800., 950., 950.]
+let MANA_L = [65, 80, 95, 110]
+let DURATION_L = [1., 1.33, 1.67, 2.]
+let DMG_L = [90., 125., 160., 195.]
 
-@compiletime function gen()
-    new AbilityDefinitionFireBoltcreep(FIRE_RAY_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a burning beam that stuns a selected enemy unit causing damage."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionFireBoltcreep.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Fire Ray")
+        ..setName("Fire Ray")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetDamage(lvl -> DMG_NL)
-        ..presetDurationHero(lvl -> DURATION_NL)
-        ..presetDurationNormal(lvl -> DURATION_NL)
-        ..presetCastRange(lvl -> RANGE_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         // Audiovisual
         ..setMissileArc(0.15)
         ..setMissileArt(Imports.fireboltRoughMinor)
         ..setAnimationNames("attack")
+
+@compiletime function gen()
+    new AbilityDefinitionFireBoltcreep(FIRE_RAY_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a burning beam that stuns a selected enemy unit causing damage."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetDurationHero(lvl -> DURATION_NL[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_NL[lvl-1])
+        ..presetCastRange(lvl -> RANGE_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Fire Ray")
+    
+    new AbilityDefinitionFireBoltcreep(FIRE_RAY_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a burning beam that stuns a selected enemy unit causing damage."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetDurationHero(lvl -> DURATION_L[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_L[lvl-1])
+        ..presetCastRange(lvl -> RANGE_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionFireBoltcreep(FIRE_RAY_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fire Ray")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetDurationHero(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetCastRange(lvl -> lvl < 3 ? RANGE_NL[lvl-1] : RANGE_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_L[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Throw a burning beam that stuns a selected enemy unit for {0} seconds causing {1} damage.".format((lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3]).toString(0), (lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3]).toString()))
+        ..setEditorSuffix("(Stealed)")

@@ -25,7 +25,7 @@ let STRANGE_CREATURE_LIFE_NL = 200
 @compiletime function gen()
     new AbilityDefinitionTinkererSummonFactoryLevel0(PORTAL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Create a portal from which summons creatures to help you in combat.\nThe portal lasts " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..setRequirements("")

@@ -19,7 +19,7 @@ let DMG_NL = 100.
 @compiletime function gen()
     new AbilityDefinitionMountainKingThunderClap(THUNDER_CLAP_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground causing damage to nearby enemy land units and slowing their movement speed and their attack rate for " + DURATION.toString(1) + " seconds."))
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION)

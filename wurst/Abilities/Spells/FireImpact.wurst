@@ -14,9 +14,13 @@ let SLOW = 0.75
 let MAX_DURATION = 10.
 let STUN = 2.
 // Not Leveling
-let CD_NL = 23.
+let CD_NL = [23., 19.]
 let MANA_NL = 75
-let DMG_NL = 100.
+let DMG_NL = [100., 175.]
+// Leveling
+let CD_L = [25., 22., 19., 16.]
+let MANA_L = [70, 75, 80, 85]
+let DMG_L = [75., 125., 175., 225.]
 // Internal
 let dmgMap = new HashMap<unit, real>()
 let cbMap = new HashMap<unit, CallbackSingle>()
@@ -29,9 +33,13 @@ function fireImact(unit source, unit target)
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == FIRE_IMPACT_NL
+        let data = abilityCond(FIRE_IMPACT_NL, FIRE_IMPACT_L, FIRE_IMPACT_S)
+        if data.check
             let caster = GetSpellAbilityUnit()
-            dmgMap.put(caster, DMG_NL)
+            if data.isNL
+                dmgMap.put(caster, DMG_NL[data.lvl])
+            else
+                dmgMap.put(caster, DMG_L[data.lvl])
             if cbMap.has(caster)
                 destroy cbMap.get(caster)
             cbMap.put(caster, doAfter(MAX_DURATION, () -> begin
@@ -49,12 +57,8 @@ init
             cbMap.remove(source)
     end)
 
-@compiletime function gen()
-    new AbilityDefinitionBerserk(FIRE_IMPACT_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("When this ability is activated, the next target to attack will be stunned by a fireball for " + STUN.toString(0) + " seconds dealing extra damage, if he doesn't attack anyone after " + MAX_DURATION.toString(0) + " seconds, then the damage and stun will go to the caster."))
-        ..setLevels(2)
-        ..presetButtonPosNormal(2, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionBerserk.general()
+    this
         ..presetBuffs(lvl -> FIRE_IMPACT_BUFF.toRawCode())
         ..presetDurationHero(lvl -> MAX_DURATION + 1.)
         ..presetDurationNormal(lvl -> MAX_DURATION + 1.)
@@ -62,18 +66,53 @@ init
         ..presetAttackSpeedIncrease(lvl -> 0.)
         ..presetMovementSpeedIncrease(lvl -> 0.)
         ..tooltipStartListen()
-        ..setName("[|cffffcc00E|r] Fire Impact")
+        ..setName("Fire Impact")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
         // Stats
-        ..addTooltipProperty("Damage", lvl -> DMG_NL)
         ..addTooltipProperty("Max. duration", lvl -> MAX_DURATION)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD_NL)
         // Audiovisual
         ..presetIcon(Imports.bTNFireImpact)
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(FIRE_IMPACT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When this ability is activated, the next target to attack will be stunned by a fireball for " + STUN.toString(0) + " seconds dealing extra damage, if he doesn't attack anyone after " + MAX_DURATION.toString(0) + " seconds, then the damage and stun will go to the caster."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL)
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
         // Tooltip
         ..presetHotkey("E")
         .tooltipStopListen()
+    
+    new AbilityDefinitionBerserk(FIRE_IMPACT_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When this ability is activated, the next target to attack will be stunned by a fireball for " + STUN.toString(0) + " seconds dealing extra damage, if he doesn't attack anyone after " + MAX_DURATION.toString(0) + " seconds, then the damage and stun will go to the caster."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(false)
+        ..general()
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("E")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionBerserk(FIRE_IMPACT_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fire Impact")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_L[lvl-1] : MANA_L[lvl-3])
+        ..presetCooldown(lvl -> lvl < 3 ? CD_L[lvl-1] : CD_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "When this ability is activated, the next target to attack will be stunned by a fireball for {0} seconds dealing {1} extra damage, if he doesn't attack anyone after {2} seconds, then the damage and stun will go to the caster.".format(STUN.toString(0), (lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3]).toString(), MAX_DURATION.toString(0)))
+        ..setEditorSuffix("(Stealed)")
     
     new BuffDefinition(FIRE_IMPACT_BUFF, 'Bblo')
         ..setIcon(Imports.bTNFireImpact)

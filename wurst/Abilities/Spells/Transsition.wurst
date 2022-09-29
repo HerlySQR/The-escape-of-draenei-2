@@ -79,7 +79,7 @@ init
 
 @compiletime function gen()
     new ChannelAbilityPreset(TRANSSITION_NL, 1, true, new AbilityTooltipGenerator("Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the wolf teleports to the shade location if is not cancelled."))
-        ..setLevels(2)
+        ..presetLevels(2)
         ..presetBaseOrderID(lvl -> "stampede")
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
@@ -100,7 +100,7 @@ init
         .tooltipStopListen()
 
     new AbilityDefinitionDefend(TRANSSITION_CANCEL)
-        ..setLevels(1)
+        ..presetLevels(1)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..setName("Abort")

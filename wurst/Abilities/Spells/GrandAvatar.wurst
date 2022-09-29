@@ -9,32 +9,79 @@ public constant GRAND_AVATAR_S = compiletime(ABIL_ID_GEN.next())
 // General
 let CD = 75.
 let DURATION = 20.
-let MANA = 125
+let ARMOR_BONUS = 5.
 // Not leveling
+let MANA_NL = 125
 let LIFE_BONUS_NL = 250.
-let ARMOR_BONUS_NL = 5.
 let DMG_BONUS_NL = 20.
+// Leveling
+let MANA_L = [125, 150]
+let LIFE_BONUS_L = [250., 325.]
+let DMG_BONUS_L = [30., 50.]
 
-@compiletime function gen()
-    new AbilityDefinitionMountainKingAvatar(GRAND_AVATAR_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("When the Avatar is activated, it provides the unit with an armor bonus, an life bonus,a damage bonus and immunity to spells.\nLasts " + DURATION.toString(0) + " seconds."))
-        ..setLevels(1)
-        ..presetButtonPosNormal(3, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionMountainKingAvatar.general()
+    this
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..setRequirements("")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Active Grand Avatar")
+        ..setName("Active Grand Avatar")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
         // Stats
-        ..presetHitPointBonus(lvl -> LIFE_BONUS_NL)
-        ..presetDefenseBonus(lvl -> ARMOR_BONUS_NL)
-        ..presetDamageBonus(lvl -> DMG_BONUS_NL)
-        ..presetManaCost(lvl -> MANA)
         ..presetCooldown(lvl -> CD)
+        ..presetDefenseBonus(lvl -> ARMOR_BONUS)
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingAvatar(GRAND_AVATAR_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When the Avatar is activated, it provides the unit with an armor bonus, an life bonus,a damage bonus and immunity to spells.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..presetHitPointBonus(lvl -> LIFE_BONUS_NL)
+        ..presetDamageBonus(lvl -> DMG_BONUS_NL)
+        ..presetManaCost(lvl -> MANA_NL)
         // Audiovisual
         // Tooltip
         ..presetTooltipTurnOff(lvl -> "[|cffffcc00R|r] Deactive Grand Avatar")
         ..presetHotkey("R")
         .tooltipStopListen()
+
+    new AbilityDefinitionMountainKingAvatar(GRAND_AVATAR_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When the Avatar is activated, it provides the unit with an armor bonus, an life bonus,a damage bonus and immunity to spells.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..presetHitPointBonus(lvl -> LIFE_BONUS_L[lvl-1])
+        ..presetDamageBonus(lvl -> DMG_BONUS_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00R|r] Deactive Grand Avatar")
+        ..presetHotkey("R")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionMountainKingAvatar(GRAND_AVATAR_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetLevels(3)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Active Grand Avatar")
+        ..presetTooltipTurnOff(lvl -> "[|cffffcc00F|r] Deactive Grand Avatar")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 2
+                value1 = DMG_BONUS_NL
+                value2 = LIFE_BONUS_NL
+            else
+                value1 = DMG_BONUS_L[lvl-2]
+                value2 = LIFE_BONUS_L[lvl-2]
+            return "When the Avatar is activated, it provides the unit with an armor bonus of {0}, an impact point bonus of {1}, a bonus of {2} damage and immunity to spells.\nLasts {3} seconds.".format(ARMOR_BONUS.toString(0), value1.toString(0), value2.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Grand Avatar")

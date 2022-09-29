@@ -17,23 +17,63 @@ let HEAL_NL = [200., 250.]
 let MANA_L = [75, 85, 95, 105]
 let HEAL_L = [200., 250., 300., 350.]
 
-@compiletime function gen()
-    new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
-        ..setLevels(2)
-        ..presetButtonPosNormal(0, 2)
+function AbilityDefinitionDeathKnightDeathCoil.general()
+    this
         ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
         ..setName("Death Coil")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetCooldown(lvl -> CD)
+
+@compiletime function gen()
+    new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
+        ..presetLevels(2)
+        ..setHeroAbility(false)
+        ..presetButtonPosNormal(0, 2)
+        ..general()
         // Stats
         ..presetAmountHealedDamaged(lvl -> HEAL_NL[lvl-1])
-        ..presetCastRange(lvl -> RANGE)
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
+    
+    new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
+        ..presetLevels(4)
+        ..setHeroAbility(true)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..general()
+        // Stats
+        ..presetAmountHealedDamaged(lvl -> HEAL_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+
+    new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_S)
+        ..presetLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Death Coil")
+        ..presetHotkey("F")
+        // Stats
+        ..presetAmountHealedDamaged(lvl -> lvl < 3 ? HEAL_NL[lvl-1] : HEAL_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = HEAL_NL[lvl-1]
+            else
+                value = HEAL_L[lvl-3]
+            return "A death coil that can heal {0} impact points from a friendly unit of undead, or cause half damage to a friendly unit of living.".format(value.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

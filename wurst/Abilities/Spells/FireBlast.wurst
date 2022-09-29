@@ -46,7 +46,7 @@ function AbilityDefinitionThunderBoltCreep.general()
     this.presetDamage(lvl -> 0.)
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Fire Blast")
+    this.setName("Fire Blast")
     this.addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
     this.presetDurationNormal(lvl -> DURATION)
     this.presetDurationHero(lvl -> DURATION)
@@ -59,7 +59,7 @@ function AbilityDefinitionThunderBoltCreep.general()
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_NL)
-        ..setLevels(2)
+        ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -68,10 +68,9 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..presetManaCost(lvl -> MANA_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Fire Blast")
     
     new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_L)
-        ..setLevels(4)
+        ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
@@ -82,24 +81,16 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Fire Blast")
     
     new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_S)
-        ..setLevels(6)
+        ..presetLevels(6)
         ..setHeroAbility(false)
         ..general()
         ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fire Blast")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value1
             real value2
@@ -112,4 +103,3 @@ function AbilityDefinitionThunderBoltCreep.general()
             return "He throws a fireball towards his enemy that is more dangerous the more weakened the target is. Deals " + value1.toString(0) + " + " + (value2 * 100.).toString(0) + "% damage to missing health and stuns for " + DURATION.toString(0) + " seconds"
         end)
         ..setEditorSuffix("(Stealed)")
-        .setName("Fire Blast")

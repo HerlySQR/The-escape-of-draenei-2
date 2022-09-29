@@ -11,14 +11,16 @@ constant DEMONIC_RAIN_EFF = 'X000'//compiletime(BUFF_ID_GEN.next())
 
 // General
 let DURATION = 20.
-let CD = 0.//140.
+let CD = 140.
 let AREA = 1000.
 let INTERVAL = 0.9
 let BUILD_REDUCTION = 0.2
 // Not leveling
-let MANA_NL = 0//200
+let MANA_NL = 200
 let DMG_NL = 150.
-let EXTRA_DMG_NL = 250.
+// Leveling
+let MANA_L = [200, 300]
+let DMG_L = [200., 270.]
 // Internal
 let SOUND = new SoundDefinition(Sounds.doom, true, false)
 SoundInstance varSound
@@ -38,29 +40,72 @@ init
                 varSound.snd.stop(false, true)
     end)
 
-@compiletime function gen()
-    new AbilityDefinitionMoonPriestessStarfall(DEMONIC_RAIN_NL)
-        ..setLevels(1)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Flame waves of infernal stones will fall on each unit at " + AREA.toString(0) + " range of the sorcerer, causing damage, if the caster is stunned or makes an action, the spell stops.|nLasts " + DURATION.toString(0) + " seconds."))
-        ..presetButtonPosNormal(3, 2)
-        ..setHeroAbility(false)
-        ..presetAreaofEffect(lvl -> AREA)
+function AbilityDefinitionMoonPriestessStarfall.general()
+    this
         ..presetDamageInterval(lvl -> INTERVAL)
         ..presetBuildingReduction(lvl -> BUILD_REDUCTION)
         ..presetBuffs(lvl -> DEMONIC_RAIN_BUFF.toRawCode())
         ..presetEffects(lvl -> DEMONIC_RAIN_EFF.toRawCode())
+        ..presetDurationHero(lvl -> DURATION)
         ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Demonic Rain")
+        ..setName("Demonic Rain")
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetCooldown(lvl -> CD)
+        ..presetDurationNormal(lvl -> DURATION)
+        // Audiovisual
+        ..presetIcon(Icons.bTNInfernalStone)
+        ..setAnimationNames("slam,looping")
+
+@compiletime function gen()
+    new AbilityDefinitionMoonPriestessStarfall(DEMONIC_RAIN_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Flame waves of infernal stones will fall on units nearby of the sorcerer, causing damage, if the caster is stunned or makes an action, the spell stops."))
+        ..presetLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..general()
         // Stats
         ..presetDamageDealt(lvl -> DMG_NL)
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
-        // Audiovisual
-        ..presetIcon(Icons.bTNInfernalStone)
         // Tooltip
-        ..setAnimationNames("slam,looping")
         ..presetHotkey("R")
         .tooltipStopListen()
+    
+    new AbilityDefinitionMoonPriestessStarfall(DEMONIC_RAIN_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Flame waves of infernal stones will fall on units nearby of the sorcerer, causing damage, if the caster is stunned or makes an action, the spell stops."))
+        ..presetLevels(2)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetDamageDealt(lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+
+    new AbilityDefinitionMoonPriestessStarfall(DEMONIC_RAIN_S)
+        ..presetLevels(3)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Demonic Rain")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamageDealt(lvl -> lvl < 2 ? DMG_NL : DMG_L[lvl-2])
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 2
+                value = DMG_NL
+            else
+                value = DMG_L[lvl-2]
+            return "Flame waves of infernal stones will fall on units nearby of the sorcerer, causing {0} of damage, if the caster is stunned or makes an action, the spell stops.".format(value.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+        ..setName("Ult Demonic Rain")
     
     new BuffDefinition(DEMONIC_RAIN_BUFF, 'AEsd')
         ..setArtTarget(1, Units.infernalBirth)

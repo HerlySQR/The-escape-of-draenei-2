@@ -51,7 +51,10 @@ init
                 if whatMode[5] == NOT_LEVELING
                     level = target.getAbilityLevel(baseSpellNL[index])
                 else if whatMode[5] == LEVELING
-                    level = target.getAbilityLevel(baseSpellL[index]) + 2
+                    if GetObjectName(stealedSpell[index]).startsWith("Ult ")
+                        level = target.getAbilityLevel(baseSpellL[index]) + 1
+                    else
+                        level = target.getAbilityLevel(baseSpellL[index]) + 2
 
                 // Move the tail
                 doPeriodically(INTERVAL, cb -> begin
@@ -104,19 +107,19 @@ init
             try(() -> destroy timerMap.get(u))
     end)
 
-var total = 0
+var total = 1
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         if GetSpellAbilityUnit().isType(UNIT_TYPE_HERO)
             let id = GetSpellAbilityId()
             if whatMode[5] == NOT_LEVELING
-                for i = 0 to total
+                for i = 1 to total
                     if id == baseSpellNL[i]
                         lastSpell.put(GetSpellAbilityUnit(), i)
                         break
             else if whatMode[5] == LEVELING
-                for i = 0 to total
+                for i = 1 to total
                     if id == baseSpellL[i]
                         lastSpell.put(GetSpellAbilityUnit(), i)
                         break
@@ -160,7 +163,7 @@ init
     initSpell(FIRE_STORM_NL, FIRE_STORM_L, FIRE_STORM_S)
     initSpell(FLAME_STRIKE_NL, FLAME_STRIKE_L, FLAME_STRIKE_S)
     initSpell(GRAND_AVATAR_NL, GRAND_AVATAR_L, GRAND_AVATAR_S)
-    initSpell(HAMMER_CRUSH_NL, HAMMER_CRUSH_L, HAMMER_CRUSH_S)
+    //initSpell(HAMMER_CRUSH_NL, HAMMER_CRUSH_L, HAMMER_CRUSH_S)
     initSpell(HOLY_LIGHT_NL, HOLY_LIGHT_L, HOLY_LIGHT_S)
     initSpell(HOWL_OF_TERROR_NL, HOWL_OF_TERROR_L, HOWL_OF_TERROR_S)
     initSpell(ILLUSION_NL, ILLUSION_L, ILLUSION_S)
@@ -194,7 +197,7 @@ init
     initSpell(THROW_AXES_NL, THROW_AXES_L, THROW_AXES_S)
     initSpell(THUNDER_BOLT_NL, THUNDER_BOLT_L, THUNDER_BOLT_S)
     initSpell(THUNDER_CLAP_NL, THUNDER_CLAP_L, THUNDER_CLAP_S)
-    initSpell(THUNDER_STORM_NL, THUNDER_STORM_L, THUNDER_STORM_S)
+    //initSpell(THUNDER_STORM_NL, THUNDER_STORM_L, THUNDER_STORM_S)
     initSpell(TOTAL_FREEZE_NL, TOTAL_FREEZE_L, TOTAL_FREEZE_S)
     initSpell(TRACK_NL, TRACK_L, TRACK_S)
     initSpell(TRANSSITION_NL, TRANSSITION_L, TRANSSITION_S)
