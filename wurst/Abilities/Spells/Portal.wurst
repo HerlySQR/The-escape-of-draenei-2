@@ -2,6 +2,8 @@ package Portal
 
 import AbilityData
 
+import BountyController
+
 public constant PORTAL_NL = compiletime(ABIL_ID_GEN.next())
 public constant PORTAL_L = compiletime(ABIL_ID_GEN.next())
 public constant PORTAL_S = compiletime(ABIL_ID_GEN.next())
@@ -14,45 +16,100 @@ let CD = 45.
 let DURATION = 40.
 let LIFE_SPAN = 18.
 let INTERVAL_SPW = 3.2
-let PORTAL = compiletime(UNIT_ID_GEN.next())
-let PORTAL_LIFE = 500
+let PORTAL = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
 // Not leveling
 let MANA_NL = 125
-let STRANGE_CREATURE_NL = compiletime(UNIT_ID_GEN.next())
-let STRANGE_CREATURE_DMG_NL = dice(24, 1, 4)
-let STRANGE_CREATURE_LIFE_NL = 200
+let STRANGE_CREATURE_NL = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+let STRANGE_CREATURE_DMG_NL = [dice(24, 1, 4), dice(29, 3, 4)]
+let STRANGE_CREATURE_LIFE_NL = [200, 275]
+let STRANGE_CREATURE_COLOR_NL = [color(255, 255, 255), color(255, 255, 170)]
+// Leveling
+let MANA_L = [125, 130, 135, 140]
+let STRANGE_CREATURE_L = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+let STRANGE_CREATURE_DMG_L = [dice(26, 1, 4), dice(31, 2, 4), dice(36, 3, 4), dice(41, 4, 4)]
+let STRANGE_CREATURE_LIFE_L = [200, 250, 300, 350]
+let STRANGE_CREATURE_COLOR_L = [color(255, 255, 255), color(170, 170, 255), color(255, 170, 170), color(170, 255, 170)]
 
-@compiletime function gen()
-    new AbilityDefinitionTinkererSummonFactoryLevel0(PORTAL_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Create a portal from which summons creatures to help you in combat.\nThe portal lasts " + DURATION.toString(0) + " seconds."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(1, 2)
-        ..setHeroAbility(false)
+init
+    for i = 0 to 1
+        Bounty.set(STRANGE_CREATURE_NL[i], 20, 3, 3)
+    for i = 0 to 3
+        Bounty.set(STRANGE_CREATURE_L[i], 20, 3, 3)
+
+function AbilityDefinitionTinkererSummonFactoryLevel0.general()
+    this
         ..setRequirements("")
-        ..presetFactoryUnitID(lvl -> PORTAL.toRawCode())
-        ..presetSpawnUnitID(lvl -> STRANGE_CREATURE_NL.toRawCode())
         ..presetLeashRange(lvl -> 99999.)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetBuffs(lvl -> commaList(PORTAL_BUFF, DURATION_BUFF))
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Portal")
+        ..setName("Portal")
         ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
-        // Stats
-        ..addTooltipProperty("Portal life", lvl -> PORTAL_LIFE)
-        ..addTooltipProperty("Creature life", lvl -> STRANGE_CREATURE_LIFE_NL)
-        ..addTooltipProperty("Creature damage", lvl -> STRANGE_CREATURE_DMG_NL.toString())
+        ..presetCooldown(lvl -> CD)
         ..presetSpawnUnitDuration(lvl -> LIFE_SPAN)
         ..presetSpawnInterval(lvl -> INTERVAL_SPW)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         ..setMissileArt("")
         ..presetIcon(Icons.bTNPortal)
+
+@compiletime function gen()
+    new AbilityDefinitionTinkererSummonFactoryLevel0(PORTAL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Create a portal from which summons creatures to help you in combat.\nThe portal lasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..presetFactoryUnitID(lvl -> PORTAL[lvl-1].toRawCode())
+        ..presetSpawnUnitID(lvl -> STRANGE_CREATURE_NL[lvl-1].toRawCode())
+        ..general()
+        // Stats
+        ..addTooltipProperty("Creature life", lvl -> STRANGE_CREATURE_LIFE_NL[lvl-1])
+        ..addTooltipProperty("Creature damage", lvl -> STRANGE_CREATURE_DMG_NL[lvl-1].toString())
+        ..presetManaCost(lvl -> MANA_NL)
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Portal")
+    
+    new AbilityDefinitionTinkererSummonFactoryLevel0(PORTAL_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Create a portal from which summons creatures to help you in combat.\nThe portal lasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..presetFactoryUnitID(lvl -> PORTAL[lvl-1].toRawCode())
+        ..presetSpawnUnitID(lvl -> STRANGE_CREATURE_L[lvl-1].toRawCode())
+        ..general()
+        // Stats
+        ..addTooltipProperty("Creature life", lvl -> STRANGE_CREATURE_LIFE_L[lvl-1])
+        ..addTooltipProperty("Creature damage", lvl -> STRANGE_CREATURE_DMG_L[lvl-1].toString())
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionTinkererSummonFactoryLevel0(PORTAL_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Portal")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetFactoryUnitID(lvl -> lvl < 3 ? PORTAL[lvl-1].toRawCode() : PORTAL[lvl-3].toRawCode())
+        ..presetSpawnUnitID(lvl -> lvl < 3 ? STRANGE_CREATURE_NL[lvl-1].toRawCode() : STRANGE_CREATURE_L[lvl-3].toRawCode())
+        ..presetTooltipNormalExtended(lvl -> begin
+            dice value1
+            int value2
+            if lvl < 3
+                value1 = STRANGE_CREATURE_DMG_NL[lvl-1]
+                value2 = STRANGE_CREATURE_LIFE_NL[lvl-1]
+            else
+                value1 = STRANGE_CREATURE_DMG_L[lvl-3]
+                value2 = STRANGE_CREATURE_LIFE_L[lvl-3]
+            return "Create a portal from which summons creatures ({0} damage {1} health) to help you in combat.\nThe portal lasts {2} seconds.".format(value1.toString(), value2.toString(), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
     
     new BuffDefinition(PORTAL_BUFF, 'BNfy')
         ..setName(1, "Portal")
@@ -62,40 +119,63 @@ let STRANGE_CREATURE_LIFE_NL = 200
         ..setName(1, "Duration")
         ..setTooltipNormal(1, "Duration.")
 
-    new UnitDefinition(PORTAL, 'nfac')
-        ..setArmorSoundType(ArmorSoundType.Ethereal)
-        ..setArmorType(ArmorType.Fortified)
-        ..setUnitClassification("summoned,mechanical")
-        ..setFoodCost(0)
-        ..setGoldCost(0)
-        ..setLevel(4)
-        ..setHitPointsMaximumBase(PORTAL_LIFE)
-        ..setModelFile(Doodads.shimmeringPortal)
-        ..setIconGameInterface(Icons.bTNPortal)
-        ..setShadowTextureBuilding("")
-        ..setScalingValue(0.5)
-        ..setAIPlacementRadius(6.)
-        ..setCollisionSize(30.)
-        //..setUnitSoundSet(data)
-        ..setName("Portal")
-        .setNameEditorSuffix("(Level 1)")
+    for i = 0 to 3
+        new UnitDefinition(PORTAL[i], 'nfac')
+            ..setArmorSoundType(ArmorSoundType.Ethereal)
+            ..setArmorType(ArmorType.Fortified)
+            ..setUnitClassification("summoned,mechanical")
+            ..setFoodCost(0)
+            ..setGoldCost(0)
+            ..setLevel(4 + i)
+            ..setHitPointsMaximumBase(500 + 200*i)
+            ..setModelFile(Doodads.shimmeringPortal)
+            ..setIconGameInterface(Icons.bTNPortal)
+            ..setShadowTextureBuilding("")
+            ..setScalingValue(0.5)
+            ..setAIPlacementRadius(6.)
+            ..setCollisionSize(30.)
+            //..setUnitSoundSet(data)
+            ..setName("Portal")
+            .setNameEditorSuffix("(Level 1)")
 
-    new UnitDefinition(STRANGE_CREATURE_NL, 'zzrg')
-        ..setAttack1DamageBase(STRANGE_CREATURE_DMG_NL.base)
-        ..setAttack1DamageNumberofDice(STRANGE_CREATURE_DMG_NL.number)
-        ..setAttack1DamageSidesperDie(STRANGE_CREATURE_DMG_NL.sides)
-        ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward")
-        ..setAttack1CooldownTime(1.35)
-        ..setUnitClassification("summoned")
-        ..setFoodCost(0)
-        ..setGoldCost(0)
-        ..setLevel(1)
-        ..setHitPointsMaximumBase(STRANGE_CREATURE_LIFE_NL)
-        ..setTintingColorRed(255)
-        ..setTintingColorGreen(255)
-        ..setTintingColorBlue(255)
-        ..setScalingValue(0.9)
-        ..setSpeedBase(350)
-        ..setCollisionSize(18.)
-        ..setName("Strange Creature")
-        .setNameEditorSuffix("(Not leveling / Level 1)")
+    for i = 0 to 1
+        new UnitDefinition(STRANGE_CREATURE_NL[i], 'zzrg')
+            ..setAttack1DamageBase(STRANGE_CREATURE_DMG_NL[i].base)
+            ..setAttack1DamageNumberofDice(STRANGE_CREATURE_DMG_NL[i].number)
+            ..setAttack1DamageSidesperDie(STRANGE_CREATURE_DMG_NL[i].sides)
+            ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward")
+            ..setAttack1CooldownTime(1.35 - 0.15*i)
+            ..setUnitClassification("summoned")
+            ..setFoodCost(0)
+            ..setGoldCost(0)
+            ..setLevel(2 + 2*i)
+            ..setHitPointsMaximumBase(STRANGE_CREATURE_LIFE_NL[i])
+            ..setTintingColorRed(STRANGE_CREATURE_COLOR_NL[i].red)
+            ..setTintingColorGreen(STRANGE_CREATURE_COLOR_NL[i].green)
+            ..setTintingColorBlue(STRANGE_CREATURE_COLOR_NL[i].blue)
+            ..setScalingValue(0.9 + 0.2*i)
+            ..setSpeedBase(350 + 20*i)
+            ..setCollisionSize(20.)
+            ..setName("Strange Creature")
+            .setNameEditorSuffix("(Not leveling / Level " + (i+1).toString() + ")")
+
+    for i = 0 to 1
+        new UnitDefinition(STRANGE_CREATURE_L[i], 'zzrg')
+            ..setAttack1DamageBase(STRANGE_CREATURE_DMG_L[i].base)
+            ..setAttack1DamageNumberofDice(STRANGE_CREATURE_DMG_L[i].number)
+            ..setAttack1DamageSidesperDie(STRANGE_CREATURE_DMG_L[i].sides)
+            ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward")
+            ..setAttack1CooldownTime(1.35 - 0.15*i)
+            ..setUnitClassification("summoned")
+            ..setFoodCost(0)
+            ..setGoldCost(0)
+            ..setLevel(3 + i)
+            ..setHitPointsMaximumBase(STRANGE_CREATURE_LIFE_L[i])
+            ..setTintingColorRed(STRANGE_CREATURE_COLOR_L[i].red)
+            ..setTintingColorGreen(STRANGE_CREATURE_COLOR_L[i].green)
+            ..setTintingColorBlue(STRANGE_CREATURE_COLOR_L[i].blue)
+            ..setScalingValue(0.9 + 0.1*i)
+            ..setSpeedBase(350 + 10*i)
+            ..setCollisionSize(20.)
+            ..setName("Strange Creature")
+            .setNameEditorSuffix("(Leveling / Level " + (i+1).toString() + ")")

@@ -12,38 +12,87 @@ constant INCINERATE_BUFF = compiletime(BUFF_ID_GEN.next())
 let SLOW = 0.71
 let MAX_TIMES = 5
 let RANGE = 700.
-let MANA_NL = 85
 let TARGETS = "air,ground,enemy,neutral,organic"
+let CD = 15.
+let MANA = 85
 // Not Leveling
-let DURATION_HERO_NL = 2.
-let DURATION_NORMAL_NL = 10.
-let CD_NL = 16.
-let DMG_NL = 15.
+let DURATION_HERO_NL = [2., 3.]
+let DURATION_NORMAL_NL = [10., 15.]
+let DMG_NL = [15., 30.]
+// Leveling
+let DURATION_HERO_L = [2., 2.5, 3., 3.5]
+let DURATION_NORMAL_L = [7., 14., 21., 28.]
+let DMG_L = [12., 24., 36., 48.]
 
-@compiletime function gen()
-    new AbilityDefinitionFirelordSoulBurn(INCINERATE_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Velen forces his target to repress his bad thoughts causing him to be slowed and this is expelled as a healing for nearby units, but this process causes him a damage, this amount is also the one that heals nearby units."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionFirelordSoulBurn.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetBuffs(lvl -> INCINERATE_BUFF.toRawCode())
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Incinerate")
+        ..setName("Incinerate")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetDamageAmount(lvl -> DMG_NL)
-        ..presetDurationHero(lvl -> DURATION_HERO_NL)
-        ..presetDurationNormal(lvl -> DURATION_NORMAL_NL)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetManaCost(lvl -> MANA)
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..presetIcon(Icons.bTNIncinerate)
+
+@compiletime function gen()
+    new AbilityDefinitionFirelordSoulBurn(INCINERATE_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Engulfs an enemy unit in magical flames, dealing damage per second, avoids spells."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamageAmount(lvl -> DMG_NL[lvl-1])
+        ..presetDurationHero(lvl -> DURATION_HERO_NL[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_NORMAL_NL[lvl-1])
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Incinerate")
+    
+    new AbilityDefinitionFirelordSoulBurn(INCINERATE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Engulfs an enemy unit in magical flames, dealing damage per second, avoids spells."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetDamageAmount(lvl -> DMG_L[lvl-1])
+        ..presetDurationHero(lvl -> DURATION_HERO_L[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_NORMAL_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionFirelordSoulBurn(INCINERATE_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetLevels(6)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Incinerate")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamageAmount(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetDurationHero(lvl -> lvl < 3 ? DURATION_HERO_NL[lvl-1] : DURATION_HERO_L[lvl-3])
+        ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NORMAL_NL[lvl-1] : DURATION_NORMAL_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            real value3
+            if lvl < 3
+                value1 = DMG_NL[lvl-1]
+                value2 = DURATION_HERO_NL[lvl-1]
+                value3 = DURATION_NORMAL_NL[lvl-1]
+            else
+                value1 = DMG_L[lvl-3]
+                value2 = DURATION_HERO_L[lvl-3]
+                value3 = DURATION_NORMAL_L[lvl-3]
+            return "Engulfs an enemy unit in magical flames, dealing {0} damage per second, avoids spells.\nLasts {1} seconds ({2} in heros).".format(value1.toString(), value2.toString(), value3.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
     
     new BuffDefinition(INCINERATE_BUFF, 'BNso')
         ..setIcon(Icons.bTNIncinerate)

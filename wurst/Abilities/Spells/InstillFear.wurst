@@ -13,6 +13,9 @@ let AREA = 900.
 // Not leveling
 let DMG_NL = 140.
 let MANA_NL = 150
+// Leveling
+let DMG_L = [175., 300.]
+let MANA_L = [175, 250]
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
@@ -23,26 +26,59 @@ init
             caster.flashEffect(Imports.fireNova2, "chest")
     end)
 
-@compiletime function gen()
-    new AbilityDefinitionTaurenChieftainWarStomp(INSTILL_FEAR_NL)
-        ..presetLevels(1)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("He gives a loud shout that stuns the enemy units that are still in rank of the Cacique and causing damage."))
-        ..presetButtonPosNormal(3, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionTaurenChieftainWarStomp.general()
+    this
         ..setArtCaster(Abilities.howlCaster)
         ..presetTargetsAllowed(lvl -> "air,organic,ground")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Instill Fear")
+        ..setName("Instill Fear")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
         // Stats
-        ..presetDamage(lvl -> DMG_NL)
+        ..presetCooldown(lvl -> CD)
+        ..presetAreaofEffect(lvl -> AREA)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
-        ..presetAreaofEffect(lvl -> AREA)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         ..presetIcon(Icons.bTNBerserk)
+
+@compiletime function gen()
+    new AbilityDefinitionTaurenChieftainWarStomp(INSTILL_FEAR_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("He gives a loud shout that stuns the enemy units that are still in rank of the Cacique and causing damage."))
+        ..presetLevels(1)
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetDamage(lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA_NL)
         // Tooltip
         ..presetHotkey("R")
         .tooltipStopListen()
+    
+    new AbilityDefinitionTaurenChieftainWarStomp(INSTILL_FEAR_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("He gives a loud shout that stuns the enemy units that are still in rank of the Cacique and causing damage."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        ..setHeroAbility(true)
+        ..general()
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionTaurenChieftainWarStomp(INSTILL_FEAR_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetLevels(3)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Instill Fear")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamage(lvl -> lvl < 2 ? DMG_NL : DMG_L[lvl-2])
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
+        ..presetTooltipNormalExtended(lvl -> begin
+            return "He gives a loud shout that stuns the enemy units that are still {0} in rank of he for {1} seconds and causing {2} damage.".format(AREA.toString(), DURATION.toString(), (lvl < 2 ? DMG_NL : DMG_L[lvl-2]).toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
+        ..setName("Ult Instill Fear")

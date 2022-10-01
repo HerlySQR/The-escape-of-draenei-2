@@ -17,7 +17,7 @@ public function abilityCond(int abilityNL, int abilityL, int abilityS) returns s
         isNL = false
     else if abilId == abilityS
         check = true
-        if GetAbilityName(abilId).startsWith("Ult ")
+        if GetObjectName(abilId).startsWith("Ult ")
             if lvl < 2
                 isNL = true
             else

@@ -52,7 +52,7 @@ function ChannelAbilityPreset.general()
     this.presetFollowThroughTime(lvl -> 0.75)
     this.setAnimationNames("spell,looping")
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Rain of Fire")
+    this.setName("Rain of Fire")
     this.presetTargetTypes(Targettype.POINT)
     this.presetCooldown(lvl -> CD)
     this.presetCastRange(lvl -> RANGE)
@@ -66,13 +66,12 @@ function ChannelAbilityPreset.general()
         ..setHeroAbility(false)
         ..general()
         // Stats
-        ..addTooltipProperty("Initial damage", lvl -> DMG_NL[lvl - 1])
-        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl - 1])
-        ..presetAreaofEffect(lvl -> AREA_NL[lvl - 1])
+        ..addTooltipProperty("Initial damage", lvl -> DMG_NL[lvl-1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL)
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Rain of Fire")
 
     new ChannelAbilityPreset(RAIN_OF_FIRE_L, 4, true, new AbilityTooltipGenerator("Attracts tides of fire that damage units in an area. Each wave deals initial damage and damage per second. \nLasts 5 waves."))
         ..setHeroAbility(true)
@@ -80,13 +79,12 @@ function ChannelAbilityPreset.general()
         ..general()
         ..presetButtonPosResearch(0, 0)
         // Stats
-        ..addTooltipProperty("Initial damage", lvl -> DMG_L[lvl - 1])
-        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl - 1])
-        ..presetAreaofEffect(lvl -> AREA_L[lvl - 1])
-        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..addTooltipProperty("Initial damage", lvl -> DMG_L[lvl-1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Rain of Fire")
     
     new ChannelAbilityPreset(RAIN_OF_FIRE_S, 6, true)
         ..setHeroAbility(false)
@@ -95,22 +93,8 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Rain of Fire")
         ..presetHotkey("F")
         // Stats
-        ..presetAreaofEffect(lvl -> begin
-            real value
-            if lvl < 3
-                value = AREA_NL[lvl - 1]
-            else
-                value = AREA_L[lvl - 3]
-            return value
-        end)
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl - 3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value1
             real value2
@@ -123,26 +107,11 @@ function ChannelAbilityPreset.general()
             return "Attracts tides of fire that damage units in an area. Each wave deals initial damage of " + value1.toString(0) + " and " + value2.toString(0) + " damage per second. \nLasts 5 waves."
         end)
         ..setEditorSuffix("(Stealed)")
-        .setName("Rain of Fire")
     
     new AbilityDefinitionRainofFire(DUMMY_RAIN_OF_FIRE)
         ..presetLevels(6)
-        ..presetDamage(lvl -> begin
-            real value
-            if lvl < 3
-                value = DMG_NL[lvl - 1]
-            else
-                value = DMG_L[lvl - 3]
-            return value
-        end)
-        ..presetDamagePerSecond(lvl -> begin
-            real value
-            if lvl < 3
-                value = DMG_PER_SEC_NL[lvl - 1]
-            else
-                value = DMG_PER_SEC_L[lvl - 3]
-            return value
-        end)
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetDamagePerSecond(lvl -> lvl < 3 ? DMG_PER_SEC_NL[lvl-1] : DMG_PER_SEC_L[lvl-3])
         ..presetNumberofWaves(lvl -> 5)
         ..presetNumberofShards(lvl -> begin
             int value
@@ -156,14 +125,7 @@ function ChannelAbilityPreset.general()
         end)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
-        ..presetAreaofEffect(lvl -> begin
-            real value
-            if lvl < 3
-                value = AREA_NL[lvl - 1]
-            else
-                value = AREA_L[lvl - 3]
-            return value
-        end)
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
         ..setName("Rain of fire")
         ..setEditorSuffix("(Dummy)")
         .setDummyAbility()

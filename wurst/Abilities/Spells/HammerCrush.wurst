@@ -13,8 +13,11 @@ let SLOW = 0.5
 let CD = 20.
 let RANGE = 600.
 // Not leveling
-let MANA_NL = 120
-let DMG_NL = 100.
+let MANA_NL = [120, 150]
+let DMG_NL = [100., 150.]
+// Leveling
+let MANA_L = [110, 125, 140, 165]
+let DMG_L = [90., 130., 170., 210.]
 // Internal
 let SMASH = new SoundDefinition(Sounds.shockwave, false, true)
 
@@ -31,12 +34,17 @@ function hammerCrushActions(unit caster, vec2 pos, player owner, real damage, an
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if EventData.getSpellAbilityId() == HAMMER_CRUSH_NL
+        let data = abilityCond(HAMMER_CRUSH_NL, HAMMER_CRUSH_L, 0/*HAMMER_CRUSH_S*/)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             let pos = caster.getPos()
             let ang = pos.angleTo(EventData.getSpellTargetPos())
-            let damage = DMG_NL
+            real damage
+            if data.isNL
+                damage = DMG_NL[data.lvl]
+            else
+                damage = DMG_L[data.lvl]
             SMASH.playOnPoint(pos.toVec3())
             hammerCrushActions(caster, pos, owner, damage, ang, 1)
             doAfter(0.25) -> 
@@ -45,25 +53,42 @@ init
                     hammerCrushActions(caster, pos, owner, damage, ang, 3)
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(HAMMER_CRUSH_NL, 1, true, new AbilityTooltipGenerator("With the force of his hammer, the Vindicator generates 3 blasts that damage the affected units slow by " + ((1. - SLOW) * 100.).toString(0) + "% for " + DURATION.toString() +" seconds."))
+function ChannelAbilityPreset.general()
+    this
         ..presetBaseOrderID(lvl -> "holybolt")
         ..presetOption(Option.PHYSICALSPELL, true)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("attack,third")
         ..presetTargetsAllowed(lvl -> "air,enemies,neutral,nonancient,organic,ground")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00W|r] Hammer Crush")
+        ..setName("Hammer Crush")
         ..presetTargetTypes(Targettype.POINT)
-        // Stats
-        ..addTooltipProperty("Damage", lvl -> DMG_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..presetIcon(Imports.bTNHammerCrush)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(HAMMER_CRUSH_NL, 2, true, new AbilityTooltipGenerator("With the force of his hammer, the Vindicator generates 3 blasts that damage the affected units slow by " + ((1. - SLOW) * 100.).toString(0) + "% for " + DURATION.toString() +" seconds."))
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()
+
+    new ChannelAbilityPreset(HAMMER_CRUSH_L, 4, true, new AbilityTooltipGenerator("With the force of his hammer, the Vindicator generates 3 blasts that damage the affected units slow by " + ((1. - SLOW) * 100.).toString(0) + "% for " + DURATION.toString() +" seconds."))
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Tooltip
         ..presetHotkey("W")
         .tooltipStopListen()

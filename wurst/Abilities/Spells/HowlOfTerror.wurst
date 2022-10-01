@@ -12,33 +12,70 @@ let DURATION = 15.
 let AREA = 800.
 let TARGETS = "air,ground,enemy,neutral"
 // Not leveling
-let ARMOR_DEC_NL = 4
-let DMG_DEC_NL = 0.35
+let ARMOR_DEC_NL = [4, 6]
+let DMG_DEC_NL = [0.35, 0.45]
 let MANA_NL = 100
+// Leveling
+let ARMOR_DEC_L = [3, 4, 5, 6]
+let DMG_DEC_L = [0.2, 0.3, 0.4, 0.5]
+let MANA_L =[90, 105, 120, 135]
+
+function AbilityDefinitionPitLordHowlofTerror.general()
+    this
+        ..presetBuffs(lvl -> "BNht")
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..tooltipStartListen()
+        ..setName("Howl of terror")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        ..presetCooldown(lvl -> CD)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
 
 @compiletime function gen()
     new AbilityDefinitionPitLordHowlofTerror(HOWL_OF_TERROR_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It emits a terrifying howl that reduces the attack damage of nearby enemy units and armor for " + DURATION.toString(0) + " seconds."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..presetDefenseIncrease(lvl -> ARMOR_DEC_NL)
-        ..presetDamageIncrease(lvl -> DMG_DEC_NL)
-        ..presetBuffs(lvl -> "BNht")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Howl of terror")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
-        // Stats
-        ..addTooltipProperty("Defense decrease", lvl -> ARMOR_DEC_NL)
-        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_NL)
-        ..presetDurationHero(lvl -> DURATION)
-        ..presetDurationNormal(lvl -> DURATION)
-        ..presetAreaofEffect(lvl -> AREA)
+        ..presetDefenseIncrease(lvl -> ARMOR_DEC_NL[lvl-1])
+        ..presetDamageIncrease(lvl -> DMG_DEC_NL[lvl-1])
+        ..general()
+        ..addTooltipProperty("Defense decrease", lvl -> ARMOR_DEC_NL[lvl-1])
+        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Howl of terror")
+    
+    new AbilityDefinitionPitLordHowlofTerror(HOWL_OF_TERROR_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It emits a terrifying howl that reduces the attack damage of nearby enemy units and armor for " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..presetDefenseIncrease(lvl -> ARMOR_DEC_L[lvl-1])
+        ..presetDamageIncrease(lvl -> DMG_DEC_L[lvl-1])
+        ..general()
+        ..addTooltipProperty("Defense decrease", lvl -> ARMOR_DEC_L[lvl-1])
+        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionPitLordHowlofTerror(HOWL_OF_TERROR_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Howl of terror")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDefenseIncrease(lvl -> lvl < 3 ? ARMOR_DEC_NL[lvl-1] : ARMOR_DEC_L[lvl-3])
+        ..presetDamageIncrease(lvl -> lvl < 3 ? DMG_DEC_NL[lvl-1] : DMG_DEC_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "It emits a terrifying howl that reduces {0}% of the attack damage of nearby enemy units and {1} of armor for {2} seconds.".format(((lvl < 3 ? DMG_DEC_NL[lvl-1] : DMG_DEC_L[lvl-3])*100).toInt().toString(), (lvl < 3 ? ARMOR_DEC_NL[lvl-1] : ARMOR_DEC_L[lvl-3]).toString(), DURATION.toString(0)))
+        ..setEditorSuffix("(Stealed)")

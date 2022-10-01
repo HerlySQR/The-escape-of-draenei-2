@@ -79,7 +79,7 @@ function ChannelAbilityPreset.general()
     this.presetFollowThroughTime(lvl -> 0.75)
     this.setAnimationNames("spell,channel")
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Pulse Nova")
+    this.setName("Pulse Nova")
     this.presetTargetTypes(Targettype.POINT)
     this.presetCooldown(lvl -> CD)
     this.presetCastRange(lvl -> RANGE)
@@ -98,7 +98,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Pulse Nova")
     
     new ChannelAbilityPreset(PULSE_NOVA_L, 4, true, new AbilityTooltipGenerator("Launches a powerful ball of energy that knocks back units deemed hostile by the prophet. \nThe damage is bigger while the units are closer of the center of the explosion."))
         ..setHeroAbility(true)
@@ -110,7 +109,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Pulse Nova")
     
     new ChannelAbilityPreset(PULSE_NOVA_S, 6, true)
         ..setHeroAbility(false)
@@ -119,21 +117,6 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Pulse Nova")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
-        ..presetTooltipNormalExtended(lvl -> begin
-            real value
-            if lvl < 3
-                value = MAX_DMG_NL[lvl - 1]
-            else
-                value = MAX_DMG_L[lvl - 3]
-            return "Launches a powerful ball of energy that knocks back units deemed hostile by the prophet, knocking them back and dealing a max damage of {0}.".format(value.toString(0))
-        end)
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Launches a powerful ball of energy that knocks back units deemed hostile by the prophet, knocking them back and dealing a max damage of {0}.".format((lvl < 3 ? MAX_DMG_NL[lvl-1] : MAX_DMG_L[lvl-3]).toString(0)))
         ..setEditorSuffix("(Stealed)")
-        .setName("Pulse Nova")

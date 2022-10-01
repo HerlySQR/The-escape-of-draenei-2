@@ -21,32 +21,35 @@ let AREA = 275.
 let RANGE = 700.
 // Not leveling
 let MANA_NL = 75
-let DMG_ACT_NL = 20.
-let DMG_PAS_NL = 20.
-let SLOW_ATTACK_NL = 0.4
+let DMG_ACT_NL = [20., 30.]
+let DMG_PAS_NL = [8., 12.]
+let SLOW_ATTACK_NL = [0.4, 0.8]
+// Leveling
+let MANA_L = [75, 90, 105, 120]
+let DMG_ACT_L = [16., 28., 40., 52.]
+let DMG_PAS_L = [8., 14., 20., 26.]
+let SLOW_ATTACK_L = [0.35, 0.5, 0.65, 0.8]
 
-@compiletime function gen()
-    new AbilityDefinitionAlchemistAcidBomb(LIQUID_FIRE_ACT_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Slows the attack and the move speed, and make damage per second to the affected units.\nLasts " + DURATION_ACT.toString(0) + " seconds."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(2, 2)
-        ..setHeroAbility(false)
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_HERO_SKILL, () -> begin
+        if GetLearnedSkill() == LIQUID_FIRE_ACT_L
+            if GetLearnedSkillLevel() == 1
+                GetLearningUnit().addAbility(LIQUID_FIRE_PAS_L)
+            else
+                GetLearningUnit().setAbilityLevel(LIQUID_FIRE_PAS_L, GetLearnedSkillLevel())
+    end)
+
+function AbilityDefinitionAlchemistAcidBomb.general()
+    this
         ..setRequirements("")
         ..presetArmorPenalty(lvl -> 0)
-        ..presetPrimaryDamage(lvl -> DMG_ACT_NL)
-        ..presetSecondaryDamage(lvl -> DMG_ACT_NL)
         ..presetCastRange(lvl -> RANGE)
         ..presetBuffs(lvl -> LIQUID_FIRE_BUFF.toRawCode())
-        ..presetAttackSpeedReduction(lvl -> -SLOW_ATTACK_NL) // It should be negative
-        ..presetMovementSpeedReduction(lvl -> -SLOW_MOVE)
+        ..presetMovementSpeedReduction(lvl -> -SLOW_MOVE) // It should be negative
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Liquid Fire")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..addTooltipProperty("Damage per second", lvl -> DMG_ACT_NL)
+        ..setName("Liquid Fire")
         ..presetDurationHero(lvl -> DURATION_ACT)
         ..presetDurationNormal(lvl -> DURATION_ACT)
-        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_NL)
         ..addTooltipProperty("Movement Speed Reduction", lvl -> SLOW_MOVE)
         ..presetCooldown(lvl -> CD)
         // Audiovisual
@@ -54,30 +57,110 @@ let SLOW_ATTACK_NL = 0.4
         ..setMissileArc(0.2)
         ..setMissileArt(Abilities.batTrollMissile)
         ..presetIcon(Icons.bTNLiquidFire)
+
+function AbilityDefinitionLiquidFire.general()
+    this
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Liquid Fire")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        ..presetDurationHero(lvl -> DURATION_PAS)
+        ..presetDurationNormal(lvl -> DURATION_PAS)
+
+@compiletime function gen()
+    new AbilityDefinitionAlchemistAcidBomb(LIQUID_FIRE_ACT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Slows the attack and the move speed, and make damage per second to the affected units.\nLasts " + DURATION_ACT.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetPrimaryDamage(lvl -> DMG_ACT_NL[lvl-1])
+        ..presetSecondaryDamage(lvl -> DMG_ACT_NL[lvl-1])
+        ..presetAttackSpeedReduction(lvl -> -SLOW_ATTACK_NL[lvl-1])
+        ..general()
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_ACT_NL[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL)
         // Tooltip
         ..presetHotkey("E")
         ..setEditorSuffix("(Active)")
         ..tooltipStopListen()
-        .setName("Liquid Fire")
     
     new AbilityDefinitionLiquidFire(LIQUID_FIRE_PAS_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a volatile liquid that causes buildings to gradually take damage. Buildings that are receiving damage from Liquid Fire cannot be repaired and their attack rate is reduced.\nLasts " + DURATION_PAS.toString(0) + " seconds."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        ..general()
         // Stats
-        ..setName("Liquid Fire")
-        ..presetExtraDamagePerSecond(lvl -> DMG_PAS_NL)
-        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_NL)
-        ..presetDurationHero(lvl -> DURATION_PAS)
-        ..presetDurationNormal(lvl -> DURATION_PAS)
+        ..presetExtraDamagePerSecond(lvl -> DMG_PAS_NL[lvl-1])
+        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..setEditorSuffix("(Pasive)")
         ..tooltipStopListen()
+    
+    new AbilityDefinitionAlchemistAcidBomb(LIQUID_FIRE_ACT_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Slows the attack and the move speed, and make damage per second to the affected units.\nLasts " + DURATION_ACT.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setRequiredLevel(1)
+        ..setHeroAbility(true)
+        ..presetPrimaryDamage(lvl -> DMG_ACT_L[lvl-1])
+        ..presetSecondaryDamage(lvl -> DMG_ACT_L[lvl-1])
+        ..presetAttackSpeedReduction(lvl -> -SLOW_ATTACK_L[lvl-1])
+        ..general()
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_ACT_L[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("E")
+        ..setEditorSuffix("(Active)")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionLiquidFire(LIQUID_FIRE_PAS_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a volatile liquid that causes buildings to gradually take damage. Buildings that are receiving damage from Liquid Fire cannot be repaired and their attack rate is reduced.\nLasts " + DURATION_PAS.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 1)
+        ..setRequiredLevel(1)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetExtraDamagePerSecond(lvl -> DMG_PAS_L[lvl-1])
+        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..setEditorSuffix("(Pasive)")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionAlchemistAcidBomb(LIQUID_FIRE_ACT_S)
+        ..presetLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Liquid Fire")
+        ..presetHotkey("F")
+        // Stats
+        ..presetPrimaryDamage(lvl ->  lvl < 3 ? DMG_ACT_NL[lvl-1] : DMG_ACT_L[lvl-3])
+        ..presetSecondaryDamage(lvl ->  lvl < 3 ? DMG_ACT_NL[lvl-1] : DMG_ACT_L[lvl-3])
+        ..presetAttackSpeedReduction(lvl ->  lvl < 3 ? -SLOW_ATTACK_L[lvl-1] : -SLOW_ATTACK_L[lvl-3])
+        ..presetManaCost(lvl ->  lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            int value1
+            real value2
+            if lvl < 3
+                value1 = (SLOW_ATTACK_NL[lvl-1] * 100).toInt()
+                value2 = DMG_ACT_NL[lvl-1]
+            else
+                value1 = (SLOW_ATTACK_L[lvl-3] * 100).toInt()
+                value2 = DMG_ACT_L[lvl-3]
+            return "Slows the attack speed by {0}% and the move speed by {1}%, and make {2} damage per second to the affected units.\nLasts {3} seconds.".format(value1.toString(), (SLOW_MOVE * 100).toInt().toString(), value2.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
     
     new BuffDefinition(LIQUID_FIRE_BUFF, 'BNab')
         ..setIcon(Icons.bTNLiquidFire)

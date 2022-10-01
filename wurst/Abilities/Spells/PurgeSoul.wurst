@@ -49,7 +49,7 @@ function AbilityDefinitionPurge.general()
     this.presetBuffs(lvl -> PURGE_SOUL_BUFF.toRawCode())
     this.presetMovementUpdateFrequency(lvl -> 5)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Purge Soul")
+    this.setName("Purge Soul")
     this.addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
     this.presetCooldown(lvl -> CD)
     this.presetCastRange(lvl -> CAST_RANGE)
@@ -71,7 +71,6 @@ function AbilityDefinitionPurge.general()
         ..presetManaCost(lvl -> MANA_NL)
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Purge Soul")
     
     new AbilityDefinitionPurge(PURGE_SOUL_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes damage and reduces its velocity but recovers it gradually, and reduces the magic resistance in 25%."))
@@ -82,11 +81,10 @@ function AbilityDefinitionPurge.general()
         ..general()
         ..presetButtonPosResearch(1, 0)
         // Stats
-        ..addTooltipProperty("Damage per shock", lvl -> DMG_L[lvl - 1])
+        ..addTooltipProperty("Damage per shock", lvl -> DMG_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Purge Soul")
     
     new AbilityDefinitionPurge(PURGE_SOUL_S)
         ..setHeroAbility(false)
@@ -97,22 +95,8 @@ function AbilityDefinitionPurge.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Purge Soul")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
-        ..presetTooltipNormalExtended(lvl -> begin
-            real value
-            if lvl < 2
-                value = DMG_NL
-            else
-                value = DMG_L[lvl - 2]
-            return "Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes " + value.toString(0) + " damage and reduces its velocity but recovers it gradually.\nLasts " + DURATION.toString(0) + " seconds."
-        end)
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
+        ..presetTooltipNormalExtended(lvl -> "Removes all buffs and gives the affected unit every second for 4 seconds an electric strike that causes {0} damage and reduces its velocity but recovers it gradually.\nLasts {1} seconds.".format((lvl < 2 ? DMG_NL : DMG_L[lvl-2]).toString(0), DURATION.toString(0)))
         ..setEditorSuffix("(Stealed)")
         .setName("Ult Purge Soul")
     

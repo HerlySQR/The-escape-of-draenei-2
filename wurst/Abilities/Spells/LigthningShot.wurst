@@ -12,28 +12,61 @@ let RANGE = 400.
 let DURATION = 0.6
 // Not leveling
 let MANA_NL = 90
-let DMG_NL = 125.
+let DMG_NL = [125., 200.]
+// Leveling
+let MANA_L = [90, 100, 110, 120]
+let DMG_L = [75., 150., 225., 300.]
+
+function AbilityDefinitionThunderBoltCreep.general()
+    this
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..tooltipStartListen()
+        ..setName("Lightning Shot")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        // Audiovisual
+        ..setMissileArt(Imports.shotIIBlue)
+        ..setIconNormal(Imports.bTNWispMissile)
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(LIGTHNING_SHOT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons an electric shot that attacks an enemy unit causing damage and stunning the target for " + DURATION.toString(1) + " seconds."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
-        ..presetDurationHero(lvl -> DURATION)
-        ..presetDurationNormal(lvl -> DURATION)
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Lightning Shot")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetDamage(lvl -> DMG_NL)
-        ..presetCastRange(lvl -> RANGE)
+        ..general()
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
-        // Audiovisual
-        ..setMissileArt(Imports.shotIIBlue)
-        ..setIconNormal(Imports.bTNWispMissile)
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Lightning Shot")
+
+    new AbilityDefinitionThunderBoltCreep(LIGTHNING_SHOT_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons an electric shot that attacks an enemy unit causing damage and stunning the target for " + DURATION.toString(1) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionThunderBoltCreep(LIGTHNING_SHOT_S)
+        ..presetLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Lightning Shot")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDamage(lvl ->  lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetManaCost(lvl ->  lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Summons an electric shot that attacks an enemy unit causing {0} damage and stunning the target for {1} seconds.".format((lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3]).toString(0), DURATION.toString(1)))
+        ..setEditorSuffix("(Stealed)")

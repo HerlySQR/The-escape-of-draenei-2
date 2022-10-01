@@ -80,7 +80,7 @@ function ChannelAbilityPreset.general()
     this.setAnimationNames("victory,spell,channel")
     this.setArtTarget(Abilities.monsoonRain)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Monsoon")
+    this.setName("Monsoon")
     this.presetTargetTypes(Targettype.POINT)
     this.presetCooldown(lvl -> CD)
     this.presetCastRange(lvl -> RANGE)
@@ -100,7 +100,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL)
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Monsoon")
     
     new ChannelAbilityPreset(MONSOON_L, 2, true, new AbilityTooltipGenerator("Summons a lightning storm to deal damage to enemy units slows the units a {0}%.".format(((1. - SPEED) * 100.).toString(0))))
         ..setHeroAbility(true)
@@ -113,7 +112,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Monsoon")
     
     new ChannelAbilityPreset(MONSOON_S, 3, true)
         ..setHeroAbility(false)
@@ -122,22 +120,8 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Monsoon")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
-        ..presetTooltipNormalExtended(lvl -> begin
-            real value
-            if lvl < 2
-                value = DMG_NL
-            else
-                value = DMG_L[lvl - 2]
-            return "Summons a lightning storm to deal {0} damage to enemy units in a {1} AOE and slows the units a {2}%.".format(value.toString(0), AREA.toString(0), ((1 - SPEED) * 100.).toString(0))
-        end)
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
+        ..presetTooltipNormalExtended(lvl -> "Summons a lightning storm to deal {0} damage to enemy units in a {1} AOE and slows the units a {2}%.".format((lvl < 2 ? DMG_NL : DMG_L[lvl-2]).toString(0), AREA.toString(0), ((1 - SPEED) * 100.).toString(0)))
         ..setEditorSuffix("(Stealed)")
         .setName("Ult Monsoon")
     

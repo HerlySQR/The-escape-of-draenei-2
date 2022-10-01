@@ -2,11 +2,13 @@ package Inferno
 
 import AbilityData
 
+import BountyController
+
 public constant INFERNO_NL = compiletime(ABIL_ID_GEN.next())
 public constant INFERNO_L = compiletime(ABIL_ID_GEN.next())
 public constant INFERNO_S = compiletime(ABIL_ID_GEN.next())
 
-constant INFERNAL_NL = compiletime(UNIT_ID_GEN.next())
+let INFERNAL_CLAP = compiletime(ABIL_ID_GEN.next())
 
 // General
 let RANGE = 500.
@@ -14,54 +16,140 @@ let TARGETS = "ground,structure,debris,enemy,neutral"
 let DURATION = 50.
 let DURATION_STUN = 2.
 // Not leveling
-let CD_NL = 32.
-let INFERNAL_LIFE_NL = 650
-let INFERNAL_DMG_NL = dice(55, 1, 12)
-let AREA_NL = 250.
-let MANA_NL = 50
-let DMG_NL = 50.
+let CD_NL = [32., 30.]
+let INFERNAL_LIFE_NL = [650, 800]
+let INFERNAL_DMG_NL = [dice(55, 1, 12), dice(75, 1, 12)]
+let INFERNAL_NL = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+let INFERNAL_COLOR_NL = [color(255, 255, 255), color(255, 100, 100)]
+let AREA_NL = [250., 275.]
+let MANA_NL = [100, 125]
+let DMG_NL = [50., 75.]
+// Leveling
+let CD_L = [35., 32., 29., 26.]
+let INFERNAL_LIFE_L = [700, 850, 1000, 1250]
+let INFERNAL_DMG_L = [dice(48, 1, 12), dice(64, 1, 12), dice(80, 1, 12), dice(96, 1, 12)]
+let INFERNAL_L = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+let INFERNAL_COLOR_L = [color(100, 255, 255), color(100, 255, 100), color(255, 100, 100), color(255, 10, 10)]
+let AREA_L = [250., 270., 290., 310.]
+let MANA_L = [125, 150, 175, 200]
+let DMG_L = [100., 120., 140., 160.]
+
+init
+    for i = 0 to 1
+        Bounty.set(INFERNAL_NL[i], 35, 6, 3)
+    for i = 0 to 3
+        Bounty.set(INFERNAL_L[i], 25 + 10*i, 6, 3)
+
+function AbilityDefinitionInferno.general()
+    this
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Inferno")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
+        // Stats
+        ..presetDuration(lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetDurationHero(lvl -> DURATION_STUN)
+        ..presetDurationNormal(lvl -> DURATION_STUN)
 
 @compiletime function gen()
     new AbilityDefinitionInferno(INFERNO_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw an infernal from the sky, it lasts " + DURATION.toString(0) + " seconds."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..presetSummonedUnit(lvl -> INFERNAL_NL.toRawCode())
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Inferno")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
-        // Stats
-        ..addTooltipProperty("Infernal life", lvl -> INFERNAL_LIFE_NL)
-        ..addTooltipProperty("Infernal damage", lvl -> INFERNAL_DMG_NL.toString())
-        ..presetDuration(lvl -> DURATION)
-        ..presetDamage(lvl -> DMG_NL)
-        ..presetDurationHero(lvl -> DURATION_STUN)
-        ..presetDurationNormal(lvl -> DURATION_STUN)
-        ..presetAreaofEffect(lvl -> AREA_NL)
-        ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD_NL)
+        ..presetSummonedUnit(lvl -> INFERNAL_NL[lvl-1].toRawCode())
+        ..general()
+        ..addTooltipProperty("Infernal life", lvl -> INFERNAL_LIFE_NL[lvl-1])
+        ..addTooltipProperty("Infernal damage", lvl -> INFERNAL_DMG_NL[lvl-1].toString())
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("E")
         ..tooltipStopListen()
-        .setName("Inferno")
+    
+    new AbilityDefinitionInferno(INFERNO_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw an infernal from the sky, it lasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..presetSummonedUnit(lvl -> INFERNAL_L[lvl-1].toRawCode())
+        ..general()
+        ..addTooltipProperty("Infernal life", lvl -> INFERNAL_LIFE_L[lvl-1])
+        ..addTooltipProperty("Infernal damage", lvl -> INFERNAL_DMG_L[lvl-1].toString())
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionInferno(INFERNO_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetLevels(6)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Incinerate")
+        ..presetHotkey("F")
+        // Stats
+        ..presetSummonedUnit(lvl -> lvl < 3 ? INFERNAL_NL[lvl-1].toRawCode() : INFERNAL_L[lvl-3].toRawCode())
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_NL[lvl-3])
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Throw a powerful Infernal from sky, causing {0} damage and stunning enemy ground units in an area for {1} seconds.\nThe Infernal lasts {2} seconds.".format((lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3]).toString(0), DURATION_STUN.toString(0), DURATION.toString(0)))
+        ..setEditorSuffix("(Stealed)")
 
-    new UnitDefinition(INFERNAL_NL, 'ninf')
-        ..setAttack1DamageBase(INFERNAL_DMG_NL.base)
-        ..setAttack1DamageNumberofDice(INFERNAL_DMG_NL.number)
-        ..setAttack1DamageSidesperDie(INFERNAL_DMG_NL.sides)
-        ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward,tree")
-        ..setUnitClassification("summoned")
-        ..setLevel(4)
-        ..setHitPointsMaximumBase(INFERNAL_LIFE_NL)
-        ..setTintingColorRed(255)
-        ..setTintingColorGreen(255)
-        ..setTintingColorBlue(255)
-        ..setScalingValue(0.8)
-        ..setNormalAbilities("ANpi")
-        ..setName("Infernal")
-        .setNameEditorSuffix("(Not leveling / Level 1)")
+    for i = 0 to 1
+        new UnitDefinition(INFERNAL_NL[i], 'ninf')
+            ..setAttack1DamageBase(INFERNAL_DMG_NL[i].base)
+            ..setAttack1DamageNumberofDice(INFERNAL_DMG_NL[i].number)
+            ..setAttack1DamageSidesperDie(INFERNAL_DMG_NL[i].sides)
+            ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward,tree")
+            ..setUnitClassification("summoned")
+            ..setLevel(2*i + 4)
+            ..setHitPointsMaximumBase(INFERNAL_LIFE_NL[i])
+            ..setTintingColorRed(INFERNAL_COLOR_NL[i].red)
+            ..setTintingColorGreen(INFERNAL_COLOR_NL[i].green)
+            ..setTintingColorBlue(INFERNAL_COLOR_NL[i].blue)
+            ..setScalingValue(0.2*i + 0.8)
+            ..setNormalAbilities("ANpi")
+            ..setName("Infernal")
+            .setNameEditorSuffix("(Not leveling / Level " + (i+1).toString() + ")")
+
+    for i = 0 to 3
+        new UnitDefinition(INFERNAL_NL[i], 'ninf')
+            ..setAttack1DamageBase(INFERNAL_DMG_L[i].base)
+            ..setAttack1DamageNumberofDice(INFERNAL_DMG_L[i].number)
+            ..setAttack1DamageSidesperDie(INFERNAL_DMG_L[i].sides)
+            ..setAttack1TargetsAllowed("air,debris,structure,item,ground,ward,tree")
+            ..setUnitClassification("summoned")
+            ..setLevel(2*i + 3)
+            ..setHitPointsMaximumBase(INFERNAL_LIFE_L[i])
+            ..setTintingColorRed(INFERNAL_COLOR_L[i].red)
+            ..setTintingColorGreen(INFERNAL_COLOR_L[i].green)
+            ..setTintingColorBlue(INFERNAL_COLOR_L[i].blue)
+            ..setScalingValue(0.2*i + 0.8)
+            ..setNormalAbilities((i < 2 ? "ANpi,ACrk" : "Apig,ACrk" + (i == 2 ?  "": INFERNAL_CLAP.toRawCode())))
+            ..setName("Infernal")
+            .setNameEditorSuffix("(Leveling / Level " + (i+1).toString() + ")")
+    
+    new AbilityDefinitionThunderClapCreep(INFERNAL_CLAP)
+        ..setDamage(1, 170.)
+        ..setMovementSpeedReduction(1, 0.4)
+        ..setAttackSpeedReduction(1, 0.4)
+        ..setManaCost(1, 0)
+        ..setCooldown(1, 13.)
+        ..setAreaofEffect(1, 300.)
+        ..setHotkeyNormal("W")
+        ..setTooltipNormal(1, "[|cffffcc00W|r] Thunder Clap")
+        ..setTooltipNormalExtended(1, "Hit the ground causing 170 damage to nearby enemy land units and slowing their movement speed by 40% and their attack rate by 40%.")
+        ..setEditorSuffix("(Infernal)")

@@ -110,7 +110,7 @@ function ChannelAbilityPreset.generalPull()
     this.setAnimationNames("spell")
     this.presetTargetsAllowed(lvl -> TARGETS_PULL)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Magic Chains (|cff00ffc5Pull|r)")
+    this.setName("Magic Chains (|cff00ffc5Pull|r)")
     this.presetTargetTypes(Targettype.UNIT)
     // Audiovisual
     this.presetIcon(Imports.bTNLightning_bolt_contest)
@@ -124,7 +124,7 @@ function ChannelAbilityPreset.generalGrasp()
     this.setAnimationNames("spell")
     this.presetTargetsAllowed(lvl -> TARGETS_GRASP)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00F|r] Magic Chains (|cffc5ff00Grasp|r)")
+    this.setName("Magic Chains (|cffc5ff00Grasp|r)")
     this.presetTargetTypes(Targettype.UNIT)
     // Audiovisual
     this.presetIcon(Imports.bTNLightning_bolt_contest)
@@ -132,7 +132,7 @@ function ChannelAbilityPreset.generalGrasp()
     this.presetHotkey("F")
 
 @compiletime function gen()
-    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_NL, 2, true, new AbilityTooltipGenerator("Pull the selected unit toward the Hero."))
+    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_NL, 2, true, new AbilityTooltipGenerator("Pull the selected unit towards the Hero."))
         ..setHeroAbility(false)
         ..generalPull()
         // Stats
@@ -141,7 +141,6 @@ function ChannelAbilityPreset.generalGrasp()
         ..presetCastRange(lvl -> RANGE_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Magic Chains (Pull)")
 
     new ChannelAbilityPreset(MAGIC_CHAINS_GRASP_NL, 2, true, new AbilityTooltipGenerator("Pull the Hero towards the selected unit."))
         ..setHeroAbility(false)
@@ -152,9 +151,8 @@ function ChannelAbilityPreset.generalGrasp()
         ..presetCastRange(lvl -> RANGE_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Magic Chains (Grasp)")
     
-    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_L, 4, true, new AbilityTooltipGenerator("Pull the selected unit toward the Hero."))
+    new ChannelAbilityPreset(MAGIC_CHAINS_PULL_L, 4, true, new AbilityTooltipGenerator("Pull the selected unit towards the Hero."))
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..generalPull()
@@ -165,7 +163,6 @@ function ChannelAbilityPreset.generalGrasp()
         ..presetCastRange(lvl -> RANGE_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Magic Chains (Pull)")
 
     new ChannelAbilityPreset(MAGIC_CHAINS_GRASP_L, 4, true, new AbilityTooltipGenerator("Pull the Hero towards the selected unit."))
         ..setHeroAbility(true)
@@ -176,41 +173,19 @@ function ChannelAbilityPreset.generalGrasp()
         ..presetCastRange(lvl -> RANGE_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Magic Chains (Grasp)")
     
     new ChannelAbilityPreset(MAGIC_CHAINS_PULL_S, 6, true)
         ..setHeroAbility(false)
         ..generalPull()
         ..presetButtonPosNormal(2, 1)
-        ..presetTooltipNormal(lvl -> "[|cffffcc00E|r] Magic Chains (|cff00ffc5Pull|r)")
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Magic Chains (|cff00ffc5Pull|r)")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
-        ..presetCooldown(lvl -> begin
-            real value
-            if lvl < 3
-                value = CD_NL[lvl - 1]
-            else
-                value = CD_L[lvl - 3]
-            return value
-        end)
-        ..presetCastRange(lvl -> begin
-            real value
-            if lvl < 3
-                value = RANGE_NL[lvl - 1]
-            else
-                value = RANGE_L[lvl - 3]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetCastRange(lvl -> lvl < 3 ? RANGE_NL[lvl-1] : RANGE_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Pull the selected unit towards the Hero.")
         ..setEditorSuffix("(Stealed)")
-        .setName("Magic Chains (Pull)")
 
     new ChannelAbilityPreset(MAGIC_CHAINS_GRASP_S, 6, true)
         ..setHeroAbility(false)
@@ -219,29 +194,8 @@ function ChannelAbilityPreset.generalGrasp()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Magic Chains (|cffc5ff00Grasp|r)")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
-        ..presetCooldown(lvl -> begin
-            real value
-            if lvl < 3
-                value = CD_NL[lvl - 1]
-            else
-                value = CD_L[lvl - 3]
-            return value
-        end)
-        ..presetCastRange(lvl -> begin
-            real value
-            if lvl < 3
-                value = RANGE_NL[lvl - 1]
-            else
-                value = RANGE_L[lvl - 3]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetCastRange(lvl -> lvl < 3 ? RANGE_NL[lvl-1] : RANGE_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Pull the Hero towards the selected unit.")
         ..setEditorSuffix("(Stealed)")
-        .setName("Magic Chains (Grasp)")

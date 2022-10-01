@@ -71,7 +71,7 @@ function ChannelAbilityPreset.general()
     this.setAnimationNames("spell,channel")
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Quell")
+    this.setName("Quell")
     this.presetTargetTypes(Targettype.UNIT)
     this.addTooltipProperty("Max. times", lvl -> MAX_TIMES)
     this.addTooltipProperty("Slow", lvl -> 1. - SLOW)
@@ -92,7 +92,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Quell")
     
     new ChannelAbilityPreset(QUELL_L, 4, true, new AbilityTooltipGenerator("Velen forces his target to repress his bad thoughts causing him to be slowed and this is expelled as a healing for nearby units, but this process causes him a damage, this amount is also the one that heals nearby units."))
         ..setHeroAbility(true)
@@ -105,7 +104,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Quell")
     
     new ChannelAbilityPreset(QUELL_S, 6, true)
         ..setHeroAbility(false)
@@ -114,29 +112,7 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Quell")
         ..presetHotkey("F")
         // Stats
-        ..presetCooldown(lvl -> begin
-            real value
-            if lvl < 3
-                value = CD_NL[lvl - 1]
-            else
-                value = CD_L[lvl - 3]
-            return value
-        end)
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
-        ..presetTooltipNormalExtended(lvl -> begin
-            real value
-            if lvl < 3
-                value = DMG_PER_SEC_NL[lvl - 1]
-            else
-                value = DMG_PER_SEC_L[lvl - 3]
-            return "Velen forces his target to repress his bad thoughts causing him to be slowed by {0}% and this is expelled as a healing for nearby units, but this process causes him a damage of {1} at a time, this amount is also the one that heals nearby units.\nLasts {2} times.".format(((1 - SLOW) * 100.).toString(0), value.toString(0), (MAX_TIMES + 1).toString())
-        end)
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Velen forces his target to repress his bad thoughts causing him to be slowed by {0}% and this is expelled as a healing for nearby units, but this process causes him a damage of {1} at a time, this amount is also the one that heals nearby units.\nLasts {2} times.".format(((1 - SLOW) * 100.).toString(0), (lvl < 3 ? DMG_PER_SEC_NL[lvl-1] : DMG_PER_SEC_L[lvl-3]).toString(0), (MAX_TIMES + 1).toString()))
         ..setEditorSuffix("(Stealed)")
-        .setName("Quell")

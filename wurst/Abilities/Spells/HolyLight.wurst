@@ -11,26 +11,62 @@ let CD = 10.
 let RANGE = 600.
 let TARGETS = "air,invulnerable,organic,ground,vulnerable"
 // Not leveling
-let MANA_NL = 80
-let HEAL_NL = 175.
+let MANA_NL = [80, 100]
+let HEAL_NL = [175., 225.]
+// Leveling
+let MANA_L = [65, 100, 135, 170]
+let HEAL_L = [150., 200., 250., 300.]
+
+function AbilityDefinitionPaladinHolyLight.general()
+    this
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Holy Light")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
 
 @compiletime function gen()
     new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("A sacred light that can heal a living friendly unit or cause half damage to an enemy demon unit."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..setName("[|cffffcc00Q|r] Holy Light")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        ..general()
         // Stats
-        ..presetAmountHealedDamaged(lvl -> HEAL_NL)
-        ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
+        ..presetAmountHealedDamaged(lvl -> HEAL_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("Q")
         .tooltipStopListen()
+    
+    new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("A sacred light that can heal a living friendly unit or cause half damage to an enemy demon unit."))
+        ..presetLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetAmountHealedDamaged(lvl -> HEAL_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Holy Light")
+        ..presetHotkey("F")
+        // Stats
+        ..presetAmountHealedDamaged(lvl -> lvl < 3 ? HEAL_NL[lvl-1] : HEAL_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_L[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "A sacred light that can heal {0} hit-points to a living friendly unit or cause half damage to an enemy demon unit.".format((lvl < 3 ? HEAL_NL[lvl-1] : HEAL_L[lvl-3]).toString(0)))
+        ..setEditorSuffix("(Stealed)")

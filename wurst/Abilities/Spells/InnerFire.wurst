@@ -10,37 +10,84 @@ public constant INNER_FIRE_S = compiletime(ABIL_ID_GEN.next())
 let CD = 5.
 let RANGE = 600.
 let TARGETS = "air,ground,friend,neutral,self"
+let DURATION = 25.
 // Not leveling
-let MANA_NL = 40
-let DURATION_NL = 30.
-let ARMOR_INC_NL = 3
-let DMG_INC_NL = 0.25
+let MANA_NL = [40, 65]
+let ARMOR_INC_NL = [3, 5]
+let DMG_INC_NL = [0.25, 0.4]
+// Leveling
+let MANA_L = [40, 55, 70, 85]
+let ARMOR_INC_L = [3, 5, 7, 9]
+let DMG_INC_L = [0.25, 0.35, 0.45, 0.55]
+
+function AbilityDefinitionInnerFire.general()
+    this
+        ..presetBuffs(lvl -> "Binf")
+        ..presetAutocastRange(lvl -> RANGE)
+        ..presetTooltipTurnOff(lvl -> "|cffc3dbffClick the right mouse button to activate the automatic action.|r")
+        ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
+        ..tooltipStartListen()
+        // Stats
+        ..setName("Inner Fire")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..setRequirements("")
 
 @compiletime function gen()
     new AbilityDefinitionInnerFire(INNER_FIRE_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the damage infringed by the selected friendly unit and its armor.\nLasts " + DURATION_NL.toString(0) + " seconds."))
-        ..presetLevels(1)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the damage infringed by the selected friendly unit and its armor.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetDurationHero(lvl -> DURATION_NL)
-        ..presetDurationNormal(lvl -> DURATION_NL)
-        ..presetAutocastRange(lvl -> RANGE)
-        ..presetBuffs(lvl -> "Binf")
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Inner Fire")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetDefenseIncrease(lvl -> ARMOR_INC_NL)
-        ..presetDamageIncrease(lvl -> DMG_INC_NL)
-        ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
+        ..general()
+        ..presetDefenseIncrease(lvl -> ARMOR_INC_NL[lvl-1])
+        ..presetDamageIncrease(lvl -> DMG_INC_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("E")
         ..tooltipStopListen()
-        ..presetTooltipTurnOff(lvl -> "|cffc3dbffClick the right mouse button to activate the automatic action.|r")
-        ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
-        .setName("Inner Fire")
+    
+    new AbilityDefinitionInnerFire(INNER_FIRE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the damage infringed by the selected friendly unit and its armor.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetDefenseIncrease(lvl -> ARMOR_INC_L[lvl-1])
+        ..presetDamageIncrease(lvl -> DMG_INC_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionInnerFire(INNER_FIRE_S)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetLevels(6)
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Inner Fire")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDefenseIncrease(lvl -> lvl < 3 ? ARMOR_INC_NL[lvl-1] : ARMOR_INC_L[lvl-3])
+        ..presetDamageIncrease(lvl -> lvl < 3 ? DMG_INC_NL[lvl-1] : DMG_INC_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            int value1
+            int value2
+            if lvl < 3
+                value1 = (DMG_INC_NL[lvl-1] * 100).toInt()
+                value2 = ARMOR_INC_NL[lvl-1]
+            else
+                value1 = (DMG_INC_L[lvl-3] * 100).toInt()
+                value2 = ARMOR_INC_L[lvl-3]
+            return "Increases the damage infringed by the selected friendly unit by {0}% and its armor by {1}.\nLasts {2} seconds.".format(value1.toString(), value2.toString(), DURATION.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")
