@@ -14,12 +14,17 @@ constant SHIELD_BUFF = compiletime(BUFF_ID_GEN.next())
 // General
 let DURATION = 10.
 let CD = 160.
+let RANGE = 500.
 // Not leveling
 let DMG_PER_SEC_NL = 33.
 let EXTRA_DMG_NL = 250.
 let MANA_NL = 200
-let RANGE_NL = 500.
 let AREA_NL = 450.
+// Leveling
+let DMG_PER_SEC_L = [33., 50.]
+let EXTRA_DMG_L = [200., 250.]
+let MANA_L = [250, 350]
+let AREA_L = 650.
 // Internal
 let casters = CreateGroup()
 let paused = CreateGroup()
@@ -107,32 +112,73 @@ init
             end)
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(VORTEX_NL, 1, false, new AbilityTooltipGenerator("Create a portal that pulls enemy units in an area and hurts every second, if a unit is close to the center, it we'll disappear and when the spells finish, that units will reappear and receive extra damage.|nThe portal lasts 10 seconds or if the Spectre is interrupted the spell finishes."))
-        ..presetLevels(2)
+function ChannelAbilityPreset.general()
+    this
         ..presetOption(Option.TARGETIMAGE, true)
         ..presetBaseOrderID(lvl -> "voodoo")
         ..presetDisableOtherAbilities(lvl -> false)
-        ..setArtEffect("")
-        ..presetButtonPosNormal(3, 2)
-        ..setHeroAbility(false)
+        ..setAnimationNames("spell,stand,channel")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00R|r] Vortex")
+        ..setName("Vortex")
         ..presetTargetTypes(Targettype.POINT)
-        // Stats
-        ..presetFollowThroughTime(lvl -> DURATION)
-        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL)
-        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
-        ..presetCastRange(lvl -> RANGE_NL)
-        ..presetAreaofEffect(lvl -> AREA_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+        ..presetFollowThroughTime(lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..presetIcon(Imports.bTNArcaneField)
+        ..setArtEffect("")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(VORTEX_NL, 1, true, new AbilityTooltipGenerator("Create a portal that pulls enemy units in an area and hurts every second, if a unit is close to the center, it we'll disappear and when the spells finish, that units will reappear and receive extra damage.\nThe portal lasts 10 seconds or if the Spectre is interrupted the spell finishes."))
+        ..presetButtonPosNormal(3, 2)
+        ..setHeroAbility(false)
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL)
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
+        ..presetAreaofEffect(lvl -> AREA_NL)
+        ..presetManaCost(lvl -> MANA_NL)
         // Tooltip
-        ..setAnimationNames("spell,stand,channel")
         ..presetHotkey("R")
         .tooltipStopListen()
+    
+    new ChannelAbilityPreset(VORTEX_L, 2, true, new AbilityTooltipGenerator("Create a portal that pulls enemy units in an area and hurts every second, if a unit is close to the center, it we'll disappear and when the spells finish, that units will reappear and receive extra damage.\nThe portal lasts 10 seconds or if the Spectre is interrupted the spell finishes."))
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl-1])
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L)
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("R")
+        .tooltipStopListen()
+    
+    new ChannelAbilityPreset(VORTEX_S, 3, true)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Vortex")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
+        ..presetAreaofEffect(lvl -> lvl < 2 ? AREA_NL : AREA_L)
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 2
+                value1 = DMG_PER_SEC_NL
+                value2 = EXTRA_DMG_NL
+            else
+                value1 = DMG_PER_SEC_L[lvl-2]
+                value2 = EXTRA_DMG_L[lvl-2]
+            return "Create a portal that pulls enemy units in an area and hurts {0} every second, if a unit is close to the center, it we'll disappear and when the spells finish, that units will reappear and receive {1} extra damage.\nThe portal lasts {2} seconds or if the caster is interrupted the spell finishes.".format(value1.toString(0), value2.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
     
     new AbilityDefinitionAuraWarDrumsKodobeast(SHIELD)
         ..setAttackDamageIncrease(1, 0.)

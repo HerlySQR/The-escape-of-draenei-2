@@ -9,34 +9,83 @@ public constant SHADOW_STRIKE_S = compiletime(ABIL_ID_GEN.next())
 // General
 let RANGE = 400.
 let TARGETS = "ground,air,enemy,neutral,organic"
-let DURATION = 15.
+let DURATION = 15.1
 // Not leveling
-let INIT_DMG = 100.
-let DECAY_DMG = 10.
+let INIT_DMG_NL = [100., 150.]
+let DECAY_DMG_NL = [10., 20.]
 let CD_NL = 8.
-let MANA_NL = 75
+let MANA_NL = [75, 90]
+// Leveling
+let INIT_DMG_L = [75., 150., 225., 300.]
+let DECAY_DMG_L = [10., 20., 30., 40.]
+let CD_L = 10.
+let MANA_L = [75, 110, 145, 170]
+
+function AbilityDefinitionWardenShadowStrike.general()
+    this
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Shadow Strike")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetCastRange(lvl -> RANGE)
 
 @compiletime function gen()
     new AbilityDefinitionWardenShadowStrike(SHADOW_STRIKE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a poisoned dagger at a selected enemy unit causing an initial damage and damage of every 3 seconds for " + DURATION.toString(0) + " seconds. The poison slows the movement speed of the selected unit for a short period of time."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00E|r] Shadow Strike")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        ..general()
         // Stats
-        ..presetInitialDamage(lvl -> INIT_DMG)
-        ..presetDecayingDamage(lvl -> DECAY_DMG)
-        ..presetDurationHero(lvl -> DURATION + 0.1)
-        ..presetDurationNormal(lvl -> DURATION + 0.1)
-        ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD_NL)
+        ..presetInitialDamage(lvl -> INIT_DMG_NL[lvl-1])
+        ..presetDecayingDamage(lvl -> DECAY_DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("E")
         ..tooltipStopListen()
-        .setName("Shadow Strike")
+    
+    new AbilityDefinitionWardenShadowStrike(SHADOW_STRIKE_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a poisoned dagger at a selected enemy unit causing an initial damage and damage of every 3 seconds for " + DURATION.toString(0) + " seconds. The poison slows the movement speed of the selected unit for a short period of time."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_L)
+        ..presetInitialDamage(lvl -> INIT_DMG_L[lvl-1])
+        ..presetDecayingDamage(lvl -> DECAY_DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("E")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionWardenShadowStrike(SHADOW_STRIKE_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Shadow Strike")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetInitialDamage(lvl -> lvl < 3 ? INIT_DMG_NL[lvl-1] : INIT_DMG_L[lvl-3])
+        ..presetDecayingDamage(lvl -> lvl < 3 ? DECAY_DMG_NL[lvl-1] : DECAY_DMG_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = INIT_DMG_NL[lvl-1]
+                value2 = DECAY_DMG_NL[lvl-1]
+            else
+                value1 = INIT_DMG_L[lvl-3]
+                value2 = DECAY_DMG_L[lvl-3]
+            return "Throw a poisoned dagger at a selected enemy unit causing an initial damage of {0} and {1} of damage of every 3 seconds for {2} seconds. The poison slows the movement speed of the selected unit for a short period of time.".format(value1.toString(0), value2.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

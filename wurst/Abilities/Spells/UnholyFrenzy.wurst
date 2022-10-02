@@ -10,32 +10,80 @@ public constant UNHOLY_FRENZY_S = compiletime(ABIL_ID_GEN.next())
 let CD = 1.
 let RANGE = 500.
 let TARGETS = "air,ground,organic"
-let DURATION = 20.
+let DURATION = 15.
 // Not leveling
-let SPEED = 0.6
-let MANA_NL = 50
-let LIFE_DRAIN_NL = 4.
+let SPEED_NL = [0.75, 1.]
+let MANA_NL = [50, 60]
+let LIFE_DRAIN_NL = [4., 5.]
+// Leveling
+let SPEED_L = [0.70, 1., 1.3, 1.6]
+let MANA_L = [50, 65, 80, 95]
+let LIFE_DRAIN_L = [4., 6., 8., 10.]
 
-@compiletime function gen()
-    new AbilityDefinitionUnholyFrenzy(UNHOLY_FRENZY_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the attack rate of a selected unit, but drains hit points per second. \nLasts " + DURATION.toString(0) + " seconds."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(1, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionUnholyFrenzy.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..presetBuffs(lvl -> "BUhf")
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Unholy Frenzy")
+        ..setName("Unholy Frenzy")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetAttackSpeedBonus(lvl -> SPEED)
-        ..presetDamageperSecond(lvl -> LIFE_DRAIN_NL)
-        ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+
+@compiletime function gen()
+    new AbilityDefinitionUnholyFrenzy(UNHOLY_FRENZY_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the attack rate of a selected unit, but drains hit points per second. \nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetAttackSpeedBonus(lvl -> SPEED_NL[lvl-1])
+        ..presetDamageperSecond(lvl -> LIFE_DRAIN_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Unholy Frenzy")
+    
+    new AbilityDefinitionUnholyFrenzy(UNHOLY_FRENZY_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the attack rate of a selected unit, but drains hit points per second. \nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetAttackSpeedBonus(lvl -> SPEED_L[lvl-1])
+        ..presetDamageperSecond(lvl -> LIFE_DRAIN_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionUnholyFrenzy(UNHOLY_FRENZY_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Unholy Frenzy")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetAttackSpeedBonus(lvl -> lvl < 3 ? SPEED_NL[lvl-1] : SPEED_L[lvl-3])
+        ..presetDamageperSecond(lvl -> lvl < 3 ? LIFE_DRAIN_NL[lvl-1] : LIFE_DRAIN_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            int value1
+            real value2
+            if lvl < 3
+                value1 = (SPEED_NL[lvl-1]*100).toInt()
+                value2 = LIFE_DRAIN_NL[lvl-1]
+            else
+                value1 = (SPEED_L[lvl-3]*100).toInt()
+                value2 = LIFE_DRAIN_L[lvl-3]
+            return "Increases the attack rate of a selected unit by {0}%, but drains {1} hit points per second. \nLasts {2} seconds.".format(value1.toString(), value2.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

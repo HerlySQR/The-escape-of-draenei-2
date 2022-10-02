@@ -71,7 +71,7 @@ function ChannelAbilityPreset.general()
     this.presetFollowThroughTime(lvl -> 0.75)
     this.setAnimationNames("spell,attack")
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Throw axes")
+    this.setName("Throw axes")
     this.presetTargetTypes(Targettype.NONE)
     this.presetCooldown(lvl -> CD)
     // Audiovisual
@@ -88,7 +88,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Throw axes")
     
     new ChannelAbilityPreset(THROW_AXES_L, 4, true, new AbilityTooltipGenerator("Throw 3 axes those go and return in the direction the hero is looking at causing damage per second of type physical to the affected units."))
         ..setHeroAbility(true)
@@ -100,7 +99,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Throw axes")
     
     new ChannelAbilityPreset(THROW_AXES_S, 6, true)
         ..setHeroAbility(false)
@@ -109,21 +107,13 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Throw axes")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value
             if lvl < 3
-                value = DMG_PER_SEC_NL[lvl - 1]
+                value = DMG_PER_SEC_NL[lvl-1]
             else
-                value = DMG_PER_SEC_L[lvl - 3]
+                value = DMG_PER_SEC_L[lvl-3]
             return "Throw 3 axes that goes and returns in the direction the hero is looking at causing {0} damage per second to the affected units.".format(value.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")
-        .setName("Throw axes")

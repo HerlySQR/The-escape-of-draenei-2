@@ -13,28 +13,69 @@ let DURATION = 2.
 let TARGETS = "air,ground,debris,enemy,neutral,organic"
 // Not leveling
 let MANA_NL = 90
-let DMG_NL = 100.
+let DMG_NL = [100., 200.]
+// Leveling
+let MANA_L = [90, 100, 110, 120]
+let DMG_L = [90., 160., 230., 300.]
 
-@compiletime function gen()
-    new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionMountainKingThunderBolt.general()
+    this
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Thunder Bolt")
+        ..setName("Thunder Bolt")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetDamage(lvl -> DMG_NL)
-        ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL)
         // Audiovisual
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Thunder Bolt")
+    
+    new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Thunder Bolt")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetDamage(lvl -> lvl < 3 ? DMG_L[lvl-1] : DMG_NL[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_NL[lvl-1]
+            else
+                value = DMG_L[lvl-3]
+            return "Throw a magic hammer against the enemy unit causing {0} of damage and stunning the target for {1} seconds.".format(value.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

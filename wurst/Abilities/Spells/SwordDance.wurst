@@ -10,8 +10,11 @@ public constant SWORD_DANCE_S = compiletime(ABIL_ID_GEN.next())
 let CD = 15.
 let AREA = 350.
 // Not leveling
-let MANA_NL = 100
-let DMG_NL = 100.
+let MANA_NL = [100, 125]
+let DMG_NL = [100., 200.]
+// Leveling
+let MANA_L = [80, 100, 120, 140]
+let DMG_L = [110., 195., 280., 365.]
 // Internal
 let effMap = new HashMap<unit, effect>()
 let destrMap = new HashMap<unit, boolean>()
@@ -34,10 +37,17 @@ init
             destrMap.remove(caster)
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == SWORD_DANCE_NL
+        let data = abilityCond(SWORD_DANCE_NL, SWORD_DANCE_L, SWORD_DANCE_S)
+        if data.check
             let caster = GetSpellAbilityUnit()
             let owner = caster.getOwner()
-            let damage = DMG_NL
+
+            real damage
+            if data.isNL
+                damage = DMG_NL[data.lvl]
+            else
+                damage = DMG_L[data.lvl]
+            
             destrMap.put(caster, false)
             forUnitsInRange(caster.getPos(), AREA, u -> begin
                 if owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE)
@@ -48,23 +58,59 @@ init
             doAfter(0.27, () -> eff.destr())
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(SWORD_DANCE_NL, 1, true, new AbilityTooltipGenerator("The zealot with its blade, with a single slash deal damage to all nearby enemy units."))
-        ..presetBaseOrderID(lvl -> "earthquake")
-        ..presetButtonPosNormal(1, 2)
-        ..setHeroAbility(false)
+function ChannelAbilityPreset.general()
+    this
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("attack")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00W|r] Sword dance")
+        ..setName("Sword dance")
         ..presetTargetTypes(Targettype.NONE)
-        // Stats
-        ..addTooltipProperty("Damage", lvl -> DMG_NL)
-        ..presetAreaofEffect(lvl -> AREA)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
+        ..presetAreaofEffect(lvl -> AREA)
         // Audiovisual
         ..presetIcon(Icons.bTNWhirlwind)
+        
+@compiletime function gen()
+    new ChannelAbilityPreset(SWORD_DANCE_NL, 2, true, new AbilityTooltipGenerator("The zealot with its blade, with a single slash deal damage to all nearby enemy units."))
+        ..presetBaseOrderID(lvl -> "earthquake")
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Tooltip
         ..presetHotkey("W")
         .tooltipStopListen()
+    
+    new ChannelAbilityPreset(SWORD_DANCE_NL, 4, true, new AbilityTooltipGenerator("The zealot with its blade, with a single slash deal damage to all nearby enemy units."))
+        ..presetBaseOrderID(lvl -> "earthquake")
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()
+    
+    new ChannelAbilityPreset(SWORD_DANCE_NL, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Sword dance")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_NL[lvl-1]
+            else
+                value = DMG_L[lvl-3]
+            return "he zealot with its blade, with a single slash deal {0} of damage to all nearby enemy units.".format(value.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")

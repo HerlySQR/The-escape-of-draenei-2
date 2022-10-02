@@ -67,7 +67,7 @@ function ChannelAbilityPreset.general()
     this.presetButtonPosNormal(0, 2)
     this.presetFollowThroughTime(lvl -> 0.25)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Sparky Explosions")
+    this.setName("Sparky Explosions")
     this.presetTargetTypes(Targettype.NONE)
     this.presetCooldown(lvl -> CD)
     // Audiovisual
@@ -85,7 +85,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Sparky Explosions")
     
     new ChannelAbilityPreset(SPARKY_EXPLOSIONS_L, 4, true, new AbilityTooltipGenerator("Create 8 queued explosions around the hero and 1 in their position."))
         ..setHeroAbility(true)
@@ -98,7 +97,6 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Sparky Explosions")
     
     new ChannelAbilityPreset(SPARKY_EXPLOSIONS_S, 6, true)
         ..setHeroAbility(false)
@@ -107,14 +105,7 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Sparky Explosions")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 3
-                value = MANA_NL[lvl - 1]
-            else
-                value = MANA_L[lvl - 3]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value
             if lvl < 3
@@ -124,4 +115,3 @@ function ChannelAbilityPreset.general()
             return "Create 8 queued explosions around the hero and 1 in their position, dealing " + value.toString(0) + " damage."
         end)
         ..setEditorSuffix("(Stealed)")
-        .setName("Sparky Explosions")

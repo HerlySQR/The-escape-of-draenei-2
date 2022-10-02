@@ -7,32 +7,91 @@ public constant STEALTH_L = compiletime(ABIL_ID_GEN.next())
 public constant STEALTH_S = compiletime(ABIL_ID_GEN.next())
 
 // General
+let CD = 12.
 // Not Leveling
-let DURATION_NL = 8.
-let SPEED_BOOST_NL = 0.2
-let CD_NL = 12.
-let MANA_NL = 50
-let EXTRA_DMG_NL = 40.
+let DURATION_NL = [8., 9.]
+let SPEED_BOOST_NL = [0.2, 0.3]
+let MANA_NL = [50, 60]
+let EXTRA_DMG_NL = [40., 60.]
+// Leveling
+let DURATION_L = [8., 9., 10., 11.]
+let SPEED_BOOST_L = [0.1, 0.2, 0.3, 0.4]
+let MANA_L = [50, 60, 70, 80]
+let EXTRA_DMG_L = [40., 60., 80., 100.]
+
+function AbilityDefinitionWindWalk.general()
+    this
+        ..tooltipStartListen()
+        ..setName("Stealth")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..presetCooldown(lvl -> CD)
 
 @compiletime function gen()
     new AbilityDefinitionWindWalk(STEALTH_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("It returns invisible to the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It turns invisible the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
         ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
-        ..presetDurationHero(lvl -> DURATION_NL)
-        ..presetDurationNormal(lvl -> DURATION_NL)
-        ..tooltipStartListen()
-        ..setName("[|cffffcc00W|r] Stealth")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..presetDurationHero(lvl -> DURATION_NL[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_NL[lvl-1])
+        ..general()
         // Stats
-        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL)
-        ..addTooltipProperty("Duration", lvl -> DURATION_NL)
-        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_NL)
-        ..presetBackstabDamage(lvl -> EXTRA_DMG_NL)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD_NL)
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL[lvl-1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_NL[lvl-1])
+        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_NL[lvl-1])
+        ..presetBackstabDamage(lvl -> EXTRA_DMG_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         .tooltipStopListen()
+    
+    new AbilityDefinitionWindWalk(STEALTH_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It turns invisible the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..presetDurationHero(lvl -> DURATION_L[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_L[lvl-1])
+        ..general()
+        // Stats
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_L[lvl-1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl-1])
+        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_L[lvl-1])
+        ..presetBackstabDamage(lvl -> EXTRA_DMG_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionWindWalk(STEALTH_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Stealth")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetMovementSpeedIncrease(lvl -> lvl < 3 ? SPEED_BOOST_NL[lvl-1] : SPEED_BOOST_L[lvl-3])
+        ..presetBackstabDamage(lvl -> lvl < 3 ? EXTRA_DMG_NL[lvl-1] : EXTRA_DMG_L[lvl-3])
+        ..presetDurationHero(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            int value1
+            real value2
+            real value3
+            if lvl < 3
+                value1 = (SPEED_BOOST_NL[lvl-1]*100).toInt()
+                value2 = EXTRA_DMG_NL[lvl-1]
+                value3 = DURATION_NL[lvl-1]
+            else
+                value1 = (SPEED_BOOST_L[lvl-3]*100).toInt()
+                value2 = EXTRA_DMG_L[lvl-3]
+                value3 = DURATION_L[lvl-3]
+            return "It turns invisible the unit and makes it move {0}% faster. If you attack a unit to break the invisibility, the attack will have a {1} damage bonus\nLasts {2} seconds.".format(value1.toString(), value2.toString(0), value3.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

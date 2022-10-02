@@ -107,14 +107,7 @@ function ChannelAbilityPreset.general()
     new AbilityDefinitionAuraDevotionCreep(POWER_OF_LIGHT_ARMOR)
         ..presetLevels(3)
         ..setArtTarget("")
-        ..presetArmorBonus(lvl -> begin
-            real value
-            if lvl < 2
-                value = ARMOR_AND_HP_REGEN_NL
-            else
-                value = ARMOR_AND_HP_REGEN_L[lvl - 2]
-            return value
-        end)
+        ..presetArmorBonus(lvl -> lvl < 2 ? ARMOR_AND_HP_REGEN_NL : ARMOR_AND_HP_REGEN_L[lvl-2])
         ..presetBuffs(lvl -> POWER_OF_LIGHT_BUFF.toRawCode())
         ..presetTargetsAllowed(lvl -> "self")
         ..setItemAbility(true)

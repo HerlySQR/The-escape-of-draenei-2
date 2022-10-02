@@ -96,7 +96,7 @@ function AbilityDefinitionPitLordHowlofTerror.general()
     this.presetDamageIncrease(lvl -> 0.)
     this.presetAreaofEffect(lvl -> AREA)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Total Freeze")
+    this.setName("Total Freeze")
     this.addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
     this.presetDurationHero(lvl -> DURATION)
     this.presetDurationNormal(lvl -> DURATION)
@@ -117,7 +117,6 @@ function AbilityDefinitionPitLordHowlofTerror.general()
         ..presetManaCost(lvl -> MANA_NL)
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Total Freeze")
     
     new AbilityDefinitionPitLordHowlofTerror(TOTAL_FREEZE_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Freeze all units on the map except the hero."))
@@ -133,7 +132,6 @@ function AbilityDefinitionPitLordHowlofTerror.general()
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Total Freeze")
     
     new AbilityDefinitionPitLordHowlofTerror(TOTAL_FREEZE_S)
         ..presetLevels(3)
@@ -143,30 +141,9 @@ function AbilityDefinitionPitLordHowlofTerror.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Total Freeze")
         ..presetHotkey("F")
         // Stats
-        ..presetCooldown(lvl -> begin
-            real value
-            if lvl < 2
-                value = CD_NL
-            else
-                value = CD_L[lvl - 2]
-            return value
-        end)
-        ..presetCastingTime(lvl -> begin
-            real value
-            if lvl < 2
-                value = CHANNEL_TIME_NL
-            else
-                value = CHANNEL_TIME_L[lvl - 2]
-            return value
-        end)
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
+        ..presetCooldown(lvl -> lvl < 2 ? CD_NL : CD_L[lvl-2])
+        ..presetCastingTime(lvl -> lvl < 2 ? CHANNEL_TIME_NL : CHANNEL_TIME_L[lvl-2])
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
         ..presetTooltipNormalExtended(lvl -> "Freeze all units on the map except the hero for {0} seconds.".format(DURATION.toString(0)))
         ..setEditorSuffix("(Stealed)")
         .setName("Ult Total Freeze")

@@ -14,21 +14,40 @@ constant ZEST_CHARGES = compiletime(ABIL_ID_GEN.next())
 // General
 let CD = 35.
 let DURATION = 60.
-let ZEST_LVL = 8
+let ZEST_LVL = [8, 9, 10, 11]
 // Not leveling
-let MANA_NL = 135
-let ELEM_NL = compiletime(UNIT_ID_GEN.next())
-let ELEM_LIFE_NL = 525
-let ELEM_DMG_NL = dice(30, 1, 9)
+let MANA_NL = [135, 155]
+let ELEM_NL = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+let ELEM_LIFE_NL = [525, 675]
+let ELEM_DMG_NL = [dice(30, 1, 9), dice(35, 2, 11)]
+let ELEM_COLOR_NL = [color(255, 255, 255), color(100, 190, 255)]
+// Leveling
+let MANA_L = [145, 160, 175, 190]
+let ELEM_L = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
+let ELEM_LIFE_L = [500, 650, 800, 950]
+let ELEM_DMG_L = [dice(30, 1, 10), dice(35, 2, 11), dice(40, 3, 13), dice(45, 4, 13)]
+let ELEM_COLOR_L = [color(255, 255, 255), color(192, 255, 255), color(192, 192, 255), color(255, 192, 192)]
 // Internal
 let levelMap = new HashMap<unit, int>()
+
+tuple elemData(bool is, int id)
+
+function unit.isElem() returns elemData
+    let id = this.getTypeId()
+    for i = 0 to 1
+        if id == ELEM_NL[i]
+            return elemData(true, i)
+    for i = 0 to 4
+        if id == ELEM_L[i]
+            return elemData(true, i)
+    return elemData(false, -1)
 
 init
     // Zest
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SUMMON, () -> begin
-        switch GetSummonedUnit().getTypeId()
-            case ELEM_NL
-                levelMap.put(GetSummonedUnit(), ZEST_LVL)
+        let data = GetSummonedUnit().isElem()
+        if data.is
+            levelMap.put(GetSummonedUnit(), ZEST_LVL[data.id])
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ATTACKED, () -> begin
         if GetAttacker().hasAbility(ELEM_ZEST)
@@ -46,33 +65,77 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, func)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, func)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
-        if GetDyingUnit().getTypeId() == ELEM_NL
+        if GetDyingUnit().isElem().is
             levelMap.remove(GetDyingUnit())
     end)
+
+function AbilityDefinitionArchMageSummonWaterElemental.general()
+    this
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Summon Water Elemental")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNSummonWaterElemental)
 
 @compiletime function gen()
     new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. \nLasts 60 seconds."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..setRequirements("")
-        ..presetSummonedUnitType(lvl -> ELEM_NL.toRawCode())
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Summon Water Elemental")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..presetSummonedUnitType(lvl -> ELEM_NL[lvl-1].toRawCode())
+        ..general()
         // Stats
-        ..addTooltipProperty("Element life", lvl -> ELEM_LIFE_NL)
-        ..addTooltipProperty("Element damage", lvl -> ELEM_DMG_NL.toString())
-        ..addTooltipProperty("Zest max. charges", lvl -> ZEST_LVL)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
-        // Audiovisual
-        ..presetIcon(Icons.bTNSummonWaterElemental)
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        ..addTooltipProperty("Element life", lvl -> ELEM_LIFE_NL[lvl-1])
+        ..addTooltipProperty("Element damage", lvl -> ELEM_DMG_NL[lvl-1].toString())
+        ..addTooltipProperty("Zest max. charges", lvl -> ZEST_LVL[lvl-1])
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Summon Water Elemental")
+    
+    new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. \nLasts 60 seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..presetSummonedUnitType(lvl -> ELEM_L[lvl-1].toRawCode())
+        ..general()
+        // Stats
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        ..addTooltipProperty("Element life", lvl -> ELEM_LIFE_L[lvl-1])
+        ..addTooltipProperty("Element damage", lvl -> ELEM_DMG_L[lvl-1].toString())
+        ..addTooltipProperty("Zest max. charges", lvl -> ZEST_LVL[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Summon Water Elemental")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetSummonedUnitType(lvl -> lvl < 3 ? ELEM_NL[lvl-1].toRawCode() : ELEM_L[lvl-3].toRawCode())
+        ..presetTooltipNormalExtended(lvl -> begin
+            int value1
+            dice value2
+            if lvl < 3
+                value1 = ELEM_LIFE_NL[lvl-1]
+                value2 = ELEM_DMG_NL[lvl-1]
+            else
+                value1 = ELEM_LIFE_L[lvl-1]
+                value2 = ELEM_DMG_L[lvl-1]
+            return "Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. It has {0} hit points and deals {1} damage.\nLasts {2} seconds.".format(value1.toString(), value2.toString(), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
 
     new AbilityDefinitionBashcreep(ELEM_BASH)
         ..presetLevels(1)
@@ -82,9 +145,9 @@ init
         ..setEditorSuffix("(Water Elemental)")
         ..setTooltipNormal(1, "Mace")
         ..setTooltipNormalExtended(1, "Gives a 10% chance to stun an opponent for 1.0 seconds.")
-        ..setDurationHero(1,  1.)
-        ..setDurationNormal(1,  1.)
-        ..setChancetoBash(1,  10.)
+        ..setDurationHero(1, 1.)
+        ..setDurationNormal(1, 1.)
+        ..setChancetoBash(1, 10.)
         ..setDamageBonus(1, 0.)
     
     new AbilityDefinitionAuraEnduranceCreep(ELEM_ZEST)
@@ -114,22 +177,44 @@ init
         ..setTooltipNormal(1, "Zest")
         ..setTooltipNormalExtended(1, "The more this unit attacks, the faster it will.")
 
-    new UnitDefinition(ELEM_NL, 'nsel')
-        ..setAttack1Range(500)
-        ..setAttack1DamageBase(ELEM_DMG_NL.base)
-        ..setAttack1DamageNumberofDice(ELEM_DMG_NL.number)
-        ..setAttack1DamageSidesperDie(ELEM_DMG_NL.sides)
-        ..setAttack1CooldownTime(1.55)
-        ..setAttack1AttackType(AttackType.Normal)
-        ..setArmorSoundType(ArmorSoundType.Ethereal)
-        ..setUnitClassification("summoned")
-        ..setLevel(3)
-        ..setHitPointsMaximumBase(ELEM_LIFE_NL)
-        ..setTintingColorRed(255)
-        ..setTintingColorGreen(255)
-        ..setTintingColorBlue(255)
-        ..setScalingValue(1.)
-        ..setNormalAbilities(commaList(ELEM_ZEST, ELEM_BASH))
-        ..setSpeedBase(270)
-        ..setName("Water Elemental")
-        .setNameEditorSuffix("(Not leveling / Level 1)")
+    for i = 0 to 1
+        new UnitDefinition(ELEM_NL[i], 'nsel')
+            ..setAttack1Range(500)
+            ..setAttack1DamageBase(ELEM_DMG_NL[i].base)
+            ..setAttack1DamageNumberofDice(ELEM_DMG_NL[i].number)
+            ..setAttack1DamageSidesperDie(ELEM_DMG_NL[i].sides)
+            ..setAttack1CooldownTime(1.55)
+            ..setAttack1AttackType(AttackType.Normal)
+            ..setArmorSoundType(ArmorSoundType.Ethereal)
+            ..setUnitClassification("summoned")
+            ..setLevel(3)
+            ..setHitPointsMaximumBase(ELEM_LIFE_NL[i])
+            ..setTintingColorRed(ELEM_COLOR_NL[i].red)
+            ..setTintingColorGreen(ELEM_COLOR_NL[i].green)
+            ..setTintingColorBlue(ELEM_COLOR_NL[i].blue)
+            ..setScalingValue(0.9 + 0.3*i)
+            ..setNormalAbilities(commaList(ELEM_ZEST, ELEM_BASH))
+            ..setSpeedBase(270)
+            ..setName("Water Elemental")
+            .setNameEditorSuffix("(Not leveling / Level " + (i+1).toString() + ")")
+
+    for i = 0 to 3
+        new UnitDefinition(ELEM_L[i], 'nsel')
+            ..setAttack1Range(500)
+            ..setAttack1DamageBase(ELEM_DMG_L[i].base)
+            ..setAttack1DamageNumberofDice(ELEM_DMG_L[i].number)
+            ..setAttack1DamageSidesperDie(ELEM_DMG_L[i].sides)
+            ..setAttack1CooldownTime(1.55)
+            ..setAttack1AttackType(AttackType.Normal)
+            ..setArmorSoundType(ArmorSoundType.Ethereal)
+            ..setUnitClassification("summoned")
+            ..setLevel(3)
+            ..setHitPointsMaximumBase(ELEM_LIFE_L[i])
+            ..setTintingColorRed(ELEM_COLOR_L[i].red)
+            ..setTintingColorGreen(ELEM_COLOR_L[i].green)
+            ..setTintingColorBlue(ELEM_COLOR_L[i].blue)
+            ..setScalingValue(0.9 + 0.2*i)
+            ..setNormalAbilities(commaList(ELEM_ZEST, ELEM_BASH))
+            ..setSpeedBase(270)
+            ..setName("Water Elemental")
+            .setNameEditorSuffix("(Not leveling / Level " + (i+1).toString() + ")")

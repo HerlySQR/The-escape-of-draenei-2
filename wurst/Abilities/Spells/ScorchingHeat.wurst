@@ -12,28 +12,48 @@ constant SCORCHING_HEAT_BUFF = compiletime(BUFF_ID_GEN.next())
 let DURATION = 1.
 let TARGETS = "ground,enemy,neutral,organic"
 // Not leveling
-let DMG_PER_SEC_NL = 15.
-let AREA_NL = 300.
+let DMG_PER_SEC_NL = [15., 35.]
+let AREA_NL = [300., 500.]
+// Leveling
+let DMG_PER_SEC_L = [15., 30., 45., 60.]
+let AREA_L = [300., 375., 450., 525.]
 
-@compiletime function gen()
-    new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(2, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionPermanentImmolation.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetBuffs(lvl -> SCORCHING_HEAT_BUFF.toRawCode())
         ..tooltipStartListen()
         ..setName("Scorching Heat")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
         // Stats
-        ..presetDamageperInterval(lvl -> DMG_PER_SEC_NL)
-        ..presetAreaofEffect(lvl -> AREA_NL)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         // Audiovisual
         ..presetIcon(Imports.pASHellfirePossession)
+
+@compiletime function gen()
+    new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetDamageperInterval(lvl -> DMG_PER_SEC_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
         // Tooltip
+        .tooltipStopListen()
+    
+    new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetDamageperInterval(lvl -> DMG_PER_SEC_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        // Tooltip
+        ..setIconResearch(Imports.bTNHellfirePossession)
         .tooltipStopListen()
     
     new BuffDefinition(SCORCHING_HEAT_BUFF, 'Bpig')

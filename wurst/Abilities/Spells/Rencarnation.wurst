@@ -7,8 +7,19 @@ public constant REENCARNATION_L = compiletime(ABIL_ID_GEN.next())
 
 // General
 // Not leveling
-let CD_NL = 16.
+let CD_NL = 160.
 let MANA_NL = 75
+// Leveling
+let CD_L = [200., 100.]
+let MANA_L = 100
+
+function AbilityDefinitionTaurenChieftainReincarnation.general()
+    this
+        ..setRequirements("")
+        ..presetCastingTime(lvl -> 3.)
+        ..tooltipStartListen()
+        ..setName("Rencarnation")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
 
 @compiletime function gen()
     new AbilityDefinitionTaurenChieftainReincarnation(REENCARNATION_NL)
@@ -16,13 +27,26 @@ let MANA_NL = 75
         ..presetLevels(1)
         ..presetButtonPosNormal(3, 2)
         ..setHeroAbility(false)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        ..general()
         // Stats
-        ..setName("Rencarnation")
         ..presetCooldown(lvl -> CD_NL)
         ..presetManaCost(lvl -> MANA_NL)
+        // Audiovisual
+        // Tooltip
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionTaurenChieftainReincarnation(REENCARNATION_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("When the hero dies, it will be resurrected."))
+        ..presetLevels(2)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L)
         // Audiovisual
         // Tooltip
         ..tooltipStopListen()

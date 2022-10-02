@@ -12,16 +12,16 @@ let DURATION = 4.5
 let SLOW = 0.4
 let TARGETS = "air,neutral,organic,ground"
 // Not leveling
-let AREA_NL = 450.
-let MANA_NL = 90
-let DMG_NL = 80.
+let AREA_NL = [450., 550.]
+let MANA_NL = [90, 95]
+let DMG_NL = [80., 120.]
+// Leveling
+let AREA_L = [400., 500., 600., 700.]
+let MANA_L = [90, 95, 100, 105]
+let DMG_L = [60., 100., 140., 180.]
 
-@compiletime function gen()
-    new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(1, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionMountainKingThunderClap.general()
+    this
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..presetTargetsAllowed(lvl -> TARGETS)
@@ -29,16 +29,64 @@ let DMG_NL = 80.
         ..presetMovementSpeedReduction(lvl -> SLOW)
         ..setRequirements("")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00W|r] Terrorizing Howl")
+        ..setName("Terrorizing Howl")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
-        // Stats
-        ..presetAOEDamage(lvl -> DMG_NL)
-        ..presetAreaofEffect(lvl -> AREA_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         // Audiovisual
         ..setArtCaster(Abilities.roarCaster)
         ..presetIcon(Icons.bTNBattleRoar)
+
+@compiletime function gen()
+    new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetAOEDamage(lvl -> DMG_NL[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Tooltip
         ..presetHotkey("W")
         .tooltipStopListen()
+    
+    new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetAOEDamage(lvl -> DMG_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("W")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Terrorizing Howl")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetAOEDamage(lvl -> lvl < 3 ? DMG_L[lvl-1] : DMG_NL[lvl-3])
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL[lvl-1] : AREA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = DMG_NL[lvl-1]
+                value2 = AREA_NL[lvl-1]
+            else
+                value1 = DMG_L[lvl-3]
+                value2 = AREA_L[lvl-3]
+            return "The wolf emits a howl that slows in {0}% an enemy units in {1} or range causing {2} damage.".format((SLOW * 100.).toString(0), value1.toString(0), value2.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")

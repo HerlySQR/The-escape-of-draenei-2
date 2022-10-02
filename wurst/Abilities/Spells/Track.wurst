@@ -16,33 +16,67 @@ let TARGETS = "air,ground,enemy,neutral"
 // Not leveling
 let MANA_NL = 25
 let ARMOR_DEC_NL = 10
+// Leveling
+let MANA_L = [30, 35]
+let ARMOR_DEC_L = [11, 17]
+
+function AbilityDefinitionFaerieFire.general()
+    this
+        ..presetBuffs(lvl -> TRACK_BUFF.toRawCode())
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Track")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
+        // Stats
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetTooltipTurnOff(lvl -> "|cffc3dbffClick the right mouse button to activate the automatic action.|r")
+        ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
 
 @compiletime function gen()
     new AbilityDefinitionFaerieFire(TRACK_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the armor of selected enemy unit and makes them visible.\nLasts " + DURATION.toString(0) + " seconds."))
         ..presetLevels(1)
-        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosNormal(3, 2)
         ..setHeroAbility(false)
-        ..presetBuffs(lvl -> TRACK_BUFF.toRawCode())
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Track")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
+        ..general()
         ..presetDefenseReduction(lvl -> ARMOR_DEC_NL)
-        ..presetDurationHero(lvl -> DURATION)
-        ..presetDurationNormal(lvl -> DURATION)
-        ..presetCastRange(lvl -> RANGE)
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         // Tooltip
         ..presetHotkey("R")
         ..tooltipStopListen()
-        ..presetTooltipTurnOff(lvl -> "|cffc3dbffClick the right mouse button to activate the automatic action.|r")
-        ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
-        .setName("Track")
+    
+    new AbilityDefinitionFaerieFire(TRACK_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the armor of selected enemy unit and makes them visible.\nLasts " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(3, 2)
+        ..presetButtonPosResearch(3, 0)
+        ..setHeroAbility(true)
+        ..general()
+        ..presetDefenseReduction(lvl -> ARMOR_DEC_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("R")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionFaerieFire(TRACK_S)
+        ..presetLevels(3)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Track")
+        ..presetHotkey("F")
+        // Stats
+        ..presetDefenseReduction(lvl -> lvl < 2 ? ARMOR_DEC_NL : ARMOR_DEC_L[lvl-2])
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
+        ..presetTooltipNormalExtended(lvl -> "Reduces the armor of selected enemy unit by {0} and makes them visible.\nLasts {1} seconds.".format((lvl < 2 ? ARMOR_DEC_NL : ARMOR_DEC_L[lvl-2]).toString(), DURATION.toString(0)))
+        ..setEditorSuffix("(Stealed)")
+        .setName("Ult Track")
     
     new BuffDefinition(TRACK_BUFF, 'Bfae')
         ..setName(1, "Track")

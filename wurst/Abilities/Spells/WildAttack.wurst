@@ -59,7 +59,7 @@ function ChannelAbilityPreset.general()
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.presetFollowThroughTime(lvl -> DURATION)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Wild attack")
+    this.setName("Wild attack")
     this.presetTargetTypes(Targettype.UNIT)
     this.presetCooldown(lvl -> CD)
     this.addTooltipProperty("Duration", lvl -> DURATION)
@@ -79,18 +79,16 @@ function ChannelAbilityPreset.general()
         ..presetManaCost(lvl -> MANA_NL)
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
-        .setName("Wild attack")
     
     new ChannelAbilityPreset(WILD_ATTACK_L, 2, true, new AbilityTooltipGenerator("The wolf attacks a unit and inmovilize it making damage and healing the same quantity the health of the wolf every second."))
         ..setHeroAbility(true)
         ..general()
         ..presetButtonPosResearch(3, 0)
         // Stats
-        ..addTooltipProperty("Damage and life consumed", lvl -> DMG_L[lvl - 1])
-        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..addTooltipProperty("Damage and life consumed", lvl -> DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
-        .setName("Wild attack")
     
     new ChannelAbilityPreset(WILD_ATTACK_S, 3, true)
         ..setHeroAbility(false)
@@ -99,20 +97,13 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Wild attack")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
         ..presetTooltipNormalExtended(lvl -> begin
             real value
             if lvl < 2
                 value = DMG_NL
             else
-                value = DMG_L[lvl - 2]
+                value = DMG_L[lvl-2]
             return "The wolf attacks a unit and inmovilize it making " + value.toString(0) + " of damage and healing the same quantity the health of the wolf every second for " + DURATION.toString(0) + " seconds."
         end)
         ..setEditorSuffix("(Stealed)")

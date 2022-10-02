@@ -9,32 +9,81 @@ public constant STOMP_S = compiletime(ABIL_ID_GEN.next())
 // General
 let CD = 12.
 let TARGETS = "ground,organic"
-let AREA_NL = 325.
+let AREA = 325.
 // Not leveling
-let DURATION_NL = 2.5
-let MANA_NL = 80
-let DMG_NL = 70.
+let DURATION_NL = [2., 2.5]
+let MANA_NL = [80, 90]
+let DMG_NL = [70., 140.]
+// Leveling
+let DURATION_L = [2., 2.25, 2.5, 2.75]
+let MANA_L = 100
+let DMG_L = [65., 130., 195., 260.]
+
+function AbilityDefinitionTaurenChieftainWarStomp.general()
+    this
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Stomp")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..presetCooldown(lvl -> CD)
+        ..presetAreaofEffect(lvl -> AREA)
 
 @compiletime function gen()
     new AbilityDefinitionTaurenChieftainWarStomp(STOMP_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground violently, causing damage and stuns nearby enemy land units."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Stomp")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..general()
         // Stats
-        ..presetDamage(lvl -> DMG_NL)
-        ..presetDurationHero(lvl -> DURATION_NL)
-        ..presetDurationNormal(lvl -> DURATION_NL)
-        ..presetAreaofEffect(lvl -> AREA_NL)
-        ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetDurationHero(lvl -> DURATION_NL[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Stomp")
+    
+    new AbilityDefinitionTaurenChieftainWarStomp(STOMP_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground violently, causing damage and stuns nearby enemy land units."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetDamage(lvl -> DMG_NL[lvl-1])
+        ..presetDurationHero(lvl -> DURATION_NL[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionTaurenChieftainWarStomp(STOMP_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Stomp")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L)
+        ..presetDamage(lvl -> lvl < 3 ? DMG_L[lvl-1] : DMG_NL[lvl-3])
+        ..presetDurationHero(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = DMG_NL[lvl-1]
+                value2 = DURATION_NL[lvl-1]
+            else
+                value1 = DMG_L[lvl-3]
+                value2 = DURATION_L[lvl-3]
+            return "Hit the ground violently, causing {0} of damage and stuns nearby enemy land units for {1} seconds.".format(value1.toString(0), value2.toString(2))
+        end)
+        ..setEditorSuffix("(Stealed)")

@@ -9,36 +9,87 @@ public constant THUNDER_CLAP_S = compiletime(ABIL_ID_GEN.next())
 // General
 let CD = 8.
 let DURATION = 2.5
-let SLOW = 0.35
 let TARGETS = "ground,neutral,organic"
 // Not leveling
 let AREA_NL = 275.
 let MANA_NL = 90
-let DMG_NL = 100.
+let DMG_NL = [100., 150.]
+let SLOW_NL = [0.35, 0.45]
+// Leveling
+let AREA_L = [250., 300., 350., 400.]
+let MANA_L = [90, 95, 100, 105]
+let DMG_L = [100., 140., 180., 220.]
+let SLOW_L = [0.3, 0.4, 0.5, 0.6]
+
+function AbilityDefinitionMountainKingThunderClap.general()
+    this
+        ..presetDurationHero(lvl -> DURATION)
+        ..presetDurationNormal(lvl -> DURATION)
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..setRequirements("")
+        ..tooltipStartListen()
+        ..setName("Thunder Clap")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..presetCooldown(lvl -> CD)
+        // Audiovisual
+        ..presetIcon(Icons.bTNSeaGiantWarStomp)
 
 @compiletime function gen()
     new AbilityDefinitionMountainKingThunderClap(THUNDER_CLAP_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground causing damage to nearby enemy land units and slowing their movement speed and their attack rate for " + DURATION.toString(1) + " seconds."))
-        ..presetLevels(1)
+        ..presetLevels(2)
         ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
-        ..presetDurationHero(lvl -> DURATION)
-        ..presetDurationNormal(lvl -> DURATION)
-        ..presetTargetsAllowed(lvl -> TARGETS)
-        ..presetAttackSpeedReduction(lvl -> SLOW)
-        ..presetMovementSpeedReduction(lvl -> SLOW)
-        ..setRequirements("")
-        ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00W|r] Thunder Clap")
-        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        ..general()
         // Stats
-        ..presetAOEDamage(lvl -> DMG_NL)
+        ..presetAOEDamage(lvl -> DMG_NL[lvl-1])
         ..presetAreaofEffect(lvl -> AREA_NL)
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetCooldown(lvl -> CD)
-        // Audiovisual
-        ..presetIcon(Icons.bTNSeaGiantWarStomp)
+        ..presetAttackSpeedReduction(lvl -> SLOW_NL[lvl-1])
+        ..presetMovementSpeedReduction(lvl -> SLOW_NL[lvl-1])
         // Tooltip
         ..presetHotkey("W")
         ..tooltipStopListen()
-        .setName("Thunder Clap")
+    
+    new AbilityDefinitionMountainKingThunderClap(THUNDER_CLAP_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground causing damage to nearby enemy land units and slowing their movement speed and their attack rate for " + DURATION.toString(1) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(1, 2)
+        ..presetButtonPosResearch(1, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetAOEDamage(lvl -> DMG_L[lvl-1])
+        ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        ..presetAttackSpeedReduction(lvl -> SLOW_L[lvl-1])
+        ..presetMovementSpeedReduction(lvl -> SLOW_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("W")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionMountainKingThunderClap(THUNDER_CLAP_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Thunder Clap")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetAOEDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
+        ..presetAreaofEffect(lvl -> lvl < 3 ? AREA_NL : AREA_L[lvl-3])
+        ..presetAttackSpeedReduction(lvl -> lvl < 3 ? SLOW_NL[lvl-1] : SLOW_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            int value2
+            if lvl < 3
+                value1 = DMG_NL[lvl-1]
+                value2 = (SLOW_NL[lvl-1]*100).toInt()
+            else
+                value1 = DMG_L[lvl-3]
+                value2 = (SLOW_L[lvl-3]*100).toInt()
+            return "Hit the ground causing {0} damage to nearby enemy land units and slowing their movement speed and their attack rate by {1}% for {2} seconds.".format(value1.toString(0), value2.toString(), DURATION.toString(1))
+        end)
+        ..setEditorSuffix("(Stealed)")

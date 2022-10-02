@@ -13,29 +13,56 @@ let RANGE = 700.
 let AREA = 500.
 let TARGETS = "air,ground,enemy,neutral,organic"
 // Not Leveling
-let MANA_NL = 90
-let DMG_NL = 90.
+let MANA_NL = [90, 100]
+let DMG_NL = [90., 160.]
+let MAX_TARGETS_NL = [5, 7]
+// Leveling
+let MANA_L = [80, 90, 100, 110]
+let DMG_L = [80., 110., 140., 170.]
+let MAX_TARGETS_L = [4, 6, 8, 10]
 
-@compiletime function gen()
-    new AbilityDefinitionFarseerChainLightning(THUNDER_STORM_NL)
-        ..presetLevels(1)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a thunder storm that damage to nearby enemies."))
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionFarseerChainLightning.general()
+    this
         ..setAnimationNames("spell,channel")
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetDamageReductionperTarget(lvl -> 0.)
         ..tooltipStartListen()
-        ..setName("[|cffffcc00Q|r] Thunder Storm")
+        ..setName("Thunder Storm")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
-        // Stats
-        ..presetDamageperTarget(lvl -> DMG_NL)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
         ..presetAreaofEffect(lvl -> AREA)
         // Audiovisual
         ..presetIcon(Imports.bTNThunderStorm)
+        ..setArtTarget(Abilities.monsoonBoltTarget)
+
+@compiletime function gen()
+    new AbilityDefinitionFarseerChainLightning(THUNDER_STORM_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a thunder storm that damage to nearby enemies."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamageperTarget(lvl -> DMG_NL[lvl-1])
+        ..presetNumberofTargetsHit(lvl -> MAX_TARGETS_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        .tooltipStopListen()
+    
+    new AbilityDefinitionFarseerChainLightning(THUNDER_STORM_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a thunder storm that damage to nearby enemies."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetDamageperTarget(lvl -> DMG_L[lvl-1])
+        ..presetNumberofTargetsHit(lvl -> MAX_TARGETS_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Tooltip
         ..presetHotkey("Q")
         .tooltipStopListen()

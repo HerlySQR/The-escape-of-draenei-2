@@ -69,13 +69,12 @@ init
     end)
 
 function ChannelAbilityPreset.general()
-    this.setName("Ripple")
     this.presetBaseOrderID(lvl -> "stomp")
     this.presetOption(Option.VISIBLE, true)
     this.presetButtonPosNormal(3, 2)
     this.presetFollowThroughTime(lvl -> 0.75)
     this.tooltipStartListen()
-    this.addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Ripple")
+    this.setName("Ripple")
     this.presetTargetTypes(Targettype.NONE)
     this.presetCooldown(lvl -> CD)
     // Audiovisual
@@ -114,14 +113,7 @@ function ChannelAbilityPreset.general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Ripple")
         ..presetHotkey("F")
         // Stats
-        ..presetManaCost(lvl -> begin
-            int value
-            if lvl < 2
-                value = MANA_NL
-            else
-                value = MANA_L[lvl - 2]
-            return value
-        end)
+        ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
         ..presetTooltipNormalExtended(lvl -> begin
             real value1
             real value2

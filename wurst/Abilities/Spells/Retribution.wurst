@@ -11,17 +11,31 @@ let CD = 20.
 let RANGE = 700.
 // Not leveling
 let MANA_NL = 100
-let BASE_DMG = 100.
-let EXTRA_DMG_FACTOR = 0.1
+let BASE_DMG_NL = [100., 150.]
+let EXTRA_DMG_FACTOR_NL = [0.1, 0.2]
+// Leveling
+let MANA_L = [90, 100, 110, 120]
+let BASE_DMG_L = [100., 125., 150., 175.]
+let EXTRA_DMG_FACTOR_L = [0.1, 0.15, 0.2, 0.25]
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == RETRIBUTION_NL
+        let data = abilityCond(RETRIBUTION_NL, RETRIBUTION_L, RETRIBUTION_S)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let target = EventData.getSpellTargetUnit()
-            let baseD = BASE_DMG
-            let factor = EXTRA_DMG_FACTOR
             let eff = target.addEffect(Imports.retribution, "origin")
+
+            real baseD
+            real factor
+
+            if data.isNL
+                baseD = BASE_DMG_NL[data.lvl]
+                factor = EXTRA_DMG_FACTOR_NL[data.lvl]
+            else
+                baseD = BASE_DMG_L[data.lvl]
+                factor = EXTRA_DMG_FACTOR_L[data.lvl]
+
             doAfter(3.) -> 
                 let damage = baseD + target.getLife() * factor
                 caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_DIVINE)
@@ -34,26 +48,64 @@ init
                     .setFadepoint(1.)
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(RETRIBUTION_NL, 1, true, new AbilityTooltipGenerator("The person affected by this must pay for the service he didn't do, causing a damage plus a percentage of his current life."))
+function ChannelAbilityPreset.general()
+    this
         ..presetBaseOrderID(lvl -> "holybolt")
         ..presetOption(Option.PHYSICALSPELL, true)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("spell,channel")
         ..presetTargetsAllowed(lvl -> "air,enemies,neutral,nonancient,organic,ground")
         ..tooltipStartListen()
-        ..setName("[|cffffcc00Q|r] Retribution")
+        ..setName("Retribution")
         ..presetTargetTypes(Targettype.UNIT)
         // Stats
-        ..addTooltipProperty("Base damage", lvl -> BASE_DMG)
-        ..addTooltipProperty("Extra damage factor", lvl -> EXTRA_DMG_FACTOR)
-        ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..presetIcon(Imports.bTNAnkhOfRebirth)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(RETRIBUTION_NL, 2, true, new AbilityTooltipGenerator("The person affected by this must pay for the service he didn't do, causing a damage plus a percentage of his current life."))
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_NL[lvl-1])
+        ..addTooltipProperty("Extra damage factor", lvl -> EXTRA_DMG_FACTOR_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL)
         // Tooltip
         ..presetHotkey("Q")
         .tooltipStopListen()
+    
+    new ChannelAbilityPreset(RETRIBUTION_L, 4, true, new AbilityTooltipGenerator("The person affected by this must pay for the service he didn't do, causing a damage plus a percentage of his current life."))
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..addTooltipProperty("Base damage", lvl -> BASE_DMG_L[lvl-1])
+        ..addTooltipProperty("Extra damage factor", lvl -> EXTRA_DMG_FACTOR_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        .tooltipStopListen()
+    
+    new ChannelAbilityPreset(RETRIBUTION_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Retribution")
+        ..presetHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            int value2
+            if lvl < 3
+                value1 = BASE_DMG_NL[lvl-1]
+                value2 = (EXTRA_DMG_FACTOR_NL[lvl-1]*100).toInt()
+            else
+                value1 = BASE_DMG_L[lvl-3]
+                value2 = (EXTRA_DMG_FACTOR_L[lvl-3]*100).toInt()
+            return "The person affected by this must pay for the service he didn't do, causing a {0} damage plus a {1}% of his current life.".format(value1.toString(0), value2.toString())
+        end)
+        ..setEditorSuffix("(Stealed)")

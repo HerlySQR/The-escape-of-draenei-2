@@ -12,31 +12,72 @@ let AREA = 200.
 let DURATION = 5.
 let MANA = 105
 // Not leveling
-let CD_NL = 30.
-let DMG_PER_SEC_NL = 100.
+let CD_NL = [30., 20.]
+let DMG_PER_SEC_NL = [100., 115.]
+// Leveling
+let CD_L = [30., 27., 24., 21.]
+let DMG_PER_SEC_L = [80., 100., 120., 140.]
 
-@compiletime function gen()
-    new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing damage per second to nearby enemy ground units. \nLast " + DURATION.toString(0) + " seconds."))
-        ..presetLevels(1)
-        ..presetButtonPosNormal(0, 2)
-        ..setHeroAbility(false)
+function AbilityDefinitionBladeMasterBladestorm.general()
+    this
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Whirlwind")
+        ..setName("Whirlwind")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
-        // Stats
-        ..presetDamagePerSecond(lvl -> DMG_PER_SEC_NL)
-        ..addTooltipProperty("Duration", lvl -> DURATION)
         ..presetAreaofEffect(lvl -> AREA)
         ..presetManaCost(lvl -> MANA)
-        ..presetCooldown(lvl -> CD_NL)
+        ..addTooltipProperty("Duration", lvl -> DURATION)
         // Audiovisual
         ..presetIcon(Imports.bTNFlamingWhirlwind)
+
+@compiletime function gen()
+    new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing damage per second to nearby enemy ground units. \nLast " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(0, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
+        ..presetDamagePerSecond(lvl -> DMG_PER_SEC_NL[lvl-1])
         // Tooltip
         ..presetHotkey("Q")
         ..tooltipStopListen()
-        .setName("Whirlwind")
+    
+    new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing damage per second to nearby enemy ground units. \nLast " + DURATION.toString(0) + " seconds."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(0, 2)
+        ..presetButtonPosResearch(0, 0)
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        ..presetDamagePerSecond(lvl -> DMG_PER_SEC_L[lvl-1])
+        // Tooltip
+        ..presetHotkey("Q")
+        ..tooltipStopListen()
+    
+    new AbilityDefinitionBladeMasterBladestorm(WHIRLWIND_S)
+        ..setHeroAbility(false)
+        ..setLevels(6)
+        ..general()
+        ..presetButtonPosNormal(2, 1)
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Whirlwind")
+        ..presetHotkey("F")
+        // Stats
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetDamagePerSecond(lvl -> lvl < 3 ? DMG_PER_SEC_NL[lvl-1] : DMG_PER_SEC_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value
+            if lvl < 3
+                value = DMG_PER_SEC_NL[lvl-1]
+            else
+                value = DMG_PER_SEC_L[lvl-3]
+            return "Creates a vortex of atacks of great destructive force around the Axemaster, making him immune to magic and dealing {0} damage per second to nearby enemy ground units. \nLast {1} seconds.".format(value.toString(0), DURATION.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
