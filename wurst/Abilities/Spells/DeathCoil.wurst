@@ -19,10 +19,10 @@ let HEAL_L = [200., 250., 300., 350.]
 
 function AbilityDefinitionDeathKnightDeathCoil.general()
     this
-        ..setHeroAbility(false)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
+        ..setHotkey("Q")
         ..setName("Death Coil")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         ..presetCastRange(lvl -> RANGE)
@@ -33,38 +33,34 @@ function AbilityDefinitionDeathKnightDeathCoil.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
         ..presetLevels(2)
         ..setHeroAbility(false)
-        ..presetButtonPosNormal(0, 2)
         ..general()
         // Stats
         ..presetAmountHealedDamaged(lvl -> HEAL_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
         ..presetLevels(4)
         ..setHeroAbility(true)
-        ..presetButtonPosNormal(0, 2)
-        ..presetButtonPosResearch(0, 0)
         ..general()
         // Stats
         ..presetAmountHealedDamaged(lvl -> HEAL_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
 
     new AbilityDefinitionDeathKnightDeathCoil(DEATH_COIL_S)
         ..presetLevels(6)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Death Coil")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetAmountHealedDamaged(lvl -> lvl < 3 ? HEAL_NL[lvl-1] : HEAL_L[lvl-3])
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])

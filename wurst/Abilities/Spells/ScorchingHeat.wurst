@@ -23,6 +23,7 @@ function AbilityDefinitionPermanentImmolation.general()
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetBuffs(lvl -> SCORCHING_HEAT_BUFF.toRawCode())
         ..tooltipStartListen()
+        ..setHotkey("E")
         ..setName("Scorching Heat")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
         // Stats
@@ -41,7 +42,8 @@ function AbilityDefinitionPermanentImmolation.general()
         ..presetDamageperInterval(lvl -> DMG_PER_SEC_NL[lvl-1])
         ..presetAreaofEffect(lvl -> AREA_NL[lvl-1])
         // Tooltip
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
@@ -54,7 +56,8 @@ function AbilityDefinitionPermanentImmolation.general()
         ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
         // Tooltip
         ..setIconResearch(Imports.bTNHellfirePossession)
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
     
     new BuffDefinition(SCORCHING_HEAT_BUFF, 'Bpig')
         ..setArtSpecial(1, Abilities.incinerateBuff)

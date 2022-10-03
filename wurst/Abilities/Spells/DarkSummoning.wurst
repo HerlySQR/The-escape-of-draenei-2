@@ -2,7 +2,7 @@ package DarkSummoning
 
 import AbilityData
 
-import HeroSelection
+import initlater HeroSelection
 import PlayerData
 
 public constant DARK_SUMMONING_NL = compiletime(ABIL_ID_GEN.next())
@@ -76,6 +76,7 @@ function ChannelAbilityPreset.general()
         ..presetBaseOrderID(lvl -> "inferno")
         ..presetFollowThroughTime(lvl -> 0.75)
         ..tooltipStartListen()
+        ..setHotkey("W")
         ..setName("Dark Summoning")
         ..presetCastRange(lvl -> 99999.)
         ..presetTargetTypes(Targettype.POINT)
@@ -86,7 +87,6 @@ function ChannelAbilityPreset.general()
 
 @compiletime function gen()
     new ChannelAbilityPreset(DARK_SUMMONING_NL, 2, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
-        ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -94,12 +94,10 @@ function ChannelAbilityPreset.general()
         ..presetCooldown(lvl -> CD_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("R")
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
     new ChannelAbilityPreset(DARK_SUMMONING_L, 4, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
-        ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
@@ -108,16 +106,14 @@ function ChannelAbilityPreset.general()
         ..presetCooldown(lvl -> CD_L[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("R")
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")
 
     new ChannelAbilityPreset(DARK_SUMMONING_S, 6, true, new AbilityTooltipGenerator("Summon ally heros at the base."))
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Dark Summoning")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1]: CD_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> "Summon ally heros at the base.")

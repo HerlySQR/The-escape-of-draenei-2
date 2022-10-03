@@ -14,7 +14,6 @@ let AREA = 600.
     new AbilityDefinitionFarseerFarSight(FAR_SIGHT)
         ..presetLevels(1)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Shows the area of the map on which it is cast for " + DURATION.toString(0) + " seconds. It also shows invisible units."))
-        ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
@@ -29,5 +28,5 @@ let AREA = 600.
         // Audiovisual
         ..presetIcon(Imports.bTNThunderStorm)
         // Tooltip
-        ..presetHotkey("F")
+        ..setHotkey("F")
         ..tooltipStopListen()

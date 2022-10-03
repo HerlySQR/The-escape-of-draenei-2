@@ -66,13 +66,13 @@ init
 
 function AbilityDefinitionThunderBoltCreep.general()
     this
-        ..setHeroAbility(false)
         ..setAnimationNames("slam")
         ..presetTargetsAllowed(lvl -> "enemies,debris,neutral,organic,ground")
         ..presetDurationHero(lvl -> MAX_DURATION)
         ..presetDurationNormal(lvl -> MAX_DURATION)
         ..presetBuffs(lvl -> AXE_OF_DESTRUCTION_BUFF.toRawCode())
         ..tooltipStartListen()
+        ..setHotkey("R")
         ..setName("Axe of Destruction")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         ..presetCooldown(lvl -> CD)
@@ -83,15 +83,14 @@ function AbilityDefinitionThunderBoltCreep.general()
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
-        ..presetButtonPosNormal(3, 2)
         ..presetLevels(1)
+        ..setHeroAbility(false)
         ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_NL)
         ..presetManaCost(lvl -> MANA_NL)
         // Audiovisual
         // Tooltip
-        ..presetHotkey("R")
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
@@ -99,16 +98,14 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
         ..setRequiredLevel(6)
         ..setLevelSkipRequirement(6)
-        ..presetButtonPosNormal(3, 2)
-        ..presetButtonPosResearch(3, 0)
         ..presetLevels(2)
+        ..setHeroAbility(true)
         ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("R")
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")
 
@@ -116,9 +113,8 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..presetLevels(3)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Axe of Destruction")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
         ..presetTooltipNormalExtended(lvl -> begin

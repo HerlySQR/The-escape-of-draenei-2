@@ -1,13 +1,13 @@
-package AnimalForce
+package FeralRampage
 
 import AbilityData
 import PseudoWindWalk
 
-public constant ANIMAL_FORCE_NL = compiletime(ABIL_ID_GEN.next())
-public constant ANIMAL_FORCE_L = compiletime(ABIL_ID_GEN.next())
-public constant ANIMAL_FORCE_S = compiletime(ABIL_ID_GEN.next())
+public constant FERAL_RAMPAGE_NL = compiletime(ABIL_ID_GEN.next())
+public constant FERAL_RAMPAGE_L = compiletime(ABIL_ID_GEN.next())
+public constant FERAL_RAMPAGE_S = compiletime(ABIL_ID_GEN.next())
 
-constant ANIMAL_FORCE_BUFF = compiletime(BUFF_ID_GEN.next())
+constant FERAL_RAMPAGE_BUFF = compiletime(BUFF_ID_GEN.next())
 
 // General
 let SPEED = 1.75
@@ -21,26 +21,26 @@ let EXTRA_DMG_L = [150., 225.]
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        let data = abilityCond(ANIMAL_FORCE_NL, ANIMAL_FORCE_L, ANIMAL_FORCE_S)
+        let data = abilityCond(FERAL_RAMPAGE_NL, FERAL_RAMPAGE_L, FERAL_RAMPAGE_S)
         if data.check
-            GetSpellAbilityUnit().startWindWalk(ANIMAL_FORCE_BUFF)
+            GetSpellAbilityUnit().startWindWalk(FERAL_RAMPAGE_BUFF)
     end)
     DamageEvent.addUnreducedListener(() -> begin
         let source = DamageEvent.getSource()
-        if source.hasAbility(ANIMAL_FORCE_BUFF) and DamageEvent.isSpell()
+        if source.hasAbility(FERAL_RAMPAGE_BUFF) and DamageEvent.isSpell()
             if whatMode[5] == NOT_LEVELING
-                let level = max(source.getAbilityLevel(ANIMAL_FORCE_NL), source.getAbilityLevel(ANIMAL_FORCE_S))
+                let level = max(source.getAbilityLevel(FERAL_RAMPAGE_NL), source.getAbilityLevel(FERAL_RAMPAGE_S))
                 if level > 0
                     DamageEvent.addAmount(EXTRA_DMG_NL)
             else if whatMode[5] == LEVELING
-                let level = max(source.getAbilityLevel(ANIMAL_FORCE_L), source.getAbilityLevel(ANIMAL_FORCE_S) - 1)
+                let level = max(source.getAbilityLevel(FERAL_RAMPAGE_L), source.getAbilityLevel(FERAL_RAMPAGE_S) - 1)
                 if level > 0
                     DamageEvent.addAmount(EXTRA_DMG_L[level - 1])
     end)
 
 function AbilityDefinitionBerserk.general()
     this
-        ..presetBuffs(lvl -> ANIMAL_FORCE_BUFF.toRawCode())
+        ..presetBuffs(lvl -> FERAL_RAMPAGE_BUFF.toRawCode())
         ..setEffectSound("StampedeCast")
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
@@ -48,21 +48,20 @@ function AbilityDefinitionBerserk.general()
         ..presetAttackSpeedIncrease(lvl -> 0.)
         ..presetMovementSpeedIncrease(lvl -> SPEED)
         ..tooltipStartListen()
+        ..setHotkey("R")
+        ..setName("Feral Rampage")
         ..addTooltipProperty("Duration", lvl -> DURATION)
         ..presetCooldown(lvl -> CD)
         ..presetManaCost(lvl -> MANA)
         // Audiovisual
         ..presetIcon(Icons.bTNStampede)
         // Tooltip
-        ..presetHotkey("R")
-        ..setName("Animal Force")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
 
 @compiletime function gen()
-    new AbilityDefinitionBerserk(ANIMAL_FORCE_NL)
+    new AbilityDefinitionBerserk(FERAL_RAMPAGE_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
         ..presetLevels(1)
-        ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -70,11 +69,9 @@ function AbilityDefinitionBerserk.general()
         ..tooltipStopListen()
         .setEditorSuffix("(Not leveling)")
     
-    new AbilityDefinitionBerserk(ANIMAL_FORCE_L)
+    new AbilityDefinitionBerserk(FERAL_RAMPAGE_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(2, 2)
-        ..presetButtonPosResearch(2, 0)
         ..setHeroAbility(true)
         ..setRequiredLevel(6)
         ..setLevelSkipRequirement(6)
@@ -84,13 +81,12 @@ function AbilityDefinitionBerserk.general()
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")
 
-    new AbilityDefinitionBerserk(ANIMAL_FORCE_S)
+    new AbilityDefinitionBerserk(FERAL_RAMPAGE_S)
         ..presetLevels(3)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
-        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Animal Force")
-        ..presetHotkey("F")
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Feral Rampage")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> MANA)
         ..presetTooltipNormalExtended(lvl -> begin
@@ -102,11 +98,11 @@ function AbilityDefinitionBerserk.general()
             return "Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal " + value.toString() + "extra damage."
         end)
         ..setEditorSuffix("(Stealed)")
-        ..setName("Ult Animal Force")
+        ..setName("Ult Feral Rampage")
     
-    new BuffDefinition(ANIMAL_FORCE_BUFF, 'Bspe')
+    new BuffDefinition(FERAL_RAMPAGE_BUFF, 'Bspe')
         ..setIcon(Icons.bTNStampede)
         ..setArtTarget(1, Abilities.volcanoDeath)
-        ..setName(1, "Animal Force")
-        ..setTooltipNormal(1, "Animal Force")
+        ..setName(1, "Feral Rampage")
+        ..setTooltipNormal(1, "Feral Rampage")
         .setTooltipNormalExtended(1, "This animal liberate his hidden powers.")

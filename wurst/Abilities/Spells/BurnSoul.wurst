@@ -41,20 +41,18 @@ init
 
 function ChannelAbilityPreset.general()
     this
-        ..setName("Burn Soul")
         ..presetBaseOrderID(lvl -> "fingerofdeath")
-        ..presetButtonPosNormal(3, 2)
         ..presetFollowThroughTime(lvl -> 0.25)
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00R|r] Burn Soul")
+        ..setHotkey("R")
+        ..setName("Burn Soul")
         ..presetTargetTypes(Targettype.UNIT)
         ..setArtTarget(Abilities.markOfChaosTarget)
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..presetIcon(Icons.bTNMarkOfFire)
         // Tooltip
-        ..presetHotkey("R")
 
 @compiletime function gen()
     new ChannelAbilityPreset(BURN_SOUL_NL, 1, true, new AbilityTooltipGenerator("Burn the soul of the target causing damage depending on the life that he lost."))
@@ -72,7 +70,6 @@ function ChannelAbilityPreset.general()
         ..setLevelSkipRequirement(6)
         ..setHeroAbility(true)
         ..general()
-        ..presetButtonPosResearch(3, 0)
         // Stats
         ..addTooltipProperty("Life lost factor", lvl -> LIFE_FACTOR_L[lvl - 1])
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
@@ -84,9 +81,8 @@ function ChannelAbilityPreset.general()
     new ChannelAbilityPreset(BURN_SOUL_S, 3, true)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Burn Soul")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl - 2])
         ..presetTooltipNormalExtended(lvl -> begin

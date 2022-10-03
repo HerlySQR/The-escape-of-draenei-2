@@ -60,14 +60,14 @@ init
 
 function ChannelAbilityPreset.general()
     this
-        ..setName("Charge")
         ..presetBaseOrderID(lvl -> "chainlightning")
         ..presetOption(Option.PHYSICALSPELL, true)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("spell,channel")
         ..presetTargetsAllowed(lvl -> "air,enemies,neutral,ground")
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Charge")
+        ..setHotkey("Q")
+        ..setName("Charge")
         ..presetTargetTypes(Targettype.UNIT)
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG[lvl-1])
@@ -80,31 +80,25 @@ function ChannelAbilityPreset.general()
 
 @compiletime function gen()
     new ChannelAbilityPreset(CHARGE_NL, 2, true, new AbilityTooltipGenerator("The Zealot concentrate in a target so increase his speed and causing a damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped."))
-        ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..general()
         // Tooltip
-        ..presetHotkey("Q")
         ..setEditorSuffix("(Not leveling)")
         .tooltipStopListen()
     
     new ChannelAbilityPreset(CHARGE_L, 4, true, new AbilityTooltipGenerator("The Zealot concentrate in a target so increase his speed and causing a damage when reaches the target.|nThe spell ends if the Zealot do another action or is stopped."))
-        ..presetButtonPosNormal(0, 2)
-        ..presetButtonPosResearch(0, 0)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")
     
     new ChannelAbilityPreset(CHARGE_S, 6, true)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Charge")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetTooltipNormalExtended(lvl -> begin
             real value

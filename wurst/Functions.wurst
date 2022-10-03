@@ -11,6 +11,9 @@ import TimerUtils
 import BuffObjEditing
 import HashMap
 
+public interface RecursiveClosure
+    function call(RecursiveClosure rc)
+
 public function unit.replace(int newId) returns unit
     if this.getTypeId() == newId
         return this

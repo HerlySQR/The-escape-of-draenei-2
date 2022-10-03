@@ -16,6 +16,7 @@ let AREA_L = 99999.
 function AbilityDefinitionAuraBrilliancecreep.general()
     this
         ..tooltipStartListen()
+        ..setHotkey("W")
         ..setName("Brilliance Aura")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
 

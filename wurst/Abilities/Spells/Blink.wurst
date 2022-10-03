@@ -26,6 +26,5 @@ let CD_NL = 10.
         ..presetCooldown(lvl -> CD_NL)
         // Audiovisual
         // Tooltip
-        ..presetHotkey("W")
         ..tooltipStopListen()
         .setName("Blink")

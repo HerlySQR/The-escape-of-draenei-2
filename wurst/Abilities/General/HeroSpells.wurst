@@ -1,7 +1,6 @@
 package HeroSpells
 
 import public AdvancedEngineering
-import public AnimalForce
 import public AxeOfDestruction
 import public Berserk
 import public BoilingOil
@@ -10,6 +9,7 @@ import public BrillianceAura
 import public BurnSoul
 import public CarrionSwarm
 import public Charge
+import public CleavingAttack
 import public Command
 import public Creed
 import public Cripple
@@ -24,10 +24,12 @@ import public DemonicRain
 import public DisableSphere
 import public Earthquake
 import public Ensnare
+import public EssenceOfCelerity
 import public Evasion
 import public ExplosiveFlares
 import public FanOfKnives
 import public FastCut
+import public FeralRampage
 import public FingerOfDeath
 import public FireBall
 import public FireBlast
@@ -65,7 +67,10 @@ import public Retribution
 import public Ripple
 import public ScorchingHeat
 import public ShadowStrike
+import public SlashFury
+import public SlowPoison
 import public SparkyExplosions
+import public StalwartThump
 import public StealSpell
 import public Stealth
 import public Stomp

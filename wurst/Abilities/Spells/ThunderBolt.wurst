@@ -25,6 +25,7 @@ function AbilityDefinitionMountainKingThunderBolt.general()
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
+        ..setHotkey("Q")
         ..setName("Thunder Bolt")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         ..presetCooldown(lvl -> CD)
@@ -34,7 +35,6 @@ function AbilityDefinitionMountainKingThunderBolt.general()
     new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -42,14 +42,12 @@ function AbilityDefinitionMountainKingThunderBolt.general()
         ..presetManaCost(lvl -> MANA_NL)
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a magic hammer against the enemy unit causing damage and stunning the target for " + DURATION.toString(0) + " seconds."))
         ..presetLevels(4)
-        ..presetButtonPosNormal(0, 2)
-        ..presetButtonPosResearch(0, 0)
         ..setHeroAbility(true)
         ..general()
         // Stats
@@ -57,19 +55,18 @@ function AbilityDefinitionMountainKingThunderBolt.general()
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
     
     new AbilityDefinitionMountainKingThunderBolt(THUNDER_BOLT_S)
         ..setHeroAbility(false)
         ..setLevels(6)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Thunder Bolt")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
-        ..presetDamage(lvl -> lvl < 3 ? DMG_L[lvl-1] : DMG_NL[lvl-3])
+        ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value
             if lvl < 3

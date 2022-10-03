@@ -71,13 +71,13 @@ function ChannelAbilityPreset.general()
     this.presetFollowThroughTime(lvl -> 0.75)
     this.setAnimationNames("spell,attack")
     this.tooltipStartListen()
+    this.setHotkey("W")
     this.setName("Throw axes")
     this.presetTargetTypes(Targettype.NONE)
     this.presetCooldown(lvl -> CD)
     // Audiovisual
     this.presetIcon(Imports.bTNThrowingAxe)
     // Tooltip
-    this.presetHotkey("W")
 
 @compiletime function gen()
     new ChannelAbilityPreset(THROW_AXES_NL, 2, true, new AbilityTooltipGenerator("Throw 3 axes those go and return in the direction the hero is looking at causing damage per second of type physical to the affected units."))
@@ -93,7 +93,6 @@ function ChannelAbilityPreset.general()
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
-        ..presetButtonPosResearch(1, 0)
         // Stats
         ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl - 1])
         ..presetManaCost(lvl -> MANA_L[lvl - 1])
@@ -103,9 +102,8 @@ function ChannelAbilityPreset.general()
     new ChannelAbilityPreset(THROW_AXES_S, 6, true)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Throw axes")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin

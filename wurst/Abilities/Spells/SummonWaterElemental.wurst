@@ -73,6 +73,7 @@ function AbilityDefinitionArchMageSummonWaterElemental.general()
     this
         ..setRequirements("")
         ..tooltipStartListen()
+        ..setHotkey("Q")
         ..setName("Summon Water Elemental")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
         ..presetCooldown(lvl -> CD)
@@ -83,7 +84,6 @@ function AbilityDefinitionArchMageSummonWaterElemental.general()
     new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. \nLasts 60 seconds."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(1, 2)
         ..setHeroAbility(false)
         ..presetSummonedUnitType(lvl -> ELEM_NL[lvl-1].toRawCode())
         ..general()
@@ -93,14 +93,12 @@ function AbilityDefinitionArchMageSummonWaterElemental.general()
         ..addTooltipProperty("Element damage", lvl -> ELEM_DMG_NL[lvl-1].toString())
         ..addTooltipProperty("Zest max. charges", lvl -> ZEST_LVL[lvl-1])
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. \nLasts 60 seconds."))
         ..presetLevels(4)
-        ..presetButtonPosNormal(1, 2)
-        ..presetButtonPosResearch(1, 0)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..presetSummonedUnitType(lvl -> ELEM_L[lvl-1].toRawCode())
@@ -111,16 +109,15 @@ function AbilityDefinitionArchMageSummonWaterElemental.general()
         ..addTooltipProperty("Element damage", lvl -> ELEM_DMG_L[lvl-1].toString())
         ..addTooltipProperty("Zest max. charges", lvl -> ZEST_LVL[lvl-1])
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
     
     new AbilityDefinitionArchMageSummonWaterElemental(SUMMON_WATER_ELEMENTAL_S)
         ..setHeroAbility(false)
         ..setLevels(6)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Summon Water Elemental")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetSummonedUnitType(lvl -> lvl < 3 ? ELEM_NL[lvl-1].toRawCode() : ELEM_L[lvl-3].toRawCode())
@@ -131,8 +128,8 @@ function AbilityDefinitionArchMageSummonWaterElemental.general()
                 value1 = ELEM_LIFE_NL[lvl-1]
                 value2 = ELEM_DMG_NL[lvl-1]
             else
-                value1 = ELEM_LIFE_L[lvl-1]
-                value2 = ELEM_DMG_L[lvl-1]
+                value1 = ELEM_LIFE_L[lvl-3]
+                value2 = ELEM_DMG_L[lvl-3]
             return "Summons a Water Elemental to attack enemies of the anchorite, it has mace and every time it attacks, it does it faster. It has {0} hit points and deals {1} damage.\nLasts {2} seconds.".format(value1.toString(), value2.toString(), DURATION.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")

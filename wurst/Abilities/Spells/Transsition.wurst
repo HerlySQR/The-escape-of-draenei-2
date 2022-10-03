@@ -81,11 +81,11 @@ init
     new ChannelAbilityPreset(TRANSSITION_NL, 1, true, new AbilityTooltipGenerator("Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the wolf teleports to the shade location if is not cancelled."))
         ..presetLevels(2)
         ..presetBaseOrderID(lvl -> "stampede")
-        ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..tooltipStartListen()
-        ..setName("[|cffffcc00Q|r] Transsition")
+        ..setHotkey("Q")
+        ..setName("Transsition")
         ..presetTargetTypes(Targettype.POINT)
         // Stats
         ..addTooltipProperty("Duration", lvl -> DURATION)
@@ -96,14 +96,14 @@ init
         ..presetIcon(Icons.bTNQuillSpray)
         // Tooltip
         ..setAnimationNames("spell,attack")
-        ..presetHotkey("Q")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
 
     new AbilityDefinitionDefend(TRANSSITION_CANCEL)
-        ..presetLevels(1)
-        ..presetButtonPosNormal(0, 2)
+        ..setLevels(1)
         ..setHeroAbility(false)
         ..setName("Abort")
+        ..setHotkey("Q")
         ..setEditorSuffix("Transsition")
         ..setTooltipNormal(1, "[|cffffcc00Q|r] Abort")
         ..setTooltipNormalExtended(1, "Cancels the transsition")
@@ -114,7 +114,6 @@ init
         // Audiovisual
         ..presetIcon(Icons.bTNQuillSprayOff)
         // Tooltip
-        ..presetHotkey("Q")
     
     new UnitDefinition(TRANSSITION_SHADE, 'osw1')
         ..setAttacksEnabled(0)

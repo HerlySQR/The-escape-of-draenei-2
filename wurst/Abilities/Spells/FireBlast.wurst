@@ -40,12 +40,12 @@ init
 
 function AbilityDefinitionThunderBoltCreep.general()
     this.registerTooltipGenerator(new AbilityTooltipGenerator("He throws a fireball towards his enemy that is more dangerous the more weakened the target is. Deals a damage plus other depending on the missing health and stuns."))
-    this.presetButtonPosNormal(1, 2)
     this.setMissileSpeed(0)
     this.setMissileArt("")
     this.presetDamage(lvl -> 0.)
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.tooltipStartListen()
+    this.setHotkey("W")
     this.setName("Fire Blast")
     this.addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
     this.presetDurationNormal(lvl -> DURATION)
@@ -55,7 +55,6 @@ function AbilityDefinitionThunderBoltCreep.general()
     // Audiovisual
     this.presetIcon(Imports.bTNSpellFireFireBolt02)
     // Tooltip
-    this.presetHotkey("W")
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(FIRE_BLAST_NL)
@@ -74,7 +73,6 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
-        ..presetButtonPosResearch(1, 0)
         // Stats
         ..addTooltipProperty("Base damage", lvl -> BASE_DMG_L[lvl - 1])
         ..addTooltipProperty("Extra damage factor", lvl -> EXTRA_DMG_FACTOR_L[lvl - 1])
@@ -86,9 +84,8 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..presetLevels(6)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Fire Blast")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin

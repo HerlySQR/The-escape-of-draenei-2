@@ -1,0 +1,135 @@
+package StalwartThump
+
+import AbilityData
+
+import DummyCaster
+
+public constant STALWART_THUMP_NL = compiletime(ABIL_ID_GEN.next())
+public constant STALWART_THUMP_L = compiletime(ABIL_ID_GEN.next())
+public constant STALWART_THUMP_S = compiletime(ABIL_ID_GEN.next())
+
+constant STALWART_THUMP_BUFF = compiletime(BUFF_ID_GEN.next())
+constant STALWART_THUMP_STUN = compiletime(ABIL_ID_GEN.next())
+
+// General
+let CD = 15.
+let STUN = 1.25
+// Not leveling
+let DURATION_NL = 7.
+let MANA_NL = 90
+let DMG_NL = [20., 40.]
+// Leveling
+let DURATION_L = [6., 6.75, 7.5, 8.25]
+let MANA_L = [90, 110, 130, 150]
+let DMG_L = [10., 30., 50., 70.]
+// Internal
+let dmgMap = new HashMap<unit, real>()
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(STALWART_THUMP_NL, STALWART_THUMP_L, STALWART_THUMP_S)
+        if data.check
+            let caster = GetSpellAbilityUnit()
+            if data.isNL
+                dmgMap.put(caster, DMG_NL[data.lvl])
+            else
+                dmgMap.put(caster, DMG_L[data.lvl])
+    end)
+    DamageEvent.addUnreducedListener(() -> begin
+        let source = DamageEvent.getSource()
+        let target = DamageEvent.getTarget()
+        if source.hasAbility(STALWART_THUMP_BUFF) and not DamageEvent.isSpell()
+            and not DamageEvent.getSource().getOwner().isAllyOf(target.getOwner())
+            DamageEvent.addAmount(dmgMap.get(source))
+            new DummyCaster()
+                ..owner(source.getOwner())
+                ..delay(0.)
+                ..castTarget(STALWART_THUMP_STUN, 1, Orders.creepthunderbolt, target)
+    end)
+
+function AbilityDefinitionBerserk.general()
+    this
+        ..presetCooldown(lvl -> CD)
+        ..presetDamageTakenIncrease(lvl -> 0.)
+        ..presetAttackSpeedIncrease(lvl -> 0.)
+        ..presetMovementSpeedIncrease(lvl -> 0.)
+        ..presetBuffs(lvl -> STALWART_THUMP_BUFF.toRawCode())
+        ..tooltipStartListen()
+        ..setHotkey("Q")
+        ..setName("Stalwart Thump")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
+        // Stats
+        // Audiovisual
+        ..presetIcon(Icons.bTNGolemStormBolt)
+
+@compiletime function gen()
+    new AbilityDefinitionBerserk(STALWART_THUMP_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("For a while the attacks you make will stun the enemy and have additional damage."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..presetDurationHero(lvl -> DURATION_NL)
+        ..presetDurationNormal(lvl -> DURATION_NL)
+        ..general()
+        ..addTooltipProperty("Extra damage", lvl -> DMG_NL[lvl-1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_NL)
+        ..presetManaCost(lvl -> MANA_NL)
+        // Tooltip
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionBerserk(STALWART_THUMP_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("For a while the attacks you make will stun the enemy and have additional damage."))
+        ..presetLevels(4)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(true)
+        ..presetDurationHero(lvl -> DURATION_L[lvl-1])
+        ..presetDurationNormal(lvl -> DURATION_L[lvl-1])
+        ..general()
+        ..addTooltipProperty("Extra damage", lvl -> DMG_L[lvl-1])
+        ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+    
+    new AbilityDefinitionBerserk(STALWART_THUMP_S)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Stalwart Thump")
+        ..setHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL : MANA_L[lvl-3])
+        ..presetDurationHero(lvl -> lvl < 3 ? DURATION_NL : DURATION_L[lvl-3])
+        ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NL : DURATION_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> begin
+            real value1
+            real value2
+            if lvl < 3
+                value1 = DURATION_NL
+                value2 = DMG_NL[lvl-1]
+            else
+                value1 = DURATION_L[lvl-3]
+                value2 = DMG_L[lvl-3]
+            return "For {0} seconds the attacks you make will stun the enemy for {1} seconds and add {2} of damage.".format(value1.toString(0), STUN.toString(2), value2.toString(0))
+        end)
+        ..setEditorSuffix("(Stealed)")
+    
+    new BuffDefinition(STALWART_THUMP_BUFF, 'Bblo')
+        ..setIcon(Imports.bTNFireImpact)
+        ..setArtTarget(1, "")
+        ..setTargetAttachmentPoint0(1, "weapon")
+        ..setTargetAttachmentPoint1(1, "weapon")
+        ..setName(1, "Stalwart Thump")
+        ..setTooltipNormal(1, "Stalwart Thump")
+        .setTooltipNormalExtended(1, "This unit has Stalwart Thump, all his physical attacks will stun.")
+    
+    new AbilityDefinitionThunderBoltCreep(STALWART_THUMP_STUN)
+        ..setMissileArt("")
+        ..setMissileSpeed(0)
+        ..setDamage(1, 0.)
+        ..setDurationHero(1, STUN)
+        ..setDurationNormal(1, STUN)
+        .setDummyAbility()

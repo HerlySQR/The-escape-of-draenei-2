@@ -1,0 +1,8 @@
+package Debug
+
+import HeroType
+
+init
+    for typ in HeroType
+        createUnit(players[1], typ.getL())
+        createUnit(players[1], typ.getNL())

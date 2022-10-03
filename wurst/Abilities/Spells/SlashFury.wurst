@@ -1,0 +1,185 @@
+package SlashFury
+
+import AbilityData
+
+public constant SLASH_FURY_NL = compiletime(ABIL_ID_GEN.next())
+public constant SLASH_FURY_L = compiletime(ABIL_ID_GEN.next())
+public constant SLASH_FURY_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let AREA = 600.
+let RANGE = 800.
+let MAX_TARGETS = 3
+let CD = 15.
+let MANA = 115
+// Not leveling
+let DMG_NL = 100.
+// Leveling
+let DMG_L = [125., 175.]
+// Internal
+let AREA_DMG = 250.
+let DIST = AREA_DMG*0.75
+let INTERVAL = 0.25
+
+function unit.slashDamage(real damage)
+    this.setAnimation("attack")
+    flashEffect(Imports.cullingSlashRed, this.getPos())
+    forUnitsInRange(this.getPos(), AREA_DMG, u -> begin
+        if u.isEnemyOf(this.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE)
+            this.damageTarget(u, damage, ATTACK_TYPE_HERO, DAMAGE_TYPE_ENHANCED)
+    end)
+
+function unit.resetSlash(vec2 pos)
+    this.setXY(pos)
+    this.pause(false)
+    this.setInvulnerable(false)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        let data = abilityCond(SLASH_FURY_NL, SLASH_FURY_L, SLASH_FURY_S)
+        if data.check
+            let caster = EventData.getSpellAbilityUnit()
+            let target = EventData.getAbilityTargetPos()
+            let owner = caster.getOwner()
+
+            real damage
+            if data.isNL
+                damage = DMG_NL
+            else
+                damage = DMG_L[data.lvl]
+            
+            let vase = CreateGroup()
+            forUnitsInRange(target, AREA, u -> begin
+                if u.isEnemyOf(owner) and not u.isType(UNIT_TYPE_STRUCTURE) and u.ignoreLocust()
+                    vase.add(u)
+            end)
+
+            // Only 3 max targets, but prioritizes heros
+            let final = CreateGroup()
+
+            var i = 0
+            for u in vase
+                if i < MAX_TARGETS
+                    if u.isType(UNIT_TYPE_HERO)
+                        final.add(u)
+                        vase.remove(u)
+                        i++
+                else
+                    break
+            
+            if i < MAX_TARGETS
+                for u in vase
+                    if i < MAX_TARGETS
+                        final.add(u)
+                        i++
+                    else
+                        break
+            
+            vase.clear()
+
+            let pos = caster.getPos()
+            caster.pause(true)
+            caster.setInvulnerable(true)
+
+            switch i
+                case 1
+                    caster.setXY(final.next().getPos().polarOffset(GetRandomDirectionDeg().asAngleDegrees(), DIST))
+                    caster.slashDamage(damage)
+                    doAfter(INTERVAL) -> 
+                        caster.resetSlash(pos)
+                case 2
+                    let target0 = final.next()
+                    let target1 = final.next()
+                    let angl = target0.getPos().angleTo(target1.getPos())
+
+                    caster.setFacing(angl)
+                    caster.setXY(target0.getPos().polarOffset(angl + 35..asAngleDegrees(), DIST))
+                    caster.slashDamage(damage)
+
+                    doAfter(INTERVAL) -> 
+                        let angl2 = target1.getPos().angleTo(target0.getPos())
+                        caster.setFacing(angl2)
+                        caster.setXY(target1.getPos().polarOffset(angl2 + 35..asAngleDegrees(), DIST))
+                        caster.slashDamage(damage)
+                        doAfter(INTERVAL) -> 
+                            caster.resetSlash(pos)
+                default
+                    vase.add(final)
+
+                    RecursiveClosure rc = rc2 -> begin
+                        if vase.hasNext()
+                            let u = vase.next()
+                            let vase2 = final.iterator()..remove(u)
+                            var nearest = vase2.next()
+                            var near = nearest.getPos().distanceToSq(u.getPos())
+                            for u2 from vase2
+                                let dist = u2.getPos().distanceToSq(u.getPos())
+                                if dist < near
+                                    near = dist
+                                    nearest = u2
+                            vase2.destr()
+
+                            caster.setFacing(caster.getPos().angleTo(nearest.getPos()))
+                            caster.setXY(u.getPos().moveTowards(nearest.getPos(), DIST))
+                            caster.slashDamage(damage)
+
+                            doAfter(INTERVAL, () -> rc2.call(rc2))
+                        else
+                            caster.resetSlash(pos)
+                            vase.close()
+                            destroy rc2
+                    end
+                    rc.call(rc)
+    end)
+
+function ChannelAbilityPreset.general()
+    this
+        ..presetOption(Option.TARGETIMAGE, true)
+        ..presetBaseOrderID(lvl -> "chainlightning")
+        ..presetFollowThroughTime(lvl -> 0.75)
+        ..tooltipStartListen()
+        ..setHotkey("R")
+        ..setName("Slash Fury")
+        ..presetCooldown(lvl -> CD)
+        ..presetCastRange(lvl -> RANGE)
+        ..presetTargetTypes(Targettype.POINT)
+        ..presetAreaofEffect(lvl -> AREA)
+        ..addTooltipProperty("Max. targets", lvl -> MAX_TARGETS)
+        ..presetIcon(Imports.bTNFlameSlash)
+        ..setAnimationNames("spell")
+
+@compiletime function gen()
+    new ChannelAbilityPreset(SLASH_FURY_NL, 1, true, new AbilityTooltipGenerator("The Maleficent rapidly moves around the battlefield, striking up to " + MAX_TARGETS.toString() + " enemies and dealing damage to them, then returning to its initial position. The Maleficent is immune to damage during this ability."))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA)
+        // Audiovisual
+        // Tooltip
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+    
+    new ChannelAbilityPreset(SLASH_FURY_L, 2, true, new AbilityTooltipGenerator("The Maleficent rapidly moves around the battlefield, striking up to " + MAX_TARGETS.toString() + " enemies and dealing damage to them, then returning to its initial position. The Maleficent is immune to damage during this ability."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
+        ..general()
+        // Stats
+        ..addTooltipProperty("Damage", lvl -> DMG_NL)
+        ..presetManaCost(lvl -> MANA)
+        // Audiovisual
+        // Tooltip
+        ..tooltipStopListen()
+        .setEditorSuffix("(Leveling)")
+
+    new ChannelAbilityPreset(SLASH_FURY_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Slash Fury")
+        ..setHotkey("F")
+        // Stats
+        ..presetManaCost(lvl -> MANA)
+        ..presetTooltipNormalExtended(lvl -> "The caster rapidly moves around the battlefield, striking up to " + MAX_TARGETS.toString() + " enemies and dealing damage to them, then returning to its initial position. The caster is immune to damage during this ability.")
+        ..setName("Ult Slash Fury")
+        ..setEditorSuffix("(Stealed)")

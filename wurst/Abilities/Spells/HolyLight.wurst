@@ -22,6 +22,7 @@ function AbilityDefinitionPaladinHolyLight.general()
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
+        ..setHotkey("Q")
         ..setName("Holy Light")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         ..presetCooldown(lvl -> CD)
@@ -39,8 +40,8 @@ function AbilityDefinitionPaladinHolyLight.general()
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("A sacred light that can heal a living friendly unit or cause half damage to an enemy demon unit."))
@@ -55,16 +56,15 @@ function AbilityDefinitionPaladinHolyLight.general()
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
     
     new AbilityDefinitionPaladinHolyLight(HOLY_LIGHT_S)
         ..setLevels(6)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Holy Light")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetAmountHealedDamaged(lvl -> lvl < 3 ? HEAL_NL[lvl-1] : HEAL_L[lvl-3])
         ..presetManaCost(lvl -> lvl < 3 ? MANA_L[lvl-1] : MANA_L[lvl-3])

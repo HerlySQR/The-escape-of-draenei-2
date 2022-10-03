@@ -112,6 +112,7 @@ function AbilityDefinitionHardenedSkin.general()
     this.setRequirements("")
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.tooltipStartListen()
+    this.setHotkey("E")
     this.setName("Advanced Engineering")
     this.addTooltipProperty("Duration", lvl -> DURATION)
     // Audiovisual

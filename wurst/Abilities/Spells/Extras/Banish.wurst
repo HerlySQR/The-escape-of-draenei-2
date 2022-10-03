@@ -14,7 +14,6 @@ let SPEED = 0.2
     new AbilityDefinitionBloodMageBanish(BANISH)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Converts a unit to Ethereal and reduces its movement speed. Ethereal creatures cannot attack but can cast spells, and certain spells cast on them will have a greater effect."))
         ..presetLevels(1)
-        ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..tooltipStartListen()
         ..setName("Banish")
@@ -28,5 +27,5 @@ let SPEED = 0.2
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         // Tooltip
-        ..presetHotkey("F")
+        ..setHotkey("F")
         ..tooltipStopListen()

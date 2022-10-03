@@ -22,6 +22,7 @@ let EXTRA_DMG_L = [40., 60., 80., 100.]
 function AbilityDefinitionWindWalk.general()
     this
         ..tooltipStartListen()
+        ..setHotkey("W")
         ..setName("Stealth")
         ..addTooltipProperty("Target Type", lvl -> Targettype.NONE castTo int)
         ..presetCooldown(lvl -> CD)
@@ -43,8 +44,8 @@ function AbilityDefinitionWindWalk.general()
         ..presetBackstabDamage(lvl -> EXTRA_DMG_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("W")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionWindWalk(STEALTH_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It turns invisible the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
@@ -64,16 +65,15 @@ function AbilityDefinitionWindWalk.general()
         ..presetBackstabDamage(lvl -> EXTRA_DMG_L[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("W")
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
     
     new AbilityDefinitionWindWalk(STEALTH_S)
         ..setHeroAbility(false)
         ..setLevels(6)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Stealth")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetMovementSpeedIncrease(lvl -> lvl < 3 ? SPEED_BOOST_NL[lvl-1] : SPEED_BOOST_L[lvl-3])

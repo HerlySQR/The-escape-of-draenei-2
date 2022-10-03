@@ -3,7 +3,7 @@ package ConsumeLifeAndMana
 import AbilityData
 import LifeSteal
 
-public constant CONSUME_LIFE_AND_MANA_ID = compiletime(ABIL_ID_GEN.next())
+public constant CONSUME_LIFE_AND_MANA = compiletime(ABIL_ID_GEN.next())
 
 let MANA = 100
 let LIFE_STEAL = 50.
@@ -17,7 +17,7 @@ let extraHeight1 = vec3(0., 0., 90.)
 let extraHeight2 = vec3(0., 0., 110.)
 
 init
-    registerSpellEffectEvent(CONSUME_LIFE_AND_MANA_ID, () -> begin
+    registerSpellEffectEvent(CONSUME_LIFE_AND_MANA, () -> begin
         let caster = GetSpellAbilityUnit()
         let target = GetSpellTargetUnit()
         let eff1 = caster.addEffect(Abilities.drainCaster, "overhead")
@@ -53,9 +53,8 @@ init
     end)
 
 @compiletime function gen()
-    new ChannelAbilityPreset(CONSUME_LIFE_AND_MANA_ID, 1, true, new AbilityTooltipGenerator("Absorbs the life essence and its mana from a targeted enemy unit by removing 50 hit points and 30 mana per second and giving them to the spellcaster."))
+    new ChannelAbilityPreset(CONSUME_LIFE_AND_MANA, 1, true, new AbilityTooltipGenerator("Absorbs the life essence and its mana from a targeted enemy unit by removing 50 hit points and 30 mana per second and giving them to the spellcaster."))
         ..presetBaseOrderID(lvl -> "drain")
-        ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..setAnimationNames("stand,channel")
         ..tooltipStartListen()
@@ -71,5 +70,5 @@ init
         // Audiovisual
         ..presetIcon(Icons.bTNDrain)
         // Tooltip
-        ..presetHotkey("F")
+        ..setHotkey("F")
         .tooltipStopListen()

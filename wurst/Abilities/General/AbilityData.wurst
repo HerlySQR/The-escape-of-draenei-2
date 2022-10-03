@@ -30,3 +30,25 @@ public function AbilityDefinition.presetLevels(int lvl)
         ..tooltipStartListen()
         ..setLevels(lvl)
         ..tooltipStopListen(false)
+
+public function AbilityDefinition.setHotkey(string data)
+    this.presetHotkey(data)
+
+    if data == "F"
+        this.presetButtonPosNormal(2, 1)
+        this.presetButtonPosTurnOff(2, 1)
+    else
+        int x = -1
+        switch data
+            case "Q"
+                x = 0
+            case "W"
+                x = 1
+            case "E"
+                x = 2
+            case "R"
+                x = 3
+        
+        this.presetButtonPosNormal(x, 2)
+        this.presetButtonPosResearch(x, 0)
+        this.presetButtonPosTurnOff(x, 2)

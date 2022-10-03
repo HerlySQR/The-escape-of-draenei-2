@@ -23,7 +23,6 @@ init
     new AbilityDefinitionBerserk(ASSASSIN_MASTERY)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the Assassin's concentration making him evade all physical attacks he receives."))
         ..presetLevels(1)
-        ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..presetBuffs(lvl -> ASSASSIN_MASTERY_BUFF.toRawCode())
         ..tooltipStartListen()
@@ -35,7 +34,7 @@ init
         // Audiovisual
         ..presetIcon(Imports.bTNDranaiHide)
         // Tooltip
-        ..presetHotkey("F")
+        ..setHotkey("F")
         .tooltipStopListen()
     
     new BuffDefinition(ASSASSIN_MASTERY_BUFF, 'Bblo')

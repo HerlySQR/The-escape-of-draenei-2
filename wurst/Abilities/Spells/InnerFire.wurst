@@ -28,6 +28,7 @@ function AbilityDefinitionInnerFire.general()
         ..presetTooltipTurnOffExtended(lvl -> "|cffc3dbffClick the right mouse button to deactivate the automatic action.|r")
         ..tooltipStartListen()
         // Stats
+        ..setHotkey("E")
         ..setName("Inner Fire")
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         ..presetCooldown(lvl -> CD)
@@ -49,8 +50,8 @@ function AbilityDefinitionInnerFire.general()
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("E")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionInnerFire(INNER_FIRE_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the damage infringed by the selected friendly unit and its armor.\nLasts " + DURATION.toString(0) + " seconds."))
@@ -65,16 +66,15 @@ function AbilityDefinitionInnerFire.general()
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("E")
         ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
     
     new AbilityDefinitionInnerFire(INNER_FIRE_S)
         ..setHeroAbility(false)
         ..general()
         ..presetLevels(6)
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Inner Fire")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetDefenseIncrease(lvl -> lvl < 3 ? ARMOR_INC_NL[lvl-1] : ARMOR_INC_L[lvl-3])
         ..presetDamageIncrease(lvl -> lvl < 3 ? DMG_INC_NL[lvl-1] : DMG_INC_L[lvl-3])

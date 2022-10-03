@@ -27,7 +27,6 @@ init
     end)
 
 function AbilityDefinitionHardenedSkin.general()
-    this.presetButtonPosNormal(2, 2)
     this.setHeroAbility(false)
     this.presetIgnoredDamage(lvl -> 0.)
     this.presetMinimumDamage(lvl -> 0.)
@@ -37,6 +36,7 @@ function AbilityDefinitionHardenedSkin.general()
     this.presetTargetsAllowed(lvl -> TARGETS)
     this.setRequirements("")
     this.tooltipStartListen()
+    this.setHotkey("E")
     this.setName("Dark Blood")
     this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
     // Audiovisual
@@ -60,7 +60,6 @@ function AbilityDefinitionHardenedSkin.general()
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..setIconResearch(Imports.bTNElderBlood)
-        ..presetButtonPosResearch(2, 0)
         ..general()
         // Stats
         ..addTooltipProperty("Life lost factor", lvl -> LIFE_LOST_FACTOR_L[lvl - 1])

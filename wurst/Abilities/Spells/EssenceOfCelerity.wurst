@@ -1,0 +1,70 @@
+package EssenceOfCelerity
+
+import AbilityData
+
+import MoveSpeedX
+
+public constant ESSENCE_OF_CELERITY_NL = compiletime(ABIL_ID_GEN.next())
+public constant ESSENCE_OF_CELERITY_L = compiletime(ABIL_ID_GEN.next())
+public constant ESSENCE_OF_CELERITY_S = compiletime(ABIL_ID_GEN.next())
+
+// General
+let SPEED = 1.5
+let MANA = 50
+let DURATION = 8.
+// Not leveling
+let CD_NL = [19., 13.]
+// Leveling
+let CD_L = [19., 16., 13., 10.]
+// Internal
+let SOUND = new SoundDefinition(Sounds.spellStealTarget1, false, true)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
+        if abilityCond(ESSENCE_OF_CELERITY_NL, ESSENCE_OF_CELERITY_L, ESSENCE_OF_CELERITY_S).check
+            let u = EventData.getSpellAbilityUnit()
+            u.scaleSpeed("essence of celerity", SPEED)
+            u.flashEffect(Abilities.spellStealMissile, "chest")
+            SOUND.playOnPoint(u.getPos3Fly())
+            let eff = u.addEffect(Abilities.trollBeserkerTarget, "chest")
+            doAfter(DURATION) -> 
+                u.removeSpeedBuff("essence of celerity")
+                eff.destr()
+    end)
+
+function ChannelAbilityPreset.general()
+    this
+        ..tooltipStartListen()
+        ..setHotkey("W")
+        ..setName("Essence of Celerity")
+        ..addTooltipProperty("Duration", lvl -> DURATION)
+        ..presetManaCost(lvl -> MANA)
+        ..presetIcon(Imports.bTNEssenceOfCelerity)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(ESSENCE_OF_CELERITY_NL, 2, true, new AbilityTooltipGenerator("Increase the movement speed of the hero by {0}%.".format((SPEED*100).toInt().toString())))
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+
+    new ChannelAbilityPreset(ESSENCE_OF_CELERITY_L, 4, true, new AbilityTooltipGenerator("Increase the movement speed of the hero by {0}%.".format((SPEED*100).toInt().toString())))
+        ..setRequiredLevel(1)
+        ..setHeroAbility(true)
+        ..general()
+        // Stats
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+    
+    new ChannelAbilityPreset(ESSENCE_OF_CELERITY_S, 6, true)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Essence of Celerity")
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..setHotkey("F")
+        // Stats
+        ..presetTooltipNormalExtended(lvl -> "Increase the movement speed of the hero by {0}% for {1} seconds.".format((SPEED*100).toInt().toString(), DURATION.toString(0)))
+        ..setEditorSuffix("(Stealed)")

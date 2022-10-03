@@ -1,0 +1,78 @@
+package SlowPoison
+
+import AbilityData
+
+public constant SLOW_POISON_NL = compiletime(ABIL_ID_GEN.next())
+public constant SLOW_POISON_L = compiletime(ABIL_ID_GEN.next())
+
+let SLOW_POISON_GROUP = compiletime(BUFF_ID_GEN.next())
+let SLOW_POISON_NO_GROUP = compiletime(BUFF_ID_GEN.next())
+
+// General
+let TARGETS = "air,ground,organic"
+let DURATION_HERO = 5.
+let DURATION_NORMAL = 1.45
+// Not leveling
+let DMG_PER_SEC_NL = [4., 6.]
+let SLOW_MOVE_NL = [0.15, 0.25]
+let SLOW_ATTACK_NL = [0.1, 0.2]
+// Leveling
+let DMG_PER_SEC_L = [4., 6., 8., 10.]
+let SLOW_MOVE_L = [0.15, 0.3, 0.45, 0.6]
+let SLOW_ATTACK_L = [0.1, 0.2, 0.3, 0.4]
+
+function AbilityDefinitionSlowPoison.general()
+    this
+        ..presetTargetsAllowed(lvl -> TARGETS)
+        ..presetStackingType(StackingType.DAMAGE, true)
+        ..presetStackingType(StackingType.KILL_UNIT, true)
+        ..presetBuffs(lvl -> commaList(SLOW_POISON_GROUP, SLOW_POISON_NO_GROUP))
+        ..tooltipStartListen()
+        ..setHotkey("E")
+        ..setName("Evasion")
+        ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        ..presetDurationHero(lvl -> DURATION_HERO)
+        ..presetDurationNormal(lvl -> DURATION_NORMAL)
+        ..presetIcon(Icons.pASBTNSlowPoison)
+
+@compiletime function gen()
+    new AbilityDefinitionSlowPoison(SLOW_POISON_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of avoiding an attack."))
+        ..presetLevels(2)
+        ..presetButtonPosNormal(2, 2)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamagePerSecond(lvl -> DMG_PER_SEC_NL[lvl-1])
+        ..presetMovementSpeedFactor(lvl -> SLOW_MOVE_NL[lvl-1])
+        ..presetAttackSpeedFactor(lvl -> SLOW_ATTACK_NL[lvl-1])
+        // Audiovisual
+        // Tooltip
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+    
+    new AbilityDefinitionSlowPoison(SLOW_POISON_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of avoiding an attack."))
+        ..presetLevels(4)
+        ..setRequiredLevel(1)
+        ..presetButtonPosNormal(2, 2)
+        ..presetButtonPosResearch(2, 0)
+        ..setHeroAbility(false)
+        ..general()
+        // Stats
+        ..presetDamagePerSecond(lvl -> DMG_PER_SEC_L[lvl-1])
+        ..presetMovementSpeedFactor(lvl -> SLOW_MOVE_L[lvl-1])
+        ..presetAttackSpeedFactor(lvl -> SLOW_ATTACK_L[lvl-1])
+        // Audiovisual
+        ..setIconResearch(Icons.bTNSlowPoison)
+        // Tooltip
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")
+    
+    new BuffDefinition(SLOW_POISON_GROUP, 'Bssd')
+        ..setArtTarget(1, Imports.soundTrauma)
+        ..setName("Blue poison")
+    
+    new BuffDefinition(SLOW_POISON_NO_GROUP, 'Bspo')
+        ..setArtTarget(1, Imports.soundTrauma)
+        ..setName("Blue poison")

@@ -64,16 +64,15 @@ init
 function ChannelAbilityPreset.general()
     this.presetBaseOrderID(lvl -> "thunderclap")
     this.presetOption(Option.VISIBLE, true)
-    this.presetButtonPosNormal(0, 2)
     this.presetFollowThroughTime(lvl -> 0.25)
     this.tooltipStartListen()
+    this.setHotkey("Q")
     this.setName("Sparky Explosions")
     this.presetTargetTypes(Targettype.NONE)
     this.presetCooldown(lvl -> CD)
     // Audiovisual
     this.presetIcon(Imports.bTNMagicExplosion)
     // Tooltip
-    this.presetHotkey("Q")
 
 @compiletime function gen()
     new ChannelAbilityPreset(SPARKY_EXPLOSIONS_NL, 2, true, new AbilityTooltipGenerator("Create 8 queued explosions around the hero and 1 in their position."))
@@ -90,7 +89,6 @@ function ChannelAbilityPreset.general()
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
-        ..presetButtonPosResearch(0, 0)
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_L[lvl - 1])
         ..addTooltipProperty("Size", lvl -> SIZE_L[lvl - 1])
@@ -101,9 +99,8 @@ function ChannelAbilityPreset.general()
     new ChannelAbilityPreset(SPARKY_EXPLOSIONS_S, 6, true)
         ..setHeroAbility(false)
         ..general()
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Sparky Explosions")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin

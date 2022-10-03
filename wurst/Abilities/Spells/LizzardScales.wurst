@@ -43,7 +43,6 @@ init
     end)
 
 function AbilityDefinitionHardenedSkin.general()
-    this.presetButtonPosNormal(2, 2)
     this.presetIgnoredDamage(lvl -> 0.)
     this.presetMinimumDamage(lvl -> 0.)
     this.presetChancetoReduceDamage(lvl -> 0.)
@@ -51,6 +50,7 @@ function AbilityDefinitionHardenedSkin.general()
     this.presetIncludeRangedDamage(lvl -> false)
     this.setRequirements("")
     this.tooltipStartListen()
+    this.setHotkey("E")
     this.setName("Lizzard Scales")
     this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
     // Audiovisual
@@ -75,7 +75,6 @@ function AbilityDefinitionHardenedSkin.general()
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
-        ..presetButtonPosResearch(2, 0)
         ..setIconResearch(Imports.bTNBloodElvenImprovedHides)
         // Stats
         ..addTooltipProperty("Hits until block", lvl -> HITS_L[lvl - 1])

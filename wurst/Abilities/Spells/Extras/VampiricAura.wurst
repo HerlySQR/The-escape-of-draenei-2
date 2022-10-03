@@ -11,7 +11,6 @@ let AREA = 900.
     new AbilityDefinitionDreadlordVampiricAura(VAMPIRIC_AURA)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Nearby melee units heal a percentage of their attack damage when they reach enemy units."))
         ..presetLevels(1)
-        ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..tooltipStartListen()
         ..setName("Vampiric Aura")

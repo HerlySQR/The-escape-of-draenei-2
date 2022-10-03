@@ -29,6 +29,5 @@ let TARGETS = "allies,structure,invulnerable,neutral,nonhero,ground,player,vulne
         // Audiovisual
         ..presetIcon(Icons.bTNScrollUber)
         // Tooltip
-        ..presetHotkey("D")
         ..tooltipStopListen()
         .setEditorSuffix("(Long)")

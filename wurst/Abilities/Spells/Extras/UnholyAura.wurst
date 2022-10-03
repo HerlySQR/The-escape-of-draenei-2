@@ -12,7 +12,6 @@ let AREA = 900.
     new AbilityDefinitionDeathKnightUnholyAura(UNHOLY_AURA)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the movement speed of nearby friendly units and the rate of life regeneration."))
         ..presetLevels(1)
-        ..presetButtonPosNormal(2, 1)
         ..setHeroAbility(false)
         ..tooltipStartListen()
         ..setName("Unholy Aura")

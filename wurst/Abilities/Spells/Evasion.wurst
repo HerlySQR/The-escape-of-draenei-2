@@ -14,6 +14,7 @@ let CHANCE_L = [0.1, 0.2, 0.3, 0.4]
 function AbilityDefinitionDemonHunterEvasion.general()
     this
         ..tooltipStartListen()
+        ..setHotkey("E")
         ..setName("Evasion")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
 
@@ -21,23 +22,24 @@ function AbilityDefinitionDemonHunterEvasion.general()
     new AbilityDefinitionDemonHunterEvasion(EVASION_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of avoiding an attack."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
+        ..general()
         // Stats
         ..presetChancetoEvade(lvl -> CHANCE_NL[lvl-1])
         // Audiovisual
         // Tooltip
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionDemonHunterEvasion(EVASION_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of avoiding an attack."))
         ..presetLevels(4)
         ..setRequiredLevel(1)
-        ..presetButtonPosNormal(2, 2)
-        ..presetButtonPosResearch(2, 0)
-        ..setHeroAbility(false)
+        ..setHeroAbility(true)
+        ..general()
         // Stats
         ..presetChancetoEvade(lvl -> CHANCE_L[lvl-1])
         // Audiovisual
         // Tooltip
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")

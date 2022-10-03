@@ -22,6 +22,7 @@ function AbilityDefinitionHardenedSkin.general()
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..setRequirements("")
         ..tooltipStartListen()
+        ..setHotkey("E")
         ..setName("Hardened skin")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
 
@@ -29,20 +30,18 @@ function AbilityDefinitionHardenedSkin.general()
     new AbilityDefinitionHardenedSkin(HARDENED_SKIN_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduce all attacks. Attacks cannot be reduced by more than one damage of " + MIN_DMG.toString(0) + "."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
         ..general()
         // Stats
         ..presetIgnoredDamage(lvl -> IGNORED_DMG_NL[lvl-1])
         // Audiovisual
         // Tooltips
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionHardenedSkin(HARDENED_SKIN_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduce all attacks. Attacks cannot be reduced by more than one damage of " + MIN_DMG.toString(0) + "."))
         ..presetLevels(4)
-        ..presetButtonPosNormal(2, 2)
-        ..presetButtonPosResearch(2, 0)
         ..setIconResearch(Icons.bTNHardenedSkin)
         ..setHeroAbility(true)
         ..general()
@@ -50,4 +49,5 @@ function AbilityDefinitionHardenedSkin.general()
         ..presetIgnoredDamage(lvl -> IGNORED_DMG_L[lvl-1])
         // Audiovisual
         // Tooltips
-        .tooltipStopListen()
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Leveling)")

@@ -23,11 +23,11 @@ let MANA_L = [90, 100, 120, 150]
 
 function AbilityDefinitionDreadlordCarrionSwarm.general()
     this
-        ..setName("Carrion Swarm")
         ..setAnimationNames("spell")
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..tooltipStartListen()
-        ..addTooltipProperty("Name", lvl -> "[|cffffcc00Q|r] Carrion Swarm")
+        ..setHotkey("Q")
+        ..setName("Carrion Swarm")
         ..addTooltipProperty("Target Type", lvl -> Targettype.POINT castTo int)
         ..presetAreaofEffect(lvl -> AREA)
         ..presetFinalArea(lvl -> AREA_FINAL)
@@ -40,7 +40,6 @@ function AbilityDefinitionDreadlordCarrionSwarm.general()
     new AbilityDefinitionDreadlordCarrionSwarm(CARRION_SWARM_NL)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Send a horde of bats that causes damage to each enemy unit in a cone."))
         ..presetLevels(2)
-        ..presetButtonPosNormal(0, 2)
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -49,7 +48,6 @@ function AbilityDefinitionDreadlordCarrionSwarm.general()
         ..presetMaxDamage(lvl -> MAX_DMG[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
@@ -57,8 +55,6 @@ function AbilityDefinitionDreadlordCarrionSwarm.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Send a horde of bats that causes damage to each enemy unit in a cone."))
         ..presetLevels(4)
         ..setRequiredLevel(1)
-        ..presetButtonPosNormal(0, 2)
-        ..presetButtonPosResearch(0, 0)
         ..setHeroAbility(true)
         ..general()
         // Stats
@@ -67,7 +63,6 @@ function AbilityDefinitionDreadlordCarrionSwarm.general()
         ..presetMaxDamage(lvl -> MAX_DMG[lvl-1])
         // Audiovisual
         // Tooltip
-        ..presetHotkey("Q")
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")
     
@@ -75,9 +70,8 @@ function AbilityDefinitionDreadlordCarrionSwarm.general()
         ..setHeroAbility(false)
         ..general()
         ..presetLevels(6)
-        ..presetButtonPosNormal(2, 1)
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Carrion Swarm")
-        ..presetHotkey("F")
+        ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
