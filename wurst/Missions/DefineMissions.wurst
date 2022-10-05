@@ -5,7 +5,7 @@ import QuestItem
 import Icons
 import Reset
 
-public Quest array mission
+public Quest array missions
 
 public QuestItem voidTravellerQuest
 public QuestItem theReaderQuest
@@ -20,35 +20,35 @@ init
         players[i].setState(PLAYER_STATE_RESOURCE_FOOD_CAP, 0)
 
     // Main objectives
-    mission[1] = new Quest(true)
+    missions = new Quest(true)
         ..setTitle("The door")
         ..setDescription("The only way to escape is through the door and the draenei will have to go through it.")
         ..addObjective("|cffff0000Draenei:|r Destroy the door of the dungeon.")
         ..addObjective("|cff32cd32Demons:|r Don't let draenei destroy the door of the dungeon.")
         ..setState(QuestState.UNDISCOVERED)
         ..setIcon("UI\\Minimap\\MiniMapIconEntrance.blp")
-    mission[2] = new Quest(true)
+    missions = new Quest(true)
         ..setTitle("The wall")
         ..setDescription("The road to the main exit is very protected, it would be better to open a gap in the dragon's habitat to take a shortcut to defenses and be able to deactivate it.")
         ..addObjective("|cffff0000Draenei:|r Place 3 barrels in the fragile part of the wall.")
         ..addObjective("|cff32cd32Demons:|r Don't let them put those barrels.")
         ..setState(QuestState.UNDISCOVERED)
         ..setIcon(Icons.bTNDeathTower)
-    mission[3] = new Quest(true)
+    missions = new Quest(true)
         ..setTitle("The habitat")
         ..setDescription("Now it's time to go through the dragons to get to the main entrance.")
         ..addObjective("|cffff0000Draenei:|r Make your way through the habitat of the dragons.")
         ..addObjective("|cff32cd32Demons:|r Don't let them go through the habitat of the dragons.")
         ..setState(QuestState.UNDISCOVERED)
         ..setIcon(Icons.bTNNetherDragon)
-    mission[4] = new Quest(true)
+    missions = new Quest(true)
         ..setTitle("The generators")
         ..setDescription("To disable the defenses you have to destroy the generators, and the rest of the forces may pass.")
         ..addObjective("|cffff0000Draenei:|r They must destroy the 2 generators.")
         ..addObjective("|cff32cd32Demons:|r Don't let them destroy the generators.")
         ..setState(QuestState.UNDISCOVERED)
         ..setIcon(Icons.bTNPowerGenerator)
-    mission[5] = new Quest(true)
+    missions = new Quest(true)
         ..setTitle("The exit")
         ..setDescription("Now only remains to destroy the main entrance to escape.")
         ..addObjective("|cffff0000Draenei:|r Destroy the door of the main entrance.")
@@ -88,7 +88,7 @@ init
 
     onReset(false, () -> begin
         for i = 1 to 5
-            mission[i].q.completed(false)
+            missions.q.completed(false)
         voidTravellerQuest.complete(false)
         theReaderQuest.complete(false)
         theFountainQuest.complete(false)

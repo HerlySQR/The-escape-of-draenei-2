@@ -33,7 +33,6 @@ boolean array youSelected
 Fx array arrow
 
 init
-
     onModesSelected(() -> begin
         if whatMode[4] == TRAITOR
             seeDraenei.start()

@@ -193,8 +193,9 @@ function destroyWall()
     let fire1 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel1.getCenter())
     let fire2 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel2.getCenter())
     let fire3 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel3.getCenter())
-    seeDrSpawn[3].start()
+    
     goblinShop.hide()
+
     forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
         if u.hasItemById(BARREL)
             u.getItemOfId(BARREL).remove()
@@ -203,18 +204,14 @@ function destroyWall()
         if u.getTypeId() == DEMON_TOWER
             u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
     end)
+
     actDrSpawn = Rects.respawn3
     actDeSpawn = Rects.respawn4
-    mission[2].setState(QuestState.COMPLETED)
+
     forUnitsInRect(Rects.shops3, u -> begin
         if u.isType(UNIT_TYPE_STRUCTURE)
             u.setOwner(DRAENEI, true)
     end)
-    Dests.voidTravellerDoor.open()
-    /* TODO
-    gg_trg_Viajero_del_vacio.enable()
-    gg_trg_Para_ser_justos.disable()
-    gg_trg_Y_aun_asi_vienes.destr()*/
 
     doAfter(3.) -> 
         // Destroy the barrels
@@ -238,8 +235,7 @@ function destroyWall()
                     for i = 1 to 11
                         CameraClearNoiseForPlayer(players[i])
 
-        pings.disable()
-        startMission3()
+        startMission(3)
         doAfter(0.2) ->
             moveCircles(3)
 

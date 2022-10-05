@@ -2,15 +2,11 @@
 package Towers
 
 import Functions
-import ClosureTimers
-import ClosureForGroups
 import PlayerData
 import Orders
 import DamageEvent
-import initlater Dungeon
-import initlater Barrels
 import GeneratedValues
-import Reset
+import initlater Missions
 
 import LinkedList
 import OnUnitEnterLeave
@@ -82,32 +78,48 @@ let towerDraeneiPos = [
 
 // Functions to order to build the towers
 
-public function defensiveTowers1()
-    let builders = CreateGroup()
-    GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[0])
-    new BuildingInstance(towerDraeneiPos[0], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[1])
-    new BuildingInstance(towerDraeneiPos[1], DRAENEI_TOWER)
-    builders.destr()
+init
+    nullTimer() -> 
+        let builders = CreateGroup()
+        GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
+        builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[0])
+        new BuildingInstance(towerDraeneiPos[0], DRAENEI_TOWER)
+        builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[1])
+        new BuildingInstance(towerDraeneiPos[1], DRAENEI_TOWER)
+        builders.destr()
 
-public function defensiveTowers2()
-    let builders = CreateGroup()
-    GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[2])
-    new BuildingInstance(towerDraeneiPos[2], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[3])
-    new BuildingInstance(towerDraeneiPos[3], DRAENEI_TOWER)
-    builders.destr()
+        onMission(mission -> begin
+            switch mission
+                case 2
+                    forUnitsInRect(Rects.demonTower1, u -> begin
+                        if u.getTypeId() == DEMON_TOWER
+                            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+                    end)
+                    forUnitsInRect(Rects.demonTower2, u -> begin
+                        if u.getTypeId() == DEMON_TOWER
+                            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+                    end)
+                    forUnitsInRect(Rects.shops2, u -> begin
+                        if u.isType(UNIT_TYPE_STRUCTURE)
+                            u.setOwner(DRAENEI, true)
+                    end)
 
-public function defensiveTowers3()
-    let builders = CreateGroup()
-    GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[4])
-    new BuildingInstance(towerDraeneiPos[4], DRAENEI_TOWER)
-    builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[5])
-    new BuildingInstance(towerDraeneiPos[5], DRAENEI_TOWER)
-    builders.destr()
+                    let builders2 = CreateGroup()
+                    GroupEnumUnitsOfPlayer(builders2, DRAENEI, builderCond)
+                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[2])
+                    new BuildingInstance(towerDraeneiPos[2], DRAENEI_TOWER)
+                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[3])
+                    new BuildingInstance(towerDraeneiPos[3], DRAENEI_TOWER)
+                    builders2.destr()
+                case 5
+                    let builders2 = CreateGroup()
+                    GroupEnumUnitsOfPlayer(builders2, DRAENEI, builderCond)
+                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[4])
+                    new BuildingInstance(towerDraeneiPos[4], DRAENEI_TOWER)
+                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[5])
+                    new BuildingInstance(towerDraeneiPos[5], DRAENEI_TOWER)
+                    builders2.destr()
+        end)
 
 // Check everytime a tower is correctly builded in less of a 60 seconds
 
@@ -198,7 +210,6 @@ init
         for _ = 1 to 8
             createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), GetRandomReal(0, PI2).asAngleRadians())
     end)
-    nullTimer(() -> defensiveTowers1())
     // If a tower is destroyed
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)

@@ -28,12 +28,11 @@ init
                 stopActTimer()
             seeDeSpawn[2].stop()
             seeDrSpawn[4].start()
-            moveCircles(4)
             actDrSpawn = Rects.respawn4
             actDeSpawn = Rects.respawn5
             QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETED|r\nYou managed to get out of the cave.")
             QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00MISSION FAILED|r\nThey managed to get out of the cave.")
-            mission[3].setState(QuestState.COMPLETED)
+            missions[3].setState(QuestState.COMPLETED)
             forUnitsInRect(Rects.shops4, u -> begin
                 if u.isType(UNIT_TYPE_STRUCTURE)
                     u.setOwner(DRAENEI, true)

@@ -319,6 +319,11 @@ init
         end)
     
     // Enter before time
+    Dests.voidTravellerDoor.killable.setInvulnerable(true)
+    onMission(mission -> begin
+        if mission == 3
+            Dests.voidTravellerDoor.open()
+    end)
     CreateTrigger()
         ..registerRectEnterEventSource(Rects.voidTravellerDoor)
         ..addCondition(isHero)

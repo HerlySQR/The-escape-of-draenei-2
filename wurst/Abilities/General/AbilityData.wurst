@@ -52,3 +52,9 @@ public function AbilityDefinition.setHotkey(string data)
         this.presetButtonPosNormal(x, 2)
         this.presetButtonPosResearch(x, 0)
         this.presetButtonPosTurnOff(x, 2)
+
+public function AbilityDefinition.basicItemSpell()
+    this
+        ..setItemAbility(true)
+        ..setHeroAbility(false)
+        ..setLevels(1)

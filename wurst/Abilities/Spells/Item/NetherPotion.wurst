@@ -1,0 +1,24 @@
+package NetherPotion
+
+import AbilityData
+
+public constant NETHER_POTION_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let MANA = 0
+let PRIM_DMG = 10.
+let SEC_DMG = 7.
+let ARMOR_RED = 3
+let AREA = 300.
+let SLOW = 0.3
+
+@compiletime function gen()
+    new AbilityDefinitionAlchemistAcidBomb(NETHER_POTION_SPELL)
+        ..basicItemSpell()
+        ..setPrimaryDamage(1, PRIM_DMG)
+        ..setSecondaryDamage(1, SEC_DMG)
+        ..setAttackSpeedReduction(1, -SLOW)
+        ..setMovementSpeedReduction(1, -SLOW)
+        ..setArmorPenalty(1, ARMOR_RED)
+        ..setManaCost(1, MANA)
+        ..setAreaofEffect(1, 300.)
+        ..setName("Nether potion")

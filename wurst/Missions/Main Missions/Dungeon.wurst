@@ -1,9 +1,6 @@
 package Dungeon
 
 import initlater Missions
-import Towers
-import HeroSelection
-import PlayerData
 import GeneratedValues
 
 import Orders
@@ -27,32 +24,6 @@ init
         ..registerDeathEvent(Dests.dungeonExitDoor2)
         ..addAction(() -> begin
             doorDestroyed = true
-            if whatMode[1] == VARIOUS_TIMERS
-                stopActTimer()
-            seeDrSpawn[2].start()
-            defensiveTowers2()
-            moveCircles(2)
-            forUnitsInRect(Rects.demonTower1, u -> begin
-                if u.getTypeId() == DEMON_TOWER
-                    u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
-            end)
-            forUnitsInRect(Rects.demonTower2, u -> begin
-                if u.getTypeId() == DEMON_TOWER
-                    u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
-            end)
-            QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")
-            QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")
-            mission[1].setState(QuestState.COMPLETED)
-            actDrSpawn = Rects.respawn2
-            actDeSpawn = Rects.respawn3
-            forUnitsInRect(Rects.shops2, u -> begin
-                if u.isType(UNIT_TYPE_STRUCTURE)
-                    u.setOwner(DRAENEI, true)
-            end)
-            /*TODOforDestructablesInRect(gg_rct_Objetivo_1, d -> begin
-                if d.getTypeId() == 'B00E'
-                    d.kill()
-            end)*/
             Dests.leverSecret.setInvulnerable(false)
-            doAfter(5., () -> startMission2())
+            startMission(2)
         end)

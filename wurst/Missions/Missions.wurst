@@ -3,6 +3,7 @@ package Missions
 import public ClosureTimers
 import public ClosureForGroups
 import Orders
+import LinkedList
 
 import public DefineMissions
 import public MissionTimers
@@ -20,6 +21,7 @@ import Towers
 import Surrender
 import GeneratedValues
 import public Reset
+import HeroSelection
 
 public int actMission = 0
 
@@ -27,6 +29,23 @@ public fogmodifier array seeDrSpawn
 public fogmodifier array seeDeSpawn
 
 boolean timeIsOver = false
+
+interface MissionClosure
+    function run(int mission)
+
+let callbacks = new LinkedList<MissionClosure>()
+
+public function onMission(MissionClosure cb)
+    callbacks.add(cb)
+
+public function startMission(int mission)
+    if timeIsOver
+        return
+
+    actMission = mission
+    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+    for cb in callbacks
+        cb.run(mission)
 
 init
     seeDrSpawn[1] = createVision(DRAENEI, Rects.items1, true)..start()
@@ -37,145 +56,134 @@ init
     seeDeSpawn[2] = createVision(DEMON, Rects.items3, true)..start()
     seeDeSpawn[3] = createVision(DEMON, Rects.items5, true)..start()
 
-    onModesSelected(() -> startMission1())
+    onModesSelected(() -> startMission(1))
 
     onReset(false, () -> begin
         seeDrSpawn[2].stop()
         seeDrSpawn[3].stop()
         seeDrSpawn[4].stop()
         seeDeSpawn[2].start()
+        timeIsOver = false
+        actMission = 0
     end)
 
     bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_CAP, 5))
+    onMission(mission -> begin
+        moveCircles(mission)
+        switch mission
+            // Mission 1
+            case 1
+                giveGold.enable()
+                doAfter(10.) () ->
+                    if whatMode[1] == SINGLE_TIMER
+                        startSingleTimer()
+                    else if whatMode[1] == VARIOUS_TIMERS
+                        startActTimer(1)
 
-// Mission 1
+                    pings.enable()
 
-public function startMission1()
-    actMission = 1
-    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
-    doAfter(10.) () ->
-        giveGold.enable()
-        if whatMode[1] == SINGLE_TIMER
-            startSingleTimer()
-        else if whatMode[1] == VARIOUS_TIMERS
-            startActTimer(1)
+                    missions[1].setState(QuestState.DISCOVERED)
+                    QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 1:|r The door")
 
-        pings.enable()
+                    gameBoard.display(true)
+                    gameBoard.minimize()
+                    if whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_DE_AND_DR
+                        doAfter(5, () -> begin
+                            spawnRun = true
+                        end)
+            // Mission 2
+            case 2
+                pings.disable()
+                if whatMode[1] == VARIOUS_TIMERS
+                    stopActTimer()
+                seeDrSpawn[2].start()
 
-        mission[1].setState(QuestState.DISCOVERED)
-        QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 1:|r The door")
+                if whatMode[1] == VARIOUS_TIMERS
+                    doAfter(10., () -> startActTimer(actMission))
+                
+                actDrSpawn = Rects.respawn2
+                actDeSpawn = Rects.respawn3
 
-        gameBoard.display(true)
-        gameBoard.minimize()
-        if whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_DE_AND_DR
-            doAfter(5, () -> begin
-                spawnRun = true
-            end)
+                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")
+                QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")
+                missions[1].setState(QuestState.COMPLETED)
 
-// Mission 2
+                doAfter(7.) -> 
+                    DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
+                    doAfter(5.) ->
+                        pings.enable()
 
-public function startMission2()
-    if timeIsOver
-        return
-    actMission = 2
-    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
-    
-    pings.disable()
+                        missions[2].setState(QuestState.DISCOVERED)
+                        QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 2:|r The wall")
+                        doAfter(20.) -> 
+                            if whatMode[5] == NOT_LEVELING
+                                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
+            // Mission 3
+            case 3
+                seeDrSpawn[3].start()
+                missions[3].setState(QuestState.COMPLETED)
+                pings.disable()
 
-    if whatMode[1] == VARIOUS_TIMERS
-        doAfter(5., () -> startActTimer(actMission))
-    doAfter(2.) -> 
-        DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
-        doAfter(5.) ->
-            pings.enable()
+                doAfter(5.) -> 
+                    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+                    // Move all the Draenei units
+                    forUnitsOfPlayer(DRAENEI, u -> begin
+                        vec2 target
+                        if u.getTypeId() == DRAENEI_WORKER
+                            target = Rects.justHidePls.getCenter()
+                        else
+                            target = Rects.attackPoint4.getCenter()
+                        u.issuePointOrderById(Orders.attack, target)
+                    end)
+                    if whatMode[1] == VARIOUS_TIMERS
+                        doAfter(5., () -> startActTimer(actMission))
+                    doAfter(2.) -> 
+                        DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
+                        DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
+                        doAfter(5.) -> 
+                            missions[3].setState(QuestState.DISCOVERED)
+                            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 3:|r The habitat")
+            // Mission 4
+            case 4
+                pings.disable()
 
-            mission[2].setState(QuestState.DISCOVERED)
-            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 2:|r The wall")
-            doAfter(20.) -> 
-                if whatMode[5] == NOT_LEVELING
-                    QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
-// Mission 3
+                if whatMode[1] == VARIOUS_TIMERS
+                    stopActTimer()
+                    doAfter(5., () -> startActTimer(actMission))
+                doAfter(2.) -> 
+                    DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
+                    DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
+                    doAfter(5.) -> 
+                        missions[4].setState(QuestState.DISCOVERED)
+                        QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 4:|r The generators")
+                        
+                        pings.enable()
 
-public function startMission3()
-    if timeIsOver
-        return
+                        doAfter(10.) -> 
+                            QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cffffce33All the telepoters have been unlocked.|r")
+            // Mission 5
+            case 5
+                SetDestructableInvulnerable(Dests.mainEntranceDoor, false)
+                missions[4].setState(QuestState.COMPLETED)
+                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
+                QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
+                // Order all draenei attack the demons
+                let pos = Rects.demonSpawn31.getCenter()
+                forUnitsOfPlayer(DRAENEI, u -> begin
+                    if not u.isType(UNIT_TYPE_HERO) and not u.getTypeId() == DRAENEI_WORKER
+                        u.issuePointOrderById(Orders.attack, pos)
+                end)
+                doAfter(5.) -> 
+                    actMission = 5
+                    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
+                    if whatMode[1] == VARIOUS_TIMERS
+                        startActTimer(actMission)
+                    doAfter(5.) -> 
+                        missions[5].setState(QuestState.DISCOVERED)
+                        QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 5:|r The exit")
 
-    pings.enable()
-
-    doAfter(5.) -> 
-        actMission = 3
-        bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
-        // Move all the Draenei units
-        forUnitsOfPlayer(DRAENEI, u -> begin
-            vec2 target
-            if u.getTypeId() == DRAENEI_WORKER
-                target = Rects.justHidePls.getCenter()
-            else
-                target = Rects.attackPoint4.getCenter()
-            u.issuePointOrderById(Orders.attack, target)
-        end)
-        if whatMode[1] == VARIOUS_TIMERS
-            doAfter(5., () -> startActTimer(actMission))
-        doAfter(2.) -> 
-            DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
-            DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
-            doAfter(5.) -> 
-                mission[3].setState(QuestState.DISCOVERED)
-                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 3:|r The habitat")
-
-// Mission 4
-
-public function startMission4()
-    if timeIsOver
-        return
-    actMission = 4
-    bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
-    
-    pings.disable()
-
-    if whatMode[1] == VARIOUS_TIMERS
-        stopActTimer()
-        doAfter(5., () -> startActTimer(actMission))
-    doAfter(2.) -> 
-        DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
-        DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
-        doAfter(5.) -> 
-            mission[4].setState(QuestState.DISCOVERED)
-            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 4:|r The generators")
-            
-            pings.enable()
-
-            doAfter(10.) -> 
-                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cffffce33All the telepoters have been unlocked.|r")
-
-// Mission 5
-
-public function startMission5()
-    if timeIsOver
-        return
-
-    pings.disable()
-
-    SetDestructableInvulnerable(Dests.mainEntranceDoor, false)
-    mission[4].setState(QuestState.COMPLETED)
-    QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
-    QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
-    // Order all draenei attack the demons
-    let pos = Rects.demonSpawn31.getCenter()
-    forUnitsOfPlayer(DRAENEI, u -> begin
-        if not u.isType(UNIT_TYPE_HERO) and not u.getTypeId() == DRAENEI_WORKER
-            u.issuePointOrderById(Orders.attack, pos)
+                        pings.enable()
     end)
-    doAfter(5.) -> 
-        actMission = 5
-        bj_FORCE_ALL_PLAYERS.forEach(() -> GetEnumPlayer().setState(PLAYER_STATE_RESOURCE_FOOD_USED, actMission))
-        if whatMode[1] == VARIOUS_TIMERS
-            startActTimer(actMission)
-        doAfter(5.) -> 
-            mission[5].setState(QuestState.DISCOVERED)
-            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 5:|r The exit")
-
-            pings.enable()
 
 // Draenei Win
 
@@ -235,8 +243,3 @@ public function demonsWin()
     
     doAfter(5.) -> 
         demonsCinematic()
-
-init
-    onReset(false, () -> begin
-        timeIsOver = false
-    end)
