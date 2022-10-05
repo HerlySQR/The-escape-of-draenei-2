@@ -8,6 +8,6 @@ dependencies:
 - https://github.com/Frotty/wurst-bonus-handler
 - https://github.com/HerlySQR/Unit-Transmission:main
 buildMapData:
-  name: The escape of draenei vBeta25
-  fileName: The_escape_of_draenei_vBeta25
+  name: The escape of draenei
+  fileName: The_escape_of_draenei_vbeta25
   author: HerlySQR

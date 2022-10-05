@@ -23,7 +23,9 @@ let INFERNAL_ARTIFACT = compiletime(UNIT_ID_GEN.next())
 
 let spawning = CreateTrigger()..disable()
 let camp = CreateGroup()
-let filt = Filter(() -> GetFilterUnit().isAlive())
+let filt = Filter(() -> begin
+    return GetFilterUnit().isAlive()
+end)
 
 public function enableNeutralSpawn()
     spawning.enable()

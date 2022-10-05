@@ -19,9 +19,12 @@ import ObjectIds
 import Assets
 import Annotations
 
-import BountyController
-
-public constant BARREL = compiletime(ITEM_ID_GEN.next())
+import EventHelper
+import ClosureEvents
+import RegisterEvents
+import UnitIndexer
+import SoundUtils
+import Imports
 
 public boolean generatorAlive = true
 public boolean wallDestroyed = false
@@ -163,7 +166,9 @@ init
         ..registerRectEnterEventSource(Rects.placeBarrel1)
         ..registerRectEnterEventSource(Rects.placeBarrel2)
         ..registerRectEnterEventSource(Rects.placeBarrel3)
-        ..addCondition(Condition(() -> GetEnteringUnit().hasItemById(BARREL)))
+        ..addCondition(Condition(() -> begin
+            return GetEnteringUnit().hasItemById(BARREL)
+        end))
         ..addAction(() -> begin
             let u = GetEnteringUnit()
             u.getItemOfId(BARREL).remove()

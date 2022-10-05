@@ -134,7 +134,7 @@ public constant LUMBER_BALE = compiletime(
         ..setButtonPositionX(1)
         ..setButtonPositionY(2)
         ..setHotkey("X")
-        ..setTooltipBasic("[|cffffcc00X|r] Buy lumber bale")
+        ..setTooltipBasic("[|cffffcc00Z|r] Buy lumber bale")
         ..setTooltipExtended("Gives 1 lumber."))
 
 public constant POWER_BOOSTER = compiletime(

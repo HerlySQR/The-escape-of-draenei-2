@@ -10,10 +10,6 @@ import SecretMerchant
 import BookStore
 import GeneratedValues
 import PlayerData
-import Reset
-import ModeSelection
-
-import ClosureForGroups
 
 public constant MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant ARMS_MERCHANT = compiletime(UNIT_ID_GEN.next())
@@ -21,14 +17,6 @@ public constant SPECIAL_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant RECIPES_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant SECRET_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant BOOK_STORE = compiletime(UNIT_ID_GEN.next())
-
-let secretMerchant = createUnit(players[PLAYER_NEUTRAL_PASSIVE], SECRET_MERCHANT, Rects.secretMerchant.getCenter(), 180..fromDeg())
-
-function addItemToStock(ItemDefinition m, int maxStock)
-    AddItemToStock(secretMerchant, (m instanceof Recipe) ? (m castTo Recipe).getDummyItem() : m.getNewId(), 1, maxStock)
-
-function removeItemFromStock(ItemDefinition m)
-    RemoveItemFromStock(secretMerchant, (m instanceof Recipe) ? (m castTo Recipe).getDummyItem() : m.getNewId())
 
 init
     onModesSelected(() -> begin
@@ -194,7 +182,6 @@ function BuildingDefinition.defaultSettings()
         ..setPropulsionWindowdegrees(30.)
         ..setNormalAbilities(
         commaList(
-            'Ane2',
             AbilityIds.neutralBuildinganyunit,
             AbilityIds.invulnerable,
             AbilityIds.shopSharingAlliedBldg,
@@ -246,7 +233,7 @@ function BuildingDefinition.defaultSettings()
             ORB_OF_CORRUPTION.getNewId(),
             ORB_OF_LIGHTNING.getNewId(),
             ICE_ORB.getNewId(),
-            UNITE_SPIRIT_RUNE.getNewId()
+            'rspl'
         ))
         ..setModelFile(Units.grunt1)
         ..setUnitSoundSet(Soundsets.grunt)
@@ -282,13 +269,11 @@ function BuildingDefinition.defaultSettings()
             //SOBI_MASK_2_RECIPE.getDummyItem(),
             FIRE_BLADE_RECIPE.getDummyItem(),
             IMPULSE_BOOTS_RECIPE.getDummyItem(),
-            ENERGY_PENDANT_RECIPE.getDummyItem(),
             MASK_OF_DEATH_RECIPE.getDummyItem(),
             SHIELD_OF_LORD_OF_DEAD_RECIPE.getDummyItem(),
             GLOVES_OF_CORRUPTION_RECIPE.getDummyItem(),
             SHAMANS_CLAWS_RECIPE.getDummyItem(),
-            NORTHREND_ARTIFACT_RECIPE.getDummyItem(),
-            POCKET_CATAPULT_RECIPE.getDummyItem()
+            NORTHREND_ARTIFACT_RECIPE.getDummyItem()
         ))
         ..setModelFile(Units.voidWalker)
         ..setUnitSoundSet(Soundsets.netherDragon)

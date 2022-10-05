@@ -75,7 +75,6 @@ public class Dests
     // Misc
     
     static constant leverSecret = gg_dest_B009_6603
-    static constant secretMerchantLever = [gg_dest_B00H_4873, gg_dest_B00H_2593, gg_dest_B00H_2594]
 
     static constant dungeonWalls = [gg_dest_B00K_6627, gg_dest_B00K_5690, gg_dest_B00K_5689, gg_dest_B00K_4875]
 
