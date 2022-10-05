@@ -65,7 +65,7 @@ function ChannelAbilityPreset.general()
     this.presetHotkey("Q")
 
 @compiletime function gen()
-    new ChannelAbilityPreset(LIGHTNING_SKIRT_NL, 2, true, new AbilityTooltipGenerator("Throws lightning to the nearby enemy units."))
+    new ChannelAbilityPreset(LIGHTNING_SKIRT_NL, 2, true, new AbilityTooltipGenerator("Throws lightning to nearby enemy units."))
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -75,7 +75,7 @@ function ChannelAbilityPreset.general()
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
 
-    new ChannelAbilityPreset(LIGHTNING_SKIRT_L, 4, true, new AbilityTooltipGenerator("Throws lightning to the nearby enemy units."))
+    new ChannelAbilityPreset(LIGHTNING_SKIRT_L, 4, true, new AbilityTooltipGenerator("Throws lightning to nearby enemy units."))
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
         ..general()
@@ -102,6 +102,6 @@ function ChannelAbilityPreset.general()
             else
                 value1 = DMG_L[lvl-3]
                 value2 = MAX_TARGETS_L[lvl-3]
-            return "Throws lightning at all enemy units within a radius of {0} causing {1} damage to max {2} units.".format(AREA.toString(0), value1.toString(0), value2.toString())
+            return "Throws lightning at enemy units within a radius of {0} causing {1} damage up to {2} units.".format(AREA.toString(0), value1.toString(0), value2.toString())
         end)
         ..setEditorSuffix("(Stealed)")

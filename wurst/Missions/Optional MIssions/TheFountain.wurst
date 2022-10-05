@@ -238,7 +238,8 @@ init
             end)
     end 
     registerSpellEffectEvent(HOLY_LIGHT_NL, onCast)
-    //TODO registerSpellEffectEvent(HOLY_LIGHT_L, onCast)
+    registerSpellEffectEvent(HOLY_LIGHT_L, onCast)
+    registerSpellEffectEvent(HOLY_LIGHT_S, onCast)
 
     // Don't touch the pictogram
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ATTACKED, () -> begin

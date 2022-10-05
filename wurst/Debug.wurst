@@ -3,6 +3,8 @@ package Debug
 import HeroType
 
 init
+    //let pos = vec2(5200, -5200)
+    let pos = vec2(0, 0)
     for typ in HeroType
-        createUnit(players[1], typ.getL())
-        createUnit(players[1], typ.getNL())
+        createUnit(players[1], typ.getL(), pos)..setLevel(6, false)
+        createUnit(players[1], typ.getNL(), pos)

@@ -64,7 +64,7 @@ function AbilityDefinitionBerserk.general()
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(STALWART_THUMP_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("For a while the attacks you make will stun the enemy and have additional damage."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("For a while the succesful attacks will stun the enemy and add damage."))
         ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
@@ -79,7 +79,7 @@ function AbilityDefinitionBerserk.general()
         ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionBerserk(STALWART_THUMP_L)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("For a while the attacks you make will stun the enemy and have additional damage."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("For a while the succesful attacks will stun the enemy and add damage."))
         ..presetLevels(4)
         ..presetButtonPosNormal(2, 2)
         ..presetButtonPosResearch(2, 0)
@@ -113,7 +113,7 @@ function AbilityDefinitionBerserk.general()
             else
                 value1 = DURATION_L[lvl-3]
                 value2 = DMG_L[lvl-3]
-            return "For {0} seconds the attacks you make will stun the enemy for {1} seconds and add {2} of damage.".format(value1.toString(0), STUN.toString(2), value2.toString(0))
+            return "For {0} seconds the succesful attacks will stun the enemy for {1} seconds and add {2} damage.".format(value1.toString(0), STUN.toString(2), value2.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")
     

@@ -82,7 +82,7 @@ function AbilityDefinitionThunderBoltCreep.general()
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster strikes the ground where its target is, making it fly through the air and when it falls it causes damage to the nearby units and makes them lose concentration."))
         ..presetLevels(1)
         ..setHeroAbility(false)
         ..general()
@@ -95,7 +95,7 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionThunderBoltCreep(AXE_OF_DESTRUCTION_L)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes a damage to the nearby units and makes them lose concentration."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The Axemaster strikes the ground where its target is, making it fly through the air and when it falls it causes damage to the nearby units and makes them lose concentration."))
         ..setRequiredLevel(6)
         ..setLevelSkipRequirement(6)
         ..presetLevels(2)
@@ -123,7 +123,7 @@ function AbilityDefinitionThunderBoltCreep.general()
                 value = DMG_NL
             else
                 value = DMG_L[lvl - 2]
-            return "The Axemaster gives a great attack on the ground where its target is, making it fly through the air and when it falls it causes {0} of damage to the nearby units and makes them lose concentration.".format(value.toString())
+            return "The hero strikes the ground where its target is, making it fly through the air and when it falls it causes {0} damage to the nearby units and makes them lose concentration.".format(value.toString())
         end)
         ..setEditorSuffix("(Stealed)")
         ..setName("Ult Axe of Destruction")

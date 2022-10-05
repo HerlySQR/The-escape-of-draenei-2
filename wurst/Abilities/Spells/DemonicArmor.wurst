@@ -17,7 +17,7 @@ let DELAY_EFF = 0.5
 
 init
     DamageEvent.addUnreducedListener(() -> begin
-        if not DamageEvent.isSpell()
+        if not DamageEvent.isSpell() and not DamageEvent.isCode()
             let data = DamageEvent.getTarget().pasAbilityCond(DEMONIC_ARMOR_NL, DEMONIC_ARMOR_L)
             if data.check
                 real reflect
@@ -47,7 +47,6 @@ init
     end)
 
 function AbilityDefinitionHardenedSkin.general()
-    this.registerTooltipGenerator(new AbilityTooltipGenerator("The armor of this demon has the ability to reflect part of the damage taken to enemies at a range of " + AREA.toString(0) + "."))
     this.setHeroAbility(false)
     this.presetIgnoredDamage(lvl -> 0.)
     this.presetMinimumDamage(lvl -> 0.)
@@ -56,7 +55,7 @@ function AbilityDefinitionHardenedSkin.general()
     this.presetIncludeRangedDamage(lvl -> false)
     this.setRequirements("")
     this.tooltipStartListen()
-    this.setHotkey("R")
+    this.setHotkey("E")
     this.setName("Demonic Armor")
     this.addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
     // Audiovisual
@@ -65,6 +64,7 @@ function AbilityDefinitionHardenedSkin.general()
 
 @compiletime function gen()
     new AbilityDefinitionHardenedSkin(DEMONIC_ARMOR_NL)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The armor of this demon has the ability to reflect part of the damage taken to enemies in a range of " + AREA.toString(0) + "."))
         ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
@@ -74,6 +74,7 @@ function AbilityDefinitionHardenedSkin.general()
         .setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionHardenedSkin(DEMONIC_ARMOR_L)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The armor of this demon has the ability to reflect part of the damage taken to enemies in a range of " + AREA.toString(0) + "."))
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)

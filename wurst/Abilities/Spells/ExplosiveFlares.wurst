@@ -30,7 +30,8 @@ let TOTAL_TIME_OF_TICKS = INTERVAL * TICKS_BEFORE_NEXT
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if EventData.getSpellAbilityId() == EXPLOSIVE_FLARES_NL
+        let data = abilityCond(EXPLOSIVE_FLARES_NL, EXPLOSIVE_FLARES_L, EXPLOSIVE_FLARES_S)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
             var pos = caster.getPos()
@@ -48,9 +49,14 @@ init
             let dummy = DummyRecycler.get(pos, angl)
             DummyRecycler.recycle(dummy, compiletime(DURATION + 2.))
             dummy.addAbility(EXPLOSIVE_FLARES_FIRE)
-            caster.dummyDamage(dummy, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_MAGIC)
+            dummy.setOwner(owner, false)
 
-            let damage = DMG_INIT_NL / TICKS_BEFORE_NEXT
+            real damage
+            if data.isNL
+                damage = DMG_INIT_NL / TICKS_BEFORE_NEXT
+            else
+                damage = DMG_INIT_L[data.lvl] / TICKS_BEFORE_NEXT
+            
             var explosions = 0
             var ticks = 0
             pos = pos.polarOffset(angl, compiletime(AREA_PER_EXPLOSIONS * 0.8))
@@ -89,7 +95,6 @@ function ChannelAbilityPreset.general()
     // Audiovisual
     this.presetIcon(Icons.bTNDizzy)
     // Tooltip
-    this.presetHotkey("F")
 
 @compiletime function gen()
     new ChannelAbilityPreset(EXPLOSIVE_FLARES_NL, 1, true, new AbilityTooltipGenerator("Create 5 explosions that causes initial damage, and they leave a flare deals damage per second."))

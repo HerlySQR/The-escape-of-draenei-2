@@ -26,7 +26,6 @@ let AREA = 600.
         ..presetCooldown(lvl -> CD)
         ..presetAreaofEffect(lvl -> AREA)
         // Audiovisual
-        ..presetIcon(Imports.bTNThunderStorm)
         // Tooltip
         ..setHotkey("F")
         ..tooltipStopListen()

@@ -62,7 +62,7 @@ public class HeroType
     private HeroDefinition heroL
     private string icon
     private Race r
-    private string abilities = TELEPORT.toRawCode() + ",AInv"
+    private string abilities = commaList(TELEPORT.toRawCode(), "AInv")
 
     construct(int origId)
         MAX++
@@ -370,14 +370,14 @@ public class HeroType
         heroL.setTurnRate(data)
 
     function setExtraAbility(int data)
-        abilities += data.toRawCode()
+        abilities = commaList(abilities, data.toRawCode())
     
     function setNormalAbilities(vararg int datas)
         let dataList = new LinkedList<string>()
         for data in datas
             dataList.add(data.toRawCode())
         heroL.setNormalAbilities(abilities)
-        abilities += commaList(dataList)
+        abilities = commaList(abilities, commaList(dataList))
         heroNL.setNormalAbilities(abilities)
     
     function setHeroAbilities(vararg int datas)
@@ -439,6 +439,7 @@ init
         ..setAnimationCastPoint(0.)
         ..setAnimationSpeed(185., 185.)
         ..setModelFile(Units.catapult1)
+        ..setModelFileExtraVersions("2")
         ..setElevationSample(4, 50.)
         ..setSelectionScale(2.75)
         ..setArtSpecial("")

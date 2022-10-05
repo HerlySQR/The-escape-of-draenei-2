@@ -33,6 +33,7 @@ function AbilityDefinitionFireBoltcreep.general()
         ..setMissileArc(0.15)
         ..setMissileArt(Imports.fireboltRoughMinor)
         ..setAnimationNames("attack")
+        ..presetIcon(Icons.bTNFireBolt)
 
 @compiletime function gen()
     new AbilityDefinitionFireBoltcreep(FIRE_RAY_NL)

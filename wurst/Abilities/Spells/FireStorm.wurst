@@ -20,7 +20,7 @@ let MANA_L = [150, 200]
 let AREA = 1000.
 let COLLISION = 48.
 let AREA_DMG = 150.
-let INTERVAL = 0.05
+let INTERVAL = 0.1
 let SPEED = 500.
 let MAX_DIST = compiletime(2*AREA)
 let MODEL = Imports.fireballMinor
@@ -28,30 +28,29 @@ let MODEL = Imports.fireballMinor
 function check(Missiles m, unit u) returns boolean
     return m.owner.isEnemyOf(u.getOwner()) and u.isAlive() and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
 
-function onHitActions(Missiles m, unit hit) returns boolean
-    if check(m, hit)
-        forUnitsInRange(m.getPos().toVec2(), AREA_DMG, u -> begin
-            if check(m, u)
-                m.source.damageTarget(u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
-        end)
-        return true
-    return false
-
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if EventData.getSpellAbilityId() == FIRE_STORM_NL
+        let data = abilityCond(FIRE_STORM_NL, FIRE_STORM_L, FIRE_STORM_S)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()
-            let damage = DMG_NL
             let center = caster.getPos()
             let face = center.angleTo(EventData.getSpellTargetPos())
-            let faceComp = face - angle(PIHALF)
             let offset = center.polarOffset(face, -AREA)
+            let vector1 = (face - angle(PIHALF)).toVec(1.)
+            let vector2 = face.toVec(MAX_DIST)
+
+            real damage
+            if data.isNL
+                damage = DMG_NL
+            else
+                damage = DMG_L[data.lvl]
+
             doPeriodically(INTERVAL, cb -> begin
                 if caster.getCurrentOrder() == Orders.stampede
                     let delta = GetRandomReal(-AREA, AREA)
-                    let fromPos = offset.polarOffset(faceComp, delta)
-                    let toPos = fromPos.polarOffset(face, MAX_DIST)
+                    let fromPos = offset + vector1 * delta
+                    let toPos = fromPos + vector2
                     let m = new Missiles(fromPos.withZ(50.), toPos.withZ(50.))
                     m.source = caster
                     m.owner = owner
@@ -60,7 +59,15 @@ init
                     m.setSpeed(SPEED)
                     m.collision = COLLISION
                     m.damage = damage
-                    m.onHit(hit -> onHitActions(m, hit))
+                    m.onHit(hit -> begin
+                        let b = check(m, hit)
+                        if b
+                            forUnitsInRange(m.getPos().toVec2(), AREA_DMG, u -> begin
+                                if check(m, u)
+                                    m.source.damageTarget(u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
+                            end)
+                        return b
+                    end)
                     m.launch()
                 else
                     destroy cb

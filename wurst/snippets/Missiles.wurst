@@ -1,10 +1,11 @@
 package Missiles
 
-import DummyRecycler
 import MapBounds
 import HashMap
 import ErrorHandling
+import Fx
 import Annotations
+import Execute
 
 // System based in Missiles v2.3 by Chopinski https://www.hiveworkshop.com/threads/relativistic-missiles-vjass-lua-gui.325964/
 
@@ -37,7 +38,7 @@ class Coordinates
     real x
     real y
     real z
-    angle angle
+    angle angl
     real distance
     real square
     real slope
@@ -61,12 +62,12 @@ class Coordinates
 
         a.square   = dx
         a.distance = dy
-        a.angle    = angle(Atan2(b.y - a.y, b.x - a.x))
+        a.angl    = angle(Atan2(b.y - a.y, b.x - a.x))
         a.slope    = (b.z - a.z)/dy
         a.alpha    = angle(Atan(a.slope))
         // b.
         if b.ref == a
-            b.angle     = a.angle + PI_ANG
+            b.angl     = a.angl + PI_ANG
             b.distance  = dy
             b.slope     = -a.slope
             b.alpha     = (-1.)*a.alpha
@@ -127,7 +128,6 @@ public class Missiles
     private HashMap<widget, boolean> widgetMap
     private HashMap<Missiles, boolean> missilMap
     private angle cA
-    private effect eff
     private string path
     private real size
     private real height
@@ -141,7 +141,7 @@ public class Missiles
     private vec3 pos
     private vec3 prevPos
     private vec3 nextPos
-    private unit dummy
+    private Fx fx
     private real veloc
     private real travel
     private boolean paused
@@ -175,9 +175,8 @@ public class Missiles
 
     /* -------------------------- Model of the missile -------------------------- */
     function setModel(string fxpath)
-        eff.destr()
+        fx.setFx(fxpath)
         path = fxpath
-        eff = dummy.addEffect(fxpath, "origin")
 
     function getModel() returns string
         return path
@@ -198,7 +197,7 @@ public class Missiles
 
     /* ------------------------------ Effect scale ------------------------------ */
     function setScale(real v)
-        dummy.setScale(v)
+        fx.setScale(v)
         size = v
 
     function getScale() returns real
@@ -348,8 +347,8 @@ public class Missiles
 
     /* -------------------------------- Terminate ------------------------------- */
     function terminate()
-        Missiles aux
         if launched
+            Missiles aux
             
             if pkey != -1
                 aux = frozen[pid]
@@ -369,10 +368,9 @@ public class Missiles
             count = count - 1
             index = -1
 
-            DummyRecycler.recycle(dummy, RECYCLE_TIME)
+            destroy fx
             destroy origin
             destroy impact
-            eff.destr()
             reset()
             destroy widgetMap
             destroy missilMap
@@ -388,8 +386,7 @@ public class Missiles
         source = null
         target = null
         owner = null
-        eff = null
-        dummy = null
+        fx = null
         path = ""
         open = 0.
         height = 0.
@@ -472,12 +469,6 @@ public class Missiles
 
     private static function move()
         int i
-        angle a
-        real s
-        real dx
-        real dy
-        angle pitch
-        Missiles missile
 
         if SWEET_SPOT > 0
             i = last
@@ -496,8 +487,8 @@ public class Missiles
                             if not temp.widgetMap.has(u)
                                 if IsUnitInRangeXY(u, temp.pos.x, temp.pos.y, temp.collision)
                                     if temp.collideZ
-                                        dx = u.getPos3Real().z
-                                        dy = u.getCollisionSize()
+                                        let dx = u.getPos3Real().z
+                                        let dy = u.getCollisionSize()
                                         if dx + dy >= temp.pos.z - temp.collision and dx <= temp.pos.z + temp.collision
                                             temp.widgetMap.put(u, true)
                                             if temp.unitEvent.run(u)
@@ -512,19 +503,17 @@ public class Missiles
 
                     if temp.missileEvent != null
                         for i2 = 0 to count
-                            missile = collection[i2]
+                            let missile = collection[i2]
                             if missile != temp
                                 if not temp.missilMap.has(missile)
-                                    dx = missile.pos.x - temp.pos.x
-                                    dy = missile.pos.y - temp.pos.y
-                                    if SquareRoot(dx*dx + dy*dy) <= temp.collision
+                                    if missile.pos.distanceTo(temp.pos) <= temp.collision
                                         temp.missilMap.put(missile, true)
                                         if temp.missileEvent.run(missile)
                                             temp.terminate()
                                             break
                     
                     if temp.destEvent != null or temp.itemEvent != null
-                        dx = temp.collision
+                        let dx = temp.collision
                         SetRect(r, temp.pos.x - dx, temp.pos.y - dx, temp.pos.x + dx, temp.pos.y + dx)
                         if temp.destEvent != null
                             EnumDestructablesInRect(r, null, function onDest)
@@ -532,8 +521,8 @@ public class Missiles
                             EnumItemsInRect(r, null, function onItems)
 
                 if temp.cliffEvent != null
-                    dx = GetTerrainCliffLevel(temp.nextPos.x, temp.nextPos.y).toReal()
-                    dy = GetTerrainCliffLevel(temp.pos.x, temp.pos.y).toReal()
+                    let dx = GetTerrainCliffLevel(temp.nextPos.x, temp.nextPos.y).toReal()
+                    let dy = GetTerrainCliffLevel(temp.pos.x, temp.pos.y).toReal()
                     if dy < dx and temp.pos.z  < (dx - getMapCliffLevel())*bj_CLIFFHEIGHT
                         if temp.cliffEvent.run()
                             temp.terminate()
@@ -556,15 +545,16 @@ public class Missiles
 
                 // Homing or not
                 let o = temp.origin
+                angle a
 
                 if temp.target != null and temp.target.getTypeId() != 0
                     temp.impact.move(temp.target.getX(), temp.target.getY(), GetUnitFlyHeight(temp.target) + temp.toZ)
-                    dx = temp.impact.x - temp.nextPos.x
-                    dy = temp.impact.y - temp.nextPos.y
+                    let dx = temp.impact.x - temp.nextPos.x
+                    let dy = temp.impact.y - temp.nextPos.y
                     a = angle(Atan2(dy, dx))
                     temp.travel = o.distance - SquareRoot(dx*dx + dy*dy)
                 else
-                    a = o.angle
+                    a = o.angl
                     temp.target = null
                 
                 // turn rate
@@ -578,10 +568,10 @@ public class Missiles
 
                 let vel = temp.veloc*dilation
                 var yaw = temp.cA
-                s = temp.travel + vel
+                let s = temp.travel + vel
                 temp.veloc += temp.acceleration
                 temp.travel = s
-                pitch  = temp.origin.alpha
+                var pitch = temp.origin.alpha
                 temp.prevPos = temp.pos
                 temp.pos = temp.nextPos
                 temp.nextPos = temp.pos.offset2d(temp.cA, vel)
@@ -597,7 +587,7 @@ public class Missiles
             
                 // curve calculation
                 if c != 0
-                    dx = 4*c*s*(d-s)/(d*d)
+                    let dx = 4*c*s*(d-s)/(d*d)
                     a = temp.cA + PI_HALF_ANG
                     temp.pos = temp.pos.offset2d(a, dx)
                     yaw = temp.cA + angle(Atan(-((4*c)*(2*s - d))/(d*d)))
@@ -611,15 +601,16 @@ public class Missiles
                                 temp.terminate()
                     else
                         temp.terminate()
-
-                SetUnitAnimationByIndex(temp.dummy, R2I(pitch.degrees() + 90.5))
-                temp.dummy.setFacing(yaw)
-                if temp.pos.inBounds()
-                    temp.dummy.setPosReal(temp.pos)
-                else
-                    if temp.boundEvent != null
-                        if temp.boundEvent.run()
-                            temp.terminate()
+                try(() -> begin
+                    temp.fx.setXYAngle(yaw)
+                    temp.fx.setZAngle(pitch)
+                    if temp.pos.inBounds()
+                        temp.fx.setXYZ(temp.pos)
+                    else
+                        if temp.boundEvent != null
+                            if temp.boundEvent.run()
+                                temp.terminate()
+                end)
             else
                 i = temp.remove(i)
                 j--
@@ -655,14 +646,13 @@ public class Missiles
         origin = new Coordinates(first.x, first.y, first.z)
         impact = new Coordinates(last.x, last.y, last.z)
         Coordinates.link(origin, impact)
-        cA = origin.angle
+        cA = origin.angl
         pos = first.toVec2().withZ(impact.z)
         prevPos = pos
         nextPos = pos
         this.toZ = last.z
 
-        dummy = DummyRecycler.get(ZERO2, face)
-        dummy.setPosReal(first)
+        fx = new Fx(first, face)
 
         widgetMap = new HashMap<widget, boolean>()
         missilMap = new HashMap<Missiles, boolean>()

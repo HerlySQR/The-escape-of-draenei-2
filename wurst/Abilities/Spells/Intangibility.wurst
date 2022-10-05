@@ -88,7 +88,7 @@ function AbilityDefinitionBerserk.general()
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(INTANGIBILITY_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes intangible the hero and causes a damage to the nearby enemy units with a cooldown of " + DMG_CD.toString(0) + " seconds."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes the hero intangible and causes damage to nearby enemy units with a cooldown of " + DMG_CD.toString(0) + " seconds."))
         ..presetLevels(2)
         ..setHeroAbility(false)
         // Stats
@@ -103,7 +103,7 @@ function AbilityDefinitionBerserk.general()
         ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionBerserk(INTANGIBILITY_L)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes intangible the hero and causes a damage to the nearby enemy units with a cooldown of " + DMG_CD.toString(0) + " seconds."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Makes the hero intangible and causes damage to nearby enemy units with a cooldown of " + DMG_CD.toString(0) + " seconds."))
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
@@ -137,7 +137,7 @@ function AbilityDefinitionBerserk.general()
             else
                 value1 = DURATION_L[lvl-3]
                 value2 = DMG_L[lvl-3]
-            return "Makes intangible the hero for {0} seconds and causes a damage of {1} to the nearby enemy units with a cooldown of {2} seconds.".format(value1.toString(0), value2.toString(0), DMG_CD.toString())
+            return "Makes the hero intangible for {0} seconds and causes {1} damage to nearby enemy units with a cooldown of {2} seconds.".format(value1.toString(0), value2.toString(0), DMG_CD.toString())
         end)
         ..setEditorSuffix("(Stealed)")
     

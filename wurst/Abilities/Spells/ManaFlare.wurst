@@ -40,6 +40,7 @@ function AbilityDefinitionAuraBrilliancecreep.general()
     this.addTooltipProperty("Damage", lvl -> DMG[lvl - 1])
     // Audiovisual
     this.presetIcon(Imports.pASManaflare)
+    this.setArtTarget("")
     // Tooltips
     this.presetAreaofEffect(lvl -> AREA)
 
@@ -57,6 +58,7 @@ function AbilityDefinitionAuraBrilliancecreep.general()
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..general()
+        ..setIconResearch(Icons.bTNManaFlare)
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")
     

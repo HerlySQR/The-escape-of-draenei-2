@@ -31,6 +31,7 @@ function AbilityDefinitionBerserk.general()
         ..addTooltipProperty("Duration", lvl -> DURATION)
         ..presetCooldown(lvl -> CD)
         ..presetIcon(Icons.bTNBerserkForTrolls)
+        ..setArtCaster(Abilities.roarCaster)
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(BERSERK_NL)

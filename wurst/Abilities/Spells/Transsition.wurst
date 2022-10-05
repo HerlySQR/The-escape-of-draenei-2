@@ -26,7 +26,7 @@ let effMap = new HashMap<unit, LinkedList<effect>>()
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if EventData.getSpellAbilityId() == TRANSSITION_NL
+        if abilityCond(TRANSSITION_NL, TRANSSITION_L, TRANSSITION_S).check
             let caster = EventData.getSpellAbilityUnit()
             let shade = createUnit(caster.getOwner(), TRANSSITION_SHADE, caster.getPos(), caster.getFacingAngle())
             shade.issuePointOrderById(Orders.move, EventData.getSpellTargetPos())

@@ -23,7 +23,8 @@ let DMG_L = [200., 350.]
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if EventData.getSpellAbilityId() == DISABLE_SPHERE_NL
+        let data = abilityCond(DISABLE_SPHERE_NL, DISABLE_SPHERE_L, DISABLE_SPHERE_S)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let target = EventData.getSpellTargetPos()
             let m = new Missiles(caster.getPos3with(50.), target.withZ(50.))
@@ -32,7 +33,10 @@ init
             m.owner = caster.getOwner()
             m.setSpeed(1250.)
             m.setScale(3.5)
-            m.damage = DMG_NL
+            if data.isNL
+                m.damage = DMG_NL
+            else
+                m.damage = DMG_L[data.lvl]
             m.onFinish(() -> begin
                 InstantDummyCaster.castPoint(m.owner, DISABLE_SPHERE_SILENCE, 1, Orders.silence, target, target)
                 forUnitsInRange(target, AREA, u -> begin
@@ -62,8 +66,9 @@ function ChannelAbilityPreset.general()
         ..presetIcon(Imports.bTNStormSphere)
 
 @compiletime function gen()
-    new ChannelAbilityPreset(DISABLE_SPHERE_NL, 1, true, new AbilityTooltipGenerator("The zealot creates an orb that when colides with the floor causes a damage and disarm and silence the affected enemy units.|nLasts " + DURATION.toString(0) + " seconds."))
+    new ChannelAbilityPreset(DISABLE_SPHERE_NL, 1, true, new AbilityTooltipGenerator("The zealot creates an orb that when it collides with the floor causes damage and disarms and silences the affected enemy units.\nLasts " + DURATION.toString(0) + " seconds."))
         ..setHeroAbility(false)
+        ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_NL)
         ..presetManaCost(lvl -> MANA_NL)
@@ -71,10 +76,11 @@ function ChannelAbilityPreset.general()
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
-    new ChannelAbilityPreset(DISABLE_SPHERE_L, 2, true, new AbilityTooltipGenerator("The zealot creates an orb that when colides with the floor causes a damage and disarm and silence the affected enemy units.|nLasts " + DURATION.toString(0) + " seconds."))
+    new ChannelAbilityPreset(DISABLE_SPHERE_L, 2, true, new AbilityTooltipGenerator("The zealot creates an orb that when it collides with the floor causes damage and disarms and silences the affected enemy units.\nLasts " + DURATION.toString(0) + " seconds."))
         ..setRequiredLevel(6)
         ..setLevelSkipRequirement(6)
         ..setHeroAbility(true)
+        ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L[lvl-1])
@@ -95,7 +101,7 @@ function ChannelAbilityPreset.general()
                 value = DMG_NL
             else
                 value = DMG_L[lvl-2]
-            return "The zealot creates an orb that when colides with the floor causes {0} of damage and disarm and silence the affected enemy units.\nLasts {1} seconds.".format(value.toString(0), DURATION.toString(0))
+            return "The hero creates an orb that when collides with the floor causes {0} damage and disarms and silences the affected enemy units.\nLasts {1} seconds.".format(value.toString(0), DURATION.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")
         ..setName("Ult Disable Sphere")

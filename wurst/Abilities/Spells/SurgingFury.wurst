@@ -117,7 +117,7 @@ init
                 SurgingFury.getInstance(GetLearningUnit()).update(GetLearnedSkillLevel() - 1, true)
     end)
     DamageEvent.addListener(() -> begin
-        if not DamageEvent.isSpell()
+        if not DamageEvent.isSpell() and not DamageEvent.isCode()
             let curr = SurgingFury.getInstance(DamageEvent.getSource())
             if curr != null
                 curr.counter = 6
@@ -176,7 +176,7 @@ function AbilityDefinitionThunderBoltCreep.general()
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(SURGING_FURY_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Every time the Doom Guard attacks increase its number of charges and deals damage for each charge when is casted plus an extra damage and also stunning the target.\nThe charges will disappear after 6 seconds of attacking."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Every time the Doom Guard attacks its number of charges increases and deals damage for each charge when is casted deals the stacked damage plus an extra and also stunning the target.\nThe charges will disappear after 6 seconds of attacking."))
         ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
@@ -189,7 +189,7 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionThunderBoltCreep(SURGING_FURY_L)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Every time the Doom Guard attacks increase its number of charges and deals damage for each charge when is casted plus an extra damage and also stunning the target.\nThe charges will disappear after 6 seconds of attacking."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Every time the Doom Guard attacks its number of charges increases and deals damage for each charge when is casted deals the stacked damage plus an extra and also stunning the target.\nThe charges will disappear after 6 seconds of attacking."))
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
@@ -219,7 +219,7 @@ function AbilityDefinitionThunderBoltCreep.general()
             else
                 value1 = BASE_DMG_L[lvl-3]
                 value2 = DMG_PER_CH_L[lvl-3]
-            return "Every time the Doom Guard attacks increase its number of charges and for each charge deals " + value2.toString(0) + " damage, and when the skill is cast throw an attack at enemy unit causing " + value1.toString(0) + " plus that damage and stunning the target for 0.5 seconds.\nThe charges will disappear after 6 seconds of attacking."
+            return "Every time the hero attacks increase its number of charges and for each charge deals " + value2.toString(0) + " damage, and when the skill is cast throw an attack at enemy unit causing the stacked damage plus " + value1.toString(0) + " and stunning the target for 0.5 seconds.\nThe charges will disappear after 6 seconds of attacking."
         end)
         ..setEditorSuffix("(Stealed)")
         .setName("Surging Fury")

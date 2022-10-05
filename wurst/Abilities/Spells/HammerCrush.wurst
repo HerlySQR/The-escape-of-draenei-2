@@ -5,7 +5,7 @@ import MoveSpeedX
 
 public constant HAMMER_CRUSH_NL = compiletime(ABIL_ID_GEN.next())
 public constant HAMMER_CRUSH_L = compiletime(ABIL_ID_GEN.next())
-//public constant HAMMER_CRUSH_S = compiletime(ABIL_ID_GEN.next())
+public constant HAMMER_CRUSH_S = compiletime(ABIL_ID_GEN.next())
 
 // General
 let DURATION = 1.5
@@ -34,7 +34,7 @@ function hammerCrushActions(unit caster, vec2 pos, player owner, real damage, an
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        let data = abilityCond(HAMMER_CRUSH_NL, HAMMER_CRUSH_L, 0/*HAMMER_CRUSH_S*/)
+        let data = abilityCond(HAMMER_CRUSH_NL, HAMMER_CRUSH_L, HAMMER_CRUSH_S)
         if data.check
             let caster = EventData.getSpellAbilityUnit()
             let owner = caster.getOwner()

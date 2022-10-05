@@ -2,6 +2,10 @@ package LordOfFire
 
 import OpMissionsControl
 
+import AbilityData
+import SpecialMerchant
+import BookStore
+
 public constant lordOfFireIndex = 4
 public bool lordOfFirePissed = false
 let lordOfFire = GUnits.lordOfFire..pause()..setInvulnerable(true)
@@ -288,7 +292,6 @@ init
                             t.addLine(lordOfFire, null, "Lord of Fire", null, "Some maggot stole my fire pictogram and you are here.", TTime.SET, 5., true)
                             t.addActions(actions)
                     else
-                        draeneiSaw++
                         TransmissionCallback actions = () -> begin
                             if not Rects.lordOfFireEnter.contains(u.getPos())
                                 t.getTargetForce().clear()
@@ -314,6 +317,7 @@ init
                                 t.addLine(lordOfFire, null, "Lord of Fire", null, "Wait a minute, DID YOU STOLE MY PICTOGRAM???!!!", TTime.SET, 4., true)
                                 t.addActions(actions)
                         iSeeYou.add(p)
+                        draeneiSaw++
 
                     t.addEnd(() -> begin
                         lordOfFire.setFacing(face)
@@ -339,11 +343,146 @@ init
                             ..addEnd(() -> lordOfFire..unpause()..issuePointOrderById(Orders.move, Rects.lordOfFireDefensePos.getCenter()))
                             ..start()
         end)
-    
-    // TODO When is in defense mode
-    CreateTrigger()
+
+// When is in defense mode
+
+let FIRE_BALLS = compiletime(ABIL_ID_GEN.next())
+let SCORCHING_HEAT = compiletime(ABIL_ID_GEN.next())
+
+let FIRE_BALLS_ORDER = Orders.clusterrockets
+
+trigger heCame
+trigger ARE_YOU_CRAZY
+trigger createBounty
+trigger dontPickThose
+trigger lordOfFireActions
+
+let cond = Condition(() -> EventData.getTriggerUnit() == lordOfFire)
+
+init
+    lordOfFire.addAbility(SCORCHING_HEAT)
+
+    heCame = CreateTrigger()
         ..registerRectEnterEventSource(Rects.lordOfFireDefensePos)
-        ..addCondition(Condition(() -> EventData.getEnteringUnit() == lordOfFire))
+        ..addCondition(cond)
         ..addAction(() -> begin
-            lordOfFire.setInvulnerable(false)
+            heCame.disable()
+            ARE_YOU_CRAZY.enable()
+            createBounty.enable()
+            lordOfFireActions.enable()
+            
+            lordOfFire
+                ..setInvulnerable(false)
+                ..addAbility(FIRE_BALLS)
         end)
+
+let DID_YOU_DARE = CreateGroup()
+
+init
+    ARE_YOU_CRAZY = CreateTrigger()
+        ..disable()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ATTACKED)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let fool = EventData.getAttackerUnit()
+            if THE_DEMONS.has(fool)
+                if DID_YOU_DARE.has(fool)
+                    Transmission.simple(fool.getOwner(), lordOfFire, null, "Lord of Fire", null, "Don't even think about doing it.", TTime.SET, 3.5)
+                else
+                    Transmission.simple(fool.getOwner(), lordOfFire, null, "Lord of Fire", null, "I warned you!", TTime.SET, 2.)
+                    lordOfFire.issueTargetOrderById(Orders.attackonce, fool)
+        end)
+    
+    DamageEvent.addUnreducedListener(() -> begin
+        if DamageEvent.getSource() == lordOfFire and THE_DEMONS.has(DamageEvent.getTarget()) and not DamageEvent.isSpell()
+            DamageEvent.setAmount(1000000000.)
+    end)
+
+    createBounty = CreateTrigger()
+        ..disable()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let pos = lordOfFire.getPos()
+            for _ = 1 to 5
+                createItem(GOLD_COINS.getNewId(), pos)..setUserData(lordOfFireIndex)
+                createItem(LUMBER_BALE.getNewId(), pos)..setUserData(lordOfFireIndex)
+                createItem(BOOK_OF_EXPERIENCE, pos)..setUserData(lordOfFireIndex)
+            dontPickThose.enable()
+
+            Transmission.simple(lordOfFire, null, "Lord of Fire", null, "You will pay for that!", TTime.SET, 3.)
+        end)
+
+    lordOfFireActions = CreateTrigger()
+        ..disable()
+        ..registerTimerEvent(2., true)
+        ..addAction(() -> begin
+            skip
+        end)
+    
+    dontPickThose = CreateTrigger()
+        ..disable()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
+        ..addCondition(Condition(() -> EventData.getOrderTargetItem().getUserData() == lordOfFireIndex and THE_DEMONS.has(EventData.getTriggerUnit())))
+        ..addAction(() -> begin
+            let fool = EventData.getTriggerUnit()
+            Transmission.simple(fool.getOwner(), lordOfFire, null, "Lord of Fire", null, "I CAN STILL SEE WHAT YOU DO.", TTime.SET, 3.5)
+            fool.issueTargetOrderById(Orders.attack, fool)
+        end)
+
+    onReset(false, () -> begin
+        heCame.enable()
+        ARE_YOU_CRAZY.disable()
+        createBounty.disable()
+        dontPickThose.disable()
+        lordOfFireActions.disable()
+        DID_YOU_DARE.clear()
+        
+        lordOfFire
+            ..removeAbility(FIRE_BALLS)
+    end)
+
+// Spells
+
+@compiletime function gen()
+    let FIRE_BALLS_BUFF = BUFF_ID_GEN.next()
+
+    new BuffDefinition(FIRE_BALLS_BUFF, 'BNcs')
+        ..setIcon(Icons.bTNStun)
+        ..setTooltipNormal("Stunned")
+        ..setTooltipNormalExtended("This unit is stunned.")
+        ..setName("Stunned")
+
+    new AbilityDefinitionTinkererClusterRocketsLevel0(FIRE_BALLS)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
+        ..presetLevels(1)
+        ..setHeroAbility(false)
+        ..setBuffs(1, FIRE_BALLS_BUFF.toRawCode())
+        ..setMissileArt(Abilities.fireBallMissile)
+        ..setDamageAmount(1, 80.)
+        ..setMaxDamage(1, 960.)
+        ..setMissileCount(1, 8)
+        ..setAreaofEffect(1, 300.)
+        ..setManaCost(1, 170)
+        ..setCooldown(1, 10)
+        // Tooltip
+        ..setName("Fire Balls")
+        ..setEditorSuffix("(Lord of Fire)")
+    
+    let SCORCHING_HEAT_BUFF = BUFF_ID_GEN.next()
+
+    new BuffDefinition(SCORCHING_HEAT_BUFF, 'Bpig')
+        ..setArtTarget(1, "")
+        ..setTargetAttachmentPoint0(1, "")
+        ..setName(1, "Scorching Heat (Lord of Fire)")
+
+    new AbilityDefinitionPermanentImmolation(SCORCHING_HEAT)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Burns nearby enemy units, dealing damage per second."))
+        ..presetLevels(1)
+        ..setHeroAbility(false)
+        ..setTargetsAllowed(1, "ground,enemy,neutral,organic")
+        ..setBuffs(1, SCORCHING_HEAT_BUFF.toRawCode())
+        ..setDamageperInterval(1, 40.)
+        ..setAreaofEffect(1, 550.)
+        // Tooltip
+        ..setEditorSuffix("(Lord of Fire)")

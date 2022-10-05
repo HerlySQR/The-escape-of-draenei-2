@@ -60,7 +60,7 @@ function AbilityDefinitionBerserk.general()
 
 @compiletime function gen()
     new AbilityDefinitionBerserk(FERAL_RAMPAGE_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamander by " + (SPEED * 100).toString(0) + "% and and gives the ability to through to the units for 8 seconds and every spell he casts deals extra damage."))
         ..presetLevels(1)
         ..setHeroAbility(false)
         ..general()
@@ -70,7 +70,7 @@ function AbilityDefinitionBerserk.general()
         .setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionBerserk(FERAL_RAMPAGE_L)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal extra damage."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the speed of the salamander ny " + (SPEED * 100).toString(0) + "% and gives the ability to go through to the units for 8 seconds and every spell he casts deals extra damage."))
         ..presetLevels(2)
         ..setHeroAbility(true)
         ..setRequiredLevel(6)
@@ -95,7 +95,7 @@ function AbilityDefinitionBerserk.general()
                 value = EXTRA_DMG_NL
             else
                 value = EXTRA_DMG_L[lvl - 2]
-            return "Increase the speed of the salamnder in " + (SPEED * 100).toString(0) + "% and he can go through to the units for 8 seconds and every spell he cast deal " + value.toString() + "extra damage."
+            return "Increase the speed of the hero by " + (SPEED * 100).toString(0) + "% and gives the ability to through to the units for 8 seconds and every spell he casts deals " + value.toString() + "extra damage."
         end)
         ..setEditorSuffix("(Stealed)")
         ..setName("Ult Feral Rampage")

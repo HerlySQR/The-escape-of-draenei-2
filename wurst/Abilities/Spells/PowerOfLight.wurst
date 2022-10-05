@@ -68,7 +68,6 @@ function ChannelAbilityPreset.general()
     // Audiovisual
     this.presetIcon(Icons.bTNResurrection)
     // Tooltip
-    this.presetHotkey("R")
 
 @compiletime function gen()
     new ChannelAbilityPreset(POWER_OF_LIGHT_NL, 1, true, new AbilityTooltipGenerator("With the help of light, the prophet grants an ally great power by increasing their armor and regeneration."))
@@ -120,4 +119,4 @@ function ChannelAbilityPreset.general()
         ..setArtTarget(1, "")
         ..setName(1, "Power of light")
         ..setTooltipNormal(1, "Power of light")
-        .setTooltipNormalExtended(1, "This unit has Power of light: it has a huge  increase in armor and regeneration.")
+        .setTooltipNormalExtended(1, "This unit has Power of light: it has a huge increase in armor and regeneration.")

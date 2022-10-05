@@ -36,6 +36,8 @@ function AbilityDefinitionInnerFire.general()
         ..presetTargetsAllowed(lvl -> TARGETS)
         ..presetDurationHero(lvl -> DURATION)
         ..presetDurationNormal(lvl -> DURATION)
+        // Audiovisual
+        ..presetIcon(Icons.bTNInnerFireOn)
         ..setRequirements("")
 
 @compiletime function gen()
@@ -48,7 +50,6 @@ function AbilityDefinitionInnerFire.general()
         ..presetDefenseIncrease(lvl -> ARMOR_INC_NL[lvl-1])
         ..presetDamageIncrease(lvl -> DMG_INC_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
-        // Audiovisual
         // Tooltip
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
@@ -64,7 +65,6 @@ function AbilityDefinitionInnerFire.general()
         ..presetDefenseIncrease(lvl -> ARMOR_INC_L[lvl-1])
         ..presetDamageIncrease(lvl -> DMG_INC_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L[lvl-1])
-        // Audiovisual
         // Tooltip
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")

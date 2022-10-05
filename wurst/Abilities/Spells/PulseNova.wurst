@@ -87,7 +87,6 @@ function ChannelAbilityPreset.general()
     // Audiovisual
     this.presetIcon(Imports.bTNHolyLance)
     // Tooltip
-    this.presetHotkey("E")
 
 @compiletime function gen()
     new ChannelAbilityPreset(PULSE_NOVA_NL, 2, true, new AbilityTooltipGenerator("Launches a powerful ball of energy that knocks back units deemed hostile by the prophet. \nThe damage is bigger while the units are closer of the center of the explosion."))
@@ -116,5 +115,5 @@ function ChannelAbilityPreset.general()
         ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
-        ..presetTooltipNormalExtended(lvl -> "Launches a powerful ball of energy that knocks back units deemed hostile by the prophet, knocking them back and dealing a max damage of {0}.".format((lvl < 3 ? MAX_DMG_NL[lvl-1] : MAX_DMG_L[lvl-3]).toString(0)))
+        ..presetTooltipNormalExtended(lvl -> "Launches a powerful ball of energy that knocks back units deemed hostile by the hero, knocking them back and dealing a max damage of {0}.".format((lvl < 3 ? MAX_DMG_NL[lvl-1] : MAX_DMG_L[lvl-3]).toString(0)))
         ..setEditorSuffix("(Stealed)")

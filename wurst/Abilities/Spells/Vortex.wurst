@@ -36,18 +36,28 @@ let SOUND_4 = new SoundDefinition(Sounds.flareTarget4, false, true)
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if EventData.getSpellAbilityId() == VORTEX_NL
+        let data = abilityCond(VORTEX_NL, VORTEX_L, VORTEX_S)
+        if data.check
             let caster = EventData.getSpellAbilityUnit()
             let target = EventData.getSpellTargetPos()
             let owner = caster.getOwner()
             let vortex = new Fx(target.withZ(50.), UNIT_FACING, Imports.blackHole)..setScale(0.5)
             let pulled = CreateGroup()
             let enter = CreateGroup()
-            let damage = DMG_PER_SEC_NL * INTERVAL
             let area = AREA_NL
             var size = 0.
             let deformation = createCrater(DURATION, false, target, area, 96.)
             let finalDmgMap = new HashMap<unit, real>()
+
+            real damage
+            real extraDamage
+            if data.isNL
+                damage = DMG_PER_SEC_NL * INTERVAL
+                extraDamage = EXTRA_DMG_NL
+            else
+                damage = DMG_PER_SEC_L[data.lvl] * INTERVAL
+                extraDamage = EXTRA_DMG_L[data.lvl]
+
             casters.add(caster)
             vortex.getDummy()..addAbility(SHIELD)..setOwner(owner, false)
             doPeriodically(INTERVAL, cb -> begin
@@ -101,7 +111,7 @@ init
                             paused.remove(u)
                             u.pause(false)
                         if owner.isEnemyOf(u.getOwner())
-                            caster.damageTarget(u, EXTRA_DMG_NL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
+                            caster.damageTarget(u, extraDamage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)
                     vortex.getDummy()..removeAbility(SHIELD)..setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     TerrainDeformStop(deformation, 1000)
                     enter.destr()
