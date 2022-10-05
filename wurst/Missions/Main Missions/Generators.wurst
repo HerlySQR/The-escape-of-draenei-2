@@ -52,7 +52,6 @@ init
                 generatorsDestroyed = true
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()
-                defensiveTowers3()
                 forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
                     if u.getTypeId() == ADVANCE_DEATH_TOWER
                         u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
@@ -60,7 +59,7 @@ init
                     for i = 0 to 7
                         Dests.entranceForceWall[i].open()
                 end)
-                startMission5()
+                startMission(5)
         end)
 
 @compiletime function gen()

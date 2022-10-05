@@ -43,7 +43,7 @@ init
             DONT_PASS.disable()
             exitCave.disable()
             doAfter(5.) -> 
-                startMission4()
+                startMission(4)
         end)
 
 // Obstacles in the habitat
