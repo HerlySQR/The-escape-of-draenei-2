@@ -19,12 +19,9 @@ import ObjectIds
 import Assets
 import Annotations
 
-import EventHelper
-import ClosureEvents
-import RegisterEvents
-import UnitIndexer
-import SoundUtils
-import Imports
+import BountyController
+
+public constant BARREL = compiletime(ITEM_ID_GEN.next())
 
 public boolean generatorAlive = true
 public boolean wallDestroyed = false

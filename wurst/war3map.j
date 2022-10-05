@@ -29,13 +29,10 @@ globals
     rect                    gg_rct_Barrel2             = null
     rect                    gg_rct_Barrel3             = null
     rect                    gg_rct_BookPlace           = null
+    rect                    gg_rct_Circle11            = null
     rect                    gg_rct_Circle12            = null
     rect                    gg_rct_Circle13            = null
     rect                    gg_rct_Circle14            = null
-    rect                    gg_rct_Circle32            = null
-    rect                    gg_rct_Circle42            = null
-    rect                    gg_rct_Circle52            = null
-    rect                    gg_rct_Circle11            = null
     rect                    gg_rct_Circle15            = null
     rect                    gg_rct_Circle21            = null
     rect                    gg_rct_Circle22            = null
@@ -43,14 +40,17 @@ globals
     rect                    gg_rct_Circle24            = null
     rect                    gg_rct_Circle25            = null
     rect                    gg_rct_Circle31            = null
+    rect                    gg_rct_Circle32            = null
     rect                    gg_rct_Circle33            = null
     rect                    gg_rct_Circle34            = null
     rect                    gg_rct_Circle35            = null
     rect                    gg_rct_Circle41            = null
+    rect                    gg_rct_Circle42            = null
     rect                    gg_rct_Circle43            = null
     rect                    gg_rct_Circle44            = null
     rect                    gg_rct_Circle45            = null
     rect                    gg_rct_Circle51            = null
+    rect                    gg_rct_Circle52            = null
     rect                    gg_rct_Circle53            = null
     rect                    gg_rct_Circle54            = null
     rect                    gg_rct_Circle55            = null
@@ -72,6 +72,7 @@ globals
     rect                    gg_rct_CreepCamp22         = null
     rect                    gg_rct_CreepCamp23         = null
     rect                    gg_rct_CreepCamp24         = null
+    rect                    gg_rct_CreepCamp25         = null
     rect                    gg_rct_CreepCamp3          = null
     rect                    gg_rct_CreepCamp4          = null
     rect                    gg_rct_CreepCamp5          = null
@@ -97,7 +98,9 @@ globals
     rect                    gg_rct_ElevatorGenerator2  = null
     rect                    gg_rct_ElevatorHabitat1    = null
     rect                    gg_rct_ElevatorHabitat2    = null
+    rect                    gg_rct_ElevatorsSecret     = null
     rect                    gg_rct_EntranceReceiver    = null
+    rect                    gg_rct_Exit                = null
     rect                    gg_rct_ExitPoint           = null
     rect                    gg_rct_FinalPart           = null
     rect                    gg_rct_FirePlace           = null
@@ -111,6 +114,8 @@ globals
     rect                    gg_rct_Guard2              = null
     rect                    gg_rct_Guard3              = null
     rect                    gg_rct_Guard4              = null
+    rect                    gg_rct_Habitat1            = null
+    rect                    gg_rct_Habitat2            = null
     rect                    gg_rct_HabitatExit1        = null
     rect                    gg_rct_HabitatExit2        = null
     rect                    gg_rct_HabitatReceiver     = null
@@ -381,7 +386,7 @@ globals
     destructable            gg_dest_B00E_0020          = null
     destructable            gg_dest_B00C_0042          = null
     destructable            gg_dest_DTfp_2145          = null
-    destructable            gg_dest_ATg1_1128          = null
+    destructable            gg_dest_B00B_1128          = null
     destructable            gg_dest_Dofw_6519          = null
     destructable            gg_dest_DTfx_2147          = null
     destructable            gg_dest_DTfx_2146          = null
@@ -423,8 +428,8 @@ globals
     destructable            gg_dest_B00G_4708          = null
     destructable            gg_dest_LTe3_4731          = null
     destructable            gg_dest_Dofw_6594          = null
-    destructable            gg_dest_DTrx_2141          = null
-    destructable            gg_dest_DTrx_2140          = null
+    destructable            gg_dest_B00G_2141          = null
+    destructable            gg_dest_B00G_2140          = null
     destructable            gg_dest_DTfx_2142          = null
     destructable            gg_dest_B008_6364          = null
     destructable            gg_dest_DTfp_2143          = null
@@ -501,11 +506,9 @@ function CreateAllDestructables takes nothing returns nothing
     set gg_dest_DTfx_2147 = CreateDestructable( 'DTfx', 5568.0, -9600.0, 270.000, 1.000, 0 )
     set gg_dest_DTfx_2146 = CreateDestructable( 'DTfx', 8640.0, -5952.0, 270.000, 1.000, 0 )
     set gg_dest_DTfx_2142 = CreateDestructable( 'DTfx', -832.0, 3392.0, 270.000, 1.000, 0 )
-    set gg_dest_DTfx_2147 = CreateDestructable( 'DTfx', 5568.0, -9600.0, 270.000, 1.000, 0 )
-    set gg_dest_DTfx_2146 = CreateDestructable( 'DTfx', 8640.0, -5952.0, 270.000, 1.000, 0 )
     set gg_dest_DTg2_4451 = CreateDestructable( 'DTg2', -2848.0, -7072.0, 270.000, 1.000, 0 )
-    set gg_dest_DTg3_0020 = CreateDestructable( 'DTg3', 8512.0, 6144.0, 0.000, 1.050, 0 )
     set gg_dest_DTg6_5527 = CreateDestructable( 'DTg6', 8672.0, -8928.0, 270.000, 1.000, 0 )
+    set gg_dest_DTlv_4448 = CreateDestructableZ( 'DTlv', -2720.0, -6560.0, 644.3, 90.000, 1.088, 0 )
     set gg_dest_DTlv_4405 = CreateDestructable( 'DTlv', -2272.0, -7008.0, 90.000, 1.097, 0 )
     set gg_dest_Dofv_6526 = CreateDestructable( 'Dofv', 8128.0, -8384.0, 270.000, 1.000, 0 )
     set gg_dest_Dofv_6521 = CreateDestructable( 'Dofv', 7744.0, -8000.0, 270.000, 1.000, 0 )
@@ -515,8 +518,6 @@ function CreateAllDestructables takes nothing returns nothing
     set gg_dest_Dofw_6594 = CreateDestructable( 'Dofw', 8832.0, -8064.0, 270.000, 1.000, 0 )
     set gg_dest_Dofw_6525 = CreateDestructable( 'Dofw', 7424.0, -9472.0, 180.000, 1.000, 0 )
     set gg_dest_Dofw_6520 = CreateDestructable( 'Dofw', 9216.0, -7680.0, 270.000, 1.000, 0 )
-    set gg_dest_Dofw_6519 = CreateDestructable( 'Dofw', 8448.0, -7680.0, 270.000, 1.000, 0 )
-    set gg_dest_Dofw_6594 = CreateDestructable( 'Dofw', 8832.0, -8064.0, 270.000, 1.000, 0 )
     set gg_dest_LTe3_4731 = CreateDestructable( 'LTe3', -1088.0, 8384.0, 0.000, 0.900, 0 )
     set gg_dest_LTg1_2771 = CreateDestructable( 'LTg1', -3520.0, -64.0, 270.000, 0.900, 0 )
     set gg_dest_LTg2_2727 = CreateDestructable( 'LTg2', -1632.0, 3360.0, 270.000, 1.000, 0 )
@@ -1086,9 +1087,9 @@ endfunction
 // Trigger: Generated values
 //===========================================================================
 function Trig_Generated_values_Actions takes nothing returns nothing
-    call KillDestructable( gg_dest_DTg3_0020 )
-    call KillDestructable( gg_dest_ATg3_0042 )
-    call KillDestructable( gg_dest_ATg1_1128 )
+    call KillDestructable( gg_dest_B00E_0020 )
+    call KillDestructable( gg_dest_B00C_0042 )
+    call KillDestructable( gg_dest_B00B_1128 )
     call KillDestructable( gg_dest_LTe3_4731 )
     call KillDestructable( gg_dest_LTg2_2727 )
     call KillDestructable( gg_dest_LTg1_2771 )
@@ -1225,7 +1226,7 @@ function InitCustomPlayerSlots takes nothing returns nothing
     call ForcePlayerStartLocation( Player(0), 0 )
     call SetPlayerColor( Player(0), ConvertPlayerColor(0) )
     call SetPlayerRacePreference( Player(0), RACE_PREF_ORC )
-    call SetPlayerRaceSelectable( Player(0), true )
+    call SetPlayerRaceSelectable( Player(0), false )
     call SetPlayerController( Player(0), MAP_CONTROL_COMPUTER )
 
     // Player 1
@@ -1233,77 +1234,87 @@ function InitCustomPlayerSlots takes nothing returns nothing
     call ForcePlayerStartLocation( Player(1), 1 )
     call SetPlayerColor( Player(1), ConvertPlayerColor(1) )
     call SetPlayerRacePreference( Player(1), RACE_PREF_ORC )
-    call SetPlayerRaceSelectable( Player(1), true )
+    call SetPlayerRaceSelectable( Player(1), false )
     call SetPlayerController( Player(1), MAP_CONTROL_USER )
 
     // Player 2
     call SetPlayerStartLocation( Player(2), 2 )
+    call ForcePlayerStartLocation( Player(2), 2 )
     call SetPlayerColor( Player(2), ConvertPlayerColor(2) )
     call SetPlayerRacePreference( Player(2), RACE_PREF_ORC )
-    call SetPlayerRaceSelectable( Player(2), true )
+    call SetPlayerRaceSelectable( Player(2), false )
     call SetPlayerController( Player(2), MAP_CONTROL_USER )
 
     // Player 3
     call SetPlayerStartLocation( Player(3), 3 )
+    call ForcePlayerStartLocation( Player(3), 3 )
     call SetPlayerColor( Player(3), ConvertPlayerColor(3) )
     call SetPlayerRacePreference( Player(3), RACE_PREF_ORC )
-    call SetPlayerRaceSelectable( Player(3), true )
+    call SetPlayerRaceSelectable( Player(3), false )
     call SetPlayerController( Player(3), MAP_CONTROL_USER )
 
     // Player 4
     call SetPlayerStartLocation( Player(4), 4 )
+    call ForcePlayerStartLocation( Player(4), 4 )
     call SetPlayerColor( Player(4), ConvertPlayerColor(4) )
     call SetPlayerRacePreference( Player(4), RACE_PREF_ORC )
-    call SetPlayerRaceSelectable( Player(4), true )
+    call SetPlayerRaceSelectable( Player(4), false )
     call SetPlayerController( Player(4), MAP_CONTROL_USER )
 
     // Player 5
     call SetPlayerStartLocation( Player(5), 5 )
+    call ForcePlayerStartLocation( Player(5), 5 )
     call SetPlayerColor( Player(5), ConvertPlayerColor(5) )
     call SetPlayerRacePreference( Player(5), RACE_PREF_ORC )
-    call SetPlayerRaceSelectable( Player(5), true )
+    call SetPlayerRaceSelectable( Player(5), false )
     call SetPlayerController( Player(5), MAP_CONTROL_USER )
 
     // Player 6
     call SetPlayerStartLocation( Player(6), 6 )
+    call ForcePlayerStartLocation( Player(6), 6 )
     call SetPlayerColor( Player(6), ConvertPlayerColor(6) )
     call SetPlayerRacePreference( Player(6), RACE_PREF_UNDEAD )
-    call SetPlayerRaceSelectable( Player(6), true )
+    call SetPlayerRaceSelectable( Player(6), false )
     call SetPlayerController( Player(6), MAP_CONTROL_COMPUTER )
 
     // Player 7
     call SetPlayerStartLocation( Player(7), 7 )
+    call ForcePlayerStartLocation( Player(7), 7 )
     call SetPlayerColor( Player(7), ConvertPlayerColor(7) )
     call SetPlayerRacePreference( Player(7), RACE_PREF_UNDEAD )
-    call SetPlayerRaceSelectable( Player(7), true )
+    call SetPlayerRaceSelectable( Player(7), false )
     call SetPlayerController( Player(7), MAP_CONTROL_USER )
 
     // Player 8
     call SetPlayerStartLocation( Player(8), 8 )
+    call ForcePlayerStartLocation( Player(8), 8 )
     call SetPlayerColor( Player(8), ConvertPlayerColor(8) )
     call SetPlayerRacePreference( Player(8), RACE_PREF_UNDEAD )
-    call SetPlayerRaceSelectable( Player(8), true )
+    call SetPlayerRaceSelectable( Player(8), false )
     call SetPlayerController( Player(8), MAP_CONTROL_USER )
 
     // Player 9
     call SetPlayerStartLocation( Player(9), 9 )
+    call ForcePlayerStartLocation( Player(9), 9 )
     call SetPlayerColor( Player(9), ConvertPlayerColor(9) )
     call SetPlayerRacePreference( Player(9), RACE_PREF_UNDEAD )
-    call SetPlayerRaceSelectable( Player(9), true )
+    call SetPlayerRaceSelectable( Player(9), false )
     call SetPlayerController( Player(9), MAP_CONTROL_USER )
 
     // Player 10
     call SetPlayerStartLocation( Player(10), 10 )
+    call ForcePlayerStartLocation( Player(10), 10 )
     call SetPlayerColor( Player(10), ConvertPlayerColor(10) )
     call SetPlayerRacePreference( Player(10), RACE_PREF_UNDEAD )
-    call SetPlayerRaceSelectable( Player(10), true )
+    call SetPlayerRaceSelectable( Player(10), false )
     call SetPlayerController( Player(10), MAP_CONTROL_USER )
 
     // Player 11
     call SetPlayerStartLocation( Player(11), 11 )
+    call ForcePlayerStartLocation( Player(11), 11 )
     call SetPlayerColor( Player(11), ConvertPlayerColor(11) )
     call SetPlayerRacePreference( Player(11), RACE_PREF_UNDEAD )
-    call SetPlayerRaceSelectable( Player(11), true )
+    call SetPlayerRaceSelectable( Player(11), false )
     call SetPlayerController( Player(11), MAP_CONTROL_USER )
 
 endfunction
