@@ -110,7 +110,7 @@ init
 
                 doAfter(7.) -> 
                     DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
-                    doAfter(5.) ->
+                    doAfter(3.) ->
                         pings.enable()
 
                         missions[2].setState(QuestState.DISCOVERED)
@@ -120,6 +120,15 @@ init
                                 QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r If you use repick when you have the barrel, it will be deleted.")
             // Mission 3
             case 3
+                if whatMode[1] == VARIOUS_TIMERS
+                    stopActTimer()
+
+                seeDeSpawn[2].stop()
+                seeDrSpawn[4].start()
+
+                actDrSpawn = Rects.respawn4
+                actDeSpawn = Rects.respawn5
+
                 seeDrSpawn[3].start()
                 missions[3].setState(QuestState.COMPLETED)
                 pings.disable()
@@ -136,7 +145,7 @@ init
                         u.issuePointOrderById(Orders.attack, target)
                     end)
                     if whatMode[1] == VARIOUS_TIMERS
-                        doAfter(5., () -> startActTimer(actMission))
+                        doAfter(7., () -> startActTimer(actMission))
                     doAfter(2.) -> 
                         DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
                         DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
@@ -145,15 +154,23 @@ init
                             QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 3:|r The habitat")
             // Mission 4
             case 4
+                if whatMode[1] == VARIOUS_TIMERS
+                    stopActTimer()
+                
                 pings.disable()
 
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()
-                    doAfter(5., () -> startActTimer(actMission))
-                doAfter(2.) -> 
+                    doAfter(10., () -> startActTimer(actMission))
+
+                QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETED|r\nYou managed to get out of the cave.")
+                QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00MISSION FAILED|r\nThey managed to get out of the cave.")
+                missions[3].setState(QuestState.COMPLETED)
+
+                doAfter(7.) -> 
                     DisplayTextToForce(THE_DRAENEI, "Your team has advanced")
                     DisplayTextToForce(THE_DEMONS, "Your team has been stopped")
-                    doAfter(5.) -> 
+                    doAfter(3.) -> 
                         missions[4].setState(QuestState.DISCOVERED)
                         QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_DISCOVERED, "|cffffcc00Mision 4:|r The generators")
                         

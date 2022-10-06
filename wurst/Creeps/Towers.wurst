@@ -16,6 +16,8 @@ import ObjectIds
 import Assets
 import Fx
 
+import BountyController
+
 // Functions and values to use
 
 public constant DRAENEI_WORKER = compiletime(UNIT_ID_GEN.next())
@@ -25,6 +27,10 @@ public constant DEMON_TOWER = compiletime(UNIT_ID_GEN.next())
 
 let DEMON_TOWER_DUMMY_ZIGURAT = compiletime(UNIT_ID_GEN.next())
 let DEMON_TOWER_DUMMY_MODEL = compiletime(UNIT_ID_GEN.next())
+
+init
+    Bounty.set(DRAENEI_TOWER, 100, 5, 5)
+    Bounty.set(DEMON_TOWER, 100, 5, 5)
 
 public rect returnPoint = Rects.whereTheWorkersWere
 

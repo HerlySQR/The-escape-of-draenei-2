@@ -6,7 +6,6 @@ import Fx
 import Annotations
 import ClosureTimers
 import ClosureForGroups
-import Execute
 import LinkedList
 
 // System based in Missiles v2.3 by Chopinski https://www.hiveworkshop.com/threads/relativistic-missiles-vjass-lua-gui.325964/

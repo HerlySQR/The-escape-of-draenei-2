@@ -50,8 +50,6 @@ init
                 QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_UPDATED, "A generator was destroyed.")
             else if generatorsLeft == 0
                 generatorsDestroyed = true
-                if whatMode[1] == VARIOUS_TIMERS
-                    stopActTimer()
                 forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
                     if u.getTypeId() == ADVANCE_DEATH_TOWER
                         u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)

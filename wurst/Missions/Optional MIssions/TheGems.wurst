@@ -6,7 +6,9 @@ import Fx
 import DamageEvent
 import DummyRecycler
 
-let heretic = GUnits.heretic..setInvulnerable(true)
+let heretic = GUnits.heretic..setInvulnerable(true)..hide()
+let hereticOriginalPos = heretic.getPos()
+let hereticNewPos = Rects.gemsHeretic.getCenter()
 let whoAre = CreateForce()
 var returnedGems = 0
 
@@ -35,6 +37,13 @@ let thePoisonGem = new Fx(Rects.poisonGemObelisk.getCenter(), Imports.gem)
     ..setPlayerColor(PLAYER_COLOR_GREEN)
 
 init
+    onMission(mission -> begin
+        if mission == 4
+            heretic..show()..issuePointOrderById(Orders.move, hereticNewPos)
+            doAfter(7.) -> 
+                heretic.setFacing(270..asAngleDegrees())
+    end)
+
     onReset(true, () -> begin
         if mark == null
             mark = heretic.addEffect(Imports.questMarking, "origin")
@@ -46,6 +55,7 @@ init
     onReset(false, () -> begin
         returnedGems = 0
         skyGemRun.disable()
+        heretic..setPos(hereticOriginalPos)..hide()
     end)
     let random = doPeriodically(0.1, _ -> GetRandomInt(1, 3))
     

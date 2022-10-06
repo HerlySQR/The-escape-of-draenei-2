@@ -24,14 +24,14 @@ let CD_L = [18., 16., 14., 12.]
 let MANA_L = [105, 115, 125, 135]
 let DMG_PER_SEC_L = [30., 45., 60., 75.]
 // Internal
-let extraHeight = vec3(0., 0., 50.)
+let extraHeight = 50.
 
 function quellActions(unit caster, unit target, player owner, real damage)
     caster.damageTarget(target, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC)
-    target.flashEffect(Imports.holyLight, "origin")
+    target.addEffect(Imports.holyLight, "origin")
     forUnitsInRange(target.getPos(), AREA, u -> begin
         if not u.isType(UNIT_TYPE_MECHANICAL) and not u.isType(UNIT_TYPE_STRUCTURE) and owner.isAllyOf(u.getOwner())
-            let m = new Missiles(target.getPos3Real() + extraHeight, u.getPos3Real() + extraHeight)
+            let m = new Missiles(target.getPos().withZ(extraHeight), u.getPos().withZ(extraHeight))
             m.setSpeed(900.)
             m.setArc(8.627.asAngleDegrees())
             m.setModel(Abilities.faerieDragonMissile)
@@ -51,17 +51,18 @@ init
             let caster = GetSpellAbilityUnit()
             let target = GetSpellTargetUnit()
             let owner = caster.getOwner()
+
             real damage
             if data.isNL
                 damage = DMG_PER_SEC_NL[data.lvl]
             else
                 damage = DMG_PER_SEC_L[data.lvl]
+            
             target.scaleSpeed("quell", SLOW)
-            target.addBuff(QUELL_BUFF, compiletime(MAX_TIMES.toReal()), () -> doAfter(0.5, () -> target.removeSpeedBuff("quell")))
+            doAfter(compiletime(MAX_TIMES.toReal()+0.5), () -> target.removeSpeedBuff("quell"))
+            //target.addBuff(QUELL_BUFF, compiletime(MAX_TIMES.toReal()), () -> doAfter(0.5, () -> target.removeSpeedBuff("quell")))
             quellActions(caster, target, owner, damage)
-            doPeriodicallyCounted(1., MAX_TIMES, cb -> begin
-                quellActions(caster, target, owner, damage)
-            end)
+            doPeriodicallyCounted(1., MAX_TIMES, _ -> quellActions(caster, target, owner, damage))
     end)
 
 function ChannelAbilityPreset.general()
@@ -86,9 +87,9 @@ function ChannelAbilityPreset.general()
         ..setHeroAbility(false)
         ..general()
         // Stats
-        ..presetCooldown(lvl -> CD_NL[lvl - 1])
-        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl - 1])
-        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
+        ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
@@ -97,9 +98,9 @@ function ChannelAbilityPreset.general()
         ..setRequiredLevel(1)
         ..general()
         // Stats
-        ..presetCooldown(lvl -> CD_L[lvl - 1])
+        ..presetCooldown(lvl -> CD_L[lvl-1])
         ..addTooltipProperty("Damage per second", lvl -> DMG_PER_SEC_L[lvl - 1])
-        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
     

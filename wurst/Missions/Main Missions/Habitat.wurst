@@ -3,7 +3,6 @@ package Habitat
 import Functions
 import initlater Missions
 import PlayerData
-import HeroSelection
 import DontPlaySmart
 import GeneratedValues
 
@@ -24,26 +23,17 @@ init
         ..registerRectEnterEventSource(Rects.habitatExit2)
         ..addCondition(Condition(() -> GetEnteringUnit().isType(UNIT_TYPE_HERO) and THE_DRAENEI.has(GetEnteringUnit().getOwner())))
         .addAction(() -> begin
-            if whatMode[1] == VARIOUS_TIMERS
-                stopActTimer()
-            seeDeSpawn[2].stop()
-            seeDrSpawn[4].start()
-            actDrSpawn = Rects.respawn4
-            actDeSpawn = Rects.respawn5
-            QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETED|r\nYou managed to get out of the cave.")
-            QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00MISSION FAILED|r\nThey managed to get out of the cave.")
-            missions[3].setState(QuestState.COMPLETED)
             forUnitsInRect(Rects.shops4, u -> begin
                 if u.isType(UNIT_TYPE_STRUCTURE)
                     u.setOwner(DRAENEI, true)
             end)
-            /*TODO gg_unit_nhhr_0207.show()*/
             generator1.setInvulnerable(false)
             generator2.setInvulnerable(false)
+
             DONT_PASS.disable()
             exitCave.disable()
-            doAfter(5.) -> 
-                startMission(4)
+
+            startMission(4)
         end)
 
 // Obstacles in the habitat

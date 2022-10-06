@@ -11,6 +11,8 @@ let ARMOR_RED = 3
 let AREA = 300.
 let SLOW = 0.3
 
+public constant NETHER_POTION_TOOLTIP = ""
+
 @compiletime function gen()
     new AbilityDefinitionAlchemistAcidBomb(NETHER_POTION_SPELL)
         ..basicItemSpell()
