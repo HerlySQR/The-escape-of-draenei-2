@@ -1,0 +1,19 @@
+package StormDiamond
+
+import AbilityData
+
+public constant STORM_DIAMOND_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let MANA = 90
+let PRIM_DMG = 180.
+let CD = 10.
+
+public constant STORM_DIAMOND_TOOLTIP = "Throws lightning that causes damage to several targets, with {0} being the first and reducing."
+    .format(PRIM_DMG.toString(0))
+
+@compiletime function gen()
+    new AbilityDefinitionChainLightningcreep(STORM_DIAMOND_SPELL)
+        ..basicItemSpell()
+        ..setDamageperTarget(1, PRIM_DMG)
+        ..setManaCost(1, MANA)
+        ..setCooldown(1, CD)

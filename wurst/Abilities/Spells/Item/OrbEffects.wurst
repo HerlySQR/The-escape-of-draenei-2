@@ -1,0 +1,49 @@
+package OrbEffects
+
+import AbilityData
+
+public constant CORRUPTION_ORB_3_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant CORRUPTION_ORB_4_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant LIGHTNING_ORB_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant ICE_ORB_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant ICE_ORB_BREATH_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant ICE_ORB_PLUS_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant ICE_ORB_PLUS_BREATH_SPELL = compiletime(ABIL_ID_GEN.next())
+
+function AbilityDefinitionFrostDamageBonus.general()
+    this
+        ..setDamageBonus(1, 0)
+        ..setDurationHero(1, 1.5)
+        ..setDurationNormal(1, 3.)
+
+@compiletime function gen()
+    new AbilityDefinitionOrbofCorruption(CORRUPTION_ORB_3_SPELL)
+        ..setDamageBonusDice(1, 0)
+        ..setArmorPenalty(1, 3)
+    
+    new AbilityDefinitionOrbofCorruption(CORRUPTION_ORB_4_SPELL)
+        ..setDamageBonusDice(1, 0)
+        ..setArmorPenalty(1, 4)
+    
+    new AbilityDefinitionOrbofLightning(LIGHTNING_ORB_SPELL)
+        ..setDamageBonus(1, 0)
+    
+    new AbilityDefinitionFrostDamageBonus(ICE_ORB_SPELL)
+        ..general()
+    
+    new AbilityDefinitionFrostDamageBonus(ICE_ORB_BREATH_SPELL)
+        ..general()
+        ..setMissileArt(Abilities.frostWyrmMissile)
+        ..setEditorSuffix("(Breath)")
+    
+    new AbilityDefinitionFrostDamageBonus(ICE_ORB_PLUS_SPELL)
+        ..general()
+        ..setMissileArt(Abilities.zigguratFrostMissile)
+        ..setIconNormal(Icons.bTNIceShard)
+        ..setEditorSuffix("(Better)")
+    
+    new AbilityDefinitionFrostDamageBonus(ICE_ORB_PLUS_BREATH_SPELL)
+        ..general()
+        ..setMissileArt(Abilities.freezingBreathMissile)
+        ..setIconNormal(Icons.bTNIceShard)
+        ..setEditorSuffix("(Better | Breath)")

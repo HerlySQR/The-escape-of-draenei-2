@@ -22,6 +22,7 @@ public constant HEALING_SALVE = compiletime(
         //..setArmorType(ArmorSoundType.Stone)
         ..setClassification("Charged")
         ..setGoldCost(100)
+        ..setAbilities(HEALING_SALVE_SPELL.toRawCode())
         ..setStockReplenishInterval(30)
         ..setStockMaximum(5)
         ..setStockStartDelay(0)
@@ -29,7 +30,7 @@ public constant HEALING_SALVE = compiletime(
         ..setButtonPositionY(0)
         ..setHotkey("Q")
         ..setTooltipBasic("[|cffffcc00Q|r] Buy Healing Salve")
-        ..setTooltipExtended("Regenerates 400 of life,"))
+        ..setTooltipExtended(HEALING_SALVE_TOOLTIP))
 
 public constant MANA_POTION = compiletime(
     new RecipeItem('pman')
@@ -49,6 +50,7 @@ public constant CLARITY_POTION = compiletime(
         //..setArmorType(ArmorSoundType.Stone)
         ..setClassification("Charged")
         ..setGoldCost(70)
+        ..setAbilities(CLARITY_POTION_SPELL.toRawCode())
         ..setStockReplenishInterval(30)
         ..setStockMaximum(5)
         ..setStockStartDelay(0)
@@ -56,19 +58,21 @@ public constant CLARITY_POTION = compiletime(
         ..setButtonPositionY(0)
         ..setHotkey("W")
         ..setTooltipBasic("[|cffffcc00W|r] Buy Clarity Potion"))
+        ..setTooltipExtended(CLARITY_POTION_TOOLTIP)
 
 public constant SCROLL_OF_THE_BEAST = compiletime(
     new RecipeItem('sror')
         //..setArmorType(ArmorSoundType.Ethereal)
         ..setClassification("Charged")
         ..setGoldCost(150)
+        ..setAbilities(ROAR_SPELL.toRawCode())
         ..setStockReplenishInterval(30)
         ..setStockStartDelay(0)
         ..setButtonPositionX(2)
         ..setButtonPositionY(0)
         ..setHotkey("E")
         ..setTooltipBasic("[|cffffcc00E|r] Buy Scroll of the beast")
-        ..setTooltipExtended("Provide nearby friendly units a 30% damage bonus for 40 seconds."))
+        ..setTooltipExtended(ROAR_TOOLTIP))
 
 public constant WIND_SCEPTER = compiletime(
     new RecipeItem('wcyc')
@@ -102,13 +106,14 @@ public constant POTION_OF_RESTORATION = compiletime(
         //..setArmorType(ArmorSoundType.Stone)
         ..setClassification("Charged")
         ..setGoldCost(150)
+        ..setAbilities(LIFE_MANA_1_SPELL.toRawCode())
         ..setInterfaceIcon(Icons.bTNMinorRejuvPotion)
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
         ..setHotkey("A")
         ..setTooltipBasic("[|cffffcc00A|r] Potion of Restoration")
-        ..setTooltipExtended("Restores 125 hit and mana points of the hero when used.")
-        ..setDescription("Restores lost hit points and mana.")
+        ..setTooltipExtended(LIFE_MANA_1_TOOLTIP)
+        ..setDescription(LIFE_MANA_1_TOOLTIP)
         ..setName("Potion of Restoration"))
 
 public constant GREATER_MANA_POTION = compiletime(
@@ -130,13 +135,14 @@ public constant GREATER_POTION_OF_RESTORATION = compiletime(
         //..setArmorType(ArmorSoundType.Stone)
         ..setClassification("Charged")
         ..setGoldCost(150)
+        ..setAbilities(LIFE_MANA_2_SPELL.toRawCode())
         ..setInterfaceIcon(Icons.bTNRejuvPotion)
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
         ..setHotkey("S")
         ..setTooltipBasic("[|cffffcc00S|r] Greater Potion of Restoration")
-        ..setTooltipExtended("Restores 250 hit and mana points of the hero when used.")
-        ..setDescription("Restores lost hit points and mana.")
+        ..setTooltipExtended(LIFE_MANA_2_TOOLTIP)
+        ..setDescription(LIFE_MANA_2_TOOLTIP)
         ..setName("Greater Potion of Restoration"))
 
 public constant SCROLL_OF_PROTECTION = compiletime(
@@ -171,13 +177,14 @@ public constant INVULNERAVILITY_POTION = compiletime(
         ..setClassification("Charged")
         ..setGoldCost(200)
         ..setLumberCost(3)
+        ..setAbilities(INVULNERABILITY_SPELL.toRawCode())
         ..setStockReplenishInterval(45)
         ..setStockStartDelay(0)
         ..setButtonPositionX(0)
         ..setButtonPositionY(2)
         ..setHotkey("Z")
         ..setTooltipBasic("[|cffffcc00Z|r] Buy Invulnerability Potion")
-        ..setTooltipExtended("Makes the Hero invulnerable for 3.5 seconds. An invulnerable Hero cannot be the target of spells or effects."))
+        ..setTooltipExtended(INVULNERABILITY_TOOLTIP))
 
 public constant SENTINEL_TOTEMS = compiletime(
     new RecipeItem('wswd')
@@ -189,7 +196,7 @@ public constant SENTINEL_TOTEMS = compiletime(
         ..setButtonPositionY(2)
         ..setHotkey("X")
         ..setTooltipBasic("[|cffffcc00X|r] Buy Sentinel Totems")
-        ..setTooltipExtended("Plant a Sentinel Totem to spy on an area for 300 seconds. \nContains 2 uses."))
+        ..setTooltipExtended("Plant a Sentinel Totem to spy on an area for 300 seconds.\nContains 2 uses."))
 
 public constant VAMPIRIC_POTION = compiletime(
     new RecipeItem('vamp')
@@ -208,9 +215,10 @@ public constant ANTIMAGIC_POTION = compiletime(
         ..setClassification("Charged")
         ..setGoldCost(150)
         ..setLumberCost(2)
+        ..setAbilities(ANTIMAGIC_SPELL.toString())
         ..setStockReplenishInterval(30)
         ..setButtonPositionX(3)
         ..setButtonPositionY(2)
         ..setHotkey("V")
         ..setTooltipBasic("[|cffffcc00V|r] Buy Anti-magic potion")
-        ..setTooltipExtended("Gives the hero immunity to magic spells for 10 seconds."))
+        ..setTooltipExtended(ANTIMAGIC_TOOLTIP))

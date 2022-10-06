@@ -10,6 +10,7 @@ import public Annotations
 import ClosureEvents
 
 import public Imports
+import public ItemSpells
 
 import public RecipeItem
 

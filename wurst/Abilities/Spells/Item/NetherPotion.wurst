@@ -10,10 +10,20 @@ let SEC_DMG = 7.
 let ARMOR_RED = 3
 let AREA = 300.
 let SLOW = 0.3
+let DURATION = 15.
 
-public constant NETHER_POTION_TOOLTIP = ""
+public constant NETHER_POTION_TOOLTIP = "Reduces armor by {0}; deals {1} damage to primary target and {2} damage per second to nearby targets and reduces their attack and movement speed by {3}%.\nLasts {4} seconds."
+    .format(ARMOR_RED.toString(), PRIM_DMG.toString(0), SEC_DMG.toString(0), (SLOW*100).toInt().toString(), DURATION.toString(0))
 
 @compiletime function gen()
+    let NETHER_POTION_BUFF = BUFF_ID_GEN.next()
+
+    new BuffDefinition(NETHER_POTION_BUFF, 'BNab')
+        ..setIcon(Imports.bTNNetherPotion)
+        ..setArtTarget(Imports.soulArmor)
+        ..setTooltipNormal("Nether Potion")
+        ..setTooltipNormalExtended("This unit has been bombarded with Nether Potion. His armor and speed have been reduced and he is gradually taking damage.")
+
     new AbilityDefinitionAlchemistAcidBomb(NETHER_POTION_SPELL)
         ..basicItemSpell()
         ..setPrimaryDamage(1, PRIM_DMG)
@@ -23,4 +33,9 @@ public constant NETHER_POTION_TOOLTIP = ""
         ..setArmorPenalty(1, ARMOR_RED)
         ..setManaCost(1, MANA)
         ..setAreaofEffect(1, 300.)
+        ..setDurationHero(1, DURATION)
+        ..setDurationNormal(1, DURATION)
+        ..setBuffs(1, NETHER_POTION_BUFF.toRawCode())
+        ..setMissileArt(Imports.netherPotionMissle)
+        ..setIconNormal(Imports.bTNNetherPotion)
         ..setName("Nether potion")

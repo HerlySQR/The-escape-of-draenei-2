@@ -1,0 +1,34 @@
+package SummonCourier
+
+import AbilityData
+
+public constant COURIER = compiletime(UNIT_ID_GEN.next())
+public constant SUMMON_COURIER_SPELL = compiletime(ABIL_ID_GEN.next())
+
+@compiletime function gen()
+    let COURIER_INV = ABIL_ID_GEN.next()
+
+    new AbilityDefinitionInventory(COURIER_INV)
+        ..setCanUseItems(1, false)
+
+    new UnitDefinition(COURIER, 'nzep')
+        ..setUnitClassification("peon")
+        ..setHitPointsMaximumBase(200)
+        ..setSelectionScale(0.75)
+        ..setShadowImageHeight(80.)
+        ..setShadowImageWidth(80.)
+        ..setShadowImageCenterX(40.)
+        ..setShadowImageCenterY(40.)
+        ..setProjectileImpactZ(30.)
+        ..setScalingValue(0.5)
+        ..setNormalAbilities("Apiv," + COURIER_INV.toRawCode())
+        ..setSpeedBase(522)
+        ..setCollisionSize(24.)
+        ..setName("Courier")
+    
+    new AbilityDefinitionFigurineUrsaWarrior(SUMMON_COURIER_SPELL)
+        ..setSummonUnitType(1, COURIER.toRawCode())
+        ..setDurationHero(1, 0.)
+        ..setDurationHero(1, 0.)
+        ..setIconNormal(Icons.bTNGoblinZeppelin)
+        ..setName("Summon Courier")

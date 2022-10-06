@@ -1,0 +1,84 @@
+package MiscItemSpells
+
+import AbilityData
+
+public constant COMMAND_AURA_SPELL = compiletime(ABIL_ID_GEN.next())
+let COMMAND_DMG_BONUS = 0.15
+public constant COMMAND_AURA_TOOLTIP = "{0}% command aura"
+    .format((COMMAND_DMG_BONUS*100).toInt().toString())
+
+public constant HEALING_SALVE_SPELL = compiletime(ABIL_ID_GEN.next())
+let HEAL_REGEN = 400.
+let HEAL_REGEN_DURATION = 10.
+public constant HEALING_SALVE_TOOLTIP = "Restores {0} life after {1} seconds"
+    .format(HEAL_REGEN.toString(0), HEAL_REGEN_DURATION.toString(0))
+
+public constant CLARITY_POTION_SPELL = compiletime(ABIL_ID_GEN.next())
+let MANA_REGEN = 200.
+public constant CLARITY_POTION_TOOLTIP = "Restores {0} mana after a while"
+    .format(MANA_REGEN.toString(0))
+
+public constant ROAR_SPELL = compiletime(ABIL_ID_GEN.next())
+let ROAR_EXTRA_DMG = 0.3
+let ROAR_DURATION = 40.
+public constant ROAR_TOOLTIP = "Provide nearby friendly units a {0}% damage bonus for {1} seconds."
+    .format((ROAR_EXTRA_DMG*100).toInt().toString(), ROAR_DURATION.toString(0))
+
+public constant LIFE_MANA_1_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant LIFE_MANA_2_SPELL = compiletime(ABIL_ID_GEN.next())
+let LIFE_MANA_REGAIN = 125
+public constant LIFE_MANA_1_TOOLTIP = "Restores {0} life and mana"
+    .format(LIFE_MANA_REGAIN.toString())
+public constant LIFE_MANA_2_TOOLTIP = "Restores {0} life and mana"
+    .format((LIFE_MANA_REGAIN*2).toString())
+
+public constant INVULNERABILITY_SPELL = compiletime(ABIL_ID_GEN.next())
+let INVULNERABILITY_DURATION = 4.
+public constant INVULNERABILITY_TOOLTIP = "Makes the Hero invulnerable for {0} seconds. An invulnerable Hero cannot be the target of spells or effects."
+    .format(INVULNERABILITY_DURATION.toString(0))
+
+public constant ANTIMAGIC_SPELL = compiletime(ABIL_ID_GEN.next())
+let ANTIMAGIC_DURATION = 10.
+public constant ANTIMAGIC_TOOLTIP = "Gives the hero immunity to magic spells for {0} seconds."
+    .format(ANTIMAGIC_DURATION.toString(0))
+
+@compiletime function gen()
+    new AbilityDefinitionAuraCommandCreep(COMMAND_AURA_SPELL)
+        ..basicItemSpell()
+        ..setAttackDamageIncrease(1, COMMAND_DMG_BONUS)
+    
+    new AbilityDefinitionPotionofLifeRegen(HEALING_SALVE_SPELL)
+        ..basicItemSpell()
+        ..setLifeRegenerated(1, HEAL_REGEN)
+        ..setDurationHero(1, HEAL_REGEN_DURATION)
+        ..setDurationNormal(1, HEAL_REGEN_DURATION)
+        ..setCastRange(1, 125.)
+    
+    new AbilityDefinitionPotionofManaRegenlesser(CLARITY_POTION_SPELL)
+        ..basicItemSpell()
+        ..setManaRegenerated(1, MANA_REGEN)
+    
+    new AbilityDefinitionRoar(ROAR_SPELL)
+        ..basicItemSpell()
+        ..setDamageIncrease(1, ROAR_EXTRA_DMG)
+        ..setDurationHero(1, ROAR_DURATION)
+        ..setDurationNormal(1, ROAR_DURATION)
+    
+    new AbilityDefinitionItemRestore(LIFE_MANA_1_SPELL)
+        ..basicItemSpell()
+        ..setHitPointsRestored(1, LIFE_MANA_REGAIN)
+        ..setManaPointsRestored(1, LIFE_MANA_REGAIN)
+    
+    new AbilityDefinitionItemRestore(LIFE_MANA_2_SPELL)
+        ..basicItemSpell()
+        ..setHitPointsRestored(1, LIFE_MANA_REGAIN*2)
+        ..setManaPointsRestored(1, LIFE_MANA_REGAIN*2)
+    
+    new AbilityDefinitionPaladinDivineShield(INVULNERABILITY_SPELL)
+        ..basicItemSpell()
+        ..setDurationHero(1, INVULNERABILITY_DURATION)
+        ..setDurationNormal(1, INVULNERABILITY_DURATION)
+    
+    new AbilityDefinitionAntimagicShieldAIxs(ANTIMAGIC_SPELL)
+        ..setDurationHero(1, ANTIMAGIC_DURATION)
+        ..setDurationNormal(1, ANTIMAGIC_DURATION)

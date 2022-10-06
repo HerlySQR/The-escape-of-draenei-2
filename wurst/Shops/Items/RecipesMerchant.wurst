@@ -22,22 +22,24 @@ public constant SHIELD_OF_HONOR_RECIPE = compiletime(
         ..setButtonPositionY(0)
         ..setHotkey("Q")
         ..setTooltipBasic("[|cffffcc00Q|r] Buy Shield of honor (Recipe)")
-        ..setTooltipExtended("Give 8 armor and 15% command aura.\n\n" +
+        ..setTooltipExtended("+8 armor\n" + COMMAND_AURA_TOOLTIP + "\n\n" +
                              "Requires:\n" +
                              "- Claws of Attack (+12)\n" +
                              "- Ring of protection (+2)\n" +
                              "- Ring of protection (+6)\n\n")
-        ..setDescription("Give 8 armor and 15% command aura.")
+        ..setDescription("+8 armor\n" + COMMAND_AURA_TOOLTIP)
         ..setName("Recipe of Shield of honor"))
 
 public constant SHIELD_OF_HONOR = compiletime(
     new RecipeItem('shhn')
+        ..setAbilities("")
+        ..addBonus(Bonus.ARMOR, 8)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNHumanArmorUpThree)
         ..addBonus(Bonus.ARMOR, 8)
-        ..setTooltipExtended("Give 8 armor and 15% command aura.")
-        ..setDescription("Give 8 armor and 15% command aura.")
+        ..setTooltipExtended("+8 armor\n" + COMMAND_AURA_TOOLTIP)
+        ..setDescription("+8 armor and\n" + COMMAND_AURA_TOOLTIP)
         ..setName("Shield of honor"))
 
 @compiletime function genShieldOfHonor()
@@ -85,6 +87,8 @@ public constant RING_OF_REGENERATION_1_RECIPE = compiletime(
 
 public constant RING_OF_REGENERATION_1 = compiletime(
     new RecipeItem('rlif')
+        ..setAbilities("")
+        ..addBonus(Bonus.LIFEREGEN, 5)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNRingSkull)
@@ -131,6 +135,8 @@ public constant RING_OF_REGENERATION_2_RECIPE = compiletime(
 
 public constant RING_OF_REGENERATION_2 = compiletime(
     new RecipeItem('rlif')
+        ..setAbilities("")
+        ..addBonus(Bonus.LIFEREGEN, 5)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNRingSkull)
@@ -180,6 +186,8 @@ public constant SOBI_MASK_1_RECIPE = compiletime(
 
 public constant SOBI_MASK_1 = compiletime(
     new RecipeItem('rwiz')
+        ..setAbilities("")
+        ..addBonus(Bonus.MANAREGEN, 1.25)
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNSobiMask)
@@ -226,6 +234,8 @@ public constant SOBI_MASK_2_RECIPE = compiletime(
 
 public constant SOBI_MASK_2 = compiletime(
     new RecipeItem('rwiz')
+        ..setAbilities("")
+        ..addBonus(Bonus.MANAREGEN, 1.25)
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNSobiMask)
@@ -279,6 +289,8 @@ public constant FIRE_BLADE_RECIPE = compiletime(
 
 public constant FIRE_BLADE = compiletime(
     new RecipeItem('srbd')
+        ..setAbilities("")
+        ..addBonus(Bonus.DAMAGE, 70)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNArcaniteMelee)
@@ -388,6 +400,8 @@ public constant ENERGY_PENDANT_RECIPE = compiletime(
 
 public constant ENERGY_PENDANT = compiletime(
     new RecipeItem('pmna')
+        ..setAbilities("")
+        ..addBonus(Bonus.MANA, 200)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNPendantOfEnergy)
@@ -439,6 +453,9 @@ public constant MASK_OF_DEATH_RECIPE = compiletime(
 
 public constant MASK_OF_DEATH = compiletime(
     new RecipeItem('modt')
+        ..setAbilities("")
+        ..addBonus(Bonus.DAMAGE, 20)
+        ..addBonus(Bonus.ARMOR, 5)
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNMaskOfDeath)
@@ -495,6 +512,10 @@ public constant SHIELD_OF_LORD_OF_DEAD_RECIPE = compiletime(
 
 public constant SHIELD_OF_LORD_OF_DEAD = compiletime(
     new RecipeItem('shdt')
+        ..setAbilities("")
+        ..addBonus(Bonus.LIFE, 250)
+        ..addBonus(Bonus.MANA, 250)
+        ..addBonus(Bonus.ARMOR, 7)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNLightningShield)
@@ -558,6 +579,9 @@ public constant GLOVES_OF_CORRUPTION_RECIPE = compiletime(
 
 public constant GLOVES_OF_CORRUPTION = compiletime(
     new RecipeItem('ocor')
+        ..setAbilities("")
+        ..addBonus(Bonus.DAMAGE, 20)
+        ..addBonus(Bonus.ATTACKSPEED, 30)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNImprovedUnholyStrength)
@@ -612,6 +636,8 @@ public constant SHAMANS_CLAWS_RECIPE = compiletime(
 
 public constant SHAMANS_CLAWS = compiletime(
     new RecipeItem('ocor')
+        ..setAbilities("AIcl")
+        ..addBonus(Bonus.DAMAGE, 20)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNShamanMaster)
@@ -666,6 +692,8 @@ public constant NORTHREND_ARTIFACT_RECIPE = compiletime(
 
 public constant NORTHREND_ARTIFACT = compiletime(
     new RecipeItem('ofro')
+        ..setAbilities("")
+        ..addBonus(Bonus.DAMAGE, 21)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
