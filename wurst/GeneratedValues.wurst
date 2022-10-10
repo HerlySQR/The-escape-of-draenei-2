@@ -403,6 +403,13 @@ public class Rects
     static constant theWarlock = gg_rct_TheWarlock
     static constant theMonster = gg_rct_TheMonster
 
+// Water
+init
+    EnumDestructablesInRect(bj_mapInitialPlayableArea, null, () -> begin
+        if GetEnumDestructable().getTypeId() == 'B00L'
+            SetTerrainPathable(GetEnumDestructable().getX(), GetEnumDestructable().getY(), PATHING_TYPE_FLOATABILITY, true)
+    end)
+
 /** The generated cameras. */
 public class Cams
 

@@ -32,7 +32,7 @@ public constant SHIELD_OF_HONOR_RECIPE = compiletime(
 
 public constant SHIELD_OF_HONOR = compiletime(
     new RecipeItem('shhn')
-        ..setAbilities("")
+        ..setAbilities(COMMAND_AURA_SPELL.toRawCode())
         ..addBonus(Bonus.ARMOR, 8)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
@@ -348,12 +348,17 @@ public constant IMPULSE_BOOTS_RECIPE = compiletime(
 
 public constant IMPULSE_BOOTS = compiletime(
     new RecipeItem('bspd')
+        ..setAbilities(IMPULSE_BOOTS_SPELL.toRawCode())
+        ..setActivelyUsed(true)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Imports.bTNWindsBoots)
-        ..setTooltipExtended("+60 Movement Speed and lets you advance fast to a certain position.\n\n|cffc3dbffNote:|r You only can go over a wall of 1 height, other case you will stop (and with some other exceptions), but you always can from top to bottom.")
-        ..setDescription("+60 Movement Speed and lets you advance fast to a certain position.\n\n|cffc3dbffNote:|r You only can go over a wall of 1 height, other case you will stop (and with some other exceptions), but you always can from top to bottom.")
+        ..setTooltipExtended("+60 Movement Speed and lets you dash to a certain position, but there are places where the dash will be stopped.")
+        ..setDescription("+60 Movement Speed and lets you dash to a certain position, but there are places where the dash will be stopped.")
         ..setName("Impulse boots"))
+
+init
+    createItem(IMPULSE_BOOTS.getNewId(), vec2(8000., 8000.))
 
 @compiletime function genImpulseBoots()
     fixRecipe(IMPULSE_BOOTS_RECIPE, IMPULSE_BOOTS,
@@ -379,7 +384,7 @@ init
 
     IMPULSE_BOOTS_RECIPE.initShopConditions()
 
-// Impulse boots
+// Energy pendant
 
 public constant ENERGY_PENDANT_RECIPE = compiletime(
     new Recipe()
@@ -501,7 +506,7 @@ public constant SHIELD_OF_LORD_OF_DEAD_RECIPE = compiletime(
         ..setButtonPositionY(1)
         ..setHotkey("F")
         ..setTooltipBasic("[|cffffcc00F|r] Buy Shield of the Lord of Death (Recipe)")
-        ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\nInmolation (30 dps)\n\n" +
+        ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP + "\n\n" +
                              "Requires:\n" +
                              "- Khadgar health stone\n" +
                              "- Mana pendant\n" +
@@ -516,13 +521,14 @@ public constant SHIELD_OF_LORD_OF_DEAD = compiletime(
         ..addBonus(Bonus.LIFE, 250)
         ..addBonus(Bonus.MANA, 250)
         ..addBonus(Bonus.ARMOR, 7)
+        ..setAbilities(IMMOLATION_30_SPELL.toRawCode())
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNLightningShield)
         ..addBonus(Bonus.LIFE, 250)
         ..addBonus(Bonus.MANA, 250)
         ..addBonus(Bonus.ARMOR, 7)
-        ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\nInmolation (30 dps)")
+        ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP)
         ..setDescription("+250 hit points\n+250 mana points\n+7 armor\nInmolation (30 dps)")
         ..setName("Shield of the Lord of Death"))
 
@@ -579,7 +585,7 @@ public constant GLOVES_OF_CORRUPTION_RECIPE = compiletime(
 
 public constant GLOVES_OF_CORRUPTION = compiletime(
     new RecipeItem('ocor')
-        ..setAbilities("")
+        ..setAbilities(CORRUPTION_ORB_4_SPELL.toRawCode())
         ..addBonus(Bonus.DAMAGE, 20)
         ..addBonus(Bonus.ATTACKSPEED, 30)
         //..setArmorType(ArmorSoundType.Flesh)
@@ -636,7 +642,7 @@ public constant SHAMANS_CLAWS_RECIPE = compiletime(
 
 public constant SHAMANS_CLAWS = compiletime(
     new RecipeItem('ocor')
-        ..setAbilities("AIcl")
+        ..setAbilities(commaList(STORM_DIAMOND_SPELL, LIGHTNING_ORB_SPELL))
         ..addBonus(Bonus.DAMAGE, 20)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
@@ -692,22 +698,24 @@ public constant NORTHREND_ARTIFACT_RECIPE = compiletime(
 
 public constant NORTHREND_ARTIFACT = compiletime(
     new RecipeItem('ofro')
-        ..setAbilities("")
+        ..setAbilities(ICE_ORB_PLUS_SPELL.toRawCode())
         ..addBonus(Bonus.DAMAGE, 21)
+        ..addBonus(Bonus.LIFE, 250)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
-        ..addBonus(Bonus.LIFE, 250)
         ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setName("Northrend Artifact"))
 
 public constant NORTHREND_ARTIFACT_BREATH = compiletime(
     new RecipeItem('ofro')
+        ..setAbilities(ICE_ORB_PLUS_BREATH_SPELL.toRawCode())
+        ..addBonus(Bonus.DAMAGE, 21)
+        ..addBonus(Bonus.LIFE, 250)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
-        ..addBonus(Bonus.LIFE, 250)
         ..setTooltipBasic("[|cffffcc00C|r] Buy Northrend Artifact")
         ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")

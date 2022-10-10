@@ -19,6 +19,11 @@ init
         Dests.dungeonDoor1.restoreLife(500., false)
         Dests.dungeonExitDoor1.restoreLife(500., false)
         Dests.dungeonExitDoor2.restoreLife(500., false)
+
+        forDestructablesInRange(Dests.dungeonExitDoor2.getPos(), 256., d -> begin
+            if d.getTypeId() == 'YTab'
+                d.restoreLife(9999., true)
+        end)
     end)
     destroyDoor
         ..registerDeathEvent(Dests.dungeonExitDoor2)
@@ -26,4 +31,9 @@ init
             doorDestroyed = true
             Dests.leverSecret.setInvulnerable(false)
             startMission(2)
+
+            forDestructablesInRange(Dests.dungeonExitDoor2.getPos(), 256., d -> begin
+                if d.getTypeId() == 'YTab'
+                    d.kill()
+            end)
         end)

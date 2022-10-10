@@ -1,0 +1,64 @@
+package StaffOfTheCyclones
+
+import AbilityData
+
+public constant STAFF_OF_THE_CYCLONES_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let CD = 20.
+let MANA = 75
+let DURATION = 3.
+let MAX_DIST = 1100.
+let RANGE = max(128., MAX_DIST - 200.)
+let AREA = 300.
+let TORNADO_DUMMY_SPELL = compiletime(ABIL_ID_GEN.next())
+
+public constant STAFF_OF_THE_CYCLONES_TOOLTIP = "Throws a tornado at a line that traps affected units for {0} seconds."
+    .format(DURATION.toString(0))
+
+init
+    registerSpellEffectEvent(STAFF_OF_THE_CYCLONES_SPELL, () -> begin
+        let caster = EventData.getSpellAbilityUnit()
+        let casterPos = caster.getPos3Zero()
+        let point = EventData.getAbilityTargetPos().toVec3()
+
+        let tornado = new Missiles(casterPos, casterPos.moveTowards(point, MAX_DIST))
+        tornado.owner = caster.getOwner()
+        tornado.setSpeed(MAX_DIST)
+        tornado.setModel(Abilities.tornadoElemental)
+
+        let dummy = DummyRecycler.get(point.toVec2(), UNIT_FACING)
+        dummy.addAbility(TORNADO_DUMMY_SPELL)
+        dummy.setOwner(tornado.owner, false)
+        let cb = doPeriodically(INTERVAL, _ -> dummy.setPos(tornado.getPos().toVec2()))
+
+        tornado.onRemove(() -> begin
+            dummy.removeAbility(TORNADO_DUMMY_SPELL)
+            DummyRecycler.recycle(dummy)
+            destroy cb
+        end)
+        tornado.launch()
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(STAFF_OF_THE_CYCLONES_SPELL, 1, true)
+        ..basicItemSpell()
+        ..presetTargetTypes(Targettype.POINT)
+        ..setBaseOrderID(1, "ward")
+        ..setCastRange(1, RANGE)
+        ..setCooldown(1, CD)
+        ..setManaCost(1, MANA)
+        ..setIconNormal(Icons.bTNTornado)
+
+    let TORNANDO_SPIN = BUFF_ID_GEN.next()
+
+    new BuffDefinition(TORNANDO_SPIN, 'Btsp')
+        ..setEffect(Abilities.cycloneTarget)
+
+    new AbilityDefinitionTornadoSpin(TORNADO_DUMMY_SPELL)
+        ..setMinimumHitIntervalseconds(1, 0.01)
+        ..setBuffs(1, commaList(TORNANDO_SPIN.toRawCode(), "Btsa"))
+        ..setAirTimeseconds(1, DURATION)
+        ..setDurationHero(1, DURATION)
+        ..setDurationNormal(1, DURATION)
+        ..setAreaofEffect(1, AREA)
+        ..setEditorSuffix("(Staff of the Cyclones)")

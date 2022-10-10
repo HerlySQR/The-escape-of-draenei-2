@@ -42,6 +42,21 @@ let ANTIMAGIC_DURATION = 10.
 public constant ANTIMAGIC_TOOLTIP = "Gives the hero immunity to magic spells for {0} seconds."
     .format(ANTIMAGIC_DURATION.toString(0))
 
+public constant GOLD_COINS_SPELL = compiletime(ABIL_ID_GEN.next())
+let GOLD_COINS_AMT = 75
+public constant GOLD_COINS_TOOLTIP = "Gives {0} of gold."
+    .format(GOLD_COINS_AMT.toString())
+
+public constant LUMBER_BALE_SPELL = compiletime(ABIL_ID_GEN.next())
+let LUMBER_BALE_AMT = 1
+public constant LUMBER_BALE_TOOLTIP = "Gives {0} of lumber."
+    .format(LUMBER_BALE_AMT.toString())
+
+public constant SILENCE_SPELL = compiletime(ABIL_ID_GEN.next())
+let SILENCE_DURATION = 7.
+public constant SILENCE_TOOLTIP = "Silence ({0} seconds)"
+    .format(SILENCE_DURATION.toString(0))
+
 @compiletime function gen()
     new AbilityDefinitionAuraCommandCreep(COMMAND_AURA_SPELL)
         ..basicItemSpell()
@@ -82,3 +97,13 @@ public constant ANTIMAGIC_TOOLTIP = "Gives the hero immunity to magic spells for
     new AbilityDefinitionAntimagicShieldAIxs(ANTIMAGIC_SPELL)
         ..setDurationHero(1, ANTIMAGIC_DURATION)
         ..setDurationNormal(1, ANTIMAGIC_DURATION)
+    
+    new AbilityDefinitionGiveGold(GOLD_COINS_SPELL)
+        ..setGoldGiven(1, GOLD_COINS_AMT)
+    
+    new AbilityDefinitionGiveGold(LUMBER_BALE_SPELL)
+        ..setGoldGiven(1, LUMBER_BALE_AMT)
+    
+    new AbilityDefinitionSilenceItem(SILENCE_SPELL)
+        ..setDurationHero(1, SILENCE_DURATION)
+        ..setDurationNormal(1, SILENCE_DURATION)

@@ -1,7 +1,10 @@
 package ItemSpells
 
+import public Immolation
+import public ImpulseBoots
 import public MiscItemSpells
 import public NetherPotion
 import public OrbEffects
+import public StaffOfTheCyclones
 import public StormDiamond
 import public SummonCourier

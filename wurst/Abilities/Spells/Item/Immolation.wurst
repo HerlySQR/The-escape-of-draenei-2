@@ -1,0 +1,20 @@
+package Immolation
+
+import AbilityData
+
+public constant IMMOLATION_20_SPELL = compiletime(ABIL_ID_GEN.next())
+public constant IMMOLATION_30_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let toolTip = "Wrap the hero in flames, causing damage of {0} per second to nearby enemy land units."
+
+public constant IMMOLATION_20_TOOLTIP = toolTip.format(20..toString(0))
+public constant IMMOLATION_30_TOOLTIP = toolTip.format(30..toString(0))
+
+@compiletime function gen()
+    new AbilityDefinitionPermanentImmolation(IMMOLATION_20_SPELL)
+        ..basicItemSpell()
+        ..setDamageperInterval(1, 20.)
+    
+    new AbilityDefinitionPermanentImmolation(IMMOLATION_30_SPELL)
+        ..basicItemSpell()
+        ..setDamageperInterval(1, 30.)

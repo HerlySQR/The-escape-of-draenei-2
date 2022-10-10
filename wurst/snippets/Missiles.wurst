@@ -106,7 +106,7 @@ public class Missiles
     private static rect r = Rect(0., 0., 0., 0.)
     private static Missiles temp = null
     
-    static LinkedList<Missiles> collection = new LinkedList<Missiles>()
+    private static LinkedList<Missiles> collection = new LinkedList<Missiles>()
     
     private HashMap<widget, boolean> widgetMap
     private HashMap<Missiles, boolean> missilMap

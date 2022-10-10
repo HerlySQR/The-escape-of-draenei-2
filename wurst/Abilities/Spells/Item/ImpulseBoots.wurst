@@ -1,0 +1,67 @@
+package ImpulseBoots
+
+import AbilityData
+
+import PseudoWindWalk
+
+public constant IMPULSE_BOOTS_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let MAX_DIST = 1200.
+let SPEED = 2500 * INTERVAL
+
+public constant IMPULSE_BOOTS_TOOLTIP = ""
+
+function destructable.isBlocker() returns bool
+    if not this.isAliveTrick()
+        return false
+    
+    let typ = this.getTypeId()
+    if typ == 'YTab'
+        return true
+    else if typ == 'YTac'
+        return true
+    else if typ == 'YTfb'
+        return true
+    else if typ == 'YTfc'
+        return true
+    return false
+
+function vec2.isPathGood() returns bool
+    if IsTerrainPathable(this.x, this.y, PATHING_TYPE_FLYABILITY)
+        return false
+    else if not IsTerrainPathable(this.x, this.y, PATHING_TYPE_FLOATABILITY)
+        return false
+    return true
+
+init
+    registerSpellEffectEvent(IMPULSE_BOOTS_SPELL, () -> begin
+        let caster = EventData.getSpellAbilityUnit()
+        let casterPos = caster.getPos()
+        let point = EventData.getAbilityTargetPos()
+        var dist = min(1200., casterPos.distanceTo(point))
+        let direction = casterPos.normalizedPointerTo(point)
+        caster.disableCollision()
+
+        var checkPoint = casterPos + 128. * direction
+        doPeriodically(INTERVAL, cb -> begin
+            if dist > 0 and checkPoint.isPathGood()
+                caster.setPos(caster.getPos() + SPEED * direction)
+                checkPoint = caster.getPos() + 128. * direction
+                if GetRandomInt(1,5) == 1
+                    caster.flashEffect(Abilities.defendCaster, "chest")
+            else
+                destroy cb
+                caster.enableCollision()
+            dist -= SPEED
+        end)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(IMPULSE_BOOTS_SPELL, 1, true)
+        ..basicItemSpell()
+        ..presetTargetTypes(Targettype.POINT)
+        ..setCastRange(1, 99999.)
+        ..setManaCost(1, 0)
+        ..setCooldown(1, 12.)
+        ..setIconNormal(Imports.bTNWindsBoots)
+        ..setName("Impulse")
