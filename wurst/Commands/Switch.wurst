@@ -8,11 +8,32 @@ import GeneratedValues
 import Reset
 import WhoSelect
 import HeroSelection
+import ModeSelection
 
 import Camera
 import Dialog
 import ClosureForGroups
 import ClosureTimers
+import LinkedList
+import ItemObjEditing
+import ObjectIdGenerator
+import Icons
+import ObjectIds
+import HashMap
+import ClosureEvents
+import Orders
+
+public interface SwitchListener
+    function run(player p1, player p2)
+
+let listeners = new LinkedList<SwitchListener>()
+
+/** Runs after 2 players succesfully switched places*/
+public function onSwitch(SwitchListener cb)
+    listeners.add(cb)
+
+let EXP_BOOK = compiletime(ITEM_ID_GEN.next())
+let expMap = new HashMap<item, int>()
 
 let endSwitch = CreateTimer()
 let switchWindow = createDialog()
@@ -139,6 +160,16 @@ function changePlayers()
     EnumItemsInRect(Rects.index, null, () -> begin
         GetEnumItem().setPos(swc1)
     end)
+
+    // Return them the levels
+    if whatMode[5] == LEVELING
+        let m1 = createItem(EXP_BOOK, swc2)
+        m1.setPlayer(swp1, false)
+        expMap.put(m1, hero[i1].getXp())
+        let m2 = createItem(EXP_BOOK, swc1)
+        m2.setPlayer(swp2, false)
+        expMap.put(m2, hero[i2].getXp())
+    
     yesOrYes = true
     repick(swp1)
     repick(swp2)
@@ -146,53 +177,19 @@ function changePlayers()
     switchMembers(swp1, swp2)
     swp1.panCameraToTimed(THE_DEMONS.has(swp1) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
     swp2.panCameraToTimed(THE_DEMONS.has(swp2) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
-    /* TODO
-    udg_Si_lo_mataste[GetPlayerId(udg_swp1)+1] = false
-    udg_Si_lo_mataste[GetPlayerId(udg_swp2)+1] = false
-    
-    // They remember you
-    if IsPlayerInForce(udg_swp1,udg_Ya_te_vi[0])
-        ForceAddPlayer(udg_Sabe_quien_eres[0],udg_swp1)
-    if IsPlayerInForce(udg_swp2,udg_Ya_te_vi[0])
-        ForceAddPlayer(udg_Sabe_quien_eres[0],udg_swp2)
-    for j = 1 to 6
-        if IsPlayerInForce(udg_swp1,udg_Mision[j]) or IsPlayerInForce(udg_swp1, udg_No_aceptaste_la_mision[j])
-            ForceAddPlayer(udg_Sabe_quien_eres[j],udg_swp1)
-        if IsPlayerInForce(udg_swp2,udg_Mision[j]) or IsPlayerInForce(udg_swp2, udg_No_aceptaste_la_mision[j])
-            ForceAddPlayer(udg_Sabe_quien_eres[j],udg_swp2)
-    // Remove them the mission
-    for j = 4 to 5
-        if IsPlayerInForce(udg_swp1, udg_Mision[j])
-            DisplayTextToForce(bj_FORCE_ALL_PLAYERS,GetPlayerName(udg_swp1)+" has lost the mission: |cffffcc00Proving yourself|r")
-            ForceRemovePlayer(udg_Mision[j],udg_swp1)
-            if j==4
-                udg_kills_prisionero=0
-                EnableTrigger(gg_trg_El_prisionero)
-                DisableTrigger(gg_trg_Dialogo_prisionero_si_lo_visita_un_draeneano)
-            else if j==5
-                udg_kills_senor_del_fuego = 0
-                EnableTrigger(gg_trg_Senor_del_fuego)
-                DisableTrigger(gg_trg_Dialogo_Senor_del_fuego_si_lo_visita_un_demonio)
-        if IsPlayerInForce(udg_swp2,udg_Mision[j])
-            DisplayTextToForce(bj_FORCE_ALL_PLAYERS,GetPlayerName(udg_swp2)+" has lost the mission: |cffffcc00Proving yourself|r")
-            ForceRemovePlayer(udg_Mision[j],udg_swp2)
-            if j==4
-                udg_kills_prisionero=0
-                EnableTrigger(gg_trg_El_prisionero)
-                DisableTrigger(gg_trg_Dialogo_prisionero_si_lo_visita_un_draeneano)
-            else if j==5
-                udg_kills_senor_del_fuego = 0
-                EnableTrigger(gg_trg_Senor_del_fuego)
-                DisableTrigger(gg_trg_Dialogo_Senor_del_fuego_si_lo_visita_un_demonio)*/
-    // TODO Returns them the levels
+
     // Change the alliances
     changeAlliance(swp1)
     changeAlliance(swp2)
+    playersOrder()
     // Last details
     circle[i1].setOwner(swp2, true)
     circle[i2].setOwner(swp1, true)
     swp1.setColor(playerColor[i2], true)
     swp2.setColor(playerColor[i1], true)
+
+    for cb in listeners
+        cb.run(swp1, swp2)
 
 function changeAlliance(player p)
     if THE_DRAENEI.has(p)
@@ -211,7 +208,6 @@ function changeAlliance(player p)
             else if THE_DEMONS.has(players[i])
                 noAllies(p, players[i])
         THE_DRAENEI.add(p)
-    playersOrder()
 
 function noAllies(player p1, player p2)
     SetPlayerAllianceStateBJ(p1, p2, bj_ALLIANCE_UNALLIED)
@@ -236,3 +232,29 @@ init
                 canPick.remove(swp2)
             whoSelect()
     end)
+    // Return them the levels
+    EventListener.add(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
+        let m = EventData.getOrderTargetItem()
+        let u = EventData.getOrderedUnit()
+        if m.getTypeId() == EXP_BOOK and m.getPlayer() != u.getOwner()
+            u.issueTargetOrderById(Orders.attack, u)
+    end)
+    EventListener.add(EVENT_PLAYER_UNIT_USE_ITEM, () -> begin
+        let m = EventData.getManipulatedItem()
+        let u = EventData.getManipulatingUnit()
+        if m.getTypeId() == EXP_BOOK
+            u.setXp(u.getXp() + expMap.get(m), true)
+            expMap.remove(m)
+            m.remove()
+    end)
+
+@compiletime function gen()
+    new ItemDefinition(EXP_BOOK, 'tkno')
+        ..setNumberofCharges(0)
+        ..setCanBeSoldToMerchants(false)
+        ..setUseAutomaticallyWhenAcquired(false)
+        ..setInterfaceIcon(Icons.bTNManual3)
+        ..setAbilities(DUMMY_ABILITY.toRawCode())
+        ..setTooltipExtended("Use to recover your XP.")
+        ..setDescription("Use to recover your XP.")
+        ..setName("Book of Power")

@@ -8,3 +8,4 @@ import public OrbEffects
 import public StaffOfTheCyclones
 import public StormDiamond
 import public SummonCourier
+import public MoveSpeed

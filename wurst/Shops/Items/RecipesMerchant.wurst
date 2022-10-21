@@ -289,14 +289,14 @@ public constant FIRE_BLADE_RECIPE = compiletime(
 
 public constant FIRE_BLADE = compiletime(
     new RecipeItem('srbd')
-        ..setAbilities("")
+        ..setAbilities(CRITICAL_STRIKE_SPELL.toRawCode())
         ..addBonus(Bonus.DAMAGE, 70)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNArcaniteMelee)
         ..addBonus(Bonus.DAMAGE, 70)
-        ..setTooltipExtended("+70 damage and 20% of chance of causing 2 times normal damage.")
-        ..setDescription("+70 damage and 20% of chance of causing 2 times normal damage.")
+        ..setTooltipExtended("+70 damage\n" + CRITICAL_STRIKE_TOOLTIP)
+        ..setDescription("+70 damage\n" + CRITICAL_STRIKE_TOOLTIP)
         ..setName("Fire Blade"))
 
 @compiletime function genFireBlade()
@@ -360,6 +360,9 @@ public constant IMPULSE_BOOTS = compiletime(
 init
     createItem(IMPULSE_BOOTS.getNewId(), vec2(8000., 8000.))
 
+init
+    IMPULSE_BOOTS.getNewId().addMoveSpeed(60)
+
 @compiletime function genImpulseBoots()
     fixRecipe(IMPULSE_BOOTS_RECIPE, IMPULSE_BOOTS,
         
@@ -405,14 +408,14 @@ public constant ENERGY_PENDANT_RECIPE = compiletime(
 
 public constant ENERGY_PENDANT = compiletime(
     new RecipeItem('pmna')
-        ..setAbilities("")
+        ..setAbilities(MANA_REPLISH_AREA_SPELL.toRawCode())
         ..addBonus(Bonus.MANA, 200)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNPendantOfEnergy)
         ..addBonus(Bonus.MANA, 200)
-        ..setTooltipExtended("+200 mana points and if you uses it, restore 100 mana to nearby allied units.")
-        ..setDescription("+200 mana points and if you uses it, restore 100 mana to nearby allied units.")
+        ..setTooltipExtended("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
+        ..setDescription("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
         ..setName("Energy Pendant"))
 
 @compiletime function genEnergyPendant()

@@ -1,0 +1,31 @@
+package MoveSpeed
+
+import HashMap
+import ClosureEvents
+
+import MoveSpeedX
+
+let addedItems = new HashMap<int, int>()
+
+public function int.addMoveSpeed(int amount)
+    addedItems.put(this, amount)
+
+function unit.resetSpeeds()
+    var extra = 0
+    for m in this.inventory()
+        let typ = m.getTypeId()
+        if addedItems.get(typ) > extra
+            extra = addedItems.get(typ)
+    if extra > 0
+        this.addBaseSpeed("movespeed", extra.toReal())
+    else
+        this.removeSpeedBuff("movespeed")
+
+init
+    EventListener e = () -> begin
+        let typ = EventData.getManipulatedItem().getTypeId()
+        if addedItems.has(typ)
+            EventData.getManipulatingUnit().resetSpeeds()
+    end
+    EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, e)
+    EventListener.add(EVENT_PLAYER_UNIT_DROP_ITEM, e)

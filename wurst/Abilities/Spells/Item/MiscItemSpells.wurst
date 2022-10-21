@@ -57,6 +57,18 @@ let SILENCE_DURATION = 7.
 public constant SILENCE_TOOLTIP = "Silence ({0} seconds)"
     .format(SILENCE_DURATION.toString(0))
 
+public constant CRITICAL_STRIKE_SPELL = compiletime(ABIL_ID_GEN.next())
+let CRITICAL_STRIKE_CHANCE = 15.
+let CRITICAL_STRIKE_AMT = 2.
+public constant CRITICAL_STRIKE_TOOLTIP = "{0}% of chance of x{1} critical strike."
+    .format((CRITICAL_STRIKE_CHANCE*100).toInt().toString(), CRITICAL_STRIKE_AMT.toString(0))
+
+public constant MANA_REPLISH_AREA_SPELL = compiletime(ABIL_ID_GEN.next())
+let MANA_REPLISH_AREA_AMT = 100
+let MANA_REPLISH_AREA_COOLDOWN = 60.
+public constant MANA_REPLISH_AREA_TOOLTIP = "When use it, restores {0} mana to nearby allied units."
+    .format(MANA_REPLISH_AREA_AMT.toString())
+
 @compiletime function gen()
     new AbilityDefinitionAuraCommandCreep(COMMAND_AURA_SPELL)
         ..basicItemSpell()
@@ -107,3 +119,12 @@ public constant SILENCE_TOOLTIP = "Silence ({0} seconds)"
     new AbilityDefinitionSilenceItem(SILENCE_SPELL)
         ..setDurationHero(1, SILENCE_DURATION)
         ..setDurationNormal(1, SILENCE_DURATION)
+    
+    new AbilityDefinitionCriticalStrikecreep(CRITICAL_STRIKE_SPELL)
+        ..basicItemSpell()
+        ..setChancetoCriticalStrike(1, CRITICAL_STRIKE_CHANCE)
+        ..setDamageMultiplier(1, CRITICAL_STRIKE_AMT)
+    
+    new AbilityDefinitionItemManaRestoreAoe(MANA_REPLISH_AREA_SPELL)
+        ..setManaPointsGained(1, MANA_REPLISH_AREA_AMT)
+        ..setCooldown(1, MANA_REPLISH_AREA_COOLDOWN)

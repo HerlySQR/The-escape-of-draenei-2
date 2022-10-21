@@ -2,7 +2,10 @@ package ImpulseBoots
 
 import AbilityData
 
+import Reference
+
 import PseudoWindWalk
+import PathingLib
 
 public constant IMPULSE_BOOTS_SPELL = compiletime(ABIL_ID_GEN.next())
 
@@ -16,20 +19,19 @@ function destructable.isBlocker() returns bool
         return false
     
     let typ = this.getTypeId()
-    if typ == 'YTab'
-        return true
-    else if typ == 'YTac'
-        return true
-    else if typ == 'YTfb'
-        return true
-    else if typ == 'YTfc'
+    if typ == 'B00L'
         return true
     return false
 
 function vec2.isPathGood() returns bool
-    if IsTerrainPathable(this.x, this.y, PATHING_TYPE_FLYABILITY)
+    let check = new Reference(false)
+    forDestructablesInRange(this, 64., d -> begin
+        if d.isBlocker()
+            check.val = true
+    end)
+    if check.into()
         return false
-    else if not IsTerrainPathable(this.x, this.y, PATHING_TYPE_FLOATABILITY)
+    else if not this.isFlyable()
         return false
     return true
 
@@ -42,11 +44,11 @@ init
         let direction = casterPos.normalizedPointerTo(point)
         caster.disableCollision()
 
-        var checkPoint = casterPos + 128. * direction
+        var checkPoint = casterPos + 64. * direction
         doPeriodically(INTERVAL, cb -> begin
             if dist > 0 and checkPoint.isPathGood()
                 caster.setPos(caster.getPos() + SPEED * direction)
-                checkPoint = caster.getPos() + 128. * direction
+                checkPoint = caster.getPos() + 64. * direction
                 if GetRandomInt(1,5) == 1
                     caster.flashEffect(Abilities.defendCaster, "chest")
             else

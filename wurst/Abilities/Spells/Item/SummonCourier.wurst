@@ -2,8 +2,32 @@ package SummonCourier
 
 import AbilityData
 
+import HashList
+import ClosureEvents
+
 public constant COURIER = compiletime(UNIT_ID_GEN.next())
 public constant SUMMON_COURIER_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let bannedItems = new HashList<int>()
+
+public function int.courierBanItem()
+    bannedItems.add(this)
+
+init
+    EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        if EventData.getManipulatingUnit().getTypeId() == COURIER and
+            bannedItems.has(EventData.getManipulatedItem().getTypeId())
+
+            EventData.getManipulatedItem().remove()
+            message("error", "That would be easy", EventData.getManipulatingUnit().getOwner())
+    end)
+    EventListener.add(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
+        if EventData.getOrderedUnit().getTypeId() == COURIER and
+            bannedItems.has(EventData.getOrderTargetItem().getTypeId())
+
+            EventData.getOrderedUnit().issueTargetOrderById(Orders.attack, EventData.getOrderedUnit())
+            message("error", "That would be easy", EventData.getOrderedUnit().getOwner())
+    end)
 
 @compiletime function gen()
     let COURIER_INV = ABIL_ID_GEN.next()
@@ -21,7 +45,7 @@ public constant SUMMON_COURIER_SPELL = compiletime(ABIL_ID_GEN.next())
         ..setShadowImageCenterY(40.)
         ..setProjectileImpactZ(30.)
         ..setScalingValue(0.5)
-        ..setNormalAbilities("Apiv," + COURIER_INV.toRawCode())
+        ..setNormalAbilities(commaList("Apiv", COURIER_INV.toRawCode()))
         ..setSpeedBase(522)
         ..setCollisionSize(24.)
         ..setName("Courier")

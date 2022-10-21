@@ -11,8 +11,18 @@ import ChatEnter
 import Icons
 import DamageEvent
 import ClosureTimers
+import LinkedList
 
 public boolean yesOrYes = false
+
+public interface RepickListener
+    function run(player p)
+
+let listeners = new LinkedList<RepickListener>()
+
+/** Runs after a player succesfully enter in repick mode*/
+public function onRepick(RepickListener cb)
+    listeners.add(cb)
 
 int array inCombat
 boolean canRepick = true
@@ -60,6 +70,9 @@ public function repick(player p)
                     ForceAddPlayer(udg_Sabe_quien_eres[j],p)*/
             canPick.add(p)
             repick.remove()
+
+            for cb in listeners
+                cb.run(p)
 
 init
     onChatCommand("repick", (p, _) -> repick(p))

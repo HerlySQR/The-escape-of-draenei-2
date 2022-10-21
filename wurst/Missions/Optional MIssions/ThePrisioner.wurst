@@ -27,6 +27,27 @@ init
     theyKnowYou[thePrisonerIndex] = CreateForce()
     disturbed[thePrisonerIndex] = CreateForce()
 
+    onRepick(p -> begin
+        if iSeeYou.has(p)
+            theyKnowYou[thePrisonerIndex].add(p)
+    end)
+
+    onSwitch((p1, p2) -> begin
+        let p = whoAre.has(p1) ? p1 : (whoAre.has(p2) ? p2 : null)
+        if p != null
+            whoAre.remove(p)
+            if table != null
+                DestroyLeaderboard(table)
+                table = null
+            enter.enable()
+            if mark == null
+                mark = thePrisoner.addEffect(Imports.questMarking, "origin")
+            kills = 0
+            returning.disable()
+            getKills.disable()
+            DisplayTextToForce(bj_FORCE_ALL_PLAYERS, p.getName() + " has lost the mission: |cffffcc00Proving yourself|r")
+    end)
+
     menu = createDialog()
     nullTimer() -> 
         menu.setMessage("Accept the mission?")
@@ -45,12 +66,14 @@ init
         enter.enable()
         menu.display(localPlayer, false)
         returning.disable()
+        returningAfter.disable()
         getKills.disable()
         for i = 1 to 10
             youKilledHim[i] = false
         if table != null
             DestroyLeaderboard(table)
             table = null
+        theyKnowYou[thePrisonerIndex].clear()
     end)
 
     let cond = And(isHero, Condition(() -> GetEnteringUnit() != fountainRestorer))
@@ -133,6 +156,7 @@ init
                                                                     + "-Get 5 Hero kills.\n"
                                                                     + "-Back with the prisioner.\n")
                     returning.enable()
+                    returningAfter.enable()
                     getKills.enable()
 
                     table = CreateLeaderboardBJ(whoAre, "")
@@ -238,6 +262,7 @@ init
     
     // Returning after completing the mission
     returningAfter = CreateTrigger()
+        ..disable()
         ..registerRectEnterEventSource(Rects.thePrisoner)
         ..addCondition(And(cond, Condition(() -> not whoAre.has(EventData.getEnteringUnit()) or not returning.isEnabled())))
         ..addAction(() -> begin
@@ -346,5 +371,29 @@ init
                 end)
                 t.start()
         end)
-    
-    // TODO: Infernals
+
+// Infernals
+
+var infernalVisit = 0
+
+init
+    onReset(false, () -> begin
+        infernalVisit = 0
+    end)
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.thePrisoner)
+        ..addCondition(Condition(function isInfernal))
+        ..addAction(() -> begin
+            var text = ""
+            if infernalVisit == 0
+                text = "What??!!! An Infernal??!!!"
+            else if infernalVisit == 1
+                text = "Again??!!!! Am I too important for them???!!!!"
+            else if infernalVisit >= 2
+                text = "Meh, I don't care at this point."
+            Transmission.simple(GetEnteringUnit().getOwner(), thePrisoner, null, "Prisoner", null, text, TTime.SET, 5.)
+            infernalVisit++
+
+            let t = GetTriggeringTrigger()..disable()
+            doAfter(25., () -> t.enable())
+        end)

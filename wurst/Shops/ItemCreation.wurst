@@ -13,6 +13,7 @@ import public Imports
 import public ItemSpells
 
 import public RecipeItem
+import public MoveSpeedX
 
 public function fixRecipe(Recipe recipe, RecipeItem result, int goldCost, int woodCost)
     recipe.setTooltipExtended(

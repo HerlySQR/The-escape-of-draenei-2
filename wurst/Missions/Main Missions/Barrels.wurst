@@ -6,6 +6,7 @@ import initlater Missions
 import HeroSelection
 import Towers
 import GeneratedValues
+import SummonCourier
 
 import ClosureEvents
 import UnitIndexer
@@ -50,6 +51,8 @@ let powerFieldEnter2 = CreateTrigger()
 CallbackPeriodic powerFieldAnimation = null
 
 init
+    BARREL.courierBanItem()
+    
     forDestructablesInRect(Rects.DESTROY, d -> d.setInvulnerable(true))
     // Wall generator
     powerFieldEnter1

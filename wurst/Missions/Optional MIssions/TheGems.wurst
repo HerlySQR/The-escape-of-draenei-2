@@ -1,10 +1,14 @@
 package TheGems
 
 import OpMissionsControl
+import SummonCourier
 
 import Fx
 import DamageEvent
 import DummyRecycler
+import OnUnitEnterLeave
+
+import MoveSpeedX
 
 let heretic = GUnits.heretic..setInvulnerable(true)..hide()
 let hereticOriginalPos = heretic.getPos()
@@ -37,6 +41,10 @@ let thePoisonGem = new Fx(Rects.poisonGemObelisk.getCenter(), Imports.gem)
     ..setPlayerColor(PLAYER_COLOR_GREEN)
 
 init
+    BLOOD_GEM.courierBanItem()
+    SKY_GEM.courierBanItem()
+    POISON_GEM.courierBanItem()
+
     onMission(mission -> begin
         if mission == 4
             heretic..show()..issuePointOrderById(Orders.move, hereticNewPos)
@@ -55,6 +63,9 @@ init
     onReset(false, () -> begin
         returnedGems = 0
         skyGemRun.disable()
+        bloodGemBearer.clear()
+        skyGemBearer.clear()
+        poisonGemBearer.clear()
         heretic..setPos(hereticOriginalPos)..hide()
     end)
     let random = doPeriodically(0.1, _ -> GetRandomInt(1, 3))
@@ -163,6 +174,7 @@ init
                     doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cffb90000Blood Gem Ability:|r When your hero kills another unit, it heals for 17% of that unit's maximum life."))
                 else if sky
                     skyGemRun.enable()
+                    forUnitsOfPlayer(p, u2 -> u2.addBaseSpeed("skygem", 30.))
                     u.getItemById(SKY_GEM).remove()
                     theSkyGem.getDummy().show()
                     skyGemBearer.add(p)
@@ -203,6 +215,16 @@ init
                 end)
             end)
         end)
+    
+    onEnter(() -> begin
+        if skyGemBearer.has(getEnterLeaveUnit())
+            getEnterLeaveUnit().addBaseSpeed("skygem", 30.)
+    end)
+    
+    onLeave(() -> begin
+        if skyGemBearer.has(getEnterLeaveUnit())
+            getEnterLeaveUnit().removeSpeedBuff("skygem")
+    end)
     
     // Poison Gem buff
     DamageEvent.addListener(() -> begin

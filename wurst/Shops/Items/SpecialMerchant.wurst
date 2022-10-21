@@ -163,8 +163,8 @@ public constant POWER_BOOSTER = compiletime(
         ..setButtonPositionY(2)
         ..setHotkey("C")
         ..setTooltipBasic("[|cffffcc00C|r] Buy Power Booster")
-        ..setTooltipExtended("Increases the power of your skills and adds you a power (It depends of your hero, leaving it will cost you 100 mana points).")
-        ..setDescription("Increases the power of your skills and adds you a power (It depends of your hero, leaving it will cost you 100 mana points).")
+        ..setTooltipExtended("Increases the power of your skills and adds you a new ability (It depends of your hero).")
+        ..setDescription("Increases the power of your skills and adds you a new ability (It depends of your hero).")
         ..setName("Power Booster"))
 
 public constant BOOTS_OF_SPEED = compiletime(
@@ -179,3 +179,6 @@ public constant BOOTS_OF_SPEED = compiletime(
         ..setHotkey("V")
         ..setTooltipBasic("[|cffffcc00V|r] Buy Boots of Speed")
         ..setTooltipExtended("+45 Movement Speed"))
+    
+init
+    BOOTS_OF_SPEED.getNewId().addMoveSpeed(45)

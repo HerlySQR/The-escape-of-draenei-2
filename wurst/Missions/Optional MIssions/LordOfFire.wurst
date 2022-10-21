@@ -35,6 +35,27 @@ init
     theyKnowYou[lordOfFireIndex] = CreateForce()
     disturbed[lordOfFireIndex] = CreateForce()
 
+    onRepick(p -> begin
+        if iSeeYou.has(p)
+            theyKnowYou[lordOfFireIndex].add(p)
+    end)
+
+    onSwitch((p1, p2) -> begin
+        let p = whoAre.has(p1) ? p1 : (whoAre.has(p2) ? p2 : null)
+        if p != null
+            whoAre.remove(p)
+            if table != null
+                DestroyLeaderboard(table)
+                table = null
+            enter.enable()
+            if mark == null
+                mark = lordOfFire.addEffect(Imports.questMarking, "origin")
+            kills = 0
+            returning.disable()
+            getKills.disable()
+            DisplayTextToForce(bj_FORCE_ALL_PLAYERS, p.getName() + " has lost the mission: |cffffcc00Proving yourself|r")
+    end)
+
     menu = createDialog()
     nullTimer() -> 
         menu.setMessage("Accept the mission?")
@@ -71,6 +92,7 @@ init
                 ..pause()
                 ..setInvulnerable(true)
         draeneiSaw = 0
+        theyKnowYou[lordOfFireIndex].clear()
     end)
 
     let cond = And(isHero, Condition(() -> GetEnteringUnit() != fountainRestorer))

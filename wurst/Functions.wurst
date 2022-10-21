@@ -10,6 +10,8 @@ import ClosureTimers
 import TimerUtils
 import BuffObjEditing
 import HashMap
+import ObjectIdGenerator
+import ChannelAbilityPreset
 
 public interface RecursiveClosure
     function call(RecursiveClosure rc)
@@ -625,3 +627,8 @@ public function createRipple(real duration, boolean limitNeg, vec2 where, real s
 
 public function createCrater(real duration, boolean permanent, vec2 where, real radius, real depth) returns terraindeformation
     return TerrainDeformCrater(where.x, where.y, radius, depth, R2I(duration * 1000), permanent)
+
+public constant DUMMY_ABILITY = compiletime(ABIL_ID_GEN.next())
+
+@compiletime function gen()
+    new ChannelAbilityPreset(DUMMY_ABILITY, 1, true)

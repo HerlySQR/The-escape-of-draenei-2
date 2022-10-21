@@ -14,6 +14,9 @@ import public initlater TheReader
 import public initlater TheFountain
 import public initlater ThePrisioner
 import public initlater LordOfFire
+import public Switch
+import public Repick
+import Inferno
 
 import public EventHelper
 import public RegisterEvents
@@ -27,6 +30,7 @@ import public AbilityObjEditing
 import public ObjectIdGenerator
 import public ObjectIds
 import public Reference
+import public Annotations
 
 import public UnitTransmission
 import public BountyController
@@ -44,6 +48,22 @@ public function unit.isMachine() returns bool
     return HeroType.get(this) == DEMOLISHER or
            HeroType.get(this) == INFERNAL_MACHINE
 
+public function isInfernal() returns bool
+    let typ = GetEnteringUnit().getTypeId()
+    if typ == INFERNAL_NL[0]
+        return true
+    else if typ == INFERNAL_NL[1]
+        return true
+    else if typ == INFERNAL_L[0]
+        return true
+    else if typ == INFERNAL_L[1]
+        return true
+    else if typ == INFERNAL_L[2]
+        return true
+    else if typ == INFERNAL_L[3]
+        return true
+    return false
+
 public function disturbing(player p, int index)
     if theyKnowYou[index].has(p) and not disturbed[index].has(p)
         var message = ""
@@ -52,6 +72,10 @@ public function disturbing(player p, int index)
                 message = "|cff32cd32HELP:|r He can see your soul."
             case theReaderIndex
                 message = "|cff32cd32HELP:|r Maybe she learnt something about voodoo in her books."
+            case theFountainIndex | thePrisonerIndex
+                message = "|cff32cd32HELP:|r Don't worry, maybe much time in the prision get him crazy."
+            case lordOfFireIndex
+                message = "|cff32cd32HELP:|r Ok, this man is so scary."
         
         doAfter(2.) -> 
             QuestMessageBJ(theyKnowYou[index], bj_QUESTMESSAGE_HINT, message)

@@ -38,6 +38,18 @@ init
     theyKnowYou[theFountainIndex] = CreateForce()
     disturbed[theFountainIndex] = CreateForce()
 
+    onRepick(p -> begin
+        if iSeeYou.has(p)
+            theyKnowYou[theFountainIndex].add(p)
+    end)
+
+    onSwitch((p1, p2) -> begin
+        if iSeeYou.has(p1)
+            theyKnowYou[theFountainIndex].add(p1)
+        if iSeeYou.has(p2)
+            theyKnowYou[theFountainIndex].add(p2)
+    end)
+
     menu = createDialog()
     nullTimer() -> 
         menu.setMessage("Accept the mission?")
@@ -59,6 +71,7 @@ init
         if healer != null
             healer.remove()
             healer = null
+        theyKnowYou[theFountainIndex].clear()
     end)
 
     enter = CreateTrigger()

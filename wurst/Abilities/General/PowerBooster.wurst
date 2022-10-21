@@ -1,0 +1,80 @@
+package PowerBooster
+
+import SpecialMerchant
+import HeroSpells
+import HeroType
+
+import LinkedListModule
+import HashMap
+import ClosureEvents
+import Abilities
+
+let POWER_BOOSTER_ITEM = POWER_BOOSTER.getNewId()
+let heroInfoMap = new HashMap<int, HeroInfo>()
+
+class HeroInfo
+    use LinkedListModule
+    int array[4] normalAbilities
+    int ultiAbility
+
+    construct(int a1, int a2, int a3, int a4, int ulti)
+        normalAbilities[0] = a1
+        normalAbilities[1] = a2
+        normalAbilities[2] = a3
+        normalAbilities[3] = a4
+        ultiAbility = ulti
+
+function initPowerBooster(HeroType h, int a1, int a2, int a3, int a4, int ulti)
+    heroInfoMap.put(h.getNL(), new HeroInfo(a1, a2, a3, a4, ulti))
+
+function initPowerBooster(HeroType h, int a1, int a2, int a3, int ulti)
+    initPowerBooster(h, a1, a2, a3, 0, ulti)
+
+init
+    initPowerBooster(DEMOLISHER, STALWART_THUMP_NL, BOILING_OIL_NL, ADVANCED_ENGINEERING_NL, FIRE_BALL_NL)
+    initPowerBooster(DARK_ASSASSIN, ENSNARE_NL, THROW_AXES_NL, MACE_NL, TRACK_NL)
+    initPowerBooster(ELDER_SAGE, LIGTHNING_SHOT_NL, STEALTH_NL, SLOW_POISON_NL, REENCARNATION_NL)
+    initPowerBooster(SEER, HOLY_LIGHT_NL, BRILLIANCE_AURA_NL, INNER_FIRE_NL, PURGE_SOUL_NL)
+    initPowerBooster(HERALD, FIRE_RAY_NL, FLAME_STRIKE_NL, LIQUID_FIRE_ACT_NL, LIQUID_FIRE_PAS_NL, BURN_SOUL_NL)
+    initPowerBooster(SALAMANDER, BREATH_OF_FIRE_NL, THUNDER_CLAP_NL, LIZZARD_SCALES_NL, FERAL_RAMPAGE_NL)
+    initPowerBooster(SPIRIT_WOLF, TRANSSITION_NL, TERRORIZING_HOWL_NL, CRITICAL_STRIKE_NL, WILD_ATTACK_NL)
+    initPowerBooster(ANCHORITE, SUMMON_WATER_ELEMENTAL_NL, EARTHQUAKE_NL, MANA_FLARE_NL, MONSOON_NL)
+    initPowerBooster(VINDICATOR, THUNDER_STORM_NL, HAMMER_CRUSH_NL, DEGENERATION_AURA_NL, STEAL_SPELL_NL)
+    initPowerBooster(ZEALOT, CHARGE_NL, SWORD_DANCE_NL, CREED_NL, DISABLE_SPHERE_NL)
+    initPowerBooster(PROPHET, RETRIBUTION_NL, QUELL_NL, PULSE_NOVA_NL, POWER_OF_LIGHT_NL)
+    initPowerBooster(BLOOD_DEMON, THUNDER_BOLT_NL, BERSERK_NL, CRITICAL_STRIKE_NL, GRAND_AVATAR_NL)
+    initPowerBooster(CACIQUE, FAST_CUT_NL, ESSENCE_OF_CELERITY_NL, CLEAVE_ATTACK_NL, INSTILL_FEAR_NL)
+    initPowerBooster(DARK_SPECTRE, LIGHTNING_SKIRT_NL, DARK_SUMMONING_NL, INTANGIBILITY_NL, VORTEX_NL)
+    initPowerBooster(DOOM_GUARD, SURGING_FURY_NL, STOMP_NL, DEMONIC_ARMOR_NL, CRYING_SOULS_NL)
+    initPowerBooster(ERECT_SORCERER, FINGER_OF_DEATH_NL, UNHOLY_FRENZY_NL, CRIPPLE_NL, DEMONIC_RAIN_NL)
+    initPowerBooster(INFERNAL_MACHINE, BREATH_OF_FIRE_NL, INFERNO_NL, HARDENED_SKIN_NL, EXPLOSIVE_FLARES_NL)
+    initPowerBooster(MAIDEN_OF_PAIN, CARRION_SWARM_NL, ESSENCE_OF_CELERITY_NL, SHADOW_STRIKE_NL, ILLUSION_NL)
+    initPowerBooster(TEMPTING_MALEFICENT, DEATH_COIL_NL, FAN_OF_KNIVES_NL, EVASION_NL, SLASH_FURY_NL)
+    initPowerBooster(PIT_LORD, RAIN_OF_FIRE_NL, HOWL_OF_TERROR_NL, DARK_BLOOD_NL, RIPLE_NL)
+    initPowerBooster(DARK_WIZARD, SPARKY_EXPLOSIONS_NL, PORTAL_NL, MAGIC_CHAINS_PULL_NL, MAGIC_CHAINS_GRASP_NL, TOTAL_FREEZE_NL)
+    initPowerBooster(AXEMASTER, WHIRLWIND_NL, COMMAND_NL, FIRE_IMPACT_NL, AXE_OF_DESTRUCTION_NL)
+    initPowerBooster(LAVA_ELEMENTAL, INCINERATE_NL, FIRE_BLAST_NL, SCORCHING_HEAT_NL, FIRE_STORM_NL)
+    
+    for i = 0 to 11
+        for heroInfo in HeroInfo
+            players[i].setAbilityAvailable(heroInfo.ultiAbility, false)
+    
+    EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        if EventData.getManipulatedItem().getTypeId() == POWER_BOOSTER_ITEM
+            let u = EventData.getManipulatingUnit()
+            let heroInfo = heroInfoMap.get(u.getTypeId())
+            for i = 0 to 3
+                u.setAbilityLevel(heroInfo.normalAbilities[i], 2)
+            u.getOwner().setAbilityAvailable(heroInfo.ultiAbility, true)
+            u.flashEffect(Abilities.tomeOfRetrainingCaster, "origin")
+    end)
+    
+    EventListener.add(EVENT_PLAYER_UNIT_DROP_ITEM, () -> begin
+        if EventData.getManipulatedItem().getTypeId() == POWER_BOOSTER_ITEM
+            let u = EventData.getManipulatingUnit()
+            let heroInfo = heroInfoMap.get(u.getTypeId())
+            for i = 0 to 2
+                u.setAbilityLevel(heroInfo.normalAbilities[i], 1)
+            u.getOwner().setAbilityAvailable(heroInfo.ultiAbility, false)
+            u.flashEffect(Abilities.aIilTarget, "origin")
+    end)

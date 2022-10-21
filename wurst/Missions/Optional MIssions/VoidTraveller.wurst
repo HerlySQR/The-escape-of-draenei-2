@@ -1,6 +1,7 @@
 package VoidTraveller
 
 import OpMissionsControl
+import SummonCourier
 
 public constant voidTravellerIndex = 0
 public bool firePictogramPicked = false
@@ -29,11 +30,25 @@ trigger returningBefore
 trigger returningAfter
 int objectsGathered
 
-// Enter region
-
 init
+    EGG.courierBanItem()
+    SKULL.courierBanItem()
+    FIRE_PICTOGRAM.courierBanItem()
+
     theyKnowYou[voidTravellerIndex] = CreateForce()
     disturbed[voidTravellerIndex] = CreateForce()
+
+    onRepick(p -> begin
+        if iSeeYou.has(p)
+            theyKnowYou[voidTravellerIndex].add(p)
+    end)
+
+    onSwitch((p1, p2) -> begin
+        if iSeeYou.has(p1)
+            theyKnowYou[voidTravellerIndex].add(p1)
+        if iSeeYou.has(p2)
+            theyKnowYou[voidTravellerIndex].add(p2)
+    end)
 
     menu = createDialog()
     nullTimer() -> 
@@ -58,6 +73,7 @@ init
         returningBefore.disable()
         returningAfter.disable()
         firePictogramPicked = true
+        theyKnowYou[voidTravellerIndex].clear()
 
         for i = 0 to 2
             pings[i].disable()

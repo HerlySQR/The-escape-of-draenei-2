@@ -1,0 +1,65 @@
+package PathingLib
+
+import UnitObjEditing
+import ObjectIdGenerator
+import ObjectIds
+import Annotations
+
+let PATH_CHECKER = compiletime(UNIT_ID_GEN.next())
+let FLY_CHECKER = compiletime(UNIT_ID_GEN.next())
+
+unit pathChecker
+
+public function vec2.isFlyable() returns bool
+    return IssueBuildOrderById(pathChecker, FLY_CHECKER, this.x, this.y)
+
+init
+    pathChecker = createUnit(DUMMY_PLAYER, PATH_CHECKER)
+        ..removeAbility('Amov')
+        ..hide()
+    if localPlayer == DUMMY_PLAYER
+        FogEnable(false)
+
+function UnitDefinition.general()
+    this
+        ..setAttacksEnabled(0)
+        ..setDeathType(0)
+        ..setCategorizationSpecial(true)
+        ..setSightRadiusDay(0)
+        ..setSightRadiusNight(0)
+        ..setFoodCost(0)
+        ..setLumberCost(0)
+        ..setGoldCost(0)
+        ..setIsaBuilding(false)
+        ..setHideMinimapDisplay(true)
+        ..setCanFlee(false)
+        ..setRace(Race.Unknown)
+        ..setPointValue(0)
+        ..setAnimationBlendTimeseconds(0)
+        ..setModelFile("dummy.mdl")
+        ..setSelectionScale(0)
+        ..setIconGameInterface("")
+        ..setShadowImageUnit("")
+        ..setMaximumPitchAngledegrees(0)
+        ..setMaximumRollAngledegrees(0)
+        ..setNormalAbilities(LOCUST_ID.toRawCode())
+        ..setUpgradesUsed("")
+        ..setUnitSoundSet("")
+        ..setHotkey("")
+        ..setTooltipBasic("")
+        ..setTooltipExtended("")
+        ..setName("")
+
+@compiletime function gen()
+    new UnitDefinition(PATH_CHECKER, 'hpea')
+        ..general()
+        ..setMovementType(MovementType.Foot)
+        ..setStructuresBuilt(commaList(FLY_CHECKER))
+        ..setCollisionSize(0.)
+        ..setNameEditorSuffix("PathChecker")
+    
+    new UnitDefinition(FLY_CHECKER, 'hgry')
+        ..general()
+        ..setMovementType(MovementType.Fly)
+        ..setCollisionSize(1.)
+        ..setNameEditorSuffix("FlyChecker")
