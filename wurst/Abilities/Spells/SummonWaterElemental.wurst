@@ -2,6 +2,8 @@ package SummonWaterElemental
 
 import AbilityData
 
+import BountyController
+
 public constant SUMMON_WATER_ELEMENTAL_NL = compiletime(ABIL_ID_GEN.next())
 public constant SUMMON_WATER_ELEMENTAL_L = compiletime(ABIL_ID_GEN.next())
 public constant SUMMON_WATER_ELEMENTAL_S = compiletime(ABIL_ID_GEN.next())
@@ -59,15 +61,21 @@ init
                 attacker.setAbilityLevel(ZEST_CHARGES, attacker.getAbilityLevel(ZEST_CHARGES) + 1)
     end)
     code func = () -> begin
-        if GetOrderedUnit().hasAbility(ELEM_ZEST) and (GetIssuedOrderId() == Orders.move or GetIssuedOrderId() == Orders.stop)
+        if GetOrderedUnit().hasAbility(ELEM_ZEST) and (GetIssuedOrderId() == Orders.smart or GetIssuedOrderId() == Orders.move or GetIssuedOrderId() == Orders.stop)
             GetOrderedUnit().removeAbility(ZEST_CHARGES)
     end
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, func)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER, func)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, func)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
         if GetDyingUnit().isElem().is
             levelMap.remove(GetDyingUnit())
     end)
+
+    for i = 0 to 1
+        Bounty.set(ELEM_NL[i], 17, 3, 3)
+    for i = 0 to 3
+        Bounty.set(ELEM_L[i], 17, 3, 3)
 
 function AbilityDefinitionArchMageSummonWaterElemental.general()
     this

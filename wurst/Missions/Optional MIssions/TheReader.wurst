@@ -168,7 +168,6 @@ init
                 let face = theReader.getFacingAngle()
                 theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
                 let t = new Transmission(u.getOwner().getForce(), 0)
-                // TODO Lord of fire
                 t.addLine(theReader, null, "Reader", null, "What?, Another person?, I have to find a better place.", TTime.SET, 5., true)
                 t.addEnd(() -> begin
                     theReader.setFacing(face)

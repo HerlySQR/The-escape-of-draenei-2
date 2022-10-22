@@ -358,9 +358,6 @@ public constant IMPULSE_BOOTS = compiletime(
         ..setName("Impulse boots"))
 
 init
-    createItem(IMPULSE_BOOTS.getNewId(), vec2(8000., 8000.))
-
-init
     IMPULSE_BOOTS.getNewId().addMoveSpeed(60)
 
 @compiletime function genImpulseBoots()

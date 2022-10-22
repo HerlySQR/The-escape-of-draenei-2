@@ -181,78 +181,76 @@ init
                 ..show(true)
     end)
 
-/*TODO     
 // YOU SHALL NOT PASS
 
-boolean actived1 = false
+var actived1 = false
 
 init
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Activar_Plataformas)
+        ..registerRectEnterEventSource(Rects.activePlatforms)
         ..addCondition(notFlying)
         ..addAction(() -> begin
             if not actived1
-                forDestructablesInRect(gg_rct_Plataformas, d -> begin
-                    d.setHeight(3)
-                    d.changeWalls(false, ElevatorWallType.ALL)
+                forDestructablesInRect(Rects.dontPass, d -> begin
+                    if d.getTypeId() == 'B00F'
+                        elevator(d)..setHeight(3)..changeWalls(false, ElevatorWallType.ALL)
                 end)
-                gg_unit_n00X_0259.setColor(PLAYER_COLOR_GREEN)
+                GUnits.activePlatforms.setColor(PLAYER_COLOR_GREEN)
             else
-                forDestructablesInRect(gg_rct_Plataformas, d -> begin
-                    d.setHeight(1)
-                    d.changeWalls(true, ElevatorWallType.ALL)
+                forDestructablesInRect(Rects.dontPass, d -> begin
+                    if d.getTypeId() == 'B00F'
+                        elevator(d)..setHeight(1)..changeWalls(true, ElevatorWallType.ALL)
                 end)
-                gg_unit_n00X_0259.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+                GUnits.activePlatforms.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+            actived1 = not actived1
         end)
 
 // Water platforms
 
-boolean actived2 = false
-trigger getDrowned = CreateTrigger()..disable()
-force ded = CreateForce()
+var actived2 = false
+let getDrowned = CreateTrigger()..disable()
 
 init
-    forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> d.changeWalls(false, ElevatorWallType.ALL))
+    forDestructablesInRect(Rects.waterPlatforms, d -> begin
+        if d.getTypeId() == 'B00G'
+            elevator(d).changeWalls(false, ElevatorWallType.ALL)
+    end)
     CreateTrigger()
-        ..registerRectEnterEventSource(gg_rct_Levantar_Plataformas)
+        ..registerRectEnterEventSource(Rects.activeWaterPlatforms)
         ..addCondition(notFlying)
         ..addAction(() -> begin
             if not actived2
-                actived2 = true
-                gg_unit_n00X_0232.setColor(PLAYER_COLOR_GREEN)
+                GUnits.activeWaterPlatforms.setColor(PLAYER_COLOR_GREEN)
                 DisplayTextToPlayer(GetTriggerUnit().getOwner(), 0., 0., "I wonder what this will do.")
-                forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> begin
-                    d.setHeight(3)
-                    d.changeWalls(true, ElevatorWallType.ALL)
+                forDestructablesInRect(Rects.waterPlatforms, d -> begin
+                    if d.getTypeId() == 'B00G'
+                        elevator(d)..setHeight(2)..changeWalls(true, ElevatorWallType.ALL)
                 end)
-                doAfter(0.7) -> 
-                    getDrowned.disable()
+                doAfter(0.7, () -> getDrowned.disable())
             else
-                actived2 = false
-                gg_unit_n00X_0232.setColor(PLAYER_COLOR_BLACK_PASSIVE)
+                GUnits.activeWaterPlatforms.setColor(PLAYER_COLOR_BLACK_PASSIVE)
                 DisplayTextToPlayer(GetTriggerUnit().getOwner(), 0., 0., "Yes, better leave it at that.")
-                forDestructablesInRect(gg_rct_Plataformas_del_agua, d -> begin
-                    d.setHeight(1)
-                    d.changeWalls(false, ElevatorWallType.EAST)
-                    d.changeWalls(false, ElevatorWallType.WEST)
+                forDestructablesInRect(Rects.waterPlatforms, d -> begin
+                    if d.getTypeId() == 'B00G'
+                        elevator(d)..setHeight(1)..changeWalls(false, ElevatorWallType.ALL)
                 end)
-                gg_dest_DTrx_1735.changeWalls(false, ElevatorWallType.NORTH)
-                gg_dest_DTrx_1737.changeWalls(false, ElevatorWallType.SOUTH)
-                forUnitsInRect(gg_rct_Plataformas_del_agua, u -> begin
+                
+                let ded = CreateForce()
+                forUnitsInRect(Rects.waterPlatforms, u -> begin
                     if u.isType(UNIT_TYPE_GROUND)
                         ded.add(u.getOwner())
                 end)
                 DisplayTextToForce(ded, "Oh no, that doesn't look good.")
-                ded.clear()
-                doAfter(0.7) -> 
-                    getDrowned.enable()
-                    
+                ded.destr()
+
+                doAfter(0.7, () -> getDrowned.enable())
+            actived2 = not actived2
         end)
     getDrowned
         ..registerTimerEvent(1., true)
         ..addAction(() -> begin
-            forUnitsInRect(gg_rct_Plataformas_del_agua, u -> begin
-                if u.isType(UNIT_TYPE_GROUND)
+            forUnitsInRect(Rects.waterPlatforms, u -> begin
+                if not u.isType(UNIT_TYPE_FLYING)
                     u.addHP(-50)
             end)
-        end)*/
+        end)

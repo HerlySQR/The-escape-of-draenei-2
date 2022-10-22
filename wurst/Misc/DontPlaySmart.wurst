@@ -49,8 +49,6 @@ init
                 u.removeAbility('Bvul')
     end)
 
-// TODO: Courier, mission items
-
 // You will lose if you do this
 
 function cond() returns boolean

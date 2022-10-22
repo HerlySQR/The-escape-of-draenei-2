@@ -19,6 +19,10 @@ public class GUnits
     
     static constant activeEarthQuake = gg_unit_ncop_0026
 
+    static constant activePlatforms = gg_unit_ncop_0045
+
+    static constant activeWaterPlatforms = gg_unit_ncop_0037
+
     // Barracks
     static constant barrack1 = gg_unit_obar_0012
     static constant barrack2 = gg_unit_obar_0035
@@ -268,6 +272,12 @@ public class Rects
     static constant secretMerchantEntrance = gg_rct_Secret_Merchant_Entrance
 
     static constant rockPieces = gg_rct_RockPieces
+
+    static constant activePlatforms = gg_rct_ActivePlatforms
+    static constant dontPass = gg_rct_DontPass
+
+    static constant activeWaterPlatforms = gg_rct_ActiveWaterPlatforms
+    static constant waterPlatforms = gg_rct_WaterPlatforms
 
     // Index (dummy rect)
     static constant index = gg_rct_Index

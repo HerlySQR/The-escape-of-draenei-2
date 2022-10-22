@@ -10,7 +10,6 @@ import ClosureTimers
 import TimerUtils
 import BuffObjEditing
 import HashMap
-import ObjectIdGenerator
 import ChannelAbilityPreset
 
 public interface RecursiveClosure
@@ -378,7 +377,7 @@ function changeWallBlocker(real x, real y, real facing, boolean open)
     // Ensure that the blocker exists.
     if (blocker == null)
         blocker = CreateDeadDestructable(bj_ELEVATOR_BLOCKER_CODE, x, y, facing, 1, 0)
-    else if blocker.getTypeId() != bj_ELEVATOR_BLOCKER_CODE//TODO and blocker.getTypeId() != 'B007' // This is just for me
+    else if blocker.getTypeId() != bj_ELEVATOR_BLOCKER_CODE
         // If a different destructible exists in the blocker's spot, ignore
         // the request.  (Two destructibles cannot occupy the same location
         // on the map, so we cannot create an elevator blocker here.)

@@ -50,7 +50,6 @@ public function repick(player p)
                 return
             if whatMode[5] == LEVELING
                 heroModel.get(repick.getTypeId()).show()
-            // TODO udg_Si_lo_mataste[p.getId()] = false
             hero[i] = null
             gameBoard.setItemIcon(row[i], 0, Icons.bTNSelectHeroOn)
             if THE_DRAENEI.has(p)
@@ -62,12 +61,6 @@ public function repick(player p)
             let pos = circleRegion[i].getCenter()
             for j = 0 to 5
                 repick.itemInSlot(j).setPos(pos)
-            /* TODO
-            if IsPlayerInForce(p,udg_Ya_te_vi[0])
-                ForceAddPlayer(udg_Sabe_quien_eres[0],p)
-            for j = 1 to 6
-                if IsPlayerInForce(p,udg_Mision[j]) or IsPlayerInForce(p,udg_No_aceptaste_la_mision[j])
-                    ForceAddPlayer(udg_Sabe_quien_eres[j],p)*/
             canPick.add(p)
             repick.remove()
 

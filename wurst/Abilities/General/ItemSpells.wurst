@@ -1,5 +1,6 @@
 package ItemSpells
 
+import public AcidStone
 import public Immolation
 import public ImpulseBoots
 import public MiscItemSpells

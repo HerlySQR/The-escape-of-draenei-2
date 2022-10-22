@@ -1,0 +1,27 @@
+package AcidStone
+
+import AbilityData
+
+public constant ACID_STONE_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let AREA = 700.
+let DMG = 90.
+let INTERVAL = 1.11
+
+public constant ACID_STONE_TOOLTIP = "This stone detects when enemy units are nearby and while active it automatically attacks an enemy unit within 700 range dealing 90 of damage."
+    .format(AREA.toString(0), DMG.toString(0))
+
+@compiletime function gen()
+    new AbilityDefinitionPhoenixFire(ACID_STONE_SPELL)
+        ..basicItemSpell()
+        ..setInitialDamage(1, DMG)
+        ..setDamagePerSecond(1, 0.)
+        ..setBuffs(1, "Bcor")
+        ..setAreaofEffect(1, 300.)
+        ..setDurationHero(1, 0.01)
+        ..setDurationNormal(1, 0.01)
+        ..setCooldown(1, INTERVAL)
+        ..setAreaofEffect(1, AREA)
+        ..setMissileArt(Abilities.chimaeraAcidMissile)
+        ..setIconNormal(Icons.bTNHealthStone)
+        ..setName("Acid stone")

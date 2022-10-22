@@ -21,6 +21,7 @@ import Assets
 import Annotations
 
 import BountyController
+import UnitTransmission
 
 public constant BARREL = compiletime(ITEM_ID_GEN.next())
 
@@ -128,9 +129,8 @@ init
                 if b
                     m.remove()
                     message("warning", "You cannot have more than one at a time.", p)
-                    // TODO
-                    doAfter(2.) () ->
-                        TransmissionFromUnitTypeWithNameBJ(GetForceOfPlayer(p), players[PLAYER_NEUTRAL_PASSIVE], GOBLIN_SHOP, "Goblin Sapper", GetRectCenter(Rects.lookTheGoblin), null, "Hey, you have one in your hand, wait for leaving it.", bj_TIMETYPE_ADD, 2.50, true)
+                    doAfter(2.) ->
+                        Transmission.simple(p, goblinShop, null, "Goblin Sapper", null, "Hey, you have one in your hand, wait for leaving it.", TTime.SET, 5.50)
                 else
                     QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_ITEMACQUIRED, "Someone got a barrel.")
                     let i = p.getNumber()

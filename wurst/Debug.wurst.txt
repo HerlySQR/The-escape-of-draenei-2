@@ -8,3 +8,6 @@ init
     for typ in HeroType
         createUnit(players[1], typ.getL(), pos)..setLevel(6, false)
         createUnit(players[1], typ.getNL(), pos)
+
+init
+    createItem(ACID_STONE.getNewId(), vec2(8000., 8000.))
