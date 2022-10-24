@@ -37,7 +37,7 @@ init
                 damage = DMG_NL
             else
                 damage = DMG_L[data.lvl]
-            caster.lifeSteal(target[i], damage, 0.5, Orders.drain, () -> begin
+            caster.lifeSteal(target[i], damage, 1., Orders.drain, () -> begin
                 caster.flashEffect(Objects.beastmasterBlood, "origin")
                 caster.flashEffect(Objects.humanBloodFootman, "origin")
                 target[i].flashEffect(Objects.beastmasterBlood, "origin")
@@ -82,6 +82,8 @@ function ChannelAbilityPreset.general()
     
     new ChannelAbilityPreset(WILD_ATTACK_L, 2, true, new AbilityTooltipGenerator("The wolf attacks a unit and inmovilize it making damage and healing the same quantity the health of the wolf every second."))
         ..setHeroAbility(true)
+        ..setRequiredLevel(6)
+        ..setLevelSkipRequirement(6)
         ..general()
         // Stats
         ..addTooltipProperty("Damage and life consumed", lvl -> DMG_L[lvl-1])

@@ -44,6 +44,7 @@ function AbilityDefinitionHardenedSkin.general()
         ..presetLevels(4)
         ..setIconResearch(Icons.bTNHardenedSkin)
         ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..general()
         // Stats
         ..presetIgnoredDamage(lvl -> IGNORED_DMG_L[lvl-1])

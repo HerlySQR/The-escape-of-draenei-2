@@ -84,6 +84,7 @@ public class Imports
     static constant bTNA7XBloodDiamond = "ReplaceableTextures\\CommandButtons\\BTNA7XBloodDiamond.blp"
     static constant bTNA7XMoonDiamond = "ReplaceableTextures\\CommandButtons\\BTNA7XMoonDiamond.blp"
     static constant bTNA7XPoisonDiamond = "ReplaceableTextures\\CommandButtons\\BTNA7XPoisonDiamond.blp"
+    static constant bTNAkamaResurrection = "ReplaceableTextures\\CommandButtons\\BTNAkamaResurrection.blp"
     static constant bTNANA_HolyEnergy = "ReplaceableTextures\\CommandButtons\\BTNANA_HolyEnergy.blp"
     static constant bTNAnkhOfRebirth = "ReplaceableTextures\\CommandButtons\\BTNAnkhOfRebirth.blp"
     static constant bTNArcaneField = "ReplaceableTextures\\CommandButtons\\BTNArcaneField.blp"
@@ -102,6 +103,7 @@ public class Imports
     static constant bTNFireImpact = "ReplaceableTextures\\CommandButtons\\BTNFireImpact.blp"
     static constant bTNFlameSlash = "ReplaceableTextures\\CommandButtons\\BTNFlameSlash.blp"
     static constant bTNFlamingWhirlwind = "ReplaceableTextures\\CommandButtons\\BTNFlamingWhirlwind.blp"
+    static constant bTNGreen_Check = "ReplaceableTextures\\CommandButtons\\BTNGreen_Check.blp"
     static constant bTNGromHellscreamsAxe = "ReplaceableTextures\\CommandButtons\\BTNGromHellscreamsAxe.blp"
     static constant bTNHammerCrush = "ReplaceableTextures\\CommandButtons\\BTNHammerCrush.blp"
     static constant bTNHellfirePossession = "ReplaceableTextures\\CommandButtons\\BTNHellfirePossession.blp"
@@ -133,6 +135,7 @@ public class Imports
     static constant uPGArcaneField = "ReplaceableTextures\\CommandButtons\\UPGUPGArcaneField.blp"
     
     static constant pASAxeOfAshes = "ReplaceableTextures\\PassiveButtons\\PAS_AxeOfAshes.blp"
+    static constant pASAkamaResurrection = "ReplaceableTextures\\PassiveButtons\\PASAkamaResurrection.blp"
     static constant pASArcaneField = "ReplaceableTextures\\PassiveButtons\\PASArcaneField.blp"
     static constant pASBloodElvenImprovedHides = "ReplaceableTextures\\PassiveButtons\\PASBloodElvenImprovedHides.blp"
     static constant pASdancingLightningGS = "ReplaceableTextures\\PassiveButtons\\PASdancingLightningGS.blp"

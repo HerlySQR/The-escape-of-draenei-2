@@ -14,11 +14,13 @@ constant TRANSSITION_SHADE = compiletime(UNIT_ID_GEN.next())
 
 // General
 let DURATION = 7.
-let CD = 16.
-let MANA = 75
 let RANGE = 1000.
 // Not Leveling
-let EXTRA_DMG_NL = 100.
+let CD_NL = [16., 11.]
+let MANA_NL = [75, 60]
+// Leveling
+let CD_L = [19., 16., 13., 11.]
+let MANA_L = [80, 70, 60, 50]
 // Internal
 let SOUND = new SoundDefinition(Sounds.absorbMana, false, true)
 let casterMap = new HashMap<unit, unit>()
@@ -77,11 +79,9 @@ init
             effMap.remove(shade)
     end)
 
-@compiletime function gen()
-    new ChannelAbilityPreset(TRANSSITION_NL, 1, true, new AbilityTooltipGenerator("Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the wolf teleports to the shade location if is not cancelled."))
-        ..presetLevels(2)
+function ChannelAbilityPreset.general()
+    this
         ..presetBaseOrderID(lvl -> "stampede")
-        ..setHeroAbility(false)
         ..presetFollowThroughTime(lvl -> 0.75)
         ..tooltipStartListen()
         ..setHotkey("Q")
@@ -90,14 +90,42 @@ init
         // Stats
         ..addTooltipProperty("Duration", lvl -> DURATION)
         ..presetCastRange(lvl -> RANGE)
-        ..presetManaCost(lvl -> MANA)
-        ..presetCooldown(lvl -> CD)
         // Audiovisual
         ..presetIcon(Icons.bTNQuillSpray)
-        // Tooltip
         ..setAnimationNames("spell,attack")
+
+
+@compiletime function gen()
+    new ChannelAbilityPreset(TRANSSITION_NL, 2, true, new AbilityTooltipGenerator("Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the wolf teleports to the shade location if is not cancelled."))
+        ..setHeroAbility(false)
+        ..general()
+        ..presetCooldown(lvl -> CD_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
+        // Tooltip
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
+    
+    new ChannelAbilityPreset(TRANSSITION_L, 4, true, new AbilityTooltipGenerator("Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the wolf teleports to the shade location if is not cancelled."))
+        ..setHeroAbility(true)
+        ..setRequiredLevel(1)
+        ..general()
+        ..presetCooldown(lvl -> CD_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
+        // Tooltip
+        ..tooltipStopListen()
+        ..setEditorSuffix("(Not leveling)")
+    
+    new ChannelAbilityPreset(TRANSSITION_S, 4, true)
+        ..setLevels(6)
+        ..setHeroAbility(false)
+        ..general()
+        ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Transsition")
+        ..setHotkey("F")
+        // Stats
+        ..presetCooldown(lvl -> lvl < 3 ? CD_NL[lvl-1] : CD_L[lvl-3])
+        ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
+        ..presetTooltipNormalExtended(lvl -> "Projects an invulnerable shade that can move but can't attack. After " + DURATION.toString(0) + " seconds, the caster teleports to the shade location if is not cancelled.")
+        ..setEditorSuffix("(Stealed)")
 
     new AbilityDefinitionDefend(TRANSSITION_CANCEL)
         ..setLevels(1)

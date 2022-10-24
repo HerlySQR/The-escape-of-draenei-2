@@ -56,6 +56,7 @@ function AbilityDefinitionFirelordSoulBurn.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Engulfs an enemy unit in magical flames, dealing damage per second, avoids spells."))
         ..presetLevels(4)
         ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..general()
         // Stats
         ..presetDamageAmount(lvl -> DMG_L[lvl-1])

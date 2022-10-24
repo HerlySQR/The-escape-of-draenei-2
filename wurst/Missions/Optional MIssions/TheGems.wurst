@@ -40,6 +40,8 @@ let thePoisonGem = new Fx(Rects.poisonGemObelisk.getCenter(), Imports.gem)
     ..setZ(240.)
     ..setPlayerColor(PLAYER_COLOR_GREEN)
 
+var random = doPeriodically(0.1, _ -> GetRandomInt(1, 3))
+
 init
     BLOOD_GEM.courierBanItem()
     SKY_GEM.courierBanItem()
@@ -68,10 +70,11 @@ init
         poisonGemBearer.clear()
         heretic..setPos(hereticOriginalPos)..hide()
     end)
-    let random = doPeriodically(0.1, _ -> GetRandomInt(1, 3))
     
     onModesSelected(() -> begin
-        destroy random
+        if random != null
+            destroy random
+            random = null
         createItem(BLOOD_GEM, Rects.bloodGemPlace[GetRandomInt(0, 2)].getCenter())
             ..setPlayer(players[0], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
         createItem(SKY_GEM, Rects.skyGemPlace[GetRandomInt(0, 2)].getCenter())

@@ -58,8 +58,8 @@ public class HeroType
 
     private static int MAX = 0
 
-    private HeroDefinition heroNL
-    private HeroDefinition heroL
+    protected HeroDefinition heroNL
+    protected HeroDefinition heroL
     private string icon
     private Race r
     private string abilities = commaList(TELEPORT.toRawCode(), "AInv")
@@ -464,6 +464,26 @@ init
         ..setUnitSoundSet(Soundsets.catapult)
         ..setProperNames("Mazuru")
         ..setName("Demolisher")
+        .heroL
+            ..setAttack1TargetsAllowed("air,debris,item,ground,ward")
+            ..setAttack2TargetsAllowed("structure")
+            ..setAttack2AreaofEffectTargets("air,debris,structure,item,ground,ward")
+            ..setAttack2Range(750)
+            ..setAttack2AnimationDamagePoint(0.1)
+            ..setAttack2AnimationBackswingPoint(1.9)
+            ..setAttack2ProjectileArc(0.35)
+            ..setAttack2DamageBase(40)
+            ..setAttack2DamageNumberofDice(1)
+            ..setAttack2DamageSidesperDie(21)
+            ..setAttack2ProjectileArt(Abilities.demolisherMissile)
+            ..setAttack2CooldownTime(2.7)
+            ..setAttack2AttackType(AttackType.Siege)
+            ..setAttack2ProjectileSpeed(900)
+            ..setAttack2AreaofEffectFullDamage(25)
+            ..setAttack2AreaofEffectMediumDamage(50)
+            ..setAttack2AreaofEffectSmallDamage(100)
+            ..setAttacksEnabled(3)
+            
 
     DARK_ASSASSIN
         ..setAcquisitionRange(500.)

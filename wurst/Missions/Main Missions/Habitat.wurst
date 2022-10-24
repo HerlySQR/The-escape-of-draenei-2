@@ -25,7 +25,7 @@ init
         .addAction(() -> begin
             forUnitsInRect(Rects.shops4, u -> begin
                 if u.isType(UNIT_TYPE_STRUCTURE)
-                    u.setOwner(DRAENEI, true)
+                    u.setColor(DRAENEI.getColor())
             end)
             generator1.setInvulnerable(false)
             generator2.setInvulnerable(false)

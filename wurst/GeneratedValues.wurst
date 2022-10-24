@@ -85,6 +85,9 @@ public class Dests
 
     static constant bigRock = gg_dest_B001_3343
 
+    static constant doorToSecretPassage = gate(gg_dest_ZTd5_5912)
+    static constant leverToTheExplosives = gg_dest_B00M_7020
+
     // Missions
 
     static constant entranceForceWall = [gate(gg_dest_Dofw_6525), gate(gg_dest_Dofw_6524), gate(gg_dest_Dofv_6521), gate(gg_dest_Dofw_6519),
@@ -195,6 +198,7 @@ public class Rects
     static constant respawn3 = gg_rct_Respawn3
     static constant respawn4 = gg_rct_Respawn4
     static constant respawn5 = gg_rct_Respawn5
+    static constant respawn6 = gg_rct_Respawn6
 
     // Creep campaments
     static constant creepCamp1 = gg_rct_CreepCamp1
@@ -278,6 +282,11 @@ public class Rects
 
     static constant activeWaterPlatforms = gg_rct_ActiveWaterPlatforms
     static constant waterPlatforms = gg_rct_WaterPlatforms
+
+    static constant secretPassage1 = gg_rct_SecretPassage1
+    static constant secretPassage2 = gg_rct_SecretPassage2
+    static constant secretPassage3 = gg_rct_SecretPassage3
+    static constant secretPassage4 = gg_rct_SecretPassage4
 
     // Index (dummy rect)
     static constant index = gg_rct_Index

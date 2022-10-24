@@ -73,6 +73,7 @@ function ChannelAbilityPreset.general()
     
     new ChannelAbilityPreset(EARTHQUAKE_L, 4, true, new AbilityTooltipGenerator("Shakes the earth of the selected area causing and stunning them."))
         ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..general()
         // Stats
         ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl-1])

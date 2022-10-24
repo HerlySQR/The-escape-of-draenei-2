@@ -75,7 +75,7 @@ function ChannelAbilityPreset.general()
     this.setName("Quell")
     this.presetTargetTypes(Targettype.UNIT)
     this.addTooltipProperty("Max. times", lvl -> MAX_TIMES)
-    this.addTooltipProperty("Slow", lvl -> 1. - SLOW)
+    this.addTooltipProperty("Slow", lvl -> (1. - SLOW).toString(2))
     this.presetCastRange(lvl -> RANGE)
     this.presetAreaofEffect(lvl -> AREA)
     // Audiovisual

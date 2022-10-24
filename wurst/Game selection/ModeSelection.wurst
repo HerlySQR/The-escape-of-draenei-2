@@ -1,16 +1,17 @@
 package ModeSelection
 
-import TimerDialog
-import LinkedList
-import StringUtils
-
 import initlater HeroSelection
 import initlater MyBoard
 import initlater Missions
 import GeneratedValues
 
+import TimerDialog
+import LinkedList
+import StringUtils
+import initlater AbilityData
+import UpgradeObjEditing
+
 public player selector
-public trigger select = CreateTrigger()..disable()
 public timer maxSelection = CreateTimer()
 public timerdialog window = CreateTimerDialog(maxSelection)
 public string array modes
@@ -47,284 +48,151 @@ public function onModesSelected(ModeSelectionCallback cb)
     callbacks.add(cb)
 
 // Text tags to the modes
-texttag array modes1 = [
-    createTTEx(vec3(-6992, -6400, 100), "|cffff40001. Timers|r", 12),
-    createTTEx(vec3(-6992, -6448, 100), "  |cff0080ff-v|r: One for each mission.", 12),
-    createTTEx(vec3(-6992, -6496, 100), "    |cff00ff80-s|r: max. 31 minutes.", 12),
-    createTTEx(vec3(-6992, -6544, 100), "    |cff00ff80-m|r: max. 41 minutes.", 12),
-    createTTEx(vec3(-6992, -6592, 100), "    |cff00ff80-l|r: max. 51 minutes.", 12),
-    createTTEx(vec3(-6992, -6640, 100), "    |cff00ff80-h|r: max. 61 minutes.", 12),
-    createTTEx(vec3(-6992, -6688, 100), "  |cff0080ff-u|r: One for the match.", 12),
-    createTTEx(vec3(-6992, -6736, 100), "    |cff00ff80-i|r: 25 minutes.", 12),
-    createTTEx(vec3(-6992, -6784, 100), "    |cff00ff80-t|r: 30 minutes.", 12),
-    createTTEx(vec3(-6992, -6832, 100), "    |cff00ff80-s|r: 35 minutes.", 12),
-    createTTEx(vec3(-6992, -6880, 100), "    |cff00ff80-m|r: 40 minutes.", 12),
-    createTTEx(vec3(-6992, -6928, 100), "    |cff00ff80-l|r: 45 minutes.", 12),
-    createTTEx(vec3(-6992, -6976, 100), "    |cff00ff80-h|r: 50 minutes.", 12),
-    createTTEx(vec3(-6992, -7024, 100), "    |cff00ff80-e|r: 55 minutes.", 12),
-    createTTEx(vec3(-6672, -6400, 100), "|cffff40002. Creeps|r", 12),
-    createTTEx(vec3(-6672, -6448, 100), "  |cff0080ff-ca|r: Yes. (Def)", 12),
-    createTTEx(vec3(-6672, -6496, 100), "  |cff0080ff-n|r: No.", 12),
-    createTTEx(vec3(-6672, -6544, 100), "    |cff00ff80-n|r: Neutral.", 12),
-    createTTEx(vec3(-6672, -6592, 100), "    |cff00ff80-p|r: |cffff0000Draenei|r and |cff32cd32Demons|r.", 12),
-    createTTEx(vec3(-6672, -6640, 100), "    |cff00ff80-c|r: Both.", 12),
-    createTTEx(vec3(-6672, -6688, 100), "|cffff40003. Shops|r", 12),
-    createTTEx(vec3(-6672, -6736, 100), "  |cff0080ff-ns|r: Normal. (Def)", 12),
-    createTTEx(vec3(-6672, -6784, 100), "  |cff0080ff-oc|r: Only consumibles.", 12),
-    createTTEx(vec3(-6672, -6832, 100), "  |cff0080ff-nr|r: No Recipes.", 12),
-    createTTEx(vec3(-6352, -6400, 100), "|cffff40004. Selection|r", 12),
-    createTTEx(vec3(-6352, -6448, 100), "  |cff0080ff-ds|r: Normal. (Def)", 12),
-    createTTEx(vec3(-6352, -6496, 100), "  |cff0080ff-ap|r: Traitor (All pick).", 12),
-    createTTEx(vec3(-6352, -6544, 100), "|cffff40005. Heros|r", 12),
-    createTTEx(vec3(-6352, -6592, 100), "  |cff0080ff-lu|r: Hero (Leveling up). (Def)", 12),
-    createTTEx(vec3(-6352, -6640, 100), "  |cff0080ff-nl|r: Classic (Not levelling up).", 12)
-]
 
-texttag array modes2 = [
-    createTTEx(vec3(-4816, -6400, 100), "|cffff40001. Timers|r", 12),
-    createTTEx(vec3(-4816, -6448, 100), "  |cff0080ff-v|r: One for each mission.", 12),
-    createTTEx(vec3(-4816, -6496, 100), "    |cff00ff80-s|r: max. 31 minutes.", 12),
-    createTTEx(vec3(-4816, -6544, 100), "    |cff00ff80-m|r: max. 41 minutes.", 12),
-    createTTEx(vec3(-4816, -6592, 100), "    |cff00ff80-l|r: max. 51 minutes.", 12),
-    createTTEx(vec3(-4816, -6640, 100), "    |cff00ff80-h|r: max. 61 minutes.", 12),
-    createTTEx(vec3(-4816, -6688, 100), "  |cff0080ff-u|r: One for the match.", 12),
-    createTTEx(vec3(-4816, -6736, 100), "    |cff00ff80-i|r: 25 minutes.", 12),
-    createTTEx(vec3(-4816, -6784, 100), "    |cff00ff80-t|r: 30 minutes.", 12),
-    createTTEx(vec3(-4816, -6832, 100), "    |cff00ff80-s|r: 35 minutes.", 12),
-    createTTEx(vec3(-4816, -6880, 100), "    |cff00ff80-m|r: 40 minutes.", 12),
-    createTTEx(vec3(-4816, -6928, 100), "    |cff00ff80-l|r: 45 minutes.", 12),
-    createTTEx(vec3(-4816, -6976, 100), "    |cff00ff80-h|r: 50 minutes.", 12),
-    createTTEx(vec3(-4816, -7024, 100), "    |cff00ff80-e|r: 55 minutes.", 12),
-    createTTEx(vec3(-4496, -6400, 100), "|cffff40002. Creeps|r", 12),
-    createTTEx(vec3(-4496, -6448, 100), "  |cff0080ff-ca|r: Yes. (Def)", 12),
-    createTTEx(vec3(-4496, -6496, 100), "  |cff0080ff-n|r: No.", 12),
-    createTTEx(vec3(-4496, -6544, 100), "    |cff00ff80-n|r: Neutral.", 12),
-    createTTEx(vec3(-4496, -6592, 100), "    |cff00ff80-p|r: |cffff0000Draenei|r and |cff32cd32Demons|r.", 12),
-    createTTEx(vec3(-4496, -6640, 100), "    |cff00ff80-c|r: Both.", 12),
-    createTTEx(vec3(-4496, -6688, 100), "|cffff40003. Shops|r", 12),
-    createTTEx(vec3(-4496, -6736, 100), "  |cff0080ff-ns|r: Normal. (Def)", 12),
-    createTTEx(vec3(-4496, -6784, 100), "  |cff0080ff-oc|r: Only consumibles.", 12),
-    createTTEx(vec3(-4496, -6832, 100), "  |cff0080ff-nr|r: No Recipes.", 12),
-    createTTEx(vec3(-4176, -6400, 100), "|cffff40004. Selection|r", 12),
-    createTTEx(vec3(-4176, -6448, 100), "  |cff0080ff-ds|r: Normal. (Def)", 12),
-    createTTEx(vec3(-4176, -6496, 100), "  |cff0080ff-ap|r: Traitor (All pick).", 12),
-    createTTEx(vec3(-4176, -6544, 100), "|cffff40005. Heros|r", 12),
-    createTTEx(vec3(-4176, -6592, 100), "  |cff0080ff-lu|r: Hero (Leveling up). (Def)", 12),
-    createTTEx(vec3(-4176, -6640, 100), "  |cff0080ff-nl|r: Classic (Not levelling up).", 12)
-]
-
-let modesCenter = Rects.selectorDraenei.getCenter()
-let modesLeft = Rects.selectorDraenei.getMinX()
-let modesRight = Rects.selectorDraenei.getMaxX()
-let modesTop = Rects.selectorDraenei.getMaxY()
 let lineHeight = 48.
 let zOffset = 100.
 
-let modesInformation = [createCenteredTexttag(vec3(modesCenter.x, modesTop - 6*lineHeight, zOffset), "|cff7777aaGAMEMODES:|r", 15)]
+let modesCenter1 = Rects.selectorDraenei.getCenter()
+let modesLeft1 = Rects.selectorDraenei.getMinX()
+let modesRight1 = Rects.selectorDraenei.getMaxX()
+let modesTop1 = Rects.selectorDraenei.getMaxY()
 
-string chat
+let modesInformation1 = [
+    createCenteredTexttag(vec3(modesCenter1.x, modesTop1 - 6*lineHeight, zOffset), "|cff7777aaGAMEMODES:|r", 15), // 0
+    createTTEx(vec3(modesLeft1 + 12*lineHeight, modesCenter1.y + 5*lineHeight, zOffset), "|cffff40001. Timers|r", 12), // 1
+    createTTEx(vec3(modesLeft1 + 13*lineHeight, modesCenter1.y + 4*lineHeight, zOffset), "One for each mission.", 12), // 2
+    createTTEx(vec3(modesLeft1 + 12*lineHeight, modesCenter1.y, zOffset), "|cffff40002. Creeps|r", 12), // 3
+    createTTEx(vec3(modesLeft1 + 13*lineHeight, modesCenter1.y - lineHeight, zOffset), "Yes.", 12), // 4
+    createTTEx(vec3(modesRight1 - 12*lineHeight, modesCenter1.y + 7*lineHeight, zOffset), "|cffff40003. Shops|r", 12), // 5
+    createTTEx(vec3(modesRight1 - 11*lineHeight, modesCenter1.y + 6*lineHeight, zOffset), "Normal.", 12), // 6
+    createTTEx(vec3(modesRight1 - 12*lineHeight, modesCenter1.y + 2*lineHeight, zOffset), "|cffff40004. Selection|r", 12), // 7
+    createTTEx(vec3(modesRight1 - 11*lineHeight, modesCenter1.y + lineHeight, zOffset), "Normal.", 12), // 8
+    createTTEx(vec3(modesRight1 - 12*lineHeight, modesCenter1.y - 4*lineHeight, zOffset), "|cffff40005. Heros|r", 12), // 9
+    createTTEx(vec3(modesRight1 - 11*lineHeight, modesCenter1.y - 5*lineHeight, zOffset), "Hero.", 12) // 10
+]
 
-function actionsSelect()
-    var mode = chat
-    var m2 = true
-    var m3 = true
-    var m4 = true
-    var m5 = true
-    string sub1
-    string sub2
+let modesCenter2 = Rects.selectorDemon.getCenter()
+let modesLeft2 = Rects.selectorDemon.getMinX()
+let modesRight2 = Rects.selectorDemon.getMaxX()
+let modesTop2 = Rects.selectorDemon.getMaxY()
 
-    // Checkings
-    mode = mode.subString(2)
-    if mode.length() > 10
-        DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode (Too much characters)|r")
-        return
+let modesInformation2 = [
+    createCenteredTexttag(vec3(modesCenter2.x, modesTop2 - 6*lineHeight, zOffset), "|cff7777aaGAMEMODES:|r", 15), // 0
+    createTTEx(vec3(modesLeft2 + 12*lineHeight, modesCenter2.y + 5*lineHeight, zOffset), "|cffff40001. Timers|r", 12), // 1
+    createTTEx(vec3(modesLeft2 + 13*lineHeight, modesCenter2.y + 4*lineHeight, zOffset), "One for each mission.", 12), // 2
+    createTTEx(vec3(modesLeft2 + 12*lineHeight, modesCenter2.y, zOffset), "|cffff40002. Creeps|r", 12), // 3
+    createTTEx(vec3(modesLeft2 + 13*lineHeight, modesCenter2.y - lineHeight, zOffset), "Yes.", 12), // 4
+    createTTEx(vec3(modesRight2 - 12*lineHeight, modesCenter2.y + 7*lineHeight, zOffset), "|cffff40003. Shops|r", 12), // 5
+    createTTEx(vec3(modesRight2 - 11*lineHeight, modesCenter2.y + 6*lineHeight, zOffset), "Normal.", 12), // 6
+    createTTEx(vec3(modesRight2 - 12*lineHeight, modesCenter2.y + 2*lineHeight, zOffset), "|cffff40004. Selection|r", 12), // 7
+    createTTEx(vec3(modesRight2 - 11*lineHeight, modesCenter2.y + lineHeight, zOffset), "Normal.", 12), // 8
+    createTTEx(vec3(modesRight2 - 12*lineHeight, modesCenter2.y - 4*lineHeight, zOffset), "|cffff40005. Heros|r", 12), // 9
+    createTTEx(vec3(modesRight2 - 11*lineHeight, modesCenter2.y - 5*lineHeight, zOffset), "Hero.", 12) // 10
+]
 
-    sub1 = mode.char(1)
-    sub2 = mode.char(2)
+function updateTimeMode()
+    var text = ""
+    if whatMode[1] == VARIOUS_TIMERS
+        text = "One for each mission (Max " + (getTotalTimeOfVariousTimers()/60).toInt().toString() + ")."
+    else if whatMode[1] == SINGLE_TIMER
+        text = "One timer for the match (" + (quantityOneTimer/60.).toInt().toString() + " minutes)."
+    modesInformation1[2].setText(text, 12)
+    modesInformation2[2].setText(text, 12)
 
-    // 1 - First 2 characters (obligatory)
-    if sub1 == "u" or sub1 == "v"
-        if sub1 == "u"
-            if sub2 != "s" and sub2 != "m" and sub2 != "l" and sub2 != "h"
-                DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-                return
-        else
-            if sub2 != "i" and sub2 != "t" and sub2 != "s" and sub2 != "m" and sub2 != "l" and sub2 != "h" and sub2 != "e"
-                DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-                return
-    else
-        DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-        return
+function updateCreepsMode()
+    var text = ""
+    if whatMode[2] == YES_CREEPS
+        text = "All."
+    else if whatMode[2] == ONLY_DE_AND_DR
+        text = "Only draenei and demon."
+    else if whatMode[2] == ONLY_NEUTRAL
+        text = "Only neutral."
+    else if whatMode[2] == NO_CREEPS
+        text = "No."
+    modesInformation1[4].setText(text, 12)
+    modesInformation2[4].setText(text, 12)
 
-    // 2
-    mode = mode.subString(3)
-    sub1 = mode.subString(1, 2)
-    if sub1 == "ca" or sub1=="nn" or sub1=="np" or sub1=="nc" or sub1 == null
-        if sub1 == null
-            m2 = false
-        else
-            mode = mode.subString(3)
-    else
-        if sub1 != "ns" and sub1 != "oc" and sub1 != "nr" and sub1 != "ds" and sub1 != "ap" and sub1 != "lu" and sub1 != "nl"
-            DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-            return
-        else
-            m2 = false
+function updateShopsMode()
+    var text = ""
+    if whatMode[3] == ALL_ITEMS
+        text = "All."
+    else if whatMode[3] == ONLY_COMSUMIBLES
+        text = "Only consummibles."
+    else if whatMode[3] == NO_RECIPES
+        text = "No recipes."
+    modesInformation1[6].setText(text, 12)
+    modesInformation2[6].setText(text, 12)
 
-    // 3
-    sub1 = mode.subString(1, 2)
-    if sub1 == "ns" or sub1 == "oc" or sub1 == "nr" or sub1 == null
-        if sub1 == null
-            m3 = false
-        else
-            mode = mode.subString(3)
-    else
-        if sub1 != "ds" and sub1 != "ap" and sub1 != "lu" and sub1 != "nl"
-            DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-            return
-        else
-            m3 = false
-    
-    // 4
-    sub1 = mode.subString(1, 2)
-    if sub1 == "ds" or sub1 == "ap" or sub1 == null
-        if sub1 == null
-            m4 = false
-        else
-            mode = mode.subString(3)
-    else
-        if sub1 != "lu" and sub1 != "nl"
-            DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-        else
-            m4 = false
+function updateSelectionMode()
+    var text = ""
+    if whatMode[4] == NORMAL_PICK
+        text = "Normal."
+    else if whatMode[4] == TRAITOR
+        text = "Traitor (All pick)."
+    modesInformation1[8].setText(text, 12)
+    modesInformation2[8].setText(text, 12)
 
-    // 5
-    sub1 = mode
-    if sub1 == "lu" or sub1 == "nl" or sub1 == null
-        if sub1 == null
-            m5 = false
-    else
-        DisplayTextToPlayer(GetTriggerPlayer(), 0, 0, "|cffff0000Not valid mode|r")
-        return
+function updateHeroMode()
+    var text = ""
+    if whatMode[5] == LEVELING
+        text = "Hero (leveling up)."
+    else if whatMode[5] == NOT_LEVELING
+        text = "Classic (not leveling up)."
+    modesInformation1[10].setText(text, 12)
+    modesInformation2[10].setText(text, 12)
 
+let MODE_SELECTOR = compiletime(UNIT_ID_GEN.next())
+
+public constant modeSelector = createUnit(players[PLAYER_NEUTRAL_AGGRESSIVE], MODE_SELECTOR, modesCenter1)
+
+public function actionsSelect()
     maxSelection.pause()
     window.display(false)
 
-    mode = chat
-
     // Mode 1: Timers
-    mode = mode.subString(2)
-    sub1 = mode.char(1)
-    sub2 = mode.char(2)
-    mode = mode.subString(3)
-    if sub1 == "v"
-        whatMode[1] = VARIOUS_TIMERS
-        if sub2 == "s"
-            handicapVariousTimers = 0.60
-            modes[1] = "One timer for each mission (31 minutes max.)."
-        else if sub2 == "m"
-            handicapVariousTimers = 0.80
-            modes[1] = "One timer for each mission (41 minutes max.)."
-        else if sub2 == "l"
-            handicapVariousTimers = 1.00
-            modes[1] = "One timer for each mission (51 minutes max.)."
-        else if sub2 == "h"
-            handicapVariousTimers = 1.20
-            modes[1] = "One timer for each mission (61 minutes max.)."
-    else
-        whatMode[1] = SINGLE_TIMER
-        if sub2 == "i"
-            quantityOneTimer = 1500.00
-            modes[1] = "One timer for the match (25 minutes)."
-        else if sub2 == "t"
-            quantityOneTimer = 1800.00
-            modes[1] = "One timer for the match (30 minutes)."
-        else if sub2 == "s"
-            quantityOneTimer = 2100.00
-            modes[1] = "One timer for the match (35 minutes)."
-        else if sub2 == "m"
-            quantityOneTimer = 2400.00
-            modes[1] = "One timer for the match (40 minutes)."
-        else if sub2 == "l"
-            quantityOneTimer = 2700.00
-            modes[1] = "One timer for the match (45 minutes)."
-        else if sub2 == "h"
-            quantityOneTimer = 3000.00
-            modes[1] = "One timer for the match (50 minutes)."
-        else if sub2 == "e"
-            quantityOneTimer = 3300.00
-            modes[1] = "One timer for the match (55 minutes)."
+    if whatMode[1] == VARIOUS_TIMERS
+        modes[1] = "One timer for each mission (" + (getTotalTimeOfVariousTimers()/60.).toInt().toString() + " minutes max.)."
+    else if whatMode[1] == SINGLE_TIMER
+        modes[1] = "One timer for the match (" + (quantityOneTimer/60.).toInt().toString() + " minutes)."
     
     // Mode 2: Creeps
-    if m2
-        sub1 = mode.char(1)
-        sub2 = mode.char(2)
-        mode = mode.subString(3)
-        if sub1 + sub2 == "ca"
-            modes[2] = "Normal."
-            whatMode[2] = YES_CREEPS
-        else if sub1 == "n"
-            if sub2 == "n"
-                modes[2] = "No Neutrals."
-                whatMode[2] = ONLY_DE_AND_DR
-            else if sub2 == "p"
-                modes[2] = "No |cffff0000Draenei|r and |cff32cd32Demons|r."
-                whatMode[2] = ONLY_NEUTRAL
-            else if sub2 == "c"
-                modes[2] = "No Creeps."
-                whatMode[2] = NO_CREEPS
-    else
+    if whatMode[2] == YES_CREEPS
         modes[2] = "Normal."
-        whatMode[2] = YES_CREEPS
+    else if whatMode[2] == ONLY_DE_AND_DR
+        modes[2] = "No Neutrals."
+    else if whatMode[2] == ONLY_NEUTRAL
+        modes[2] = "No |cffff0000Draenei|r and |cff32cd32Demons|r."
+    else if whatMode[2] == NO_CREEPS
+        modes[2] = "No Creeps."
 
     // Mode 3: Shops
-    if m3
-        sub1 = mode.subString(1, 2)
-        mode = mode.subString(3)
-        if sub1 == "ns"
-            modes[3] = "Normal."
-            whatMode[3] = ALL_ITEMS
-        else if sub1 == "oc"
-            modes[3] = "Only consummibles."
-            whatMode[3] = ONLY_COMSUMIBLES
-            doAfter(25, () -> begin
-                print("\nAs there are only consummibles items, you can only get wood by buying to balance the costs.")
-                bj_questHintSound.play()
-            end)
-        else if sub1 == "nr"
-            modes[3] = "No recipes."
-            whatMode[3] = NO_RECIPES
-    else
+    if whatMode[3] == ALL_ITEMS
         modes[3] = "Normal."
-        whatMode[3] = ALL_ITEMS
+    else if whatMode[3] == ONLY_COMSUMIBLES
+        modes[3] = "Only consummibles."
+        doAfter(25, () -> begin
+            print("\nAs there are only consummibles items, you can only get wood by buying to balance the costs.")
+            bj_questHintSound.play()
+        end)
+    else if whatMode[3] == NO_RECIPES
+        modes[3] = "No recipes."
 
     // Mode 4: Selection
-    if m4
-        sub1 = mode.subString(1, 2)
-        mode = mode.subString(3)
-        if sub1 == "ds"
-            modes[4] = "Normal."
-            whatMode[4] = NORMAL_PICK
-        else if sub1 == "ap"
-            modes[4] = "Traitor (All pick)."
-            whatMode[4] = TRAITOR
-    else
+    if whatMode[4] == NORMAL_PICK
         modes[4] = "Normal."
-        whatMode[4] = NORMAL_PICK
+    else if whatMode[4] == TRAITOR
+        modes[4] = "Traitor (All pick)."
 
     // Mode 5: Leveling
-    sub1 = mode.subString(1, 2)
-    if sub1 == "lu" or not m5
+    if whatMode[5] == LEVELING
         modes[5] = "Hero (Leveling up)."
-        whatMode[5] = LEVELING
-    else if sub1 == "nl"
+    else if whatMode[5] == NOT_LEVELING
         modes[5] = "Classic (Not leveling up)."
-        whatMode[5] = NOT_LEVELING
     
     // Final
-    for i = 0 to 29
-        modes1[i].setVisibility(false)
-        modes2[i].setVisibility(false)
+    for i = 0 to 10
+        modesInformation1[i].setVisibility(false)
+        modesInformation2[i].setVisibility(false)
     
     ClearTextMessages()
     
@@ -347,30 +215,480 @@ function actionsSelect()
 
     for cb in callbacks
         cb.run()
+    
+    modeSelector.setOwner(players[PLAYER_NEUTRAL_AGGRESSIVE], true)
 
-    select.disable()
+let SELECTED = compiletime(UPGD_ID_GEN.next())
+let LIMIT_REACHED = compiletime(UPGD_ID_GEN.next())
 
+let CHECK_TIMERS = compiletime(new SelectorButton())
+let CHECK_CREEPS = compiletime(new SelectorButton())
+let CHECK_SHOP = compiletime(new SelectorButton())
+let CHECK_SELECTION = compiletime(new SelectorButton())
+let CHECK_HERO = compiletime(new SelectorButton())
 
-public function didntChose()
-    window.display(false)
+let MULTIPLE_TIMERS = compiletime(new SelectorButton(SELECTED))
+let SINGLE_TIMER = compiletime(new SelectorButton(SELECTED))
+let DECREASE_TIME = compiletime(new SelectorButton(LIMIT_REACHED))
+let INCREASE_TIME = compiletime(new SelectorButton(LIMIT_REACHED))
 
-    let modes = ["-vs", "-vm", "-vl", "-vh", "-ui", "-ut", "-us", "-um", "-ul", "-uh", "-ue"]
-    chat = modes[GetRandomInt(0,11)]
+let NORMAL_CREEPS = compiletime(new SelectorButton(SELECTED))
+let NO_NEUTRAL_CREEPS = compiletime(new SelectorButton(SELECTED))
+let NO_DR_AND_DE_CREEPS = compiletime(new SelectorButton(SELECTED))
+let NO_CREEPS = compiletime(new SelectorButton(SELECTED))
 
-    actionsSelect()
+let NORMAL_SHOPS = compiletime(new SelectorButton(SELECTED))
+let ONLY_CONSUMMIBLES_SHOPS = compiletime(new SelectorButton(SELECTED))
+let NO_RECIPES_SHOPS = compiletime(new SelectorButton(SELECTED))
+
+let NORMAL_SELECTION = compiletime(new SelectorButton(SELECTED))
+let TRAITOR_SELECTION = compiletime(new SelectorButton(SELECTED))
+
+let LEVELING_HERO = compiletime(new SelectorButton(SELECTED))
+let NOT_LEVELING_HERO = compiletime(new SelectorButton(SELECTED))
+
+let GO_BACK = compiletime(new SelectorButton())
+let READY = compiletime(new SelectorButton())
+
+let SELECTOR_MENU = new SelectorMenu()..addButton(CHECK_TIMERS, CHECK_CREEPS, CHECK_SHOP, CHECK_SELECTION, CHECK_HERO, READY)
+
+let TIMERS_MENU = new SelectorMenu()..addButton(MULTIPLE_TIMERS, SINGLE_TIMER, DECREASE_TIME, INCREASE_TIME, GO_BACK)
+let CREEPS_MENU = new SelectorMenu()..addButton(NORMAL_CREEPS, NO_NEUTRAL_CREEPS, NO_DR_AND_DE_CREEPS, NO_CREEPS, GO_BACK)
+let SHOPS_MENU = new SelectorMenu()..addButton(NORMAL_SHOPS, ONLY_CONSUMMIBLES_SHOPS, NO_RECIPES_SHOPS, GO_BACK)
+let SELECTION_MENU = new SelectorMenu()..addButton(NORMAL_SELECTION, TRAITOR_SELECTION, GO_BACK)
+let HERO_MENU = new SelectorMenu()..addButton(LEVELING_HERO, NOT_LEVELING_HERO, GO_BACK)
+
+public function initSelector()
+    modeSelector.unpause()
+    SELECTOR_MENU.setActual()
+    modeSelector.setOwner(selector, true)
+    if THE_DRAENEI.has(selector)
+        modeSelector.setPos(modesCenter1)
+    else
+        modeSelector.setPos(modesCenter2)
+    selector.selectSingle(modeSelector)
+    for i = 0 to 10
+        modesInformation1[i].setVisibility(THE_DRAENEI.has(localPlayer))
+        modesInformation2[i].setVisibility(THE_DEMONS.has(localPlayer))
 
 init
     nullTimer() -> 
-        for i = 0 to 29
-            modes1[i].setVisibility(THE_DEMONS.has(localPlayer))
-            modes2[i].setVisibility(THE_DRAENEI.has(localPlayer))
+        onReset(true, () -> begin
+            whatMode[1] = SINGLE_TIMER
+            whatMode[2] = YES_CREEPS
+            whatMode[3] = ALL_ITEMS
+            whatMode[4] = NORMAL_PICK
+            whatMode[5] = LEVELING
 
-    for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE
-        select.registerPlayerChatEvent(players[i], "-", false)
+            updateTimeMode()
+            updateCreepsMode()
+            updateShopsMode()
+            updateSelectionMode()
+            updateHeroMode()
+            
+            SINGLE_TIMER.disable()
+            NORMAL_CREEPS.disable()
+            NORMAL_SHOPS.disable()
+            NORMAL_SELECTION.disable()
+            LEVELING_HERO.disable()
+        end)
+
+    // Timers menu
+
+    CHECK_TIMERS.onPress(() -> begin
+        TIMERS_MENU.setActual()
+    end)
+
+    MULTIPLE_TIMERS.onPress(() -> begin
+        whatMode[1] = VARIOUS_TIMERS
+        handicapVariousTimers = 0.8
+        MULTIPLE_TIMERS.disable()
+        SINGLE_TIMER.enable()
+        DECREASE_TIME.enable()
+        INCREASE_TIME.enable()
+        updateTimeMode()
+    end)
+
+    SINGLE_TIMER.onPress(() -> begin
+        whatMode[1] = SINGLE_TIMER
+        quantityOneTimer = 2400.
+        MULTIPLE_TIMERS.enable()
+        SINGLE_TIMER.disable()
+        DECREASE_TIME.enable()
+        INCREASE_TIME.enable()
+        updateTimeMode()
+    end)
+
+    DECREASE_TIME.onPress(() -> begin
+        if whatMode[1] == VARIOUS_TIMERS
+            handicapVariousTimers -= HANDICAP_VARIOUS_TIMERS_STEP
+            if handicapVariousTimers <= HANDICAP_VARIOUS_TIMERS_MIN
+                DECREASE_TIME.disable()
+        else if whatMode[1] == SINGLE_TIMER
+            quantityOneTimer -= QUANTITY_ONE_TIMER_STEP
+            if quantityOneTimer <= QUANTITY_ONE_TIMER_MIN
+                DECREASE_TIME.disable()
+        if not INCREASE_TIME.isEnabled
+            INCREASE_TIME.enable()
+        updateTimeMode()
+    end)
+
+    INCREASE_TIME.onPress(() -> begin
+        if whatMode[1] == VARIOUS_TIMERS
+            handicapVariousTimers += HANDICAP_VARIOUS_TIMERS_STEP
+            if handicapVariousTimers >= HANDICAP_VARIOUS_TIMERS_MAX
+                INCREASE_TIME.disable()
+        else if whatMode[1] == SINGLE_TIMER
+            quantityOneTimer += QUANTITY_ONE_TIMER_STEP
+            if quantityOneTimer >= QUANTITY_ONE_TIMER_MAX
+                INCREASE_TIME.disable()
+        if not DECREASE_TIME.isEnabled
+            DECREASE_TIME.enable()
+        updateTimeMode()
+    end)
+
+    // Creeps menu
+
+    CHECK_CREEPS.onPress(() -> begin
+        CREEPS_MENU.setActual()
+    end)
+
+    NORMAL_CREEPS.onPress(() -> begin
+        whatMode[2] = YES_CREEPS
+        NORMAL_CREEPS.disable()
+        NO_NEUTRAL_CREEPS.enable()
+        NO_DR_AND_DE_CREEPS.enable()
+        NO_CREEPS.enable()
+        updateCreepsMode()
+    end)
+
+    NO_NEUTRAL_CREEPS.onPress(() -> begin
+        whatMode[2] = ONLY_DE_AND_DR
+        NORMAL_CREEPS.enable()
+        NO_NEUTRAL_CREEPS.disable()
+        NO_DR_AND_DE_CREEPS.enable()
+        NO_CREEPS.enable()
+        updateCreepsMode()
+    end)
+
+    NO_DR_AND_DE_CREEPS.onPress(() -> begin
+        whatMode[2] = ONLY_NEUTRAL
+        NORMAL_CREEPS.enable()
+        NO_NEUTRAL_CREEPS.enable()
+        NO_DR_AND_DE_CREEPS.disable()
+        NO_CREEPS.enable()
+        updateCreepsMode()
+    end)
+
+    NO_CREEPS.onPress(() -> begin
+        whatMode[2] = NO_CREEPS
+        NORMAL_CREEPS.enable()
+        NO_NEUTRAL_CREEPS.enable()
+        NO_DR_AND_DE_CREEPS.enable()
+        NO_CREEPS.disable()
+        updateCreepsMode()
+    end)
+
+    // Shops menu
+
+    CHECK_SHOP.onPress(() -> begin
+        SHOPS_MENU.setActual()
+    end)
+
+    NORMAL_SHOPS.onPress(() -> begin
+        whatMode[3] = ALL_ITEMS
+        NORMAL_SHOPS.disable()
+        ONLY_CONSUMMIBLES_SHOPS.enable()
+        NO_RECIPES_SHOPS.enable()
+        updateShopsMode()
+    end)
+
+    ONLY_CONSUMMIBLES_SHOPS.onPress(() -> begin
+        whatMode[3] = ONLY_COMSUMIBLES
+        NORMAL_SHOPS.enable()
+        ONLY_CONSUMMIBLES_SHOPS.disable()
+        NO_RECIPES_SHOPS.enable()
+        updateShopsMode()
+    end)
+
+    NO_RECIPES_SHOPS.onPress(() -> begin
+        whatMode[3] = NO_RECIPES
+        NORMAL_SHOPS.enable()
+        ONLY_CONSUMMIBLES_SHOPS.enable()
+        NO_RECIPES_SHOPS.disable()
+        updateShopsMode()
+    end)
+
+    // Selection menu
+
+    CHECK_SELECTION.onPress(() -> begin
+        SELECTION_MENU.setActual()
+    end)
+
+    NORMAL_SELECTION.onPress(() -> begin
+        whatMode[4] = NORMAL_PICK
+        NORMAL_SELECTION.disable()
+        TRAITOR_SELECTION.enable()
+        updateSelectionMode()
+    end)
+
+    TRAITOR_SELECTION.onPress(() -> begin
+        whatMode[4] = TRAITOR
+        NORMAL_SELECTION.enable()
+        TRAITOR_SELECTION.disable()
+        updateSelectionMode()
+    end)
+
+    // Hero menu
+
+    CHECK_HERO.onPress(() -> begin
+        HERO_MENU.setActual()
+    end)
+
+    LEVELING_HERO.onPress(() -> begin
+        whatMode[5] = LEVELING
+        LEVELING_HERO.disable()
+        NOT_LEVELING_HERO.enable()
+        updateHeroMode()
+    end)
+
+    NOT_LEVELING_HERO.onPress(() -> begin
+        whatMode[5] = NOT_LEVELING
+        LEVELING_HERO.enable()
+        NOT_LEVELING_HERO.disable()
+        updateHeroMode()
+    end)
+
+    // -- --
+
+    GO_BACK.onPress(() -> begin
+        SELECTOR_MENU.setActual()
+    end)
+
+    READY.onPress(function actionsSelect)
+
+class SelectorMenu
+    static SelectorMenu actual = null
     
-    select..addAction(function actionsSelect)
-          ..addCondition(Condition(() -> begin
-        chat = GetEventPlayerChatString()
-        return GetTriggerPlayer() == selector and GetEventPlayerChatString().char(1) == "-"
-    end))
+    LinkedList<SelectorButton> buttons = new LinkedList<SelectorButton>()
 
+    function addButton(vararg SelectorButton newButtons)
+        for def in newButtons
+            buttons.add(def)
+    
+    function setActual()
+        if actual != null
+            for b in actual.buttons
+                if b.isEnabled
+                    modeSelector.removeAbility(b.getNewId())
+                else
+                    modeSelector.removeAbility(b.disabled.getNewId())
+        
+        for b in buttons
+            if b.isEnabled
+                modeSelector.addAbility(b.getNewId())
+            else
+                modeSelector.addAbility(b.disabled.getNewId())
+        
+        actual = this
+
+class SelectorButton extends ChannelAbilityPreset
+    SelectorButton disabled
+    string hotkey = "Q"
+    boolean isEnabled = true
+
+    function onPress(code c)
+        registerSpellEffectEvent(newId, c)
+    
+    function enable()
+        isEnabled = true
+        if modeSelector.hasAbility(newId) or modeSelector.hasAbility(disabled.newId)
+            modeSelector.removeAbility(disabled.newId)
+            modeSelector.addAbility(newId)
+    
+    function disable()
+        isEnabled = false
+        if modeSelector.hasAbility(newId) or modeSelector.hasAbility(disabled.newId)
+            modeSelector.removeAbility(newId)
+            modeSelector.addAbility(disabled.newId)
+
+    construct()
+        super(ABIL_ID_GEN.next(), 1, true)
+        basic()
+    
+    construct(int disableCondition)
+        super(ABIL_ID_GEN.next(), 1, true)
+        basic()
+        this.disabled = new SelectorButton()
+            ..setRequirements(disableCondition.toRawCode())
+
+    function basic()
+        makeUnitSpell(0, 0)
+        setTooltipNormalExtended(1, "")
+    
+    function setIcon(string value)
+        setIconNormal(value)
+        if disabled != null
+            disabled.setIconNormal(value)
+
+    function setHotkey(string data)
+        setHotkeyNormal(data)
+        var x = 0
+        var y = 0
+        switch data
+            case "Q"
+                x = 0
+                y = 0
+            case "W"
+                x = 1
+                y = 0
+            case "E"
+                x = 2
+                y = 0
+            case "R"
+                x = 3
+                y = 0
+            case "A"
+                x = 0
+                y = 1
+            case "S"
+                x = 1
+                y = 1
+            case "Z"
+                x = 0
+                y = 2
+            case "V"
+                x = 3
+                y = 2
+        presetButtonPosNormal(x, y)
+        if disabled != null
+            disabled.presetButtonPosNormal(x, y)
+        hotkey = data
+    
+    override function setName(string value)
+        super.setName(value)
+        super.setTooltipNormal(1, "[|cffffcc00" + hotkey + "|r] " + value)
+        if disabled != null
+            disabled.setName(value)
+
+@compiletime function gen()
+    new UnitDefinition(MODE_SELECTOR, 'ewsp')
+        ..setName("Mode selector")
+        ..setUpgradesUsed("")
+        ..setStructuresBuilt("")
+        ..setManaRegeneration(0)
+        ..setManaInitialAmount(0)
+        ..setManaMaximum(0)
+        ..setCollisionSize(0.0)
+        ..setFoodCost(0)
+        ..setArmorType(ArmorType.Divine)
+        ..setIconGameInterface(Icons.bTNTemp)
+        ..setSpeedBase(0)
+        ..setModelFile("dummy.mdl")
+        ..setSightRadiusDay(1)
+        ..setSightRadiusNight(1)
+        ..setUnitClassification("_")
+        ..setTooltipBasic("")
+        ..setAttacksEnabled(0)
+        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.permanentInvisibility))
+        ..setMovementType(MovementType.Fly)
+    
+    CHECK_TIMERS
+        ..setIcon(Icons.bTNCrystalBall)
+        ..setHotkey("Q")
+        ..setName("Check timers")
+    CHECK_CREEPS
+        ..setIcon(Icons.bTNGrunt)
+        ..setHotkey("W")
+        ..setName("Check creeps")
+    CHECK_SHOP
+        ..setIcon(Icons.bTNArcaneVault)
+        ..setHotkey("E")
+        ..setName("Check shop")
+    CHECK_SELECTION
+        ..setIcon(Icons.bTNControlMagic)
+        ..setHotkey("R")
+        ..setName("Check selection")
+    CHECK_HERO
+        ..setIcon(Icons.bTNAltarOfKings)
+        ..setHotkey("A")
+        ..setName("Check hero")
+
+    SINGLE_TIMER
+        ..setIcon(Icons.bTN3M1)
+        ..setHotkey("Q")
+        ..setName("Single timer")
+    MULTIPLE_TIMERS
+        ..setIcon(Icons.bTN3M3)
+        ..setHotkey("W")
+        ..setName("Multiple timers")
+    DECREASE_TIME
+        ..setIcon(Icons.bTNReplay_SpeedDown)
+        ..setHotkey("A")
+        ..setName("Decrease time")
+    INCREASE_TIME
+        ..setIcon(Icons.bTNReplay_SpeedUp)
+        ..setHotkey("S")
+        ..setName("Increase time")
+
+    NORMAL_CREEPS
+        ..setIcon(Icons.bTNDranai)
+        ..setHotkey("Q")
+        ..setName("Normal creeps")
+    NO_DR_AND_DE_CREEPS
+        ..setIcon(Icons.bTNChaosGrunt)
+        ..setHotkey("W")
+        ..setName("No draenei and demon creeps")
+    NO_NEUTRAL_CREEPS
+        ..setIcon(Icons.bTNPurpleFelhound)
+        ..setHotkey("E")
+        ..setName("No neutral creeps")
+    NO_CREEPS
+        ..setIcon(Icons.bTNDranaiHut)
+        ..setHotkey("R")
+        ..setName("No creeps")
+
+    NORMAL_SHOPS
+        ..setIcon(Icons.bTNVoodooLounge)
+        ..setHotkey("Q")
+        ..setName("Normal shops")
+    ONLY_CONSUMMIBLES_SHOPS
+        ..setIcon(Icons.bTNMerchant)
+        ..setHotkey("W")
+        ..setName("Only comsummibles")
+    NO_RECIPES_SHOPS
+        ..setIcon(Icons.bTNBlackMarket)
+        ..setHotkey("E")
+        ..setName("No recipes")
+
+    NORMAL_SELECTION
+        ..setIcon(Icons.bTNArthas)
+        ..setHotkey("Q")
+        ..setName("Normal pick")
+    TRAITOR_SELECTION
+        ..setIcon(Icons.bTNHeroDeathKnight)
+        ..setHotkey("W")
+        ..setName("Traitor (All pick)")
+
+    LEVELING_HERO
+        ..setIcon(Icons.bTNAltarOfStorms)
+        ..setHotkey("Q")
+        ..setName("Leveling")
+    NOT_LEVELING_HERO
+        ..setIcon(Icons.bTNAltarOfElders)
+        ..setHotkey("W")
+        ..setName("Not leveling")
+
+    READY
+        ..setIcon(Imports.bTNGreen_Check)
+        ..setHotkey("Z")
+        ..setName("You are ready")
+    GO_BACK
+        ..setIcon(Icons.bTNReplay_Play)
+        ..setHotkey("V")
+        ..setName("Go back")
+
+    new UpgradeDefinition(SELECTED)
+        ..setName(1, "Selected")
+    new UpgradeDefinition(LIMIT_REACHED)
+        ..setName(1, "Limit reached")

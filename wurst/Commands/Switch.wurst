@@ -101,6 +101,8 @@ vec2 swc1
 vec2 swc2
 vec2 vase
 
+var notBooks = false
+
 init
     CreateTrigger()
         ..registerDialogEvent(switchWindow)
@@ -162,13 +164,14 @@ function changePlayers()
     end)
 
     // Return them the levels
-    if whatMode[5] == LEVELING
-        let m1 = createItem(EXP_BOOK, swc2)
-        m1.setPlayer(swp1, false)
-        expMap.put(m1, hero[i1].getXp())
-        let m2 = createItem(EXP_BOOK, swc1)
-        m2.setPlayer(swp2, false)
-        expMap.put(m2, hero[i2].getXp())
+    if not notBooks
+        if whatMode[5] == LEVELING
+            let m1 = createItem(EXP_BOOK, swc2)
+            m1.setPlayer(swp1, false)
+            expMap.put(m1, hero[i1].getXp())
+            let m2 = createItem(EXP_BOOK, swc1)
+            m2.setPlayer(swp2, false)
+            expMap.put(m2, hero[i2].getXp())
     
     yesOrYes = true
     repick(swp1)
@@ -221,7 +224,8 @@ init
     // Interchange teams at the end
     onReset(false, () -> begin
         EnumItemsInRect(bj_mapInitialPlayableArea, null, () -> GetEnumItem().remove())
-        doAfter(17.) -> 
+        doAfter(17.) ->
+            notBooks = true
             for i = 1 to 5
                 swp1 = playerM(i)
                 swp2 = playerM(i+5)
@@ -230,6 +234,7 @@ init
                 changePlayers()
                 canPick.remove(swp1)
                 canPick.remove(swp2)
+            notBooks = false
             whoSelect()
     end)
     // Return them the levels

@@ -6,8 +6,22 @@ import initlater Missions
 let timeMission = [0.00, 600.00, 780.00, 540.00, 600.00, 540.00]
 
 public boolean timeIsOver
-public real handicapVariousTimers
-public real quantityOneTimer
+
+public real handicapVariousTimers = 0.8
+public constant HANDICAP_VARIOUS_TIMERS_STEP = 0.2
+public constant HANDICAP_VARIOUS_TIMERS_MIN = 0.6
+public constant HANDICAP_VARIOUS_TIMERS_MAX = 1.2
+
+public function getTotalTimeOfVariousTimers() returns real
+    var sum = 0.
+    for i = 1 to 5
+        sum += timeMission[i]
+    return sum * handicapVariousTimers
+
+public real quantityOneTimer = 2400.
+public constant QUANTITY_ONE_TIMER_STEP = 300.
+public constant QUANTITY_ONE_TIMER_MIN = 1500.
+public constant QUANTITY_ONE_TIMER_MAX = 3300.
 
 timer actMission = CreateTimer()
 timerdialog windowActMission = CreateTimerDialog(actMission)

@@ -10,4 +10,4 @@ init
         createUnit(players[1], typ.getNL(), pos)
 
 init
-    createItem(ACID_STONE.getNewId(), vec2(8000., 8000.))
+    createItem(WAR_HELMET.getNewId(), vec2(8000., 8000.))

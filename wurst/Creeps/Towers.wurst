@@ -107,7 +107,7 @@ init
                     end)
                     forUnitsInRect(Rects.shops2, u -> begin
                         if u.isType(UNIT_TYPE_STRUCTURE)
-                            u.setOwner(DRAENEI, true)
+                            u.setColor(DRAENEI.getColor())
                     end)
 
                     let builders2 = CreateGroup()
@@ -208,7 +208,7 @@ init
     // Run the first
     onReset(false, () -> begin
         forUnitsOfPlayer(DRAENEI, u -> begin
-            if u.getTypeId() == DRAENEI_WORKER
+            if u.getTypeId() == DRAENEI_WORKER or u.getTypeId() == DRAENEI_TOWER
                 u.remove()
         end)
     end)

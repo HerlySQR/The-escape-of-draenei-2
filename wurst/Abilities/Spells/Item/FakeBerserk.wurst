@@ -1,0 +1,72 @@
+package FakeBerserk
+
+import AbilityData
+
+import Execute
+
+public constant FAKE_BERSERK_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let CD = 25.
+let MANA = 25
+let ATTACK_SPEED = 0.9
+let MOVE_SPEED = 0.4
+let DURATION = 8.
+let EXTRA_DMG = 0.25
+
+public constant FAKE_BERSERK_TOOLTIP = "When you active it, you will attack {0}% and move {1}% faster for {2} seconds, but you get {3}% extra damage."
+    .format((ATTACK_SPEED*100).toInt().toString(), (MOVE_SPEED*100).toInt().toString(), DURATION.toString(0), (EXTRA_DMG*100).toInt().toString())
+
+let BERSERK_BUFF = compiletime(ABIL_ID_GEN.next())
+let timersMap = new HashMap<unit, CallbackSingle>()
+
+init
+    registerSpellEffectEvent(FAKE_BERSERK_SPELL, () -> begin
+        let caster = GetSpellAbilityUnit()
+        caster.addAbility(BERSERK_BUFF)
+        try(() -> destroy timersMap.get(caster))
+        timersMap.put(caster, doAfter(DURATION, () -> begin
+            caster.removeAbility(BERSERK_BUFF)
+            timersMap.remove(caster)
+        end))
+    end)
+
+    DamageEvent.addUnreducedListener(() -> begin
+        if timersMap.has(DamageEvent.getTarget())
+            DamageEvent.addAmount(EXTRA_DMG * DamageEvent.getAmount())
+    end)
+
+@compiletime function gen()
+    let BERSERK_FAKE = BUFF_ID_GEN.next()
+
+    new AbilityDefinitionWindWalk(FAKE_BERSERK_SPELL)
+        ..basicItemSpell()
+        ..setMovementSpeedIncrease(1, 0.)
+        ..setBackstabDamage(1, 0.)
+        ..setBackstabDamage(1, false)
+        ..setTransitionTime(1, 250.)
+        ..setBuffs(1, BERSERK_FAKE.toRawCode())
+        ..setManaCost(1, MANA)
+        ..setDurationHero(1, 0.01)
+        ..setDurationNormal(1, 0.01)
+        ..setCooldown(1, CD)
+        ..setEffectSound("BerserkerRage")
+    
+    new BuffDefinition(BERSERK_FAKE, 'BOae')
+        ..setIcon(Icons.bTNBerserkForTrolls)
+        ..setArtTarget("")
+        ..setTooltipNormal("Berserk")
+        ..setTooltipNormalExtended("This unit is Berserk:  it will deal more damage but will also take more damage from attacks.")
+        ..setName("Berserk")
+        ..setEditorSuffix("(Fake)")
+
+    new AbilityDefinitionAuraEnduranceCreep(BERSERK_BUFF)
+        ..basicItemSpell()
+        ..setAttackSpeedIncrease(1, ATTACK_SPEED)
+        ..setMovementSpeedIncrease(1, MOVE_SPEED)
+        ..setBuffs(1, "Bbsk")
+        ..setTargetsAllowed(1, "self")
+        ..setIconNormal(Icons.bTNBerserkForTrolls)
+        ..setArtTarget("")
+        ..presetButtonPosNormal(0, -11)
+        ..setTargetAttachmentPoint("")
+        ..setName("Berserk (Buff)")

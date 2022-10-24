@@ -58,6 +58,7 @@ function AbilityDefinitionFireBoltcreep.general()
         ..presetButtonPosNormal(0, 2)
         ..presetButtonPosResearch(0, 0)
         ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..general()
         // Stats
         ..presetDamage(lvl -> DMG_L[lvl-1])

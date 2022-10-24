@@ -4,13 +4,14 @@ import ClosureForGroups
 import ObjectIdGenerator
 import UnitObjEditing
 import Abilities
-import BountyController
-import initlater TheMonster
 
 import Functions
 import ModeSelection
 import Reset
 import GeneratedValues
+import initlater TheMonster
+
+import BountyController
 
 let OWNER = players[PLAYER_NEUTRAL_AGGRESSIVE]
 let RENEGADE_DRAENEI = compiletime(UNIT_ID_GEN.next())
@@ -37,7 +38,7 @@ public function disableNeutralSpawn()
 init
     onReset(false, () -> begin
         forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
-            if u != theMonster and not u.isType(UNIT_TYPE_STRUCTURE)
+            if u != theMonster and u != modeSelector and not u.isType(UNIT_TYPE_STRUCTURE)
                 u.remove()
         end)
         spawning.disable()

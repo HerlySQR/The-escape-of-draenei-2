@@ -48,6 +48,7 @@ function AbilityDefinitionAuraEnduranceCreep.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("The Vindicator will not let the culprits escape, reducing their movement speeds."))
         ..presetLevels(4)
         ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..general()
         ..setIconResearch(Imports.bTNSparkle)
         // Stats

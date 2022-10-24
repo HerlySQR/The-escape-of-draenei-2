@@ -21,6 +21,7 @@ function AbilityDefinitionTaurenChieftainReincarnation.general()
         ..setHotkey("R")
         ..setName("Rencarnation")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
+        ..presetIcon(Imports.pASAkamaResurrection)
 
 @compiletime function gen()
     new AbilityDefinitionTaurenChieftainReincarnation(REENCARNATION_NL)
@@ -50,6 +51,7 @@ function AbilityDefinitionTaurenChieftainReincarnation.general()
         ..presetCooldown(lvl -> CD_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L)
         // Audiovisual
+        ..setIconResearch(Imports.bTNAkamaResurrection)
         // Tooltip
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")

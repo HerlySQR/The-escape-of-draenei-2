@@ -24,6 +24,7 @@ public constant HEALING_SALVE = compiletime(
         ..setGoldCost(100)
         ..setAbilities(HEALING_SALVE_SPELL.toRawCode())
         ..setStockReplenishInterval(30)
+        ..setNumberofCharges(1)
         ..setStockMaximum(5)
         ..setStockStartDelay(0)
         ..setButtonPositionX(0)

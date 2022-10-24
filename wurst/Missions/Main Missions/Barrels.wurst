@@ -215,7 +215,7 @@ function destroyWall()
 
     forUnitsInRect(Rects.shops3, u -> begin
         if u.isType(UNIT_TYPE_STRUCTURE)
-            u.setOwner(DRAENEI, true)
+            u.setColor(DRAENEI.getColor())
     end)
 
     doAfter(3.) -> 

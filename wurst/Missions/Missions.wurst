@@ -101,7 +101,7 @@ init
                 if whatMode[1] == VARIOUS_TIMERS
                     doAfter(10., () -> startActTimer(actMission))
                 
-                actDrSpawn = Rects.respawn2
+                actDrSpawn = Rects.respawn6
                 actDeSpawn = Rects.respawn3
 
                 QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DOOR OF THE DUNGEON WAS DESTROYED|r")

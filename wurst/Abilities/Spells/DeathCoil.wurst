@@ -46,6 +46,7 @@ function AbilityDefinitionDeathKnightDeathCoil.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("A death coil that can heal impact points from a friendly unit of undead, or cause half damage to a friendly unit of living."))
         ..presetLevels(4)
         ..setHeroAbility(true)
+        ..setRequiredLevel(1)
         ..general()
         // Stats
         ..presetAmountHealedDamaged(lvl -> HEAL_L[lvl-1])
