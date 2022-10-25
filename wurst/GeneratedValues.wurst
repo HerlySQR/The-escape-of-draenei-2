@@ -97,6 +97,8 @@ public class Dests
     static constant powerField = [gg_dest_B00J_6607, gg_dest_B00J_6608, gg_dest_B00J_2611, gg_dest_B00J_6606,
                                   gg_dest_B00J_6609, gg_dest_B00J_6611, gg_dest_B00J_6610, gg_dest_B00J_6612,
                                   gg_dest_B00J_6613, gg_dest_B00J_6614]
+    static constant powerField2 = [gg_dest_B00J_1268, gg_dest_B00J_1269, gg_dest_B00J_7109, gg_dest_B00J_7111,
+                                  gg_dest_B00J_7110]
 
 /** The generated regions (rects). */
 public class Rects
@@ -332,6 +334,8 @@ public class Rects
     static constant powerField2 = gg_rct_PowerField2
     static constant powerField3 = gg_rct_PowerField3
     static constant powerField4 = gg_rct_PowerField4
+    static constant powerField5 = gg_rct_PowerField5
+    static constant powerField6 = gg_rct_PowerField6
 
     /* Postions for placed units */
 
@@ -364,6 +368,7 @@ public class Rects
 
     // Wall generator
     static constant wallGenerator = gg_rct_WallGenerator
+    static constant wallGenerator2 = gg_rct_WallGenerator2
 
     // Generators
     static constant generator1 = gg_rct_Generator1

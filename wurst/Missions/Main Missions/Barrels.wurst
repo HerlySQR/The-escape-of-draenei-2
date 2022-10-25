@@ -26,12 +26,14 @@ import UnitTransmission
 public constant BARREL = compiletime(ITEM_ID_GEN.next())
 
 public boolean generatorAlive = true
+public boolean generatorAlive2 = true
 public boolean wallDestroyed = false
 public trigger placeBarrel = CreateTrigger()
 public unit array heroWithBarrel
 
 let GENERATOR = compiletime(UNIT_ID_GEN.next())
 public unit wallGenerator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
+public unit wallGenerator2 = createUnit(DEMON, GENERATOR, Rects.wallGenerator2.getCenter(), UNIT_FACING)
 
 rect place = Rects.barrel1
 int barrelNumber = 1
@@ -49,7 +51,10 @@ let goblinShop = createUnit(players[PLAYER_NEUTRAL_PASSIVE], GOBLIN_SHOP, Rects.
 
 let powerFieldEnter1 = CreateTrigger()
 let powerFieldEnter2 = CreateTrigger()
+let powerFieldEnter3 = CreateTrigger()
+let powerFieldEnter4 = CreateTrigger()
 CallbackPeriodic powerFieldAnimation = null
+CallbackPeriodic powerFieldAnimation2 = null
 
 init
     BARREL.courierBanItem()
@@ -72,11 +77,30 @@ init
             if THE_DRAENEI.has(u)
                 u.setY(u.getY() - 25.)
         end)
+    powerFieldEnter3
+        ..registerRectEnterEventSource(Rects.powerField5)
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            if THE_DRAENEI.has(u)
+                u.setY(u.getY() + 25.)
+        end)
+    powerFieldEnter4
+        ..registerRectEnterEventSource(Rects.powerField6)
+        ..addAction(() -> begin
+            let u = GetEnteringUnit()
+            if THE_DRAENEI.has(u)
+                u.setY(u.getY() - 25.)
+        end)
     onReset(true, () -> begin
         if powerFieldAnimation == null
             powerFieldAnimation = doPeriodically(3., _ -> begin
                 for i = 0 to 9
                     Dests.powerField[i].setAnimation("stand")
+            end)
+        if powerFieldAnimation2 == null
+            powerFieldAnimation2 = doPeriodically(3., _ -> begin
+                for i = 0 to 4
+                    Dests.powerField2[i].setAnimation("stand")
             end)
     end)
     onReset(false, () -> begin
@@ -92,7 +116,17 @@ init
             powerFieldEnter2.enable()
         else
             wallGenerator.setLife(wallGenerator.getMaxHP())
-        
+        if not generatorAlive2
+            generatorAlive2 = true
+            wallGenerator2 = createUnit(DEMON, GENERATOR, Rects.wallGenerator2.getCenter(), UNIT_FACING)
+            for i = 0 to 4
+                Dests.powerField2[i]
+                    ..restoreLife(50., true)
+                    ..queueAnimation("stand")
+            powerFieldEnter3.enable()
+            powerFieldEnter4.enable()
+        else
+            wallGenerator2.setLife(wallGenerator2.getMaxHP())
         // Wall
         if not wallDestroyed
             wallDestroyed = true
@@ -106,12 +140,22 @@ init
             generatorAlive = false
             powerFieldEnter1.disable()
             powerFieldEnter2.disable()
-            destroy powerFieldAnimation
-            powerFieldAnimation = null
             for i = 0 to 9
                 Dests.powerField[i].kill()
             if EventData.getKillingUnit() != null
-                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator was destroyed")
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator in the pavilion was destroyed")
+            destroy powerFieldAnimation
+            powerFieldAnimation = null
+        else if EventData.getDyingUnit() == wallGenerator2
+            generatorAlive2 = false
+            powerFieldEnter3.disable()
+            powerFieldEnter4.disable()
+            for i = 0 to 4
+                Dests.powerField2[i].kill()
+            if EventData.getKillingUnit() != null
+                QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator of the dungeon was destroyed")
+            destroy powerFieldAnimation2
+            powerFieldAnimation2 = null
     end)
 
     // Get barrel

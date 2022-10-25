@@ -54,6 +54,7 @@ init
                     if u.getTypeId() == ADVANCE_DEATH_TOWER
                         u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     wallGenerator.kill()
+                    wallGenerator2.kill()
                     for i = 0 to 7
                         Dests.entranceForceWall[i].open()
                 end)
