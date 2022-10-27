@@ -81,6 +81,11 @@ init
                 destroy cbMap.get(d)
                 cbMap.remove(d)
     end)
+    registerPlayerUnitEvent(EVENT_PLAYER_HERO_SKILL, () -> begin
+        let skill = EventData.getLearnedSkill()
+        if skill == CREED_L and EventData.getLearnedSkillLevel() == 1
+            addCreed(EventData.getLearningUnit(), CD_L[0])
+    end)
 
 function AbilityDefinitionHardenedSkin.general()
     this

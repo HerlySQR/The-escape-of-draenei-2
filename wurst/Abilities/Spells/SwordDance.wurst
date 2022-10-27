@@ -21,7 +21,7 @@ let destrMap = new HashMap<unit, boolean>()
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST, () -> begin
-        if GetSpellAbilityId() == SWORD_DANCE_NL
+        if abilityCond(SWORD_DANCE_NL, SWORD_DANCE_L, SWORD_DANCE_S).check
             let caster = GetSpellAbilityUnit()
             if effMap.has(caster)
                 effMap.get(caster).destr()
@@ -29,7 +29,7 @@ init
             destrMap.put(caster, true)
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_ENDCAST, () -> begin
-        if GetSpellAbilityId() == SWORD_DANCE_NL
+        if abilityCond(SWORD_DANCE_NL, SWORD_DANCE_L, SWORD_DANCE_S).check
             let caster = GetSpellAbilityUnit()
             if destrMap.get(caster)
                 effMap.get(caster).destr()

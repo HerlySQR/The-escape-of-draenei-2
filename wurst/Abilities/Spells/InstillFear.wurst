@@ -19,7 +19,7 @@ let MANA_L = [175, 250]
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        if GetSpellAbilityId() == INSTILL_FEAR_NL
+        if abilityCond(INSTILL_FEAR_NL, INSTILL_FEAR_L, INSTILL_FEAR_S).check
             let caster = GetSpellAbilityUnit()
             caster.flashEffect(Abilities.roarCaster, "chest")
             caster.flashEffect(Abilities.tauntCaster, "chest")
