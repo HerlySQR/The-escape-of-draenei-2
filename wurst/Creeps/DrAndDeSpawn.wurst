@@ -65,14 +65,23 @@ DamageListener theyAreCowards
 public function startSpawn()
     spawning.enable()
     attack.enable()
-    DamageEvent.addListener(theyAreCowards)
+    // If a creep wanna go back for taking damage from an ally
+    if theyAreCowards == null
+        theyAreCowards = DamageEvent.addListener(() -> begin
+            if attackers.has(DamageEvent.getTarget()) and
+                DamageEvent.isSpell() and
+                DamageEvent.getSource().getOwner().isAllyOf(DamageEvent.getTarget().getOwner())
+                theyGo.add(DamageEvent.getTarget())
+        end)
     changeTarget.enable()
     cleaner.enable()
 
 public function stopSpawn()
     spawning.disable()
     attack.disable()
-    DamageEvent.removeListener(theyAreCowards)
+    if theyAreCowards != null
+        destroy theyAreCowards
+        theyAreCowards = null
     changeTarget.disable()
     cleaner.disable()
 
@@ -178,13 +187,6 @@ init
                     u.issuePointOrderById(Orders.attack, target[u.getIndex()])
                     theyGo.remove(u)
         end)
-    // If a creep wanna go back for taking damage from an ally
-    theyAreCowards = () -> begin
-        if attackers.has(DamageEvent.getTarget()) and
-            DamageEvent.isSpell() and
-            DamageEvent.getSource().getOwner().isAllyOf(DamageEvent.getTarget().getOwner())
-            theyGo.add(DamageEvent.getTarget())
-    end
     // Clear the groups when the units die
     cleaner
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)

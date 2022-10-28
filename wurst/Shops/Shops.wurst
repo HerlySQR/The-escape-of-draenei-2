@@ -34,6 +34,9 @@ function removeItemFromStock(ItemDefinition m)
 interface ItemAllowedCondition
     function check() returns bool
 
+function ItemAllowedCondition.and_(ItemAllowedCondition other) returns ItemAllowedCondition
+    return () -> this.check() and other.check()
+
 let condMap = new HashMap<ItemDefinition, ItemAllowedCondition>()
 
 function ItemDefinition.setCondition(ItemAllowedCondition cond)
@@ -45,7 +48,6 @@ function ItemDefinition.setToStock(unit u, int currentStock, int maxStock)
         AddItemToStock(u, id, currentStock, maxStock)
     else
         RemoveItemFromStock(u, id)
-
 
 init
     ItemAllowedCondition isNotLeveling = () -> whatMode[5] == NOT_LEVELING
@@ -67,10 +69,10 @@ init
     MANA_PENDANT.setCondition(notOnlyConsummibles)
     STORM_DIAMOND.setCondition(notOnlyConsummibles)
     BOOTS_OF_SPEED.setCondition(notOnlyConsummibles)
-    POWER_BOOSTER.setCondition(() -> notOnlyConsummibles.check() and isNotLeveling.check())
+    POWER_BOOSTER.setCondition(notOnlyConsummibles.and_(isNotLeveling))
 
-    ItemAllowedCondition isNotLevelingAndNotOnlyConsummibles = () -> isNotLeveling.check() and notOnlyConsummibles.check()
-    ItemAllowedCondition isLevelingAndNotOnlyConsummibles = () -> isLeveling.check() and notOnlyConsummibles.check()
+    let isNotLevelingAndNotOnlyConsummibles = isNotLeveling.and_(notOnlyConsummibles)
+    let isLevelingAndNotOnlyConsummibles = isLeveling.and_(notOnlyConsummibles)
 
     SHIELD_OF_HONOR_RECIPE.setCondition(notOnlyConsummibles)
     RING_OF_REGENERATION_1_RECIPE.setCondition(isNotLevelingAndNotOnlyConsummibles)
@@ -176,12 +178,13 @@ init
 
     // Create the shops and add the items
 
+    let colors = [PLAYER_COLOR_RED, PLAYER_COLOR_GREEN, PLAYER_COLOR_BLACK_PASSIVE, PLAYER_COLOR_BLACK_PASSIVE, PLAYER_COLOR_GREEN]
     let angles = [90..fromDeg(), 0..fromDeg(), 90..fromDeg(), 90..fromDeg(), 90..fromDeg()]
     for i = 0 to 4
-        createUnit(players[PLAYER_NEUTRAL_PASSIVE], MERCHANT, Rects.merchant[i].getCenter(), angles[i])
-        createUnit(players[PLAYER_NEUTRAL_PASSIVE], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])
-        createUnit(players[PLAYER_NEUTRAL_PASSIVE], SPECIAL_MERCHANT, Rects.specialMerchant[i].getCenter(), angles[i])
-        createUnit(players[PLAYER_NEUTRAL_PASSIVE], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])
+        createUnit(players[PLAYER_NEUTRAL_PASSIVE], MERCHANT, Rects.merchant[i].getCenter(), angles[i])..setColor(colors[i])
+        createUnit(players[PLAYER_NEUTRAL_PASSIVE], ARMS_MERCHANT, Rects.armsMerchant[i].getCenter(), angles[i])..setColor(colors[i])
+        createUnit(players[PLAYER_NEUTRAL_PASSIVE], SPECIAL_MERCHANT, Rects.specialMerchant[i].getCenter(), angles[i])..setColor(colors[i])
+        createUnit(players[PLAYER_NEUTRAL_PASSIVE], RECIPES_MERCHANT, Rects.recipeMerchant[i].getCenter(), angles[i])..setColor(colors[i])
     
     for i = 0 to 2
         createUnit(players[PLAYER_NEUTRAL_PASSIVE], BOOK_STORE, Rects.bookStore[i].getCenter(), UNIT_FACING)
@@ -262,6 +265,10 @@ init
             Dests.secretMerchantLever[i].restoreLife(5, false)
     end)
 
+    // To prevent the items dissapear from the shop
+    bj_stockUpdateTimer.pause()
+    bj_stockItemPurchased.disable()
+
 function BuildingDefinition.defaultSettings()
     this..setSelectionScale(2.25)
         ..setShadowTextureBuilding(Textures.shadowHouse)
@@ -283,7 +290,7 @@ function BuildingDefinition.defaultSettings()
         ..setCollisionSize(25.)
 
 @compiletime function gen()
-    new BuildingDefinition(MERCHANT, UnitIds.marketplace)
+    new BuildingDefinition(MERCHANT, UnitIds.arcanevault)
         ..defaultSettings()
         ..setItemsSold(commaList(
             SCROLL_OF_THE_BEAST.getNewId(),
@@ -299,7 +306,7 @@ function BuildingDefinition.defaultSettings()
         ..setUnitSoundSet(Soundsets.peon)
         .setName("Merchant")
 
-    new BuildingDefinition(ARMS_MERCHANT, UnitIds.marketplace)
+    new BuildingDefinition(ARMS_MERCHANT, UnitIds.arcanevault)
         ..defaultSettings()
         ..setItemsSold(commaList(
             CLAWS_OF_ATTACK_12.getNewId(),
@@ -319,7 +326,7 @@ function BuildingDefinition.defaultSettings()
         ..setUnitSoundSet(Soundsets.grunt)
         .setName("Arms merchant")
 
-    new BuildingDefinition(SPECIAL_MERCHANT, UnitIds.marketplace)
+    new BuildingDefinition(SPECIAL_MERCHANT, UnitIds.arcanevault)
         ..defaultSettings()
         ..setItemsSold(commaList(
             STAFF_OF_NEGATION.getNewId(),
@@ -333,14 +340,14 @@ function BuildingDefinition.defaultSettings()
         ..setUnitSoundSet(Soundsets.acolyte)
         .setName("Special merchant")
 
-    new BuildingDefinition(RECIPES_MERCHANT, UnitIds.marketplace)
+    new BuildingDefinition(RECIPES_MERCHANT, UnitIds.arcanevault)
         ..defaultSettings()
         ..setItemsSold(POCKET_CATAPULT_RECIPE.getDummyItem().toRawCode())
         ..setModelFile(Units.voidWalker)
         ..setUnitSoundSet(Soundsets.netherDragon)
         .setName("Recipes merchant")
 
-    new BuildingDefinition(SECRET_MERCHANT, UnitIds.marketplace)
+    new BuildingDefinition(SECRET_MERCHANT, UnitIds.arcanevault)
         ..defaultSettings()
         ..setItemsSold("")
         ..setModelFile(Units.spiritOfVengeance)

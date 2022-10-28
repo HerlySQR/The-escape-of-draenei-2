@@ -57,7 +57,10 @@ init
                             u.setXY(u.getPos().moveTowards(pos, offset))
                             if owner.isEnemyOf(u.getOwner())
                                 if u.getAbilityLevel('BPSE') == 0
-                                    InstantDummyCaster.castTarget(owner, DUMMY_STUN, 1, Orders.firebolt, u)
+                                    new DummyCaster()
+                                        ..origin(pos)
+                                        ..owner(owner)
+                                        ..castTarget(DUMMY_STUN, 1, Orders.firebolt, u)
                                 caster.damageTarget(u, damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
                     end)
                 else

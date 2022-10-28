@@ -35,7 +35,7 @@ init
         let p = GetTriggerPlayer()
         let i = p.getNumber()
         afkTime[i] = 0
-        if not whoAreHere.has(p)
+        if p.isIngame() and not whoAreHere.has(p)
             whoAreHere.add(p)
             for j = 0 to 4
                 gameBoard.setItemValueColor(row[i], j, COLOR_WHITE)

@@ -27,7 +27,10 @@ let cbMap = new HashMap<unit, CallbackSingle>()
 
 function fireImact(unit source, unit target)
     source.removeAbility(FIRE_IMPACT_BUFF)
-    InstantDummyCaster.castTarget(target.getOwner() == players[PLAYER_NEUTRAL_AGGRESSIVE] ? source.getOwner() : players[PLAYER_NEUTRAL_AGGRESSIVE] , FIRE_IMPACT_STUN, 1, Orders.creepthunderbolt, target, target.getPos())
+    new DummyCaster()
+        ..origin(source.getPos())
+        ..owner(target == source ? players[PLAYER_NEUTRAL_AGGRESSIVE] : source.getOwner())
+        ..castTarget(FIRE_IMPACT_STUN, 1, Orders.creepthunderbolt, target)
     source.damageTarget(target, dmgMap.get(source), ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE)
     dmgMap.remove(source)
 
@@ -55,6 +58,12 @@ init
             fireImact(source, target)
             destroy cbMap.get(source)
             cbMap.remove(source)
+    end)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let d = EventData.getDyingUnit()
+        if d.hasAbility(FIRE_IMPACT_BUFF)
+            destroy cbMap.get(d)
+            cbMap.remove(d)
     end)
 
 function AbilityDefinitionBerserk.general()

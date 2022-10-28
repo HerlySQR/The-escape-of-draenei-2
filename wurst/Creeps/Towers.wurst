@@ -101,10 +101,6 @@ init
                         if u.getTypeId() == DEMON_TOWER
                             u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     end)
-                    forUnitsInRect(Rects.demonTower2, u -> begin
-                        if u.getTypeId() == DEMON_TOWER
-                            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
-                    end)
                     forUnitsInRect(Rects.shops2, u -> begin
                         if u.isType(UNIT_TYPE_STRUCTURE)
                             u.setColor(DRAENEI.getColor())

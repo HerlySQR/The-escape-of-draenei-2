@@ -30,7 +30,7 @@ function AbilityDefinitionThunderBoltCreep.general()
         ..presetCastRange(lvl -> RANGE)
         // Audiovisual
         ..setMissileArt(Imports.shotIIBlue)
-        ..setIconNormal(Imports.bTNWispMissile)
+        ..presetIcon(Imports.bTNWispMissile)
 
 @compiletime function gen()
     new AbilityDefinitionThunderBoltCreep(LIGTHNING_SHOT_NL)

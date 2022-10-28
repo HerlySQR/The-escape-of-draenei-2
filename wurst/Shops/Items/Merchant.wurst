@@ -47,7 +47,7 @@ public constant MANA_POTION = compiletime(
         ..setTooltipBasic("[|cffffcc00W|r] Buy Mana Potion"))
 
 public constant CLARITY_POTION = compiletime(
-    new RecipeItem('pman')
+    new RecipeItem('plcl')
         //..setArmorType(ArmorSoundType.Stone)
         ..setClassification("Charged")
         ..setGoldCost(70)
@@ -135,7 +135,8 @@ public constant GREATER_POTION_OF_RESTORATION = compiletime(
     new RecipeItem('pres')
         //..setArmorType(ArmorSoundType.Stone)
         ..setClassification("Charged")
-        ..setGoldCost(150)
+        ..setGoldCost(200)
+        ..setLumberCost(1)
         ..setAbilities(LIFE_MANA_2_SPELL.toRawCode())
         ..setInterfaceIcon(Icons.bTNRejuvPotion)
         ..setButtonPositionX(0)

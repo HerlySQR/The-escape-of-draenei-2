@@ -113,8 +113,8 @@ public constant MANA_REPLISH_AREA_TOOLTIP = "When use it, restores {0} mana to n
     new AbilityDefinitionGiveGold(GOLD_COINS_SPELL)
         ..setGoldGiven(1, GOLD_COINS_AMT)
     
-    new AbilityDefinitionGiveGold(LUMBER_BALE_SPELL)
-        ..setGoldGiven(1, LUMBER_BALE_AMT)
+    new AbilityDefinitionGiveLumber(LUMBER_BALE_SPELL)
+        ..setLumberGiven(1, LUMBER_BALE_AMT)
     
     new AbilityDefinitionSilenceItem(SILENCE_SPELL)
         ..setDurationHero(1, SILENCE_DURATION)

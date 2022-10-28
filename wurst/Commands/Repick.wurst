@@ -25,18 +25,24 @@ public function onRepick(RepickListener cb)
     listeners.add(cb)
 
 int array inCombat
-boolean canRepick = true
+boolean canRepick
 DamageListener noRepick
 trigger reduce = CreateTrigger()
 
 public function enableRepick()
     canRepick = true
-    DamageEvent.addListener(noRepick)
+    if noRepick == null
+        noRepick = DamageEvent.addListener(() -> begin
+            if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
+                inCombat[DamageEvent.getTarget().getOwner().getNumber()] = 3
+        end)
     reduce.enable()
 
 public function disableRepick()
     canRepick = false
-    DamageEvent.removeListener(noRepick)
+    if noRepick != null
+        destroy noRepick
+        noRepick = null
     reduce.disable()
 
 public function repick(player p)
@@ -71,6 +77,7 @@ init
     onChatCommand("repick", (p, _) -> repick(p))
 
     onModesSelected(() -> begin
+        enableRepick()
         if whatMode[5] == LEVELING
             doAfter(20, () -> begin
                 print("\nYou can only repick until 2 minutes.")
@@ -84,15 +91,8 @@ init
     end)
 
     onReset(false, () -> begin
-        enableRepick()
-        
         for i = 1 to 10
             inCombat[i] = 0
-    end)
-
-    noRepick = DamageEvent.addListener(() -> begin
-        if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
-            inCombat[DamageEvent.getTarget().getOwner().getNumber()] = 3
     end)
 
     // No during combat

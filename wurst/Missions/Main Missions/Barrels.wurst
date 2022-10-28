@@ -146,6 +146,10 @@ init
                 QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator in the pavilion was destroyed")
             destroy powerFieldAnimation
             powerFieldAnimation = null
+            forUnitsInRect(Rects.demonTower2, u -> begin
+                if u.getTypeId() == DEMON_TOWER
+                    u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+            end)
         else if EventData.getDyingUnit() == wallGenerator2
             generatorAlive2 = false
             powerFieldEnter3.disable()

@@ -12,11 +12,11 @@ public constant BOOK_OF_INTELLIGENCE_5 = compiletime(ITEM_ID_GEN.next())
 public constant BOOK_OF_RECONVERSION = compiletime(ITEM_ID_GEN.next())
 public constant BOOK_OF_EXPERIENCE = compiletime(ITEM_ID_GEN.next())
 
-let STRENGTH_5 = compiletime(ABIL_ID_GEN.next())
-let AGILITY_5 = compiletime(ABIL_ID_GEN.next())
-let INTELLIGENCE_5 = compiletime(ABIL_ID_GEN.next())
-
 @compiletime function gen()
+    let STRENGTH_5 = ABIL_ID_GEN.next()
+    let AGILITY_5 = ABIL_ID_GEN.next()
+    let INTELLIGENCE_5 = ABIL_ID_GEN.next()
+
     new ItemDefinition(BOOK_OF_STRENGTH, 'tstr')
         ..setGoldCost(75)
         ..setStockReplenishInterval(0)

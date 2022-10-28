@@ -41,7 +41,10 @@ init
             m.onFinish(() -> begin
                 let pos2 = m.getPos().toVec2()
                 flashEffect(Objects.neutralBuildingExplosion, pos2)
-                InstantDummyCaster.castImmediate(m.owner, FIRE_BALL_SLOW, 1, Orders.creepthunderclap, pos2)
+                new DummyCaster()
+                    ..origin(pos2)
+                    ..owner(m.owner)
+                    ..castImmediate(FIRE_BALL_SLOW, 1, Orders.creepthunderclap)
                 forUnitsInRange(pos2, AREA, u -> begin
                     if m.owner.isEnemyOf(u.getOwner())
                         m.source.damageTarget(u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL)

@@ -1,13 +1,20 @@
 package Debug
 
-import HeroType
+import DamageEvent
+import Functions
+import Merchant
+//import HeroType
 
 init
+    DamageEvent.addListener() -> 
+        if DamageEvent.getSource().hasItemById(HEALING_SALVE.getNewId())
+            DamageEvent.getSource().removeItemById(HEALING_SALVE.getNewId())
+            DamageEvent.getSource().damageTarget(DamageEvent.getTarget(), 100, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE)
     //let pos = vec2(5200, -5200)
-    let pos = vec2(0, 0)
+    /*let pos = vec2(0, 0)
     for typ in HeroType
         createUnit(players[1], typ.getL(), pos)..setLevel(6, false)
         createUnit(players[1], typ.getNL(), pos)
-
 init
     createItem(WAR_HELMET.getNewId(), vec2(8000., 8000.))
+*/

@@ -2,6 +2,8 @@ package Command
 
 import AbilityData
 
+import Preloader
+
 public constant COMMAND_NL = compiletime(ABIL_ID_GEN.next())
 public constant COMMAND_L = compiletime(ABIL_ID_GEN.next())
 
@@ -53,6 +55,8 @@ init
                 master.setAbilityLevel(COMMAND_AURA, master.getAbilityLevel(COMMAND_AURA) + 1)
     end)
 
+    preloadAbility(COMMAND_AURA)
+
 function AbilityDefinitionHardenedSkin.general()
     this
         ..presetIgnoredDamage(lvl -> 0.)
@@ -85,8 +89,8 @@ function AbilityDefinitionHardenedSkin.general()
         ..presetLevels(4)
         ..setRequiredLevel(1)
         ..setHeroAbility(true)
-        ..setIconResearch(Imports.bTNHellscreamBerserk)
         ..general()
+        ..setIconResearch(Imports.bTNHellscreamBerserk)
         // Stats
         ..addTooltipProperty("Max charges", lvl -> MAX_CHARGES_L[lvl-1])
         // Audiovisual
@@ -102,6 +106,7 @@ function AbilityDefinitionHardenedSkin.general()
         ..presetRangedBonus(lvl -> true)
         ..presetTargetsAllowed(lvl -> "air,ground,friend,self,vuln,invu")
         ..presetBuffs(lvl -> COMMAND_BUFF.toRawCode())
+        ..setArtTarget("")
         ..setItemAbility(true)
         ..presetButtonPosNormal(0, -11)
         ..presetIcon(Imports.pASHellscreamBerserk)

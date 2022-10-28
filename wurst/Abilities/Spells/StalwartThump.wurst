@@ -42,6 +42,7 @@ init
             and not DamageEvent.getSource().getOwner().isAllyOf(target.getOwner())
             DamageEvent.addAmount(dmgMap.get(source))
             new DummyCaster()
+                ..origin(source.getPos())
                 ..owner(source.getOwner())
                 ..castTarget(STALWART_THUMP_STUN, 1, Orders.creepthunderbolt, target)
     end)

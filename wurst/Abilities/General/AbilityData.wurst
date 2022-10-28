@@ -12,7 +12,7 @@ import public ClosureTimers
 import public TimerUtils
 import public ClosureForGroups
 import public Orders
-import public InstantDummyCaster
+import public DummyCaster
 import public DummyRecycler
 import public HashMap
 import public SoundUtils

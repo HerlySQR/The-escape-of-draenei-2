@@ -38,7 +38,10 @@ init
             else
                 m.damage = DMG_L[data.lvl]
             m.onFinish(() -> begin
-                InstantDummyCaster.castPoint(m.owner, DISABLE_SPHERE_SILENCE, 1, Orders.silence, target, target)
+                new DummyCaster()
+                    ..origin(target)
+                    ..owner(m.owner)
+                    ..castPoint(DISABLE_SPHERE_SILENCE, 1, Orders.silence, target)
                 forUnitsInRange(target, AREA, u -> begin
                     if m.owner.isEnemyOf(u.getOwner()) and not u.isType(UNIT_TYPE_STRUCTURE) and not u.isType(UNIT_TYPE_MAGIC_IMMUNE)
                         m.source.damageTarget(u, m.damage, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FORCE)
