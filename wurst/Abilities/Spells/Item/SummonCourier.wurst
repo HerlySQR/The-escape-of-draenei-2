@@ -1,13 +1,19 @@
 package SummonCourier
 
 import AbilityData
+import PlayerData
+import HeroSelection
 
 import HashList
 import ClosureEvents
 
+import BountyController
+
 public constant COURIER = compiletime(UNIT_ID_GEN.next())
 public constant SUMMON_COURIER_SPELL = compiletime(ABIL_ID_GEN.next())
 
+let GO_TO_HERO = compiletime(UNIT_ID_GEN.next())
+let GO_TO_BASE = compiletime(UNIT_ID_GEN.next())
 let bannedItems = new HashList<int>()
 
 public function int.courierBanItem()
@@ -28,6 +34,32 @@ init
             EventData.getOrderedUnit().issueTargetOrderById(Orders.attack, EventData.getOrderedUnit())
             message("error", "That would be easy", EventData.getOrderedUnit().getOwner())
     end)
+    EventListener.add(EVENT_PLAYER_UNIT_SELL, () -> begin
+        let caster = EventData.getSellingUnit()
+        if caster.getTypeId() == COURIER
+            let u = EventData.getSoldUnit()
+            let typ = u.getTypeId()
+
+            if typ == GO_TO_HERO
+                let i = u.getOwner().getNumber()
+                if hero[i].isAlive()
+                    caster.issueTargetOrderById(Orders.smart, hero[i])
+            else if typ == GO_TO_BASE
+                caster.issuePointOrderById(Orders.move, (THE_DRAENEI.has(u) ? actDrSpawn : actDeSpawn).getCenter())
+            u.remove()
+    end)
+    EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let d = EventData.getDyingUnit()
+        if d.getTypeId() == COURIER
+            let p = EventData.getKillingUnit().getOwner()
+            printTimed("{0} killed {1}'s courier".format(p.getName(), d.getOwner().getName()), 10.)
+            if THE_DRAENEI.has(p)
+                for i = 1 to 5
+                    new Bounty().run(100, hero[i].isAlive() ? hero[i] : circle[i], playerM(i), true, false)
+            else if THE_DEMONS.has(p)
+                for i = 6 to 10
+                    new Bounty().run(100, hero[i].isAlive() ? hero[i] : circle[i], playerM(i), true, false)
+    end)
 
 @compiletime function gen()
     let COURIER_INV = ABIL_ID_GEN.next()
@@ -46,13 +78,40 @@ init
         ..setProjectileImpactZ(30.)
         ..setScalingValue(0.5)
         ..setNormalAbilities(commaList("Apiv", COURIER_INV.toRawCode()))
+        ..setUnitsSold(commaList(GO_TO_HERO, GO_TO_BASE))
         ..setSpeedBase(522)
         ..setCollisionSize(24.)
         ..setName("Courier")
     
+    new UnitDefinition(GO_TO_HERO, 'nalb')
+        ..setStockReplenishInterval(1)
+        ..setStockMaximum(1)
+        ..setNormalAbilities("")
+        ..setUnitSoundSet("")
+        ..setButtonPositionX(0)
+        ..setButtonPositionY(2)
+        ..setIconGameInterface(Icons.bTNRiderlessHorse)
+        ..setHotkey("Q")
+        ..setTooltipBasic("[|cffffcc00Q|r] Go to hero")
+        ..setTooltipExtended("Orders the courier to go to the position of your hero.")
+        ..setName("Go to hero")
+    
+    new UnitDefinition(GO_TO_BASE, 'nalb')
+        ..setStockReplenishInterval(1)
+        ..setStockMaximum(1)
+        ..setNormalAbilities("")
+        ..setUnitSoundSet("")
+        ..setButtonPositionX(1)
+        ..setButtonPositionY(2)
+        ..setIconGameInterface(Icons.bTNUndeadAirBarge)
+        ..setHotkey("W")
+        ..setTooltipBasic("[|cffffcc00W|r] Go to base")
+        ..setTooltipExtended("Orders the courier to go to the spawnpoint of your team.")
+        ..setName("Go to base")
+    
     new AbilityDefinitionFigurineUrsaWarrior(SUMMON_COURIER_SPELL)
-        ..setSummonUnitType(1, COURIER.toRawCode())
-        ..setDurationHero(1, 0.)
-        ..setDurationHero(1, 0.)
+        ..setSummonUnitType1(1, COURIER.toRawCode())
+        ..setDurationHero(1, 0)
+        ..setDurationNormal(1, 0)
         ..setIconNormal(Icons.bTNGoblinZeppelin)
         ..setName("Summon Courier")

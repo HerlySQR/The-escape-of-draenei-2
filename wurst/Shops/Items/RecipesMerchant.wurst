@@ -793,35 +793,40 @@ public constant POCKET_CATAPULT_RECIPE = compiletime(
         ..setButtonPositionY(2)
         ..setHotkey("V")
         ..setTooltipBasic("[|cffffcc00V|r] Buy Pocket Catapult (Recipe)")
-        ..setTooltipExtended("Unfold a calapult, that can you help to destroy the towers.\nLasts 120 seconds." +
+        ..setTooltipExtended("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.\n\n" +
                              "Requires:\n" +
-                             "- Courier\n\n")
-        ..setDescription("Unfold a calapult, that can you help to destroy the towers.\nLasts 120 seconds.")
+                             "- Courier\n"+
+                             "- Scroll of the beast\n\n")
+        ..setDescription("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
         ..setName("Recipe of Pocket Catapult"))
 
 public constant POCKET_CATAPULT = compiletime(
     new RecipeItem('wild')
         //..setArmorType(ArmorSoundType.Wood)
+        ..setAbilities(POCKET_CATAPULT_SPELL.toRawCode())
         ..setClassification("Charged")
         ..setInterfaceIcon(Icons.bTNCatapult)
         ..setTooltipBasic("[|cffffcc00C|r] Buy Pocket Catapult")
-        ..setTooltipExtended("Unfold a calapult, that can you help to destroy the towers.\nLasts 120 seconds.")
-        ..setDescription("Unfold a calapult, that can you help to destroy the towers.\nLasts 120 seconds.")
+        ..setTooltipExtended("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
+        ..setDescription("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
         ..setName("Pocket Catapult"))
 
 @compiletime function genPocketCatapult()
     fixRecipe(POCKET_CATAPULT_RECIPE, POCKET_CATAPULT,
         
         SUMMON_COURIER.goldCost +
+        SCROLL_OF_THE_BEAST.goldCost +
         POCKET_CATAPULT_RECIPE.goldCost,
         
         SUMMON_COURIER.lumberCost +
+        SCROLL_OF_THE_BEAST.lumberCost +
         POCKET_CATAPULT_RECIPE.lumberCost)
 
 init
     new ItemRecipe()
         ..setRequiredItems(
             SUMMON_COURIER,
+            SCROLL_OF_THE_BEAST,
             POCKET_CATAPULT_RECIPE)
         ..setResultItem(POCKET_CATAPULT)
 

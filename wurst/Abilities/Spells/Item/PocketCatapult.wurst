@@ -1,0 +1,36 @@
+package PocketCatapult
+
+import AbilityData
+
+import BountyController
+
+public constant POCKET_CATAPULT_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let CATAPULT = compiletime(UNIT_ID_GEN.next())
+
+init
+    Bounty.set(CATAPULT, 25, 7, 3)
+
+@compiletime function gen()
+    new AbilityDefinitionFigurineUrsaWarrior(POCKET_CATAPULT_SPELL)
+        ..setSummonUnitType1(1, CATAPULT.toRawCode())
+        ..setIconNormal(Icons.bTNCatapult)
+        ..setArtTarget(Objects.toonBoom)
+        ..setName("Pocket catapult")
+    
+    new UnitDefinition(CATAPULT, 'ocat')
+        ..setAttack1Range(800)
+        ..setAttack1DamageBase(61)
+        ..setAttack1ProjectileArt(Abilities.catapultMissile)
+        ..setAttack2Range(800)
+        ..setUnitClassification("summoned,mechanical")
+        ..setFoodCost(0)
+        ..setHitPointsMaximumBase(725)
+        ..setModelFileExtraVersions("1")
+        ..setIconGameInterface(Icons.bTNCatapult)
+        ..setScalingValue(0.8)
+        ..setNormalAbilities("")
+        ..setUpgradesUsed("")
+        ..setRequirements("")
+        ..setCollisionSize(32.)
+        ..setName("Catapult")

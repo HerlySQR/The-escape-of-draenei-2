@@ -108,6 +108,7 @@ public constant SUMMON_COURIER = compiletime(
     new RecipeItem('wild')
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Charged")
+        ..setGoldCost(0)
         ..setLumberCost(2)
         ..setAbilities(SUMMON_COURIER_SPELL.toRawCode())
         ..setStockReplenishInterval(1)

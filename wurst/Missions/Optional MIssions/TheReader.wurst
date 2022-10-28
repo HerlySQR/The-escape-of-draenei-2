@@ -191,7 +191,7 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
         let u = EventData.getTriggerUnit()
         let p = u.getOwner()
-        if not whoAre.has(p) and EventData.getManipulatedItem().getTypeId() == BOOK
+        if not whoAre.has(p) and EventData.getOrderTargetItem().getTypeId() == BOOK
             message("error", "No time to read, besides boring.", p)
             u.issueTargetOrderById(Orders.attack, u)
     end)

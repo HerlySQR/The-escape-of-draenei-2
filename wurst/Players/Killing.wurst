@@ -5,6 +5,7 @@ import MyBoard
 import ArrayList
 import DamageEvent
 import BountyController
+import TheMonster
 
 import ClosureEvents
 import ClosureTimers
@@ -110,10 +111,10 @@ init
                             ultraKill[k] = 10
                             print(playerName[k] + " just got a |cff00ffffRampage|r!")
                 else
-                    /*if GetKillingUnit() == udg_Golem_de_carne
+                    if GetKillingUnit() == theMonster
                         printTimed(playerName[d] + " was killed by The Monster", 4.00)
                     else
-                        printTimed(playerName[d] + " was killed by the Neutral Creeps", 4.00)*/
+                        printTimed(playerName[d] + " was killed by the Neutral Creeps", 4.00)
             else
                 // Killed by an ally
                 if p1 == p2

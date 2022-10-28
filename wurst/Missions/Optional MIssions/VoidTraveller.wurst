@@ -230,7 +230,7 @@ init
         let u = EventData.getTriggerUnit()
         let p = u.getOwner()
         if not whoAre.has(p)
-            let typ = EventData.getManipulatedItem().getTypeId()
+            let typ = EventData.getOrderTargetItem().getTypeId()
             if typ == EGG
                 message("error", "How cruel it would be to steal an egg without reason.", p)
                 u.issueTargetOrderById(Orders.attack, u)
