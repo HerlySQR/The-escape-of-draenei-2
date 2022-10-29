@@ -83,7 +83,7 @@ init
 
                 paralized
                     ..setInvulnerable(true)
-                    ..pause()
+                    ..pause(true)
                 
                 let p = GetOwningPlayer(paralized)
                 whoAre.add(p)
@@ -147,7 +147,7 @@ init
             doAfter(2., () -> theReader.setFacing(270..asAngleDegrees()))
             paralized
                 ..setInvulnerable(false)
-                ..unpause()
+                ..pause(false)
         end)
 
     // Pings
@@ -207,7 +207,7 @@ init
                 inDialog = true
                 theReader.setFacing(theReader.getPos().angleTo(u.getPos()))
                 if objectGathered
-                    paralized = u..pause()..setInvulnerable(true)
+                    paralized = u..pause(true)..setInvulnerable(true)
                     returning.disable()
                     returningBefore.disable()
                     var given = new Reference(false)
@@ -231,7 +231,7 @@ init
                     t.addLine(theReader, null, "Reader", null, "Now please, leave me alone.", TTime.SET, 3., true)
                     t.addLine(paralized, null, "You", null, "Uhmm.", TTime.SET, 5., true)
                     t.addEnd(() -> begin
-                        paralized..unpause().setInvulnerable(false)
+                        paralized..pause(false).setInvulnerable(false)
                         theReaderQuest.complete(true)
                         returningAfter.enable()
                         if t.wasSkipped()

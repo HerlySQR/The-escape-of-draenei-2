@@ -89,7 +89,7 @@ init
                 lordOfFire.revive(originPos, false)
             lordOfFire
                 ..setFacing(originFace)
-                ..pause()
+                ..pause(true)
                 ..setInvulnerable(true)
         draeneiSaw = 0
         theyKnowYou[lordOfFireIndex].clear()
@@ -108,7 +108,7 @@ init
 
                 paralized
                     ..setInvulnerable(true)
-                    ..pause()
+                    ..pause(true)
                 let p = GetOwningPlayer(paralized)
                 whoAre.add(p)
                 
@@ -197,7 +197,7 @@ init
             doAfter(2., () -> lordOfFire.setFacing(180..asAngleDegrees()))
             paralized
                 ..setInvulnerable(false)
-                ..unpause()
+                ..pause(false)
         end)
     
     // Kill an enemy hero
@@ -232,7 +232,7 @@ init
                 let t = new Transmission(whoAre, 0)
                 t.addLine(lordOfFire, null, "Lord of Fire", null, "Hello again.", TTime.SET, 3.5, true)
                 if kills == 5
-                    paralized..pause()..setInvulnerable(true)
+                    paralized..pause(true)..setInvulnerable(true)
                     returning.disable()
                     var given = new Reference(false)
                     t.addLine(lordOfFire, null, "Lord of Fire", null, "Yes, good job, As I said the only thing you need is an incentive.", TTime.SET, 5., true)
@@ -248,7 +248,7 @@ init
                     t.addActions(() -> paralized.setFacing(paralized.getFacingAngle() * -1))
                     t.addLine(paralized, null, "You", null, "This money isn't enough.", TTime.SET, 4., true)
                     t.addEnd(() -> begin
-                        paralized..unpause().setInvulnerable(false)
+                        paralized..pause(false).setInvulnerable(false)
                         lordOfFireQuest.complete(true)
                         if t.wasSkipped()
                             if not given.into()

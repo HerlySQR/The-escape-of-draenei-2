@@ -8,7 +8,7 @@ import Orders
 import ClosureForGroups
 import ClosureTimers
 
-// Friendly Fire off
+// Friendly Fire off (unless)
 init
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ATTACKED)

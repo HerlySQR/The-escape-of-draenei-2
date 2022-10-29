@@ -96,7 +96,7 @@ init
 
                 paralized
                     ..setInvulnerable(true)
-                    ..pause()
+                    ..pause(true)
                 
                 let p = GetOwningPlayer(paralized)
                 whoAre.add(p)
@@ -151,7 +151,7 @@ init
                 whoAre.remove(p)
             paralized
                 ..setInvulnerable(false)
-                ..unpause()
+                ..pause(false)
         end)
 
     // Pings
@@ -265,7 +265,7 @@ init
                 inDialog = true
                 voidTraveller.setFacing(voidTraveller.getPos().angleTo(u.getPos()))
                 if objectsGathered == 3
-                    paralized = u..pause()..setInvulnerable(true)
+                    paralized = u..pause(true)..setInvulnerable(true)
                     returning.disable()
                     returningBefore.disable()
                     var moved = new Reference(false)
@@ -283,7 +283,7 @@ init
                         ..addLine(voidTraveller, null, "Void Traveller", null, "My potion it's done, thanks for help, I'll do my promise.", TTime.SET, 5., true)
                         ..addActions(2., () -> endVoidTraveller())
                     t.addEnd(() -> begin
-                        paralized..unpause().setInvulnerable(false)
+                        paralized..pause(false).setInvulnerable(false)
                         QuestMessageBJ(whoAre, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00MISSION COMPLETE|r\n"
                                                                             + "Void Traveller\n")
                         voidTravellerQuest.complete(true)

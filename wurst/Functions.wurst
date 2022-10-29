@@ -631,3 +631,39 @@ public constant DUMMY_ABILITY = compiletime(ABIL_ID_GEN.next())
 
 @compiletime function gen()
     new ChannelAbilityPreset(DUMMY_ABILITY, 1, true)
+
+// Item closure
+
+public interface ForItemCallback
+    function callback(item m)
+
+// ====Callback stack for nested usage====
+ForItemCallback array tempCallbacks
+var tempCallbacksCount = 0
+var maxCount = INT_MAX
+var iterCount = 0
+constant filter = Filter(() -> filterCallback(GetFilterItem()))
+
+function filterCallback(item filter)
+    if iterCount < maxCount
+        currentCallback().callback(filter)
+    iterCount++
+
+function pushCallback(ForItemCallback c)
+    tempCallbacks[tempCallbacksCount] = c
+    tempCallbacksCount++
+    iterCount = 0
+    maxCount = INT_MAX
+
+function popCallback()
+    tempCallbacksCount--
+    destroy tempCallbacks[tempCallbacksCount]
+
+function currentCallback() returns ForItemCallback
+    return tempCallbacks[tempCallbacksCount - 1]
+
+/** Executes the given closure for every unit in the given rect */
+public function forItemsInRect(rect r, ForItemCallback c)
+    pushCallback(c)
+    EnumItemsInRect(r, filter, null)
+    popCallback()

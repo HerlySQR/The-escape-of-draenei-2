@@ -90,7 +90,7 @@ init
 
                 paralized
                     ..setInvulnerable(true)
-                    ..pause()
+                    ..pause(true)
                 
                 let p = GetOwningPlayer(paralized)
                 whoAre.add(p)
@@ -190,7 +190,7 @@ init
             doAfter(2., () -> thePrisoner.setFacing(270..asAngleDegrees()))
             paralized
                 ..setInvulnerable(false)
-                ..unpause()
+                ..pause(false)
         end)
     
     // Kill an enemy hero
@@ -225,7 +225,7 @@ init
                 let t = new Transmission(whoAre, 0)
                 t.addLine(thePrisoner, null, "Prisoner", null, "Hello again.", TTime.SET, 3.5, true)
                 if kills == 5
-                    paralized..pause()..setInvulnerable(true)
+                    paralized..pause(true)..setInvulnerable(true)
                     returning.disable()
                     var given = new Reference(false)
                     t.addLine(thePrisoner, null, "Prisoner", null, "I see you get 5 kills, you are too strong, as I said I'll give you the gold.", TTime.SET, 5.5, true)
@@ -239,7 +239,7 @@ init
                     t.addActions(2., first)
                     t.addLine(thePrisoner, null, "Prisoner", null, "Now go to give to the demons what they deserve!", TTime.SET, 5., true)
                     t.addEnd(() -> begin
-                        paralized..unpause().setInvulnerable(false)
+                        paralized..pause(false).setInvulnerable(false)
                         thePrisonerQuest.complete(true)
                         if t.wasSkipped()
                             if not given.into()

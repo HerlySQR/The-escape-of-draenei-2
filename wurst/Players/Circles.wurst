@@ -5,6 +5,7 @@ import ArrayList
 import AbilityData
 import GeneratedValues
 import Reset
+import initlater PlayerData
 
 public constant CIRCLE = compiletime(UNIT_ID_GEN.next())
 
@@ -13,7 +14,8 @@ let MANA_REGEN = compiletime(ABIL_ID_GEN.next())
 let ZOOM_IN = compiletime(ABIL_ID_GEN.next())
 let ZOOM_OUT = compiletime(ABIL_ID_GEN.next())
 let TOWER_RANGE = compiletime(ABIL_ID_GEN.next())
-let NO_IMMO = compiletime(BUFF_ID_GEN.next())
+let PICK_ITEMS = compiletime(ABIL_ID_GEN.next())
+let DROP_ITEMS = compiletime(ABIL_ID_GEN.next())
 
 public rect itemDraenei = Rects.items1
 public rect itemDemons = Rects.items2
@@ -118,10 +120,30 @@ init
     pointCircle[5].add(Rects.circle54)
     pointCircle[5].add(Rects.circle55)
 
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> GetManipulatedItem().setPlayer(GetManipulatingUnit().getOwner(), false))
+
+    registerSpellEffectEvent(PICK_ITEMS, () -> begin
+        let caster = GetSpellAbilityUnit()
+        let owner = caster.getOwner()
+        let r = THE_DRAENEI.has(owner) ? itemDraenei : itemDemons
+        forItemsInRect(r, m -> begin
+            if m.getPlayer() == owner
+                caster.addItemHandle(m)
+        end)
+    end)
+
+    registerSpellEffectEvent(DROP_ITEMS, () -> begin
+        let caster = GetSpellAbilityUnit()
+        for m in caster.inventory()
+            caster.removeItem(m)
+    end)
+
 @compiletime function gen()
+    let NO_IMMO = BUFF_ID_GEN.next()
+
     new UnitDefinition(CIRCLE, 'ncop')
         ..setFoodProduced(5) // 5 missions
-        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory, ZOOM_IN, ZOOM_OUT, TOWER_RANGE))
+        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, PICK_ITEMS, DROP_ITEMS))
         ..setName("Circle of power")
 
     new AbilityDefinitionDefend(ZOOM_IN)
@@ -203,3 +225,25 @@ init
     new AbilityDefinitionNeutralRegenmanaonly(MANA_REGEN)
         ..setAmountRegenerated(1, 0.02)
         ..setPercentage(1, true)
+
+    new ChannelAbilityPreset(PICK_ITEMS, 1, true)
+        ..setIconNormal(Icons.bTNLoad)
+        ..setButtonPositionNormalX(0)
+        ..setButtonPositionNormalY(2)
+        ..setHotkeyNormal("Q")
+        ..setTooltipTurnOff(1, "[|cffffcc00Q|r] Pick items")
+        ..setTooltipTurnOffExtended(1, "Picks up your nearby items.")
+        ..setTooltipNormal(1, "[|cffffcc00Q|r] Pick items")
+        ..setTooltipNormalExtended(1, "Picks up your nearby items.")
+        ..setName("Pick items")
+
+    new ChannelAbilityPreset(DROP_ITEMS, 1, true)
+        ..setIconNormal(Icons.bTNUnLoad)
+        ..setButtonPositionNormalX(1)
+        ..setButtonPositionNormalY(2)
+        ..setHotkeyNormal("W")
+        ..setTooltipTurnOff(1, "[|cffffcc00W|r] Drop items")
+        ..setTooltipTurnOffExtended(1, "Drop the items in the inventory.")
+        ..setTooltipNormal(1, "[|cffffcc00W|r] Drop items")
+        ..setTooltipNormalExtended(1, "Drop the items in the inventory.")
+        ..setName("Drop items")

@@ -10,7 +10,7 @@ init
             return GetKillingUnit().getOwner().isAllyOf(GetDyingUnit().getOwner())
         end))
         ..addAction(() -> begin
-            createTTEx(GetDyingUnit().getPos3Zero(), colorId[GetDyingUnit().getOwner().getNumber()] + "!|r", 10)
+            createTTEx(GetDyingUnit().getPos3Zero(), colorId[GetKillingUnit().getOwner().getNumber()] + "!|r", 10)
                 ..setSpeed(64., 90.)
                 ..setPermanent(false)
                 ..setLifespan(4.)

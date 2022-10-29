@@ -137,7 +137,7 @@ init
             ping.disable()
             paralized = GetEnteringUnit()
                 ..setInvulnerable(true)
-                ..pause()
+                ..pause(true)
 
             let p = paralized.getOwner()
             let face = thePrisoner.getFacingAngle()
@@ -188,7 +188,7 @@ init
                 destroy haveItem
                 thePrisoner.setFacing(face)
                 disturbing(p, theFountainIndex)
-                paralized..unpause()..setInvulnerable(false)
+                paralized..pause(false)..setInvulnerable(false)
                 
                 if THE_DRAENEI.has(p)
                     QuestMessageBJ(whoAre, bj_QUESTMESSAGE_UPDATED, "|cffffcc00UPDATE: THE FOUNTAIN|r\n"
