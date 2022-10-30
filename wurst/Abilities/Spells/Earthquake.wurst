@@ -1,7 +1,6 @@
 package Earthquake
 
 import AbilityData
-import DummyDamager
 
 public constant EARTHQUAKE_NL = compiletime(ABIL_ID_GEN.next())
 public constant EARTHQUAKE_L = compiletime(ABIL_ID_GEN.next())
@@ -29,18 +28,19 @@ init
         if data.check
             let caster = EventData.getSpellAbilityUnit()
             let pos = EventData.getSpellTargetPos()
-            let dummy = DummyRecycler.get(pos, UNIT_FACING)
-            dummy.addAbility(DUMMY_EARTHQUAKE)
+            
+            int lvl
             if data.isNL
-                dummy.setAbilityLevel(DUMMY_EARTHQUAKE, data.lvl + 1)
+                lvl = data.lvl + 1
             else
-                dummy.setAbilityLevel(DUMMY_EARTHQUAKE, data.lvl + 3)
-            dummy.setOwner(caster.getOwner(), false)
-            caster.dummyDamage(dummy, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SONIC)
-            dummy.issueImmediateOrderById(Orders.stomp)
-            doAfter(0.27) -> 
-                dummy.removeAbility(DUMMY_EARTHQUAKE)
-                DummyRecycler.recycle(dummy)
+                lvl = data.lvl + 3
+            
+            new DummyCaster()
+                ..owner(caster.getOwner())
+                ..origin(pos)
+                ..delay(0.27)
+                ..castImmediate(DUMMY_EARTHQUAKE, lvl, Orders.stomp)
+            
             addEffect(Abilities.earthquakeTarget, pos).destroyAfter(2.)
     end)
 

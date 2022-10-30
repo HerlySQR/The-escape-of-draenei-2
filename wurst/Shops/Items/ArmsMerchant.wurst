@@ -8,7 +8,6 @@ public constant CLAWS_OF_ATTACK_12 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(400)
         ..setAbilities("")
-        ..addBonus(Bonus.DAMAGE, 12)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(0)
         ..setButtonPositionY(0)
@@ -17,6 +16,7 @@ public constant CLAWS_OF_ATTACK_12 = compiletime(
         ..setTooltipExtended("Increase the attack damage of the hero by 12.")
         ..setDescription("Increase the attack damage of the hero by 12.")
         ..setName("Claws of Attack (+12)"))
+        ..addBonus(Bonus.DAMAGE, 12)
 
 public constant CLAWS_OF_ATTACK_15 = compiletime(
     new RecipeItem('ratc')
@@ -24,7 +24,6 @@ public constant CLAWS_OF_ATTACK_15 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(600)
         ..setAbilities("")
-        ..addBonus(Bonus.DAMAGE, 15)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(1)
         ..setButtonPositionY(0)
@@ -33,6 +32,7 @@ public constant CLAWS_OF_ATTACK_15 = compiletime(
         ..setTooltipExtended("Increase the attack damage of the hero by 15.")
         ..setDescription("Increase the attack damage of the hero by 15.")
         ..setName("Claws of Attack (+15)"))
+        ..addBonus(Bonus.DAMAGE, 15)
 
 public constant CLAWS_OF_ATTACK_18 = compiletime(
     new RecipeItem('ratc')
@@ -40,7 +40,6 @@ public constant CLAWS_OF_ATTACK_18 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(800)
         ..setAbilities("")
-        ..addBonus(Bonus.DAMAGE, 18)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(2)
         ..setButtonPositionY(0)
@@ -49,6 +48,7 @@ public constant CLAWS_OF_ATTACK_18 = compiletime(
         ..setTooltipExtended("Increase the attack damage of the hero by 18.")
         ..setDescription("Increase the attack damage of the hero by 18.")
         ..setName("Claws of Attack (+18)"))
+        ..addBonus(Bonus.DAMAGE, 18)
 
 public constant CLAWS_OF_ATTACK_21 = compiletime(
     new RecipeItem('ratc')
@@ -56,7 +56,6 @@ public constant CLAWS_OF_ATTACK_21 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(1000)
         ..setAbilities("")
-        ..addBonus(Bonus.DAMAGE, 21)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(3)
         ..setButtonPositionY(0)
@@ -65,6 +64,7 @@ public constant CLAWS_OF_ATTACK_21 = compiletime(
         ..setTooltipExtended("Increase the attack damage of the hero by 21.")
         ..setDescription("Increase the attack damage of the hero by 21.")
         ..setName("Claws of Attack (+21)"))
+        ..addBonus(Bonus.DAMAGE, 21)
 
 public constant RING_OF_PROTECTION_2 = compiletime(
     new RecipeItem('rde1')
@@ -72,7 +72,6 @@ public constant RING_OF_PROTECTION_2 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(200)
         ..setAbilities("")
-        ..addBonus(Bonus.ARMOR, 2)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
@@ -80,6 +79,7 @@ public constant RING_OF_PROTECTION_2 = compiletime(
         ..setTooltipBasic("[|cffffcc00A|r] Ring of protection (+2)")
         ..setTooltipExtended("Increase the attack damage of the hero by 21.")
         ..setDescription("Increase the attack damage of the hero by 21."))
+        ..addBonus(Bonus.ARMOR, 2)
 
 public constant RING_OF_PROTECTION_3 = compiletime(
     new RecipeItem('rde2')
@@ -87,12 +87,12 @@ public constant RING_OF_PROTECTION_3 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(350)
         ..setAbilities("")
-        ..addBonus(Bonus.ARMOR, 3)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(1)
         ..setButtonPositionY(1)
         ..setHotkey("S")
         ..setTooltipBasic("[|cffffcc00S|r] Ring of protection (+3)"))
+        ..addBonus(Bonus.ARMOR, 3)
 
 public constant RING_OF_PROTECTION_4 = compiletime(
     new RecipeItem('rde3')
@@ -100,12 +100,12 @@ public constant RING_OF_PROTECTION_4 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(500)
         ..setAbilities("")
-        ..addBonus(Bonus.ARMOR, 4)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(2)
         ..setButtonPositionY(1)
         ..setHotkey("D")
         ..setTooltipBasic("[|cffffcc00S|r] Ring of protection (+4)"))
+        ..addBonus(Bonus.ARMOR, 4)
 
 public constant RING_OF_PROTECTION_6 = compiletime(
     new RecipeItem('rde3')
@@ -113,7 +113,6 @@ public constant RING_OF_PROTECTION_6 = compiletime(
         ..setClassification("Permanent")
         ..setGoldCost(650)
         ..setAbilities("")
-        ..addBonus(Bonus.ARMOR, 6)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(3)
         ..setButtonPositionY(1)
@@ -122,6 +121,7 @@ public constant RING_OF_PROTECTION_6 = compiletime(
         ..setTooltipExtended("Increase the armor by 6.")
         ..setDescription("Increase the armor by 6.")
         ..setName("Ring of protection +6"))
+        ..addBonus(Bonus.ARMOR, 6)
 
 public constant ORB_OF_CORRUPTION = compiletime(
     new RecipeItem('ocor')
@@ -130,13 +130,13 @@ public constant ORB_OF_CORRUPTION = compiletime(
         ..setGoldCost(550)
         ..setLumberCost(3)
         ..setAbilities(CORRUPTION_ORB_3_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 5)
         ..setButtonPositionX(0)
         ..setButtonPositionY(2)
         ..setRequirements("")
         ..setHotkey("Z")
         ..setTooltipBasic("[|cffffcc00Z|r] Buy Orb Corruption")
         ..setTooltipExtended("Adds 5 attack damage bonus to the hero wearing them and reduces the armor of enemy units for 5 seconds.\n\n|cffff0000Orb effects don't stack.|r"))
+        ..addBonus(Bonus.DAMAGE, 5)
 
 public constant ORB_OF_LIGHTNING = compiletime(
     new RecipeItem('oli2')
@@ -145,13 +145,13 @@ public constant ORB_OF_LIGHTNING = compiletime(
         ..setGoldCost(550)
         ..setLumberCost(2)
         ..setAbilities(LIGHTNING_ORB_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 5)
         ..setButtonPositionX(1)
         ..setButtonPositionY(2)
         ..setRequirements("")
         ..setHotkey("X")
         ..setTooltipBasic("[|cffffcc00X|r] Buy Orb of Lightning")
         ..setTooltipExtended("Adds 5 attack damage bonus to the hero wearing them and can dispel magic and slow enemy movement speed for 3 seconds (1 for heroes).\n|cffffcc00Deals 150 damage bonus to summoned units.|r\n\n|cffff0000Orb effects don't stack.|r"))
+        ..addBonus(Bonus.DAMAGE, 5)
 
 public constant ICE_ORB = compiletime(
     new RecipeItem('ofro')
@@ -160,13 +160,13 @@ public constant ICE_ORB = compiletime(
         ..setGoldCost(550)
         ..setLumberCost(2)
         ..setAbilities(ICE_ORB_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 5)
         ..setButtonPositionX(2)
         ..setButtonPositionY(2)
         ..setRequirements("")
         ..setHotkey("C")
         ..setTooltipBasic("[|cffffcc00C|r] Buy Ice Orb")
         ..setTooltipExtended("Adds 6 Cold Damage Bonus to the Hero Attack that carries it and slows the enemy's movement speed and attack rate for 1.5 seconds.\n\n|cffff0000Orb effects don't stack.|r"))
+        ..addBonus(Bonus.DAMAGE, 5)
 
 public constant ICE_ORB_BREATH = compiletime(
     new RecipeItem('ofro')
@@ -175,13 +175,13 @@ public constant ICE_ORB_BREATH = compiletime(
         ..setGoldCost(550)
         ..setLumberCost(2)
         ..setAbilities(ICE_ORB_BREATH_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 5)
         ..setButtonPositionX(2)
         ..setButtonPositionY(2)
         ..setRequirements("")
         ..setHotkey("C")
         ..setTooltipBasic("[|cffffcc00C|r] Buy Ice Orb")
         ..setTooltipExtended("Adds 6 Cold Damage Bonus to the Hero Attack that carries it and slows the enemy's movement speed and attack rate for 1.5 seconds.\n\n|cffff0000Orb effects don't stack.|r"))
+        ..addBonus(Bonus.DAMAGE, 5)
 
 public constant UNITE_SPIRIT_RUNE = compiletime(
     new ItemDefinition(ITEM_ID_GEN.next(), 'rspl')

@@ -2,6 +2,7 @@ package RecipesMerchant
 
 import ClosureEvents
 import ClosureTimers
+import DamageEvent
 
 import ItemCreation
 import Merchant
@@ -33,14 +34,13 @@ public constant SHIELD_OF_HONOR_RECIPE = compiletime(
 public constant SHIELD_OF_HONOR = compiletime(
     new RecipeItem('shhn')
         ..setAbilities(COMMAND_AURA_SPELL.toRawCode())
-        ..addBonus(Bonus.ARMOR, 8)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNHumanArmorUpThree)
-        ..addBonus(Bonus.ARMOR, 8)
         ..setTooltipExtended("+8 armor\n" + COMMAND_AURA_TOOLTIP)
         ..setDescription("+8 armor and\n" + COMMAND_AURA_TOOLTIP)
         ..setName("Shield of honor"))
+        ..addBonus(Bonus.ARMOR, 8)
 
 @compiletime function genShieldOfHonor()
     fixRecipe(SHIELD_OF_HONOR_RECIPE, SHIELD_OF_HONOR,
@@ -88,14 +88,13 @@ public constant RING_OF_REGENERATION_1_RECIPE = compiletime(
 public constant RING_OF_REGENERATION_1 = compiletime(
     new RecipeItem('rlif')
         ..setAbilities("")
-        ..addBonus(Bonus.LIFEREGEN, 5)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNRingSkull)
-        ..addBonus(Bonus.LIFEREGEN, 5)
         ..setTooltipExtended("+5 Health regeneration.")
         ..setDescription("+5 Health regeneration.")
         ..setName("Ring of Regeneration"))
+        ..addBonus(Bonus.LIFEREGEN, 5)
 
 @compiletime function genRingOfRegeneration1()
     fixRecipe(RING_OF_REGENERATION_1_RECIPE, RING_OF_REGENERATION_1,
@@ -136,14 +135,13 @@ public constant RING_OF_REGENERATION_2_RECIPE = compiletime(
 public constant RING_OF_REGENERATION_2 = compiletime(
     new RecipeItem('rlif')
         ..setAbilities("")
-        ..addBonus(Bonus.LIFEREGEN, 5)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNRingSkull)
-        ..addBonus(Bonus.LIFEREGEN, 5)
         ..setTooltipExtended("+5 Health regeneration.")
         ..setDescription("+5 Health regeneration.")
         ..setName("Ring of Regeneration"))
+        ..addBonus(Bonus.LIFEREGEN, 5)
 
 @compiletime function genRingOfRegeneration2()
     fixRecipe(RING_OF_REGENERATION_2_RECIPE, RING_OF_REGENERATION_2,
@@ -187,14 +185,13 @@ public constant SOBI_MASK_1_RECIPE = compiletime(
 public constant SOBI_MASK_1 = compiletime(
     new RecipeItem('rwiz')
         ..setAbilities("")
-        ..addBonus(Bonus.MANAREGEN, 1.25)
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNSobiMask)
-        ..addBonus(Bonus.MANAREGEN, 1.25)
         ..setTooltipExtended("+1.25 Mana regeneration.")
         ..setDescription("+1.25 Mana regeneration.")
         ..setName("Sobi Mask"))
+        ..addBonus(Bonus.MANAREGEN, 1.25)
 
 @compiletime function genSobiMask1()
     fixRecipe(SOBI_MASK_1_RECIPE, SOBI_MASK_1,
@@ -235,14 +232,13 @@ public constant SOBI_MASK_2_RECIPE = compiletime(
 public constant SOBI_MASK_2 = compiletime(
     new RecipeItem('rwiz')
         ..setAbilities("")
-        ..addBonus(Bonus.MANAREGEN, 1.25)
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNSobiMask)
-        ..addBonus(Bonus.MANAREGEN, 1.25)
         ..setTooltipExtended("+1.25 Mana regeneration.")
         ..setDescription("+1.25 Mana regeneration.")
         ..setName("Sobi Mask"))
+        ..addBonus(Bonus.MANAREGEN, 1.25)
 
 @compiletime function genSobiMask2()
     fixRecipe(SOBI_MASK_2_RECIPE, SOBI_MASK_2,
@@ -266,65 +262,65 @@ init
 
     SOBI_MASK_2_RECIPE.initShopConditions()
 
-// Fire Blade
+// Runic bracers
 
-public constant FIRE_BLADE_RECIPE = compiletime(
+public constant RUNIC_BRACERS_RECIPE = compiletime(
     new Recipe()
         ..setGoldCost(300)
-        ..setLumberCost(5)
+        ..setLumberCost(3)
         ..setStockReplenishInterval(10)
-        ..setInterfaceIcon(Icons.bTNArcaniteMelee)
-        ..setButtonPositionX(3)
-        ..setButtonPositionY(0)
+        ..setInterfaceIcon(Icons.bTNBoots)
+        ..setButtonPositionX(1)
+        ..setButtonPositionY(2)
         ..setHotkey("R")
-        ..setTooltipBasic("[|cffffcc00R|r] Buy Fire Blade (Recipe)")
-        ..setTooltipExtended("+70 damage and 20% of chance of causing 2 times normal damage.\n\n" +
+        ..setTooltipBasic("[|cffffcc00R|r] Buy Runic Bracers (Recipe)")
+        ..setTooltipExtended("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP + "\n\n" +
                              "Requires:\n" +
-                             "- Claws of attack (+12)\n" +
-                             "- Claws of attack (+15)\n" +
-                             "- Claws of attack (+18)\n" +
-                             "- Claws of attack (+21)\n\n")
-        ..setDescription("+70 damage and 20% of chance of causing 2 times normal damage.")
-        ..setName("Recipe of Fire Blade"))
+                             "- Anti-Magic Potion\n" +
+                             "- Ring of regeneration\n\n")
+        ..setDescription("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
+        ..setName("Recipe of Runic Bracers"))
 
-public constant FIRE_BLADE = compiletime(
-    new RecipeItem('srbd')
-        ..setAbilities(CRITICAL_STRIKE_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 70)
-        //..setArmorType(ArmorSoundType.Metal)
-        ..setClassification("Miscellaneous")
-        ..setInterfaceIcon(Icons.bTNArcaniteMelee)
-        ..addBonus(Bonus.DAMAGE, 70)
-        ..setTooltipExtended("+70 damage\n" + CRITICAL_STRIKE_TOOLTIP)
-        ..setDescription("+70 damage\n" + CRITICAL_STRIKE_TOOLTIP)
-        ..setName("Fire Blade"))
+public constant RUNIC_BRACERS = compiletime(
+    new RecipeItem('brac')
+        //..setArmorType(ArmorSoundType.Wood)
+        ..setAbilities(RUNIC_BRACERS_SPELL.toRawCode())
+        ..setActivelyUsed(true)
+        ..setClassification("Permanent")
+        ..setInterfaceIcon(Icons.bTNRunedBracers)
+        ..setTooltipExtended("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
+        ..setDescription("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
+        ..setName("Runic Bracers"))
+        ..addBonus(Bonus.LIFEREGEN, 6)
 
-@compiletime function genFireBlade()
-    fixRecipe(FIRE_BLADE_RECIPE, FIRE_BLADE,
+@compiletime function genRunicBracers()
+    fixRecipe(RUNIC_BRACERS_RECIPE, RUNIC_BRACERS,
         
-        CLAWS_OF_ATTACK_12.goldCost +
-        CLAWS_OF_ATTACK_15.goldCost +
-        CLAWS_OF_ATTACK_18.goldCost +
-        CLAWS_OF_ATTACK_21.goldCost +
-        FIRE_BLADE_RECIPE.goldCost,
+        ANTIMAGIC_POTION.goldCost +
+        RING_OF_REGENERATION_1.goldCost +
+        RUNIC_BRACERS_RECIPE.goldCost,
         
-        CLAWS_OF_ATTACK_12.lumberCost +
-        CLAWS_OF_ATTACK_15.lumberCost +
-        CLAWS_OF_ATTACK_18.lumberCost +
-        CLAWS_OF_ATTACK_21.lumberCost +
-        FIRE_BLADE_RECIPE.lumberCost)
+        ANTIMAGIC_POTION.lumberCost +
+        RING_OF_REGENERATION_1.lumberCost +
+        RUNIC_BRACERS_RECIPE.lumberCost)
 
 init
+    createItem(RUNIC_BRACERS.getNewId(), vec2(8000, 8000))
     new ItemRecipe()
         ..setRequiredItems(
-            CLAWS_OF_ATTACK_12,
-            CLAWS_OF_ATTACK_15,
-            CLAWS_OF_ATTACK_18,
-            CLAWS_OF_ATTACK_21,
-            FIRE_BLADE_RECIPE)
-        ..setResultItem(FIRE_BLADE)
+            ANTIMAGIC_POTION,
+            RING_OF_REGENERATION_1,
+            RUNIC_BRACERS_RECIPE)
+        ..setResultItem(RUNIC_BRACERS)
 
-    FIRE_BLADE_RECIPE.initShopConditions()
+    new ItemRecipe()
+        ..setRequiredItems(
+            ANTIMAGIC_POTION,
+            RING_OF_REGENERATION_2,
+            RUNIC_BRACERS_RECIPE)
+        ..setResultItem(RUNIC_BRACERS)
+
+    RUNIC_BRACERS_RECIPE.initShopConditions()
 
 // Impulse boots
 
@@ -406,14 +402,14 @@ public constant ENERGY_PENDANT_RECIPE = compiletime(
 public constant ENERGY_PENDANT = compiletime(
     new RecipeItem('pmna')
         ..setAbilities(MANA_REPLISH_AREA_SPELL.toRawCode())
-        ..addBonus(Bonus.MANA, 200)
+        ..setActivelyUsed(true)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNPendantOfEnergy)
-        ..addBonus(Bonus.MANA, 200)
         ..setTooltipExtended("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
         ..setDescription("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
         ..setName("Energy Pendant"))
+        ..addBonus(Bonus.MANA, 200)
 
 @compiletime function genEnergyPendant()
     fixRecipe(ENERGY_PENDANT_RECIPE, ENERGY_PENDANT,
@@ -459,16 +455,14 @@ public constant MASK_OF_DEATH_RECIPE = compiletime(
 public constant MASK_OF_DEATH = compiletime(
     new RecipeItem('modt')
         ..setAbilities("")
-        ..addBonus(Bonus.DAMAGE, 20)
-        ..addBonus(Bonus.ARMOR, 5)
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNMaskOfDeath)
-        ..addBonus(Bonus.DAMAGE, 20)
-        ..addBonus(Bonus.ARMOR, 5)
         ..setTooltipExtended("15% life steal\n+20 damage\n+5 armor")
         ..setDescription("15% life steal\n+20 damage\n+5 armor")
         ..setName("Mask of Death"))
+        ..addBonus(Bonus.DAMAGE, 20)
+        ..addBonus(Bonus.ARMOR, 5)
 
 @compiletime function genMaskOfDeath()
     fixRecipe(MASK_OF_DEATH_RECIPE, MASK_OF_DEATH,
@@ -494,6 +488,13 @@ init
 
     MASK_OF_DEATH_RECIPE.initShopConditions()
 
+    DamageEvent.addListener(() -> begin
+        if not DamageEvent.isSpell() and DamageEvent.getSource().hasItemById(MASK_OF_DEATH.getNewId())
+            DamageEvent.getSource()
+                ..setLife(DamageEvent.getSource().getLife() + 0.15 * DamageEvent.getAmount())
+                ..flashEffect(Abilities.vampiricAuraTarget, "origin")
+    end)
+
 // Shield of the Lord of Death
 
 public constant SHIELD_OF_LORD_OF_DEAD_RECIPE = compiletime(
@@ -518,19 +519,16 @@ public constant SHIELD_OF_LORD_OF_DEAD_RECIPE = compiletime(
 public constant SHIELD_OF_LORD_OF_DEAD = compiletime(
     new RecipeItem('shdt')
         ..setAbilities("")
-        ..addBonus(Bonus.LIFE, 250)
-        ..addBonus(Bonus.MANA, 250)
-        ..addBonus(Bonus.ARMOR, 7)
         ..setAbilities(IMMOLATION_30_SPELL.toRawCode())
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNLightningShield)
-        ..addBonus(Bonus.LIFE, 250)
-        ..addBonus(Bonus.MANA, 250)
-        ..addBonus(Bonus.ARMOR, 7)
         ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP)
         ..setDescription("+250 hit points\n+250 mana points\n+7 armor\nInmolation (30 dps)")
         ..setName("Shield of the Lord of Death"))
+        ..addBonus(Bonus.LIFE, 250)
+        ..addBonus(Bonus.MANA, 250)
+        ..addBonus(Bonus.ARMOR, 7)
 
 @compiletime function genShieldOfTheLordOfDeath()
     fixRecipe(SHIELD_OF_LORD_OF_DEAD_RECIPE, SHIELD_OF_LORD_OF_DEAD,
@@ -586,15 +584,14 @@ public constant GLOVES_OF_CORRUPTION_RECIPE = compiletime(
 public constant GLOVES_OF_CORRUPTION = compiletime(
     new RecipeItem('ocor')
         ..setAbilities(CORRUPTION_ORB_4_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 20)
-        ..addBonus(Bonus.ATTACKSPEED, 30)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNImprovedUnholyStrength)
-        ..addBonus(Bonus.ATTACKSPEED, 30)
         ..setTooltipExtended("+20 of corruption attack and +30% of attack speed")
         ..setDescription("+20 of corruption attack and +30% of attack speed")
         ..setName("Gloves of corruption"))
+        ..addBonus(Bonus.DAMAGE, 20)
+        ..addBonus(Bonus.ATTACKSPEED, 30)
 
 @compiletime function genGlovesOfCorruption()
     fixRecipe(GLOVES_OF_CORRUPTION_RECIPE, GLOVES_OF_CORRUPTION,
@@ -643,14 +640,15 @@ public constant SHAMANS_CLAWS_RECIPE = compiletime(
 public constant SHAMANS_CLAWS = compiletime(
     new RecipeItem('ocor')
         ..setAbilities(commaList(STORM_DIAMOND_SPELL, LIGHTNING_ORB_SPELL))
-        ..addBonus(Bonus.DAMAGE, 20)
+        ..setActivelyUsed(true)
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNShamanMaster)
-        ..addBonus(Bonus.ATTACKSPEED, 30)
         ..setTooltipExtended("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.")
         ..setDescription("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.")
         ..setName("Shaman's claws"))
+        ..addBonus(Bonus.DAMAGE, 20)
+        ..addBonus(Bonus.ATTACKSPEED, 30)
 
 @compiletime function genShamanClaws()
     fixRecipe(SHAMANS_CLAWS_RECIPE, SHAMANS_CLAWS,
@@ -699,20 +697,18 @@ public constant NORTHREND_ARTIFACT_RECIPE = compiletime(
 public constant NORTHREND_ARTIFACT = compiletime(
     new RecipeItem('ofro')
         ..setAbilities(ICE_ORB_PLUS_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 21)
-        ..addBonus(Bonus.LIFE, 250)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
         ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setName("Northrend Artifact"))
+        ..addBonus(Bonus.DAMAGE, 21)
+        ..addBonus(Bonus.LIFE, 250)
 
 public constant NORTHREND_ARTIFACT_BREATH = compiletime(
     new RecipeItem('ofro')
         ..setAbilities(ICE_ORB_PLUS_BREATH_SPELL.toRawCode())
-        ..addBonus(Bonus.DAMAGE, 21)
-        ..addBonus(Bonus.LIFE, 250)
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
@@ -720,6 +716,8 @@ public constant NORTHREND_ARTIFACT_BREATH = compiletime(
         ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..setName("Northrend Artifact"))
+        ..addBonus(Bonus.DAMAGE, 21)
+        ..addBonus(Bonus.LIFE, 250)
 
 @compiletime function genNorthrendArtifact()
     let goldCost = ORB_OF_LIGHTNING.goldCost +

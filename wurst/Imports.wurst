@@ -153,6 +153,8 @@ public class Imports
 
     static constant aTTArcaneField = "ReplaceableTextures\\ATTArcaneField.blp"
 
+    static constant rune = "Textures\\Rune.blp"
+
     static constant dominating = "Sounds\\Dominating.mp3"
     static constant double_Kill = "Sounds\\Double_Kill.mp3"
     static constant godLike = "Sounds\\GodLike.mp3"

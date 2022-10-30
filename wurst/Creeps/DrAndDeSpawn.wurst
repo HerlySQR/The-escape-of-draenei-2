@@ -1,6 +1,6 @@
 package DrAndDeSpawn
 
-import UnitIndexer
+import public UnitIndexer
 import Orders
 import DamageEvent
 import ObjectIdGenerator
@@ -10,7 +10,7 @@ import ObjectIds
 import Abilities
 
 import Functions
-import PlayerData
+import public PlayerData
 import initlater Missions
 import GeneratedValues
 
@@ -44,6 +44,7 @@ public constant deSpw31 = Rects.demonSpawn31.getCenter()
 public constant deSpw32 = Rects.demonSpawn31.getCenter()
 
 public vec2 array target
+public unit array targetHero
 
 let DUMMY_DAMAGE_UPGRADES = [compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next())]
 let DUMMY_ARMOR_UPGRADES = [compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next())]
@@ -60,7 +61,7 @@ let spawning = CreateTrigger()..disable()
 let attack = CreateTrigger()..disable()
 let changeTarget = CreateTrigger()..disable()
 let cleaner = CreateTrigger()..disable()
-DamageListener theyAreCowards
+DamageListener theyAreCowards = null
 
 public function startSpawn()
     spawning.enable()
@@ -69,8 +70,8 @@ public function startSpawn()
     if theyAreCowards == null
         theyAreCowards = DamageEvent.addListener(() -> begin
             if attackers.has(DamageEvent.getTarget()) and
-                DamageEvent.isSpell() and
                 DamageEvent.getSource().getOwner().isAllyOf(DamageEvent.getTarget().getOwner())
+
                 theyGo.add(DamageEvent.getTarget())
         end)
     changeTarget.enable()
@@ -181,12 +182,19 @@ init
         ..registerTimerEvent(2., true)
         .addAction(() -> begin
             for u in attackers
+                let i = u.getIndex()
                 if not u.isAlive()
                     attackers.remove(u)
+                    targetHero[i] = null
                 else if u.getCurrentOrder() != Orders.attack or theyGo.has(u)
-                    u.issuePointOrderById(Orders.attack, target[u.getIndex()])
+                    if targetHero[i] != null and targetHero[i].isAlive()
+                        u.issuePointOrderById(Orders.attack, targetHero[i].getPos())
+                    else
+                        u.issuePointOrderById(Orders.attack, target[i])
                     theyGo.remove(u)
         end)
+    RemoveAllGuardPositions(DRAENEI)
+    RemoveAllGuardPositions(DEMON)
     // Clear the groups when the units die
     cleaner
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_DEATH)

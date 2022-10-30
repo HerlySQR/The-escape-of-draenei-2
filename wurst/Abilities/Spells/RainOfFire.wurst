@@ -2,8 +2,6 @@ package RainOfFire
 
 import AbilityData
 
-import DummyDamager
-
 public constant RAIN_OF_FIRE_NL = compiletime(ABIL_ID_GEN.next())
 public constant RAIN_OF_FIRE_L = compiletime(ABIL_ID_GEN.next())
 public constant RAIN_OF_FIRE_S = compiletime(ABIL_ID_GEN.next())
@@ -30,7 +28,20 @@ init
         let data = abilityCond(RAIN_OF_FIRE_NL, RAIN_OF_FIRE_L, RAIN_OF_FIRE_S)
         if data.check
             let caster = EventData.getSpellAbilityUnit()
-            let dummy = DummyRecycler.get(caster.getPos(), caster.getFacingAngle())
+
+            int lvl
+            if data.isNL
+                lvl = data.lvl + 1
+            else
+                lvl = data.lvl + 3
+            
+            new DummyCaster()
+                ..origin(caster.getPos())
+                ..owner(caster.getOwner())
+                ..delay(9.)
+                ..castPoint(DUMMY_RAIN_OF_FIRE, lvl, Orders.rainoffire, EventData.getSpellTargetPos())
+
+            /*let dummy = DummyRecycler.get(caster.getPos(), caster.getFacingAngle())
             dummy.setOwner(caster.getOwner(), false)
             dummy.addAbility(DUMMY_RAIN_OF_FIRE)
             if data.isNL
@@ -41,7 +52,7 @@ init
             caster.dummyDamage(dummy, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
             doAfter(9.) ->
                 dummy.removeAbility(DUMMY_RAIN_OF_FIRE)
-                DummyRecycler.recycle(dummy)
+                DummyRecycler.recycle(dummy)*/
     end)
 
 function ChannelAbilityPreset.general()

@@ -1,7 +1,6 @@
 package ExplosiveFlares
 
 import AbilityData
-import DummyDamager
 
 public constant EXPLOSIVE_FLARES_NL = compiletime(ABIL_ID_GEN.next())
 public constant EXPLOSIVE_FLARES_L = compiletime(ABIL_ID_GEN.next())

@@ -38,7 +38,7 @@ init
             gameBoard.setItemValue(row[d], 3, deaths[d].toString())
             
             if noKiller
-                print(playerName[k] + " just died")
+                print(playerName[d] + " just died")
             else if p1.isEnemyOf(p2)
                 // Killed by an enemy
                 let oldSpree = spree[d]
@@ -57,8 +57,8 @@ init
                     var killingMsg = ""
 
                     if oldSpree >= 3
-                        let extra = GetRandomInt(spree[d] * 40, spree[d] * 60)
-                        killingMsg += playerName[k] + " has ended the spree of |cffffcc00" +spree[d].toString() + "|r of " + playerName[d] + " |cffffcc00(+" + extra.toString() + ")|r"
+                        let extra = GetRandomInt(oldSpree * 40, oldSpree * 60)
+                        killingMsg += playerName[k] + " has ended the spree of |cffffcc00" + oldSpree.toString() + "|r of " + playerName[d] + " |cffffcc00(+" + extra.toString() + ")|r"
                         p1.addGold(extra)
                     else
                         killingMsg += playerName[k] + " killed " + playerName[d]
@@ -82,13 +82,13 @@ init
                     
                     if howMany > 0
                         whoAssisted = whoAssisted.subString(1, whoAssisted.length() - 1)
-                        printTimedToPlayer(killingMsg + whoAssisted, 4., localPlayer)
+                        printTimed(killingMsg + whoAssisted, 4.)
                     else
-                        printTimedToPlayer(killingMsg, 4., localPlayer)
+                        printTimed(killingMsg, 4.)
                     
                     if p1 != DRAENEI and p1 != DEMON
                         if spree[k] >= 3
-                            print(playerName[k] + " has a spree of |cffffcc00" + spree[k].toString() + "|r")
+                            printTimed(playerName[k] + " has a spree of |cffffcc00" + spree[k].toString() + "|r", 4.)
                         let fk = firstKill[k] <= 0
                         let dk = doubleKill[k] <= 0
                         let tk = tripleKill[k] <= 0
@@ -98,29 +98,29 @@ init
                         else if not fk and dk and tk and uk
                             doubleKill[k] = 10
                             firstKill[k] = 0
-                            print(playerName[k] + " just got a |cff00ffffDouble kill|r!")
+                            printTimed(playerName[k] + " just got a |cff00ffffDouble kill|r!", 4.)
                         else if fk and not dk and tk and uk
                             tripleKill[k] = 10
                             doubleKill[k] = 0
-                            print(playerName[k] + " just got a |cff00ffffTriple kill|r!")
+                            printTimed(playerName[k] + " just got a |cff00ffffTriple kill|r!", 4.)
                         else if fk and dk and not tk and uk
                             ultraKill[k] = 10
                             tripleKill[k] = 0
-                            print(playerName[k] + " just got a |cff00ffffUltra kill|r!")
+                            printTimed(playerName[k] + " just got a |cff00ffffUltra kill|r!", 4.)
                         else if fk and dk and tk and not uk
                             ultraKill[k] = 10
-                            print(playerName[k] + " just got a |cff00ffffRampage|r!")
+                            printTimed(playerName[k] + " just got a |cff00ffffRampage|r!", 4.)
                 else
                     if GetKillingUnit() == theMonster
-                        printTimed(playerName[d] + " was killed by The Monster", 4.00)
+                        printTimed(playerName[d] + " was killed by The Monster", 4.)
                     else
-                        printTimed(playerName[d] + " was killed by the Neutral Creeps", 4.00)
+                        printTimed(playerName[d] + " was killed by the Neutral Creeps", 4.)
             else
                 // Killed by an ally
                 if p1 == p2
-                    printTimed(playerName[d] + " has killed himself.", 4.00)
+                    printTimed(playerName[d] + " has killed himself.", 4.)
                 else
-                    printTimed(playerName[k] + " killed his teammate " + playerName[d], 4.00)
+                    printTimed(playerName[k] + " killed his teammate " + playerName[d], 4.)
     end)
 
     // Assist time

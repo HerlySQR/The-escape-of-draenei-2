@@ -5,10 +5,12 @@ import ArrayList
 import AbilityData
 import GeneratedValues
 import Reset
-import initlater PlayerData
+import initlater DrAndDeSpawn
+import initlater Towers
 
 public constant CIRCLE = compiletime(UNIT_ID_GEN.next())
 
+let ASK_HELP = compiletime(ABIL_ID_GEN.next())
 let LIFE_REGEN = compiletime(ABIL_ID_GEN.next())
 let MANA_REGEN = compiletime(ABIL_ID_GEN.next())
 let ZOOM_IN = compiletime(ABIL_ID_GEN.next())
@@ -55,6 +57,9 @@ init
             circle[3].removeAbility(MANA_REGEN)
             circle[8].removeAbility(LIFE_REGEN)
             circle[8].removeAbility(MANA_REGEN)
+        for i = 1 to 10
+            circle[i].resetAbilityCooldown(ASK_HELP)
+            circle[i].issuePointOrderById(Orders.roar, ZERO2)
     end)
 
     onReset(true, () -> begin
@@ -122,6 +127,24 @@ init
 
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> GetManipulatedItem().setPlayer(GetManipulatingUnit().getOwner(), false))
 
+    registerSpellEffectEvent(ASK_HELP, () -> begin
+        let caster = GetSpellAbilityUnit()
+        let owner = caster.getOwner()
+        let h = hero[owner.getNumber()]
+        if h.isAlive()
+            var i = 0
+            forUnitsInRange(EventData.getAbilityTargetPos(), 300., u -> begin
+                if i < 4
+                    if u.isAllyOf(owner) and not u.isType(UNIT_TYPE_STRUCTURE)
+                        and ((u.getOwner() == DRAENEI and u.getTypeId() != DRAENEI_WORKER) or (u.getOwner() == DEMON and u.getTypeId() != DEMON_ACOLYTE))
+
+                        targetHero[u.getIndex()] = h
+                        u.flashEffect(Abilities.thornsAuraDamage, "overhead")
+                        u.issuePointOrderById(Orders.attack, h.getPos())
+                        i++
+            end)
+    end)
+
     registerSpellEffectEvent(PICK_ITEMS, () -> begin
         let caster = GetSpellAbilityUnit()
         let owner = caster.getOwner()
@@ -143,8 +166,23 @@ init
 
     new UnitDefinition(CIRCLE, 'ncop')
         ..setFoodProduced(5) // 5 missions
-        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, PICK_ITEMS, DROP_ITEMS))
+        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory, ASK_HELP, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, PICK_ITEMS, DROP_ITEMS))
         ..setName("Circle of power")
+
+    new ChannelAbilityPreset(ASK_HELP, 1, true)
+        ..presetTargetTypes(Targettype.POINT)
+        ..presetOption(Option.TARGETIMAGE, true)
+        ..setBaseOrderID(1, "roar")
+        ..setAreaofEffect(1, 300.)
+        ..setCastRange(1, 99999.)
+        ..setCooldown(1, 120.)
+        ..setIconNormal(Icons.bTNHornOfCenarius)
+        ..setButtonPositionNormalX(0)
+        ..setButtonPositionNormalY(0)
+        ..setHotkeyNormal("Q")
+        ..setTooltipNormal(1, "[|cffffcc00Q|r] Ask help")
+        ..setTooltipNormalExtended(1, "Orders a group of ally units up to 4, to go to help at you, if your hero dies, they will return to their previous objective.")
+        ..setName("Ask help")
 
     new AbilityDefinitionDefend(ZOOM_IN)
         ..setDamageDealt(1, 0)
@@ -230,10 +268,10 @@ init
         ..setIconNormal(Icons.bTNLoad)
         ..setButtonPositionNormalX(0)
         ..setButtonPositionNormalY(2)
-        ..setHotkeyNormal("Q")
-        ..setTooltipTurnOff(1, "[|cffffcc00Q|r] Pick items")
+        ..setHotkeyNormal("Z")
+        ..setTooltipTurnOff(1, "[|cffffcc00Z|r] Pick items")
         ..setTooltipTurnOffExtended(1, "Picks up your nearby items.")
-        ..setTooltipNormal(1, "[|cffffcc00Q|r] Pick items")
+        ..setTooltipNormal(1, "[|cffffcc00Z|r] Pick items")
         ..setTooltipNormalExtended(1, "Picks up your nearby items.")
         ..setName("Pick items")
 
@@ -241,9 +279,9 @@ init
         ..setIconNormal(Icons.bTNUnLoad)
         ..setButtonPositionNormalX(1)
         ..setButtonPositionNormalY(2)
-        ..setHotkeyNormal("W")
-        ..setTooltipTurnOff(1, "[|cffffcc00W|r] Drop items")
+        ..setHotkeyNormal("X")
+        ..setTooltipTurnOff(1, "[|cffffcc00X|r] Drop items")
         ..setTooltipTurnOffExtended(1, "Drop the items in the inventory.")
-        ..setTooltipNormal(1, "[|cffffcc00W|r] Drop items")
+        ..setTooltipNormal(1, "[|cffffcc00X|r] Drop items")
         ..setTooltipNormalExtended(1, "Drop the items in the inventory.")
         ..setName("Drop items")

@@ -8,6 +8,7 @@ import public MiscItemSpells
 import public NetherPotion
 import public OrbEffects
 import public PocketCatapult
+import public RunicBracers
 import public StaffOfTheCyclones
 import public StormDiamond
 import public SummonCourier

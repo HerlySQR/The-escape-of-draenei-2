@@ -23,12 +23,12 @@ public constant GLOVES_OF_HASTE = compiletime(
         ..setGoldCost(400)
         ..setLumberCost(1)
         ..setAbilities("")
-        ..addBonus(Bonus.ATTACKSPEED, 15)
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(1)
         ..setButtonPositionY(0)
         ..setHotkey("W")
         ..setTooltipBasic("[|cffffcc00W|r] Buy Gloves of Haste"))
+        ..addBonus(Bonus.ATTACKSPEED, 15)
 
 public constant NETHER_POTION = compiletime(
     new RecipeItem('wcyc')
@@ -66,13 +66,13 @@ public constant KHADGAR_HEATH_STONE = compiletime(
         ..setLumberCost(3)
         ..setStockReplenishInterval(10)
         ..setAbilities("")
-        ..addBonus(Bonus.LIFE, 200)
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
         ..setHotkey("A")
         ..setTooltipBasic("[|cffffcc00A|r] Buy Khadgar health stone")
         ..setTooltipExtended("Increase the Hero's hit points by 200.")
         ..setDescription("Increase the Hero's hit points."))
+        ..addBonus(Bonus.LIFE, 200)
 
 public constant MANA_PENDANT = compiletime(
     new RecipeItem('pmna')
@@ -81,13 +81,13 @@ public constant MANA_PENDANT = compiletime(
         ..setLumberCost(3)
         ..setStockReplenishInterval(10)
         ..setAbilities("")
-        ..addBonus(Bonus.MANA, 150)
         ..setButtonPositionX(1)
         ..setButtonPositionY(1)
         ..setHotkey("S")
         ..setTooltipBasic("[|cffffcc00S|r] Buy Mana Pendant")
         ..setTooltipExtended("Increases the mana in 150.")
         ..setDescription("Increases the mana."))
+        ..addBonus(Bonus.MANA, 150)
 
 public constant STORM_DIAMOND = compiletime(
     new RecipeItem('thdm')

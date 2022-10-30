@@ -86,13 +86,13 @@ public constant BOOK_OF_EXPERIENCE = compiletime(ITEM_ID_GEN.next())
         ..setTooltipExtended("Permanently increases the intelligence of the hero using it by 5.")
         ..setName("Book of Intelligence (+5)")
     
-    new AbilityDefinitionStrengthBonusPlus1(STRENGTH_5)
+    new AbilityDefinitionStrengthMod(STRENGTH_5)
         ..setStrengthBonus(1, 5)
     
-    new AbilityDefinitionAgilityBonusPlus1(AGILITY_5)
+    new AbilityDefinitionAgilityMod(AGILITY_5)
         ..setAgilityBonus(1, 5)
     
-    new AbilityDefinitionIntelligenceBonusPlus1(INTELLIGENCE_5)
+    new AbilityDefinitionIntelligenceMod(INTELLIGENCE_5)
         ..setIntelligenceBonus(1, 5)
 
     new ItemDefinition(BOOK_OF_RECONVERSION, 'tret')

@@ -14,6 +14,7 @@ public constant SUMMON_COURIER_SPELL = compiletime(ABIL_ID_GEN.next())
 
 let GO_TO_HERO = compiletime(UNIT_ID_GEN.next())
 let GO_TO_BASE = compiletime(UNIT_ID_GEN.next())
+let DROP_ITEMS = compiletime(UNIT_ID_GEN.next())
 let bannedItems = new HashList<int>()
 
 public function int.courierBanItem()
@@ -46,6 +47,9 @@ init
                     caster.issueTargetOrderById(Orders.smart, hero[i])
             else if typ == GO_TO_BASE
                 caster.issuePointOrderById(Orders.move, (THE_DRAENEI.has(u) ? actDrSpawn : actDeSpawn).getCenter())
+            else if typ == DROP_ITEMS
+                for m in caster.inventory()
+                    caster.removeItem(m)
             u.remove()
     end)
     EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
@@ -60,6 +64,14 @@ init
                 for i = 6 to 10
                     new Bounty().run(100, hero[i].isAlive() ? hero[i] : circle[i], playerM(i), true, false)
     end)
+
+function UnitDefinition.general()
+    this
+        ..setStockReplenishInterval(1)
+        ..setStockMaximum(1)
+        ..setNormalAbilities("")
+        ..setUnitSoundSet("")
+
 
 @compiletime function gen()
     let COURIER_INV = ABIL_ID_GEN.next()
@@ -77,17 +89,14 @@ init
         ..setShadowImageCenterY(40.)
         ..setProjectileImpactZ(30.)
         ..setScalingValue(0.5)
-        ..setNormalAbilities(commaList("Apiv", COURIER_INV.toRawCode()))
-        ..setUnitsSold(commaList(GO_TO_HERO, GO_TO_BASE))
+        ..setNormalAbilities(commaList('Apiv', COURIER_INV))
+        ..setUnitsSold(commaList(GO_TO_HERO, GO_TO_BASE, DROP_ITEMS))
         ..setSpeedBase(522)
         ..setCollisionSize(24.)
         ..setName("Courier")
     
     new UnitDefinition(GO_TO_HERO, 'nalb')
-        ..setStockReplenishInterval(1)
-        ..setStockMaximum(1)
-        ..setNormalAbilities("")
-        ..setUnitSoundSet("")
+        ..general()
         ..setButtonPositionX(0)
         ..setButtonPositionY(2)
         ..setIconGameInterface(Icons.bTNRiderlessHorse)
@@ -97,10 +106,7 @@ init
         ..setName("Go to hero")
     
     new UnitDefinition(GO_TO_BASE, 'nalb')
-        ..setStockReplenishInterval(1)
-        ..setStockMaximum(1)
-        ..setNormalAbilities("")
-        ..setUnitSoundSet("")
+        ..general()
         ..setButtonPositionX(1)
         ..setButtonPositionY(2)
         ..setIconGameInterface(Icons.bTNUndeadAirBarge)
@@ -108,6 +114,16 @@ init
         ..setTooltipBasic("[|cffffcc00W|r] Go to base")
         ..setTooltipExtended("Orders the courier to go to the spawnpoint of your team.")
         ..setName("Go to base")
+
+    new UnitDefinition(DROP_ITEMS, 'nalb')
+        ..general()
+        ..setIconGameInterface(Icons.bTNUnLoad)
+        ..setButtonPositionX(2)
+        ..setButtonPositionY(2)
+        ..setHotkey("E")
+        ..setTooltipBasic("[|cffffcc00E|r] Drop items")
+        ..setTooltipExtended("Drop the items in the inventory.")
+        ..setName("Drop items")
     
     new AbilityDefinitionFigurineUrsaWarrior(SUMMON_COURIER_SPELL)
         ..setSummonUnitType1(1, COURIER.toRawCode())

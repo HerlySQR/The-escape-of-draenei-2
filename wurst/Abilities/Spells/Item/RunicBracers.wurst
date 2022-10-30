@@ -1,0 +1,50 @@
+package RunicBracers
+
+import AbilityData
+
+import InstantDummyCaster
+
+public constant RUNIC_BRACERS_SPELL = compiletime(ABIL_ID_GEN.next())
+
+let CD = 20.
+let MANA = 75
+let RANGE = 700.
+let DURATION = 17.
+let LIFE_PROTECTED = 150
+
+public constant RUNIC_BRACERS_TOOLTIP = "If you use it every ally unit in {0} of range of you they will have a shield that blocks {1} magic damage."
+    .format(RANGE.toString(0), LIFE_PROTECTED.toString())
+
+let MAGIC_SHELLS = compiletime(ABIL_ID_GEN.next())
+let MAGIC_SHELL_BUFF = compiletime(BUFF_ID_GEN.next())
+
+init
+    registerSpellEffectEvent(RUNIC_BRACERS_SPELL, () -> begin
+        let caster = GetSpellAbilityUnit()
+        let owner = caster.getOwner()
+
+        forUnitsInRange(caster.getPos(), RANGE, u -> begin
+            if u.isAllyOf(owner)
+                InstantDummyCaster.castTarget(owner, MAGIC_SHELLS, 1, Orders.antimagicshell, u)
+        end)
+    end)
+
+@compiletime function gen()
+    new ChannelAbilityPreset(RUNIC_BRACERS_SPELL, 1, true)
+        ..basicItemSpell()
+        ..setManaCost(1, MANA)
+        ..setCooldown(1, CD)
+        ..setName("Anti-magic shields")
+
+    new AbilityDefinitionAntimagicShield(MAGIC_SHELLS)
+        ..setDummyAbility()
+        ..setShieldLife(1, LIFE_PROTECTED)
+        ..setDurationHero(1, DURATION)
+        ..setDurationNormal(1, DURATION)
+        ..setBuffs(1, commaList("Bams", MAGIC_SHELL_BUFF.toRawCode()))
+        ..setIconNormal(Imports.rune)
+
+    new BuffDefinition(MAGIC_SHELL_BUFF, 'Bam2')
+        ..setIcon(Imports.rune)
+        ..setArtTarget(Imports.runeShell)
+        ..setTooltipNormal("Anti-Magic Shield (Magic Resistance)")
