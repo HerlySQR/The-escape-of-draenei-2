@@ -2,10 +2,8 @@ package Leave
 
 import MyBoard
 import AFK
-import SummonCourier
 
 import SoundUtils
-import ClosureForGroups
 
 let SOUND = new SoundDefinition(Sounds.upkeepRing, false, false)
 
@@ -24,26 +22,13 @@ init
         ..addAction(() -> begin
             let p = GetTriggerPlayer()
             let temp = p.getNumber()
-            let pos = circleRegion[temp].getCenter()
 
             whoAreHere.remove(p)
             printTimed(playerName[temp] + " |cffff0000left the game.|r", 10.)
 
-            for i = 0 to 5
-                hero[temp].itemInSlot(i).setPos(pos)
+            p.createCrate(true)
             hero[temp].remove()
 
-            forUnitsOfPlayer(p, u -> begin
-                if u.getTypeId() == COURIER
-                    for m in u.inventory()
-                        m.setPos(pos)
-            end)
-
-            forItemsInRect(bj_mapInitialPlayableArea, m -> begin
-                if GetItemPlayer(m) == p
-                    m.setPos(pos)
-                    SetItemPlayer(m, players[PLAYER_NEUTRAL_PASSIVE], false)
-            end)
             SOUND.play()
             playersOrder()
         end)

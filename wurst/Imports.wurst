@@ -78,6 +78,7 @@ public class Imports
     static constant aTCTimeEclipse3 = "ReplaceableTextures\\CommandButtons\\ATCTimeEclipse3.blp"
     
     static constant bTNAxeOfAshes = "ReplaceableTextures\\CommandButtons\\BTN_AxeOfAshes.blp"
+    static constant bTN_cr_Shield = "ReplaceableTextures\\CommandButtons\\BTN_cr_Shield.blp"
     static constant bTNCrZoomIn = "ReplaceableTextures\\CommandButtons\\BTN_CR_ZOOMIN.blp"
     static constant bTNCrZoomOut = "ReplaceableTextures\\CommandButtons\\BTN_CR_ZOOMOUT.blp"
     static constant bTNRadar1 = "ReplaceableTextures\\CommandButtons\\BTN_radar.blp"
@@ -152,8 +153,6 @@ public class Imports
     static constant pASTimeEclipse3 = "ReplaceableTextures\\PassiveButtons\\PASTimeEclipse3.blp"
 
     static constant aTTArcaneField = "ReplaceableTextures\\ATTArcaneField.blp"
-
-    static constant rune = "Textures\\Rune.blp"
 
     static constant dominating = "Sounds\\Dominating.mp3"
     static constant double_Kill = "Sounds\\Double_Kill.mp3"

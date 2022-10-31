@@ -45,7 +45,7 @@ init
                 timeFreeze = true
                 fadeOut(Textures.hazeAndFogFilter_Mask, 0.50)
                 forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                    if u != caster and u.getTypeId() != CIRCLE
+                    if u != caster and u.getTypeId() != BACKPACK
                         u.pause(true)
                 end)
                 var count1 = 0
@@ -68,7 +68,7 @@ init
                             end)
                         else
                             forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-                                if u != caster and u.getTypeId() != CIRCLE
+                                if u != caster and u.getTypeId() != BACKPACK
                                     u.removeAbility(TOTAL_FREEZE_BUFF)
                                     u.pause(false)
                             end)

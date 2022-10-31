@@ -127,7 +127,7 @@ init
 
     // Show / Hide
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, () -> begin
-        if GetOrderedUnit().getTypeId() == CIRCLE
+        if GetOrderedUnit().getTypeId() == BACKPACK
             if GetIssuedOrderId() == Orders.immolation
                 let b = GetOrderedUnit().getOwner() == localPlayer
                 forUnitsAll(u -> begin

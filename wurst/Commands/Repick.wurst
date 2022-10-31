@@ -51,6 +51,8 @@ public function repick(player p)
         let repick = hero[i]
 
         if repick != null
+            p.createCrate(false)
+            
             if inCombat[i] > 0 and not yesOrYes
                 DisplayTextToPlayer(p, 0., 0., "You cannot repick during combat")
                 return
@@ -64,9 +66,7 @@ public function repick(player p)
             else
                 repick.setPos(Rects.selectorDemon.getCenter())
             p.panCamToTimed(repick, 0.)
-            let pos = circleRegion[i].getCenter()
-            for j = 0 to 5
-                repick.itemInSlot(j).setPos(pos)
+            
             canPick.add(p)
             repick.remove()
 

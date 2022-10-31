@@ -9,6 +9,7 @@ import Reset
 import WhoSelect
 import HeroSelection
 import ModeSelection
+import SummonCourier
 
 import Camera
 import Dialog
@@ -97,9 +98,6 @@ init
 
 player swp1
 player swp2
-vec2 swc1
-vec2 swc2
-vec2 vase
 
 var notBooks = false
 
@@ -133,46 +131,20 @@ function changePlayers()
     let i1 = swp1.getNumber()
     let i2 = swp2.getNumber()
     // Return items to their owners
-    forUnitsOfType("Courier", u -> begin
-        if u.getOwner() == swp1 or u.getOwner() == swp2
-            for i = 1 to 10
-                for j = 0 to 5
-                    if GetItemPlayer(u.itemInSlot(j)).getNumber() == i
-                        u.itemInSlot(j).setPos(circleRegion[i].getCenter())
+    forUnitsOfPlayer(swp1, u -> begin
+        if u.getTypeId() == BACKPACK or u.getTypeId() == COURIER
+            for m in u.inventory()
+                if m.getPlayer() != swp1
+                    m.setPos((THE_DRAENEI.has(swp1) ? actDrSpawn : actDeSpawn).getCenter())
     end)
-    // Change the players
-    swc1 = circleRegion[i1].getCenter()
-    swc2 = circleRegion[i2].getCenter()
-    vase = Rects.index.getCenter()
-    for i = 0 to 5
-        hero[i1].itemInSlot(i).setPos(swc1)
-        hero[i2].itemInSlot(i).setPos(swc2)
-        circle[i1].removeItem(circle[i1].itemInSlot(i))
-        circle[i2].removeItem(circle[i2].itemInSlot(i))
-    EnumItemsInRect(circleRegion[i1], null, () -> begin
-        let m = GetEnumItem()
-        if GetItemPlayer(m) == swp1
-            m.setPos(vase)
+    forUnitsOfPlayer(swp2, u -> begin
+        if u.getTypeId() == BACKPACK or u.getTypeId() == COURIER
+            for m in u.inventory()
+                if m.getPlayer() != swp2
+                    m.setPos((THE_DRAENEI.has(swp2) ? actDrSpawn : actDeSpawn).getCenter())
     end)
-    EnumItemsInRect(circleRegion[i2], null, () -> begin
-        let m = GetEnumItem()
-        if GetItemPlayer(m) == swp2
-            m.setPos(swc1)
-    end)
-    EnumItemsInRect(Rects.index, null, () -> begin
-        GetEnumItem().setPos(swc1)
-    end)
-
-    // Return them the levels
-    if not notBooks
-        if whatMode[5] == LEVELING
-            let m1 = createItem(EXP_BOOK, swc2)
-            m1.setPlayer(swp1, false)
-            expMap.put(m1, hero[i1].getXp())
-            let m2 = createItem(EXP_BOOK, swc1)
-            m2.setPlayer(swp2, false)
-            expMap.put(m2, hero[i2].getXp())
     
+    // Change the players
     yesOrYes = true
     repick(swp1)
     repick(swp2)
@@ -186,10 +158,25 @@ function changePlayers()
     changeAlliance(swp2)
     playersOrder()
     // Last details
-    circle[i1].setOwner(swp2, true)
-    circle[i2].setOwner(swp1, true)
     swp1.setColor(playerColor[i2], true)
     swp2.setColor(playerColor[i1], true)
+
+    let list1 = swp1.createCrate(false)
+    let list2 = swp2.createCrate(false)
+
+    // Return them the levels
+    if not notBooks
+        if whatMode[5] == LEVELING
+            let m1 = createItem(EXP_BOOK, ZERO2)
+            m1.setPlayer(swp1, false)
+            m1.setVisible(false)
+            expMap.put(m1, hero[i1].getXp())
+            list1.add(m1)
+            let m2 = createItem(EXP_BOOK, ZERO2)
+            m2.setPlayer(swp2, false)
+            m2.setVisible(false)
+            expMap.put(m2, hero[i2].getXp())
+            list2.add(m2)
 
     for cb in listeners
         cb.run(swp1, swp2)
@@ -229,11 +216,11 @@ init
             for i = 1 to 5
                 swp1 = playerM(i)
                 swp2 = playerM(i+5)
-                swc1 = circle[i].getPos()
-                swc2 = circle[i+5].getPos()
                 changePlayers()
                 canPick.remove(swp1)
                 canPick.remove(swp2)
+                swp1.removeCrate()
+                swp2.removeCrate()
             notBooks = false
             whoSelect()
     end)

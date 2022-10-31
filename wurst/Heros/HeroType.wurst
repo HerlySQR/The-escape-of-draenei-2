@@ -3,6 +3,7 @@ package HeroType
 import Imports
 import HeroSpells
 import ExtraSpells
+import Circles
 
 import Assets
 import ObjectIdGenerator
@@ -62,7 +63,7 @@ public class HeroType
     protected HeroDefinition heroL
     private string icon
     private Race r
-    private string abilities = commaList(TELEPORT.toRawCode(), "AInv")
+    private string abilities = commaList(MORE_ABILITIES.toRawCode(), "AInv")
 
     construct(int origId)
         MAX++

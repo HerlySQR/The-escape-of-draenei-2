@@ -42,9 +42,9 @@ init
         ..setDurationHero(1, DURATION)
         ..setDurationNormal(1, DURATION)
         ..setBuffs(1, commaList("Bams", MAGIC_SHELL_BUFF.toRawCode()))
-        ..setIconNormal(Imports.rune)
+        ..setIconNormal(Imports.bTN_cr_Shield)
 
     new BuffDefinition(MAGIC_SHELL_BUFF, 'Bam2')
-        ..setIcon(Imports.rune)
+        ..setIcon(Imports.bTN_cr_Shield)
         ..setArtTarget(Imports.runeShell)
         ..setTooltipNormal("Anti-Magic Shield (Magic Resistance)")

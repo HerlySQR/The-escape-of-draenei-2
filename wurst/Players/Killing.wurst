@@ -75,7 +75,7 @@ init
                                 gameBoard.setItemValue(row[aKill], 4, assists[aKill].toString())
                                 if whatMode[3] != ONLY_COMSUMIBLES
                                     players[i].addLumber(GetRandomInt(0, 1))
-                                new Bounty().run(GetRandomInt(30, 48), hero[aKill] == null ? circle[aKill] : hero[aKill], players[i], true, false)
+                                new Bounty().run(GetRandomInt(30, 48), hero[aKill], players[i], hero[aKill].isAlive(), false)
 
                                 assistTime[aKill].replace(d, 0)
                                 howMany++

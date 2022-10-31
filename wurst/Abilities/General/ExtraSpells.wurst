@@ -5,6 +5,5 @@ import public Banish
 import public ConsumeLifeAndMana
 import public Curse
 import public FarSight
-import public Teleport
 import public UnholyAura
 import public VampiricAura

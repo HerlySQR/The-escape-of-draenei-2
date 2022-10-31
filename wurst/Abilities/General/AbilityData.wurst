@@ -15,6 +15,7 @@ import public Orders
 import public DummyCaster
 import public DummyRecycler
 import public HashMap
+import public LinkedList
 import public SoundUtils
 import public DamageEvent
 import public Annotations
@@ -37,6 +38,9 @@ public function AbilityDefinition.setHotkey(string data)
     if data == "F"
         this.presetButtonPosNormal(2, 1)
         this.presetButtonPosTurnOff(2, 1)
+    else if data == "D"
+        this.presetButtonPosNormal(1, 1)
+        this.presetButtonPosTurnOff(1, 1)
     else
         int x = -1
         switch data

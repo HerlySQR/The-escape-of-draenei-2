@@ -289,8 +289,6 @@ function destroyWall()
                         CameraClearNoiseForPlayer(players[i])
 
         startMission(3)
-        doAfter(0.2) ->
-            moveCircles(3)
 
 @compiletime function gen()
     new ItemDefinition(BARREL, 'skrt')

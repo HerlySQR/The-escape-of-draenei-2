@@ -7,14 +7,25 @@ import GeneratedValues
 import Orders
 import ClosureForGroups
 import ClosureTimers
+import HashList
 
 // Friendly Fire off (unless)
+
+let alwaysFriendFire = new HashList<int>()
+
+public function int.allowFriendFire()
+    alwaysFriendFire.add(this)
+
 init
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ATTACKED)
         ..addAction(() -> begin
-            if GetAttacker().getOwner().isAllyOf(GetTriggerUnit().getOwner()) and GetUnitLifePercent(GetTriggerUnit()) >= 30.
-                GetAttacker().issueTargetOrderById(Orders.smart, GetTriggerUnit())
+            let target = GetTriggerUnit()
+            if GetAttacker().getOwner().isAllyOf(target.getOwner())
+                and not alwaysFriendFire.has(target.getTypeId())
+                and GetUnitLifePercent(target) >= 30.
+                
+                GetAttacker().issueTargetOrderById(Orders.smart, target)
         end)
 
 // Don't try pass

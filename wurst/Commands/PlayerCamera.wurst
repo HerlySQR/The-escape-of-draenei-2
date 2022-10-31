@@ -4,7 +4,7 @@ import Functions
 import Circles
 import ChatEnter
 
-import Orders
+import RegisterEvents
 
 real array distanceToTarget
 
@@ -19,20 +19,13 @@ init
     CreateTimer().startPeriodic(0.125, () -> begin
         if not inCinematic
             SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, distanceToTarget[localPlayer.getId()], 0.00)
-                        
     end)
     // Edit the camera
-    CreateTrigger()
-        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
-        ..addAction(() -> begin
-            if (GetIssuedOrderId() == Orders.defend or GetIssuedOrderId() == Orders.undefend) and GetOrderedUnit().getTypeId() == CIRCLE
-                if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) >= 300.
-                    distanceToTarget[GetOrderedUnit().getOwner().getId()] -= 100.
-        end)
-    CreateTrigger()
-        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
-        ..addAction(() -> begin
-            if (GetIssuedOrderId() == Orders.magicdefense or GetIssuedOrderId() == Orders.magicundefense) and GetOrderedUnit().getTypeId() == CIRCLE
-                if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) <= 3000.
-                    distanceToTarget[GetOrderedUnit().getOwner().getId()] += 100.
-        end)
+    registerSpellEffectEvent(ZOOM_IN, () -> begin
+        if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) >= 300.
+            distanceToTarget[GetSpellAbilityUnit().getOwner().getId()] -= 100.
+    end)
+    registerSpellEffectEvent(ZOOM_OUT, () -> begin
+        if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) <= 3000.
+            distanceToTarget[GetSpellAbilityUnit().getOwner().getId()] += 100.
+    end)

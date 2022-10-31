@@ -1,175 +1,182 @@
 package Circles
 
-import ArrayList
-
 import AbilityData
-import GeneratedValues
-import Reset
 import initlater DrAndDeSpawn
 import initlater Towers
+import initlater DontPlaySmart
+import initlater SummonCourier
+import initlater HeroSelection
+import Reference
 
-public constant CIRCLE = compiletime(UNIT_ID_GEN.next())
+public constant MORE_ABILITIES = compiletime(ABIL_ID_GEN.next())
+public constant BACKPACK = compiletime(UNIT_ID_GEN.next())
+
+public unit array backpack
+
+let CRATE = compiletime(UNIT_ID_GEN.next())
+let TOTEM = compiletime(UNIT_ID_GEN.next())
+
+let crateMap = new HashMap<unit, LinkedList<item>>()
 
 let ASK_HELP = compiletime(ABIL_ID_GEN.next())
-let LIFE_REGEN = compiletime(ABIL_ID_GEN.next())
-let MANA_REGEN = compiletime(ABIL_ID_GEN.next())
-let ZOOM_IN = compiletime(ABIL_ID_GEN.next())
-let ZOOM_OUT = compiletime(ABIL_ID_GEN.next())
+let HEAL_TOTEM = compiletime(ABIL_ID_GEN.next())
+let TELEPORT = compiletime(ABIL_ID_GEN.next())
+let SELECT_BACKPACK = compiletime(ABIL_ID_GEN.next())
 let TOWER_RANGE = compiletime(ABIL_ID_GEN.next())
+public constant ZOOM_IN = compiletime(ABIL_ID_GEN.next())
+public constant ZOOM_OUT = compiletime(ABIL_ID_GEN.next())
 let PICK_ITEMS = compiletime(ABIL_ID_GEN.next())
 let DROP_ITEMS = compiletime(ABIL_ID_GEN.next())
 
-public rect itemDraenei = Rects.items1
-public rect itemDemons = Rects.items2
-public unit array circle
-public rect array circleRegion
+/** Removes all the items of the hero and couriers of the player and puts them in a crate*/
+public function player.createCrate(bool includeCourier) returns LinkedList<item>
+    let list = new LinkedList<item>()
 
-ArrayList<rect> array pointCircle
+    let i = this.getNumber()
+    if hero[i] != null
+        for m in hero[i].inventory()
+            hero[i].removeItem(m)
+            m.setVisible(false)
+            list.add(m)
+    
+    if includeCourier
+        forUnitsOfPlayer(this, u -> begin
+            if u.getTypeId() == COURIER
+                for m in u.inventory()
+                    u.removeItem(m)
+                    m.setVisible(false)
+                    list.add(m)
+        end)
 
-public function moveCircles(int mission)
-    for i = 1 to 5
-        // Move demons
-        forUnitsInRect(circleRegion[i + 5], u -> u.setPos(pointCircle[mission + 1].get(i).getCenter()))
-        circleRegion[i + 5] = pointCircle[mission + 1].get(i)
-        // Move draenei
-        forUnitsInRect(circleRegion[i], u -> u.setPos(pointCircle[mission].get(i).getCenter()))
-        circleRegion[i] = pointCircle[mission].get(i)
-    switch mission
-        case 2
-            itemDraenei = Rects.items2
-            itemDemons = Rects.items3
-        case 3
-            itemDraenei = Rects.items3
-            itemDemons = Rects.items4
-        case 4
-            itemDraenei = Rects.items4
-            itemDemons = Rects.items5
+    crateMap.put(createUnit(this, CRATE, (THE_DRAENEI.has(this) ? actDrSpawn : actDeSpawn).getCenter()), list)
+    return list
+
+/** Removes all the crates of the player and their items*/
+public function player.removeCrate()
+    forUnitsOfPlayer(this, u -> begin
+        if u.getTypeId() == CRATE
+            let list = crateMap.get(u)
+            for m in list
+                m.remove()
+            crateMap.remove(u)
+            destroy list
+    end)
 
 init
-    onModesSelected(() -> begin
-        if whatMode[5] == LEVELING
-            circle[3].addAbility(LIFE_REGEN)
-            circle[3].addAbility(MANA_REGEN)
-            circle[8].addAbility(LIFE_REGEN)
-            circle[8].addAbility(MANA_REGEN)
-        else if whatMode[5] == NOT_LEVELING
-            circle[3].removeAbility(LIFE_REGEN)
-            circle[3].removeAbility(MANA_REGEN)
-            circle[8].removeAbility(LIFE_REGEN)
-            circle[8].removeAbility(MANA_REGEN)
-        for i = 1 to 10
-            circle[i].resetAbilityCooldown(ASK_HELP)
-            circle[i].issuePointOrderById(Orders.roar, ZERO2)
-    end)
+    for i = 1 to 10
+        backpack[i] = createUnit(players[bj_PLAYER_NEUTRAL_VICTIM], BACKPACK)
 
-    onReset(true, () -> begin
-        itemDraenei = Rects.items1
-        itemDemons = Rects.items2
+    // Crate
 
-        circleRegion[1] = Rects.circle11
-        circleRegion[2] = Rects.circle12
-        circleRegion[3] = Rects.circle13
-        circleRegion[4] = Rects.circle14
-        circleRegion[5] = Rects.circle15
-        circleRegion[6] = Rects.circle21
-        circleRegion[7] = Rects.circle22
-        circleRegion[8] = Rects.circle23
-        circleRegion[9] = Rects.circle24
-        circleRegion[10] = Rects.circle25
-    end)
-
-    onReset(false, () -> begin
-        for i = 1 to 10
-            circle[i].setPos(circleRegion[i].getCenter())
-            for m in circle[i].inventory()
-                m.remove()
-    end)
-
-    circle[1] = createUnit(players[1], CIRCLE, circleRegion[1].getCenter(), UNIT_FACING)
-    circle[2] = createUnit(players[2], CIRCLE, circleRegion[2].getCenter(), UNIT_FACING)
-    circle[3] = createUnit(players[3], CIRCLE, circleRegion[3].getCenter(), UNIT_FACING)
-    circle[4] = createUnit(players[4], CIRCLE, circleRegion[4].getCenter(), UNIT_FACING)
-    circle[5] = createUnit(players[5], CIRCLE, circleRegion[5].getCenter(), UNIT_FACING)
-    circle[6] = createUnit(players[7], CIRCLE, circleRegion[6].getCenter(), UNIT_FACING)
-    circle[7] = createUnit(players[8], CIRCLE, circleRegion[7].getCenter(), UNIT_FACING)
-    circle[8] = createUnit(players[9], CIRCLE, circleRegion[8].getCenter(), UNIT_FACING)
-    circle[9] = createUnit(players[10], CIRCLE, circleRegion[9].getCenter(), UNIT_FACING)
-    circle[10] = createUnit(players[11], CIRCLE, circleRegion[10].getCenter(), UNIT_FACING)
-
-    for i = 1 to 5
-        pointCircle[i] = new ArrayList<rect>()
+    nullTimer() -> 
+        CRATE.allowFriendFire()
     
-    pointCircle[1].add(Rects.circle11)
-    pointCircle[1].add(Rects.circle12)
-    pointCircle[1].add(Rects.circle13)
-    pointCircle[1].add(Rects.circle14)
-    pointCircle[1].add(Rects.circle15)
-    pointCircle[2].add(Rects.circle21)
-    pointCircle[2].add(Rects.circle22)
-    pointCircle[2].add(Rects.circle23)
-    pointCircle[2].add(Rects.circle24)
-    pointCircle[2].add(Rects.circle25)
-    pointCircle[3].add(Rects.circle31)
-    pointCircle[3].add(Rects.circle32)
-    pointCircle[3].add(Rects.circle33)
-    pointCircle[3].add(Rects.circle34)
-    pointCircle[3].add(Rects.circle35)
-    pointCircle[4].add(Rects.circle41)
-    pointCircle[4].add(Rects.circle42)
-    pointCircle[4].add(Rects.circle43)
-    pointCircle[4].add(Rects.circle44)
-    pointCircle[4].add(Rects.circle45)
-    pointCircle[5].add(Rects.circle51)
-    pointCircle[5].add(Rects.circle52)
-    pointCircle[5].add(Rects.circle53)
-    pointCircle[5].add(Rects.circle54)
-    pointCircle[5].add(Rects.circle55)
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let u = GetDyingUnit()
+        if u.getTypeId() == CRATE
+            let list = crateMap.get(u)
+            let pos = u.getPos()
+            for m in list
+                m..setVisible(true)..setPos(pos)
+            crateMap.remove(u)
+            destroy list
+    end)
 
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> GetManipulatedItem().setPlayer(GetManipulatingUnit().getOwner(), false))
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        let u = GetManipulatingUnit()
+        let m = GetManipulatedItem()
+        if u.isAllyOf(m.getPlayer()) 
+            if u.isType(UNIT_TYPE_HERO)
+                m.setPlayer(u.getOwner(), false)
+        else
+            message("error", "This is not of yours.", u.getOwner())
+            u.dropItemPoint(m, u.getPos())
+    end)
 
     registerSpellEffectEvent(ASK_HELP, () -> begin
         let caster = GetSpellAbilityUnit()
         let owner = caster.getOwner()
         let h = hero[owner.getNumber()]
         if h.isAlive()
-            var i = 0
+            var i = new Reference(0)
             forUnitsInRange(EventData.getAbilityTargetPos(), 300., u -> begin
-                if i < 4
+                if i.val < 4
                     if u.isAllyOf(owner) and not u.isType(UNIT_TYPE_STRUCTURE)
                         and ((u.getOwner() == DRAENEI and u.getTypeId() != DRAENEI_WORKER) or (u.getOwner() == DEMON and u.getTypeId() != DEMON_ACOLYTE))
 
                         targetHero[u.getIndex()] = h
                         u.flashEffect(Abilities.thornsAuraDamage, "overhead")
                         u.issuePointOrderById(Orders.attack, h.getPos())
-                        i++
+                        i.val++
             end)
+            if i.into() > 0
+                let f = THE_DRAENEI.has(owner) ? THE_DRAENEI : THE_DEMONS
+                pingMinimap(f, EventData.getAbilityTargetPos(), 2., COLOR_GOLD.withoutAlpha(), false)
+                DisplayTextToForce(f, "{0} asked for help to the {1}.".format(owner.getName(), f == THE_DRAENEI ? "the draenei" : "the demons"))
+    end)
+
+    registerSpellEffectEvent(SELECT_BACKPACK, () -> begin
+        let owner = GetSpellAbilityUnit().getOwner()
+        let i = owner.getNumber()
+        backpack[i].setOwner(owner, false)
+        owner.selectSingle(backpack[i])
+    end)
+
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DESELECTED, () -> begin
+        if GetTriggerUnit().getTypeId() == BACKPACK
+            GetTriggerUnit().setOwner(players[bj_PLAYER_NEUTRAL_VICTIM], false)
     end)
 
     registerSpellEffectEvent(PICK_ITEMS, () -> begin
         let caster = GetSpellAbilityUnit()
         let owner = caster.getOwner()
-        let r = THE_DRAENEI.has(owner) ? itemDraenei : itemDemons
+        let i = owner.getNumber()
+        let pos = hero[i].getPos()
+        let r = Rect(pos.x - 300., pos.y - 300., pos.x + 300, pos.y + 300)
         forItemsInRect(r, m -> begin
             if m.getPlayer() == owner
-                caster.addItemHandle(m)
+                backpack[i].addItemHandle(m)
         end)
+        r.remove()
     end)
 
     registerSpellEffectEvent(DROP_ITEMS, () -> begin
         let caster = GetSpellAbilityUnit()
+        let pos = hero[caster.getOwner().getNumber()].getPos()
         for m in caster.inventory()
             caster.removeItem(m)
+            m.setPos(pos)
     end)
 
 @compiletime function gen()
-    let NO_IMMO = BUFF_ID_GEN.next()
+    new AbilityDefinitionSpellBook(MORE_ABILITIES)
+        ..setItemAbility(false)
+        ..setMinimumSpells(1, 12)
+        ..setMaximumSpells(1, 12)
+        ..setSharedSpellCooldown(1, false)
+        ..setSpellList(1, commaList(ASK_HELP, HEAL_TOTEM, TELEPORT, SELECT_BACKPACK))
+        ..setHotkey("D")
+        ..setTooltipNormal(1, "[|cffffcc00D|r] More abilities")
+    
+    new UnitDefinition(CRATE, 'nalb')
+        ..setNormalAbilities("")
+        ..setUnitSoundSet("")
+        ..setModelFile(Doodads.crates0)
+        ..setIconGameInterface(Icons.bTNCrate)
+        ..setSpeedBase(0)
+        ..setMovementType(MovementType.None)
+        ..setName("Item crate")
 
-    new UnitDefinition(CIRCLE, 'ncop')
-        ..setFoodProduced(5) // 5 missions
-        ..setNormalAbilities(commaList(AbilityIds.invulnerable, AbilityIds.inventory, ASK_HELP, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, PICK_ITEMS, DROP_ITEMS))
-        ..setName("Circle of power")
+    new UnitDefinition(BACKPACK, 'ncop')
+        ..setSightRadiusDay(1)
+        ..setSightRadiusNight(1)
+        ..setSelectionScale(-1.)
+        ..setModelFile("dummy.mdl")
+        ..setNormalAbilities(commaList(COURIER_INV, PICK_ITEMS, DROP_ITEMS, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, AbilityIds.invulnerable, AbilityIds.permanentInvisibility))
+        ..setName("Backpack")
 
     new ChannelAbilityPreset(ASK_HELP, 1, true)
+        ..setHeroAbility(false)
         ..presetTargetTypes(Targettype.POINT)
         ..presetOption(Option.TARGETIMAGE, true)
         ..setBaseOrderID(1, "roar")
@@ -184,51 +191,78 @@ init
         ..setTooltipNormalExtended(1, "Orders a group of ally units up to 4, to go to help at you, if your hero dies, they will return to their previous objective.")
         ..setName("Ask help")
 
-    new AbilityDefinitionDefend(ZOOM_IN)
-        ..setDamageDealt(1, 0)
-        ..setDamageTaken(1, 0)
-        ..setDeflectDamageTakenSpells(1, 0)
-        ..setMovementSpeedFactor(1, 0)
-        ..setChancetoDeflect(1, 0)
-        ..setMagicDamageReduction(1, 0)
+    let LIFE_REGEN = ABIL_ID_GEN.next()
+    let MANA_REGEN = ABIL_ID_GEN.next()
+    
+    new AbilityDefinitionHealingWard(HEAL_TOTEM)
+        ..setWardUnitType(1, TOTEM.toRawCode())
+        ..setManaCost(1, 0)
+        ..setCastRange(1, 700.)
+        ..setCooldown(1, 90.)
+        ..setRequirements("")
+        ..setButtonPositionNormalX(0)
+        ..setButtonPositionNormalY(0)
+        ..setHotkeyNormal("W")
+        ..setTooltipNormal(1, "[|cffffcc00W|r] Heal totem")
+        ..setTooltipNormalExtended(1, "Places a totem that heals life and mana to nearby ally units.")
+    
+    new UnitDefinition(TOTEM, 'ohwd')
+        ..setHitPointsMaximumBase(200)
+        ..setNormalAbilities(commaList(LIFE_REGEN, MANA_REGEN))
+
+    new ChannelAbilityPreset(SELECT_BACKPACK, 1, true)
+        ..setHeroAbility(false)
+        ..setIconNormal(Icons.bTNDustOfAppearance)
+        ..setButtonPositionNormalX(0)
+        ..setButtonPositionNormalY(1)
+        ..setHotkeyNormal("A")
+        ..setTooltipNormal(1, "[|cffffcc00A|r] Select backpack")
+        ..setTooltipNormalExtended(1, "")
+        ..setName("Select backpack")
+    
+    new AbilityDefinitionStaffoTeleportation(TELEPORT)
+        ..setRace(Race.Naga)
+        ..presetButtonPosNormal(2, 0)
+        ..setHeroAbility(false)
+        ..setItemAbility(false)
+        ..setTargetsAllowed(1, "allies,structure,invulnerable,neutral,nonhero,ground,player,vulnerable")
+        // Stats
+        ..setCastingDelay(1, 4.5)
+        ..setManaCost(1, 50)
+        ..setCooldown(1, 35.)
+        // Audiovisual
+        ..setIconNormal(Icons.bTNScrollUber)
+        // Tooltip
+        ..setHotkeyNormal("E")
+        ..setTooltipNormal(1, "[|cffffcc00E|r] Teleport")
+        ..setTooltipNormalExtended(1, "Teleports the hero to a ally unit.")
+        ..setName("Teleport")
+        .setEditorSuffix("(Long)")
+
+    new ChannelAbilityPreset(ZOOM_IN, 1, true)
+        ..setHeroAbility(false)
         ..setArtCaster("")
-        ..setIconTurnOff(Imports.bTNCrZoomIn)
         ..setIconNormal(Imports.bTNCrZoomIn)
         ..setButtonPositionNormalX(1)
         ..setButtonPositionNormalY(1)
-        ..setButtonPositionTurnOffX(1)
-        ..setButtonPositionTurnOffY(1)
-        ..setCheckDependencies(false)
-        ..setHotkeyTurnOff("S")
         ..setHotkeyNormal("S")
-        ..setTooltipTurnOff(1, "[|cffffcc00S|r] Zoom In")
-        ..setTooltipTurnOffExtended(1, "Zoom in on the camera view.")
         ..setTooltipNormal(1, "[|cffffcc00S|r] Zoom In")
         ..setTooltipNormalExtended(1, "Zoom in on the camera view.")
         ..setName("Zoom In")
 
-    new AbilityDefinitionMagicDefense(ZOOM_OUT)
-        ..setDamageDealt(1, 0)
-        ..setDamageTaken(1, 0)
-        ..setDeflectDamageTakenSpells(1, 0)
-        ..setMovementSpeedFactor(1, 0)
-        ..setChancetoDeflect(1, 0)
-        ..setMagicDamageReduction(1, 0)
+    new ChannelAbilityPreset(ZOOM_OUT, 1, true)
+        ..setHeroAbility(false)
         ..setArtCaster("")
         ..setIconTurnOff(Imports.bTNCrZoomOut)
         ..setIconNormal(Imports.bTNCrZoomOut)
         ..setButtonPositionNormalX(2)
         ..setButtonPositionNormalY(1)
-        ..setButtonPositionTurnOffX(2)
-        ..setButtonPositionTurnOffY(1)
-        ..setCheckDependencies(false)
-        ..setHotkeyTurnOff("D")
         ..setHotkeyNormal("D")
-        ..setTooltipTurnOff(1, "[|cffffcc00D|r] Zoom Out")
-        ..setTooltipTurnOffExtended(1, "Zoom out the camera view.")
         ..setTooltipNormal(1, "[|cffffcc00D|r] Zoom Out")
         ..setTooltipNormalExtended(1, "Zoom out the camera view.")
         ..setName("Zoom Out")
+
+    let NO_IMMO = BUFF_ID_GEN.next()
 
     new AbilityDefinitionImmolationcreep(TOWER_RANGE)
         ..setDamageperInterval(1, 0)
@@ -265,6 +299,7 @@ init
         ..setPercentage(1, true)
 
     new ChannelAbilityPreset(PICK_ITEMS, 1, true)
+        ..setHeroAbility(false)
         ..setIconNormal(Icons.bTNLoad)
         ..setButtonPositionNormalX(0)
         ..setButtonPositionNormalY(2)
@@ -276,6 +311,7 @@ init
         ..setName("Pick items")
 
     new ChannelAbilityPreset(DROP_ITEMS, 1, true)
+        ..setHeroAbility(false)
         ..setIconNormal(Icons.bTNUnLoad)
         ..setButtonPositionNormalX(1)
         ..setButtonPositionNormalY(2)

@@ -305,7 +305,6 @@ public constant RUNIC_BRACERS = compiletime(
         RUNIC_BRACERS_RECIPE.lumberCost)
 
 init
-    createItem(RUNIC_BRACERS.getNewId(), vec2(8000, 8000))
     new ItemRecipe()
         ..setRequiredItems(
             ANTIMAGIC_POTION,
