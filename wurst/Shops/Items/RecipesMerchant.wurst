@@ -22,14 +22,14 @@ public constant SHIELD_OF_HONOR_RECIPE = compiletime(
         ..setButtonPositionX(0)
         ..setButtonPositionY(0)
         ..setHotkey("Q")
-        ..setTooltipBasic("[|cffffcc00Q|r] Buy Shield of honor (Recipe)")
-        ..setTooltipExtended("+8 armor\n" + COMMAND_AURA_TOOLTIP + "\n\n" +
+        ..setName("Recipe of Shield of honor")
+        ..generateTooltip("+8 armor\n" + COMMAND_AURA_TOOLTIP + "\n\n" +
                              "Requires:\n" +
                              "- Claws of Attack (+12)\n" +
                              "- Ring of protection (+2)\n" +
                              "- Ring of protection (+6)\n\n")
-        ..setDescription("+8 armor\n" + COMMAND_AURA_TOOLTIP)
-        ..setName("Recipe of Shield of honor"))
+        ..setTooltipBasic("[|cffffcc00Q|r] Buy Shield of honor (Recipe)"))
+        ..register()
 
 public constant SHIELD_OF_HONOR = compiletime(
     new RecipeItem('shhn')
@@ -37,10 +37,10 @@ public constant SHIELD_OF_HONOR = compiletime(
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNHumanArmorUpThree)
-        ..setTooltipExtended("+8 armor\n" + COMMAND_AURA_TOOLTIP)
-        ..setDescription("+8 armor and\n" + COMMAND_AURA_TOOLTIP)
-        ..setName("Shield of honor"))
-        ..addBonus(Bonus.ARMOR, 8)
+        ..setName("Shield of honor")
+        ..generateTooltip("+8 armor\n" + COMMAND_AURA_TOOLTIP)
+        ..addBonus(Bonus.ARMOR, 8))
+        ..register()
 
 @compiletime function genShieldOfHonor()
     fixRecipe(SHIELD_OF_HONOR_RECIPE, SHIELD_OF_HONOR,
@@ -78,12 +78,12 @@ public constant RING_OF_REGENERATION_1_RECIPE = compiletime(
         ..setButtonPositionX(1)
         ..setButtonPositionY(0)
         ..setHotkey("W")
-        ..setTooltipBasic("[|cffffcc00W|r] Buy Ring of Regeneration (Recipe)")
-        ..setTooltipExtended("+5 Health regeneration.\n\n" +
+        ..setName("Recipe of Ring of Regeneration")
+        ..generateTooltip("+5 Health regeneration.\n\n" +
                              "Requires:\n" +
                              "- x3 Healing potions\n\n")
-        ..setDescription("+5 Health regeneration.")
-        ..setName("Recipe of Ring of Regeneration"))
+        ..setTooltipBasic("[|cffffcc00W|r] Buy Ring of Regeneration (Recipe)"))
+        ..register()
 
 public constant RING_OF_REGENERATION_1 = compiletime(
     new RecipeItem('rlif')
@@ -91,10 +91,10 @@ public constant RING_OF_REGENERATION_1 = compiletime(
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNRingSkull)
-        ..setTooltipExtended("+5 Health regeneration.")
-        ..setDescription("+5 Health regeneration.")
-        ..setName("Ring of Regeneration"))
-        ..addBonus(Bonus.LIFEREGEN, 5)
+        ..setName("Ring of Regeneration")
+        ..generateTooltip("+5 Health regeneration.")
+        ..addBonus(Bonus.LIFEREGEN, 5))
+        ..register()
 
 @compiletime function genRingOfRegeneration1()
     fixRecipe(RING_OF_REGENERATION_1_RECIPE, RING_OF_REGENERATION_1,
@@ -125,12 +125,12 @@ public constant RING_OF_REGENERATION_2_RECIPE = compiletime(
         ..setButtonPositionX(1)
         ..setButtonPositionY(0)
         ..setHotkey("W")
-        ..setTooltipBasic("[|cffffcc00W|r] Buy Ring of Regeneration (Recipe)")
-        ..setTooltipExtended("+5 Health regeneration.\n\n" +
+        ..setName("Recipe of Ring of Regeneration")
+        ..generateTooltip("+5 Health regeneration.\n\n" +
                              "Requires:\n" +
                              "- x4 Healing salves\n\n")
-        ..setDescription("+5 Health regeneration.")
-        ..setName("Recipe of Ring of Regeneration"))
+        ..setTooltipBasic("[|cffffcc00W|r] Buy Ring of Regeneration (Recipe)"))
+        ..register()
 
 public constant RING_OF_REGENERATION_2 = compiletime(
     new RecipeItem('rlif')
@@ -138,10 +138,10 @@ public constant RING_OF_REGENERATION_2 = compiletime(
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNRingSkull)
-        ..setTooltipExtended("+5 Health regeneration.")
-        ..setDescription("+5 Health regeneration.")
-        ..setName("Ring of Regeneration"))
-        ..addBonus(Bonus.LIFEREGEN, 5)
+        ..setName("Ring of Regeneration")
+        ..generateTooltip("+5 Health regeneration.")
+        ..addBonus(Bonus.LIFEREGEN, 5))
+        ..register()
 
 @compiletime function genRingOfRegeneration2()
     fixRecipe(RING_OF_REGENERATION_2_RECIPE, RING_OF_REGENERATION_2,
@@ -175,12 +175,12 @@ public constant SOBI_MASK_1_RECIPE = compiletime(
         ..setButtonPositionX(2)
         ..setButtonPositionY(0)
         ..setHotkey("E")
-        ..setTooltipBasic("[|cffffcc00E|r] Buy Sobi Mask (Recipe)")
-        ..setTooltipExtended("+1.25 Mana regeneration.\n\n" +
+        ..setName("Recipe of Sobi Mask")
+        ..generateTooltip("+1.25 Mana regeneration.\n\n" +
                              "Requires:\n" +
                              "- x3 Mana potions\n\n")
-        ..setDescription("+1.25 Mana regeneration.")
-        ..setName("Recipe of Sobi Mask"))
+        ..setTooltipBasic("[|cffffcc00E|r] Buy Sobi Mask (Recipe)"))
+        ..register()
 
 public constant SOBI_MASK_1 = compiletime(
     new RecipeItem('rwiz')
@@ -188,10 +188,10 @@ public constant SOBI_MASK_1 = compiletime(
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNSobiMask)
-        ..setTooltipExtended("+1.25 Mana regeneration.")
-        ..setDescription("+1.25 Mana regeneration.")
-        ..setName("Sobi Mask"))
-        ..addBonus(Bonus.MANAREGEN, 1.25)
+        ..setName("Sobi Mask")
+        ..generateTooltip("+1.25 Mana regeneration.")
+        ..addBonus(Bonus.MANAREGEN, 1.25))
+        ..register()
 
 @compiletime function genSobiMask1()
     fixRecipe(SOBI_MASK_1_RECIPE, SOBI_MASK_1,
@@ -222,12 +222,12 @@ public constant SOBI_MASK_2_RECIPE = compiletime(
         ..setButtonPositionX(2)
         ..setButtonPositionY(0)
         ..setHotkey("E")
-        ..setTooltipBasic("[|cffffcc00E|r] Buy Sobi Mask (Recipe)")
-        ..setTooltipExtended("+1.25 Mana regeneration.\n\n" +
+        ..setName("Recipe of Sobi Mask")
+        ..generateTooltip("+1.25 Mana regeneration.\n\n" +
                              "Requires:\n" +
                              "- x5 Clarity potions\n\n")
-        ..setDescription("+1.25 Mana regeneration.")
-        ..setName("Recipe of Sobi Mask"))
+        ..setTooltipBasic("[|cffffcc00E|r] Buy Sobi Mask (Recipe)"))
+        ..register()
 
 public constant SOBI_MASK_2 = compiletime(
     new RecipeItem('rwiz')
@@ -235,10 +235,10 @@ public constant SOBI_MASK_2 = compiletime(
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNSobiMask)
-        ..setTooltipExtended("+1.25 Mana regeneration.")
-        ..setDescription("+1.25 Mana regeneration.")
-        ..setName("Sobi Mask"))
-        ..addBonus(Bonus.MANAREGEN, 1.25)
+        ..setName("Sobi Mask")
+        ..generateTooltip("+1.25 Mana regeneration.")
+        ..addBonus(Bonus.MANAREGEN, 1.25))
+        ..register()
 
 @compiletime function genSobiMask2()
     fixRecipe(SOBI_MASK_2_RECIPE, SOBI_MASK_2,
@@ -273,13 +273,13 @@ public constant RUNIC_BRACERS_RECIPE = compiletime(
         ..setButtonPositionX(1)
         ..setButtonPositionY(2)
         ..setHotkey("R")
-        ..setTooltipBasic("[|cffffcc00R|r] Buy Runic Bracers (Recipe)")
-        ..setTooltipExtended("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP + "\n\n" +
+        ..setName("Recipe of Runic Bracers")
+        ..generateTooltip("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP + "\n\n" +
                              "Requires:\n" +
                              "- Anti-Magic Potion\n" +
                              "- Ring of regeneration\n\n")
-        ..setDescription("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
-        ..setName("Recipe of Runic Bracers"))
+        ..setTooltipBasic("[|cffffcc00R|r] Buy Runic Bracers (Recipe)"))
+        ..register()
 
 public constant RUNIC_BRACERS = compiletime(
     new RecipeItem('brac')
@@ -288,10 +288,10 @@ public constant RUNIC_BRACERS = compiletime(
         ..setActivelyUsed(true)
         ..setClassification("Permanent")
         ..setInterfaceIcon(Icons.bTNRunedBracers)
-        ..setTooltipExtended("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
-        ..setDescription("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
-        ..setName("Runic Bracers"))
-        ..addBonus(Bonus.LIFEREGEN, 6)
+        ..setName("Runic Bracers")
+        ..generateTooltip("+15% Magic Resistance, +6 Health Regeneration.\n" + RUNIC_BRACERS_TOOLTIP)
+        ..addBonus(Bonus.LIFEREGEN, 6))
+        ..register()
 
 @compiletime function genRunicBracers()
     fixRecipe(RUNIC_BRACERS_RECIPE, RUNIC_BRACERS,
@@ -332,14 +332,14 @@ public constant IMPULSE_BOOTS_RECIPE = compiletime(
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
         ..setHotkey("A")
-        ..setTooltipBasic("[|cffffcc00A|r] Buy Impulse boots (Recipe)")
-        ..setTooltipExtended("+60 Movement Speed and lets you advance fast to a certain position.\n\n|cffc3dbffNote:|r You only can go over a wall of 1 height, other case you will stop (and with some other exceptions), but you always can from top to bottom.\n\n" +
+        ..setName("Recipe of Impulse boots")
+        ..generateTooltip("+60 Movement Speed and lets you advance fast to a certain position.\n\n|cffc3dbffNote:|r You only can go over a wall of 1 height, other case you will stop (and with some other exceptions), but you always can from top to bottom.\n\n" +
                              "Requires:\n" +
                              "- Boots of speed\n" +
                              "- Scroll of speed\n" +
                              "- Wind scepter\n\n")
-        ..setDescription("+60 Movement Speed and lets you advance fast to a certain position.\n\n|cffc3dbffNote:|r You only can go over a wall of 1 height, other case you will stop (and with some other exceptions), but you always can from top to bottom.")
-        ..setName("Recipe of Impulse boots"))
+        ..setTooltipBasic("[|cffffcc00A|r] Buy Impulse boots (Recipe)"))
+        ..register()
 
 public constant IMPULSE_BOOTS = compiletime(
     new RecipeItem('bspd')
@@ -348,9 +348,9 @@ public constant IMPULSE_BOOTS = compiletime(
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Imports.bTNWindsBoots)
-        ..setTooltipExtended("+60 Movement Speed and lets you dash to a certain position, but there are places where the dash will be stopped.")
-        ..setDescription("+60 Movement Speed and lets you dash to a certain position, but there are places where the dash will be stopped.")
-        ..setName("Impulse boots"))
+        ..setName("Impulse boots")
+        ..generateTooltip("+60 Movement Speed and lets you dash to a certain position, but there are places where the dash will be stopped."))
+        ..register()
 
 init
     IMPULSE_BOOTS.getNewId().addMoveSpeed(60)
@@ -390,13 +390,13 @@ public constant ENERGY_PENDANT_RECIPE = compiletime(
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
         ..setHotkey("S")
-        ..setTooltipBasic("[|cffffcc00S|r] Buy Energy Pendant (Recipe)")
-        ..setTooltipExtended("+200 mana points and if you uses it, restore 100 mana to nearby allied units.\n\n" +
+        ..setName("Recipe of Energy Pendant")
+        ..generateTooltip("+200 mana points and if you uses it, restore 100 mana to nearby allied units.\n\n" +
                              "Requires:\n" +
                              "- Pendant of mana\n" +
                              "- Scroll of protection\n\n")
-        ..setDescription("+200 mana points and if you uses it, restore 100 mana to nearby allied units.")
-        ..setName("Recipe of Energy Pendant"))
+        ..setTooltipBasic("[|cffffcc00S|r] Buy Energy Pendant (Recipe)"))
+        ..register()
 
 public constant ENERGY_PENDANT = compiletime(
     new RecipeItem('pmna')
@@ -405,10 +405,10 @@ public constant ENERGY_PENDANT = compiletime(
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNPendantOfEnergy)
-        ..setTooltipExtended("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
-        ..setDescription("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
-        ..setName("Energy Pendant"))
-        ..addBonus(Bonus.MANA, 200)
+        ..setName("Energy Pendant")
+        ..generateTooltip("+200 mana points\n" + MANA_REPLISH_AREA_TOOLTIP)
+        ..addBonus(Bonus.MANA, 200))
+        ..register()
 
 @compiletime function genEnergyPendant()
     fixRecipe(ENERGY_PENDANT_RECIPE, ENERGY_PENDANT,
@@ -442,14 +442,14 @@ public constant MASK_OF_DEATH_RECIPE = compiletime(
         ..setButtonPositionX(2)
         ..setButtonPositionY(1)
         ..setHotkey("D")
-        ..setTooltipBasic("[|cffffcc00D|r] Buy Mask of Death (Recipe)")
-        ..setTooltipExtended("15% life steal\n+20 damage\n+5 armor\n\n" +
+        ..setName("Recipe of Mask of Death")
+        ..generateTooltip("15% life steal\n+20 damage\n+5 armor\n\n" +
                              "Requires:\n" +
                              "- Claws of attack (+18)\n" +
                              "- Ring of protection (+4)\n" +
                              "- Vampiric potion\n\n")
-        ..setDescription("15% life steal\n+20 damage\n+5 armor")
-        ..setName("Recipe of Mask of Death"))
+        ..setTooltipBasic("[|cffffcc00D|r] Buy Mask of Death (Recipe)"))
+        ..register()
 
 public constant MASK_OF_DEATH = compiletime(
     new RecipeItem('modt')
@@ -457,11 +457,11 @@ public constant MASK_OF_DEATH = compiletime(
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNMaskOfDeath)
-        ..setTooltipExtended("15% life steal\n+20 damage\n+5 armor")
-        ..setDescription("15% life steal\n+20 damage\n+5 armor")
-        ..setName("Mask of Death"))
+        ..setName("Mask of Death")
+        ..generateTooltip("15% life steal\n+20 damage\n+5 armor")
         ..addBonus(Bonus.DAMAGE, 20)
-        ..addBonus(Bonus.ARMOR, 5)
+        ..addBonus(Bonus.ARMOR, 5))
+        ..register()
 
 @compiletime function genMaskOfDeath()
     fixRecipe(MASK_OF_DEATH_RECIPE, MASK_OF_DEATH,
@@ -505,15 +505,15 @@ public constant SHIELD_OF_LORD_OF_DEAD_RECIPE = compiletime(
         ..setButtonPositionX(3)
         ..setButtonPositionY(1)
         ..setHotkey("F")
-        ..setTooltipBasic("[|cffffcc00F|r] Buy Shield of the Lord of Death (Recipe)")
-        ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP + "\n\n" +
+        ..setName("Recipe of Shield of the Lord of Death")
+        ..generateTooltip("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP + "\n\n" +
                              "Requires:\n" +
                              "- Khadgar health stone\n" +
                              "- Mana pendant\n" +
                              "- Ring of protection (+3)\n" +
                              "- Ring of protection (+4)\n\n")
-        ..setDescription("+250 hit points\n+250 mana points\n+7 armor\nInmolation (30 dps)")
-        ..setName("Recipe of Shield of the Lord of Death"))
+        ..setTooltipBasic("[|cffffcc00F|r] Buy Shield of the Lord of Death (Recipe)"))
+        ..register()
 
 public constant SHIELD_OF_LORD_OF_DEAD = compiletime(
     new RecipeItem('shdt')
@@ -522,12 +522,12 @@ public constant SHIELD_OF_LORD_OF_DEAD = compiletime(
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNLightningShield)
-        ..setTooltipExtended("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP)
-        ..setDescription("+250 hit points\n+250 mana points\n+7 armor\nInmolation (30 dps)")
-        ..setName("Shield of the Lord of Death"))
+        ..setName("Shield of the Lord of Death")
+        ..generateTooltip("+250 hit points\n+250 mana points\n+7 armor\n" + IMMOLATION_30_TOOLTIP)
         ..addBonus(Bonus.LIFE, 250)
         ..addBonus(Bonus.MANA, 250)
-        ..addBonus(Bonus.ARMOR, 7)
+        ..addBonus(Bonus.ARMOR, 7))
+        ..register()
 
 @compiletime function genShieldOfTheLordOfDeath()
     fixRecipe(SHIELD_OF_LORD_OF_DEAD_RECIPE, SHIELD_OF_LORD_OF_DEAD,
@@ -571,14 +571,14 @@ public constant GLOVES_OF_CORRUPTION_RECIPE = compiletime(
         ..setButtonPositionX(0)
         ..setButtonPositionY(2)
         ..setHotkey("Z")
-        ..setTooltipBasic("[|cffffcc00Z|r] Buy Gloves of corruption (Recipe)")
-        ..setTooltipExtended("+20 of corruption attack and +30% of attack speed\n\n" +
+        ..setName("Recipe of Gloves of corruption")
+        ..generateTooltip("+20 of corruption attack and +30% of attack speed\n\n" +
                              "Requires:\n" +
                              "- Orb of corruption\n" +
                              "- Claws of attack (+15)\n" +
                              "- Gloves of haste\n\n")
-        ..setDescription("+20 of corruption attack and +30% of attack speed")
-        ..setName("Recipe of Gloves of corruption"))
+        ..setTooltipBasic("[|cffffcc00Z|r] Buy Gloves of corruption (Recipe)"))
+        ..register()
 
 public constant GLOVES_OF_CORRUPTION = compiletime(
     new RecipeItem('ocor')
@@ -586,11 +586,11 @@ public constant GLOVES_OF_CORRUPTION = compiletime(
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNImprovedUnholyStrength)
-        ..setTooltipExtended("+20 of corruption attack and +30% of attack speed")
-        ..setDescription("+20 of corruption attack and +30% of attack speed")
-        ..setName("Gloves of corruption"))
+        ..setName("Gloves of corruption")
+        ..generateTooltip("+20 of corruption attack and +30% of attack speed")
         ..addBonus(Bonus.DAMAGE, 20)
-        ..addBonus(Bonus.ATTACKSPEED, 30)
+        ..addBonus(Bonus.ATTACKSPEED, 30))
+        ..register()
 
 @compiletime function genGlovesOfCorruption()
     fixRecipe(GLOVES_OF_CORRUPTION_RECIPE, GLOVES_OF_CORRUPTION,
@@ -627,14 +627,14 @@ public constant SHAMANS_CLAWS_RECIPE = compiletime(
         ..setButtonPositionX(1)
         ..setButtonPositionY(2)
         ..setHotkey("X")
-        ..setTooltipBasic("[|cffffcc00X|r] Buy Shaman's claws (Recipe)")
-        ..setTooltipExtended("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.\n\n" +
+        ..setName("Recipe of Gloves of corruption")
+        ..generateTooltip("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.\n\n" +
                              "Requires:\n" +
                              "- Orb of lightning\n" +
                              "- Claws of attack (+15)\n" +
                              "- Storm diamond\n\n")
-        ..setDescription("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.")
-        ..setName("Recipe of Gloves of corruption"))
+        ..setTooltipBasic("[|cffffcc00X|r] Buy Shaman's claws (Recipe)"))
+        ..register()
 
 public constant SHAMANS_CLAWS = compiletime(
     new RecipeItem('ocor')
@@ -643,11 +643,11 @@ public constant SHAMANS_CLAWS = compiletime(
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNShamanMaster)
-        ..setTooltipExtended("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.")
-        ..setDescription("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.")
-        ..setName("Shaman's claws"))
+        ..setName("Shaman's claws")
+        ..generateTooltip("+20 of lightning attack and throws a lightning that causes damage to several targets, with initial damage 180.")
         ..addBonus(Bonus.DAMAGE, 20)
-        ..addBonus(Bonus.ATTACKSPEED, 30)
+        ..addBonus(Bonus.ATTACKSPEED, 30))
+        ..register()
 
 @compiletime function genShamanClaws()
     fixRecipe(SHAMANS_CLAWS_RECIPE, SHAMANS_CLAWS,
@@ -684,14 +684,14 @@ public constant NORTHREND_ARTIFACT_RECIPE = compiletime(
         ..setButtonPositionX(2)
         ..setButtonPositionY(2)
         ..setHotkey("C")
-        ..setTooltipBasic("[|cffffcc00C|r] Buy Northrend Artifact (Recipe)")
-        ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r\n\n" +
+        ..setName("Northrend Artifact")
+        ..generateTooltip("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r\n\n" +
                              "Requires:\n" +
                              "- Ice orb\n" +
                              "- Claws of attack (+15)\n" +
                              "- Kadghar health stone\n\n")
-        ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
-        ..setName("Northrend Artifact"))
+        ..setTooltipBasic("[|cffffcc00C|r] Buy Northrend Artifact (Recipe)"))
+        ..register()
 
 public constant NORTHREND_ARTIFACT = compiletime(
     new RecipeItem('ofro')
@@ -699,11 +699,11 @@ public constant NORTHREND_ARTIFACT = compiletime(
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
-        ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
-        ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
-        ..setName("Northrend Artifact"))
+        ..setName("Northrend Artifact")
+        ..generateTooltip("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..addBonus(Bonus.DAMAGE, 21)
-        ..addBonus(Bonus.LIFE, 250)
+        ..addBonus(Bonus.LIFE, 250))
+        ..register()
 
 public constant NORTHREND_ARTIFACT_BREATH = compiletime(
     new RecipeItem('ofro')
@@ -711,12 +711,11 @@ public constant NORTHREND_ARTIFACT_BREATH = compiletime(
         //..setArmorType(ArmorSoundType.Metal)
         ..setClassification("Miscellaneous")
         ..setInterfaceIcon(Icons.bTNIceShard)
-        ..setTooltipBasic("[|cffffcc00C|r] Buy Northrend Artifact")
-        ..setTooltipExtended("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
-        ..setDescription("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
-        ..setName("Northrend Artifact"))
+        ..setName("Northrend Artifact")
+        ..generateTooltip("+250 hit points and +21 ice attack (don't ask why this is here).\n\n|cffff0000Orb effects don't stack.|r")
         ..addBonus(Bonus.DAMAGE, 21)
-        ..addBonus(Bonus.LIFE, 250)
+        ..addBonus(Bonus.LIFE, 250))
+        ..register()
 
 @compiletime function genNorthrendArtifact()
     let goldCost = ORB_OF_LIGHTNING.goldCost +
@@ -789,13 +788,13 @@ public constant POCKET_CATAPULT_RECIPE = compiletime(
         ..setButtonPositionX(3)
         ..setButtonPositionY(2)
         ..setHotkey("V")
-        ..setTooltipBasic("[|cffffcc00V|r] Buy Pocket Catapult (Recipe)")
-        ..setTooltipExtended("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.\n\n" +
+        ..setName("Recipe of Pocket Catapult")
+        ..generateTooltip("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.\n\n" +
                              "Requires:\n" +
                              "- Courier\n"+
                              "- Scroll of the beast\n\n")
-        ..setDescription("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
-        ..setName("Recipe of Pocket Catapult"))
+        ..setTooltipBasic("[|cffffcc00V|r] Buy Pocket Catapult (Recipe)"))
+        ..register()
 
 public constant POCKET_CATAPULT = compiletime(
     new RecipeItem('wild')
@@ -803,10 +802,10 @@ public constant POCKET_CATAPULT = compiletime(
         ..setAbilities(POCKET_CATAPULT_SPELL.toRawCode())
         ..setClassification("Charged")
         ..setInterfaceIcon(Icons.bTNCatapult)
-        ..setTooltipBasic("[|cffffcc00C|r] Buy Pocket Catapult")
-        ..setTooltipExtended("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
-        ..setDescription("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
-        ..setName("Pocket Catapult"))
+        ..setName("Pocket Catapult")
+        ..generateTooltip("Unfold a calapult, that can you help to destroy the towers.\nLasts 180 seconds.")
+        ..setTooltipBasic("[|cffffcc00C|r] Buy Pocket Catapult"))
+        ..register()
 
 @compiletime function genPocketCatapult()
     fixRecipe(POCKET_CATAPULT_RECIPE, POCKET_CATAPULT,

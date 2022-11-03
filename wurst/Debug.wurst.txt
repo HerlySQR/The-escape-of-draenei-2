@@ -1,17 +1,22 @@
 package Debug
 
-import DamageEvent
-import Functions
-import Merchant
+//import DamageEvent
+//import Functions
+//import Merchant
 //import HeroType
+import ClosureTimers
+import BonusHandler
 
 init
-    DamageEvent.addListener() -> 
+    let u = createUnit(players[0], 'hpea', vec2(8000, 8000))
+    doAfter(4) ->
+        u.addBonus(Bonus.DAMAGE, 12)
+    /*DamageEvent.addListener() -> 
         if DamageEvent.getSource().hasItemById(HEALING_SALVE.getNewId())
             DamageEvent.getSource().removeItemById(HEALING_SALVE.getNewId())
             DamageEvent.getSource().damageTarget(DamageEvent.getTarget(), 100, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE)
     //let pos = vec2(5200, -5200)
-    /*let pos = vec2(0, 0)
+    let pos = vec2(0, 0)
     for typ in HeroType
         createUnit(players[1], typ.getL(), pos)..setLevel(6, false)
         createUnit(players[1], typ.getNL(), pos)

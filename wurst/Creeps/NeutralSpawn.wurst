@@ -38,7 +38,7 @@ public function disableNeutralSpawn()
 init
     onReset(false, () -> begin
         forUnitsOfPlayer(players[PLAYER_NEUTRAL_AGGRESSIVE], u -> begin
-            if u != theMonster and u != modeSelector and not u.isType(UNIT_TYPE_STRUCTURE)
+            if u != theMonster and not u.isType(UNIT_TYPE_STRUCTURE)
                 u.remove()
         end)
         spawning.disable()

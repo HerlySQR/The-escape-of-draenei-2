@@ -14,7 +14,10 @@ public constant STAFF_OF_NEGATION = compiletime(
         ..setButtonPositionX(0)
         ..setButtonPositionY(0)
         ..setHotkey("Q")
+        ..setName("Staff of Negation")
+        ..generateTooltip("Dispels the effects of magic from a selected area.\n|cffffcc00Cause 200 damage to summoned units.|r")
         ..setTooltipBasic("[|cffffcc00Q|r] Buy Staff of Negation"))
+        ..register()
 
 public constant GLOVES_OF_HASTE = compiletime(
     new RecipeItem('gcel')
@@ -26,9 +29,12 @@ public constant GLOVES_OF_HASTE = compiletime(
         ..setStockReplenishInterval(10)
         ..setButtonPositionX(1)
         ..setButtonPositionY(0)
-        ..setHotkey("W")
-        ..setTooltipBasic("[|cffffcc00W|r] Buy Gloves of Haste"))
         ..addBonus(Bonus.ATTACKSPEED, 15)
+        ..setHotkey("W")
+        ..setName("Gloves of Haste")
+        ..generateTooltip("")
+        ..setTooltipBasic("[|cffffcc00W|r] Buy Gloves of Haste"))
+        ..register()
 
 public constant NETHER_POTION = compiletime(
     new RecipeItem('wcyc')
@@ -43,21 +49,25 @@ public constant NETHER_POTION = compiletime(
         ..setButtonPositionY(0)
         ..setAbilities(NETHER_POTION_SPELL.toRawCode())
         ..setHotkey("E")
-        ..setTooltipBasic("[|cffffcc00E|r] Buy Nether Potion")
-        ..setTooltipExtended("This is a flask full of spirits, which breaks on impact and unleashes said spirits affecting the target units.\n" + NETHER_POTION_TOOLTIP)
-        ..setDescription("This is a flask full of spirits, which breaks on impact and unleashes said spirits affecting the target units.")
-        ..setName("Nether Potion"))
+        ..setName("Nether Potion")
+        ..generateTooltip("This is a flask full of spirits, which breaks on impact and unleashes said spirits affecting the target units.\n" + NETHER_POTION_TOOLTIP)
+        ..setTooltipBasic("[|cffffcc00E|r] Buy Nether Potion"))
+        ..register()
 
 public constant GOBLIN_LANDMINES = compiletime(
     new RecipeItem('gobm')
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("Charged")
+        ..setGoldCost(0)
         ..setLumberCost(3)
         ..setStockStartDelay(240)
         ..setButtonPositionX(3)
         ..setButtonPositionY(0)
         ..setHotkey("R")
+        ..setName("Goblin Landmines")
+        ..generateTooltip("Place a hidden landmine at the selected point. Enemy units moving near the mine will activate it, destroying the mine and dealing damage to nearby units.")
         ..setTooltipBasic("[|cffffcc00R|r] Buy Goblin Landmines"))
+        ..register()
 
 public constant KHADGAR_HEATH_STONE = compiletime(
     new RecipeItem('rhth')
@@ -68,11 +78,12 @@ public constant KHADGAR_HEATH_STONE = compiletime(
         ..setAbilities("")
         ..setButtonPositionX(0)
         ..setButtonPositionY(1)
-        ..setHotkey("A")
-        ..setTooltipBasic("[|cffffcc00A|r] Buy Khadgar health stone")
-        ..setTooltipExtended("Increase the Hero's hit points by 200.")
-        ..setDescription("Increase the Hero's hit points."))
         ..addBonus(Bonus.LIFE, 200)
+        ..setHotkey("A")
+        ..setName("Khadgar health stone")
+        ..generateTooltip("")
+        ..setTooltipBasic("[|cffffcc00A|r] Buy Khadgar health stone"))
+        ..register()
 
 public constant MANA_PENDANT = compiletime(
     new RecipeItem('pmna')
@@ -83,11 +94,12 @@ public constant MANA_PENDANT = compiletime(
         ..setAbilities("")
         ..setButtonPositionX(1)
         ..setButtonPositionY(1)
-        ..setHotkey("S")
-        ..setTooltipBasic("[|cffffcc00S|r] Buy Mana Pendant")
-        ..setTooltipExtended("Increases the mana in 150.")
-        ..setDescription("Increases the mana."))
         ..addBonus(Bonus.MANA, 150)
+        ..setHotkey("S")
+        ..setName("Mana Pendant")
+        ..generateTooltip("")
+        ..setTooltipBasic("[|cffffcc00S|r] Buy Mana Pendant"))
+        ..register()
 
 public constant STORM_DIAMOND = compiletime(
     new RecipeItem('thdm')
@@ -100,9 +112,10 @@ public constant STORM_DIAMOND = compiletime(
         ..setButtonPositionX(2)
         ..setButtonPositionY(1)
         ..setHotkey("D")
-        ..setTooltipBasic("[|cffffcc00D|r] Storm diamond")
-        ..setTooltipExtended(STORM_DIAMOND_TOOLTIP)
-        ..setDescription(STORM_DIAMOND_TOOLTIP))
+        ..setName("Storm diamond")
+        ..generateTooltip(STORM_DIAMOND_TOOLTIP)
+        ..setTooltipBasic("[|cffffcc00D|r] Storm diamond"))
+        ..register()
 
 public constant SUMMON_COURIER = compiletime(
     new RecipeItem('wild')
@@ -116,13 +129,13 @@ public constant SUMMON_COURIER = compiletime(
         ..setButtonPositionX(3)
         ..setButtonPositionY(1)
         ..setHotkey("F")
-        ..setTooltipBasic("[|cffffcc00F|r] Buy Courier")
-        ..setTooltipExtended("Summon a courier who can carry items for you.")
-        ..setDescription("Summon a courier who can carry items for you.")
-        ..setName("Summon Courier"))
+        ..setName("Summon Courier")
+        ..generateTooltip("Summon a courier who can carry items for you.")
+        ..setTooltipBasic("[|cffffcc00F|r] Buy Courier"))
+        ..register()
 
 public constant GOLD_COINS = compiletime(
-    new RecipeItem('gold')
+    new ItemDefinition(ITEM_ID_GEN.next(), 'gold')
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("PowerUp")
         ..setGoldCost(0)
@@ -137,7 +150,7 @@ public constant GOLD_COINS = compiletime(
         ..setTooltipExtended("Gives 75 gold."))
 
 public constant LUMBER_BALE = compiletime(
-    new RecipeItem('lmbr')
+    new ItemDefinition(ITEM_ID_GEN.next(), 'lmbr')
         //..setArmorType(ArmorSoundType.Wood)
         ..setClassification("PowerUp")
         ..setGoldCost(125)
@@ -165,10 +178,10 @@ public constant POWER_BOOSTER = compiletime(
         ..setButtonPositionX(2)
         ..setButtonPositionY(2)
         ..setHotkey("C")
-        ..setTooltipBasic("[|cffffcc00C|r] Buy Power Booster")
-        ..setTooltipExtended("Increases the power of your skills and adds you a new ability (It depends of your hero).")
-        ..setDescription("Increases the power of your skills and adds you a new ability (It depends of your hero).")
-        ..setName("Power Booster"))
+        ..setName("Power Booster")
+        ..generateTooltip("Increases the power of your skills and adds you a new ability (It depends of your hero).")
+        ..setTooltipBasic("[|cffffcc00C|r] Buy Power Booster"))
+        ..register()
 
 public constant BOOTS_OF_SPEED = compiletime(
     new RecipeItem('bspd')
@@ -180,8 +193,10 @@ public constant BOOTS_OF_SPEED = compiletime(
         ..setButtonPositionX(3)
         ..setButtonPositionY(2)
         ..setHotkey("V")
-        ..setTooltipBasic("[|cffffcc00V|r] Buy Boots of Speed")
-        ..setTooltipExtended("+45 Movement Speed"))
+        ..setName("Boots of Speed")
+        ..generateTooltip("+45 Movement Speed")
+        ..setTooltipBasic("[|cffffcc00V|r] Buy Boots of Speed"))
+        ..register()
     
 init
     BOOTS_OF_SPEED.getNewId().addMoveSpeed(45)

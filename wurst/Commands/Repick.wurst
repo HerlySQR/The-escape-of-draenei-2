@@ -51,11 +51,13 @@ public function repick(player p)
         let repick = hero[i]
 
         if repick != null
-            p.createCrate(false)
-            
             if inCombat[i] > 0 and not yesOrYes
                 DisplayTextToPlayer(p, 0., 0., "You cannot repick during combat")
                 return
+
+            if not yesOrYes
+                p.createCrate(false)
+
             if whatMode[5] == LEVELING
                 heroModel.get(repick.getTypeId()).show()
             hero[i] = null

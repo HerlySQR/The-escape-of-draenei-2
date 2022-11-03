@@ -143,6 +143,30 @@ function changePlayers()
                 if m.getPlayer() != swp2
                     m.setPos((THE_DRAENEI.has(swp2) ? actDrSpawn : actDeSpawn).getCenter())
     end)
+
+    // Change the alliances
+    changeAlliance(swp1)
+    changeAlliance(swp2)
+    playersOrder()
+
+    let list1 = swp1.createCrate(false)
+    let list2 = swp2.createCrate(false)
+
+    // Return them the levels
+    if not notBooks
+        if whatMode[5] == LEVELING
+            if hero[i1] != null
+                let m1 = createItem(EXP_BOOK, ZERO2)
+                m1.setPlayer(swp1, false)
+                m1.setVisible(false)
+                expMap.put(m1, hero[i1].getXp())
+                list1.add(m1)
+            if hero[i1] != null
+                let m2 = createItem(EXP_BOOK, ZERO2)
+                m2.setPlayer(swp2, false)
+                m2.setVisible(false)
+                expMap.put(m2, hero[i2].getXp())
+                list2.add(m2)
     
     // Change the players
     yesOrYes = true
@@ -153,30 +177,9 @@ function changePlayers()
     swp1.panCameraToTimed(THE_DEMONS.has(swp1) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
     swp2.panCameraToTimed(THE_DEMONS.has(swp2) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
 
-    // Change the alliances
-    changeAlliance(swp1)
-    changeAlliance(swp2)
-    playersOrder()
     // Last details
     swp1.setColor(playerColor[i2], true)
     swp2.setColor(playerColor[i1], true)
-
-    let list1 = swp1.createCrate(false)
-    let list2 = swp2.createCrate(false)
-
-    // Return them the levels
-    if not notBooks
-        if whatMode[5] == LEVELING
-            let m1 = createItem(EXP_BOOK, ZERO2)
-            m1.setPlayer(swp1, false)
-            m1.setVisible(false)
-            expMap.put(m1, hero[i1].getXp())
-            list1.add(m1)
-            let m2 = createItem(EXP_BOOK, ZERO2)
-            m2.setPlayer(swp2, false)
-            m2.setVisible(false)
-            expMap.put(m2, hero[i2].getXp())
-            list2.add(m2)
 
     for cb in listeners
         cb.run(swp1, swp2)

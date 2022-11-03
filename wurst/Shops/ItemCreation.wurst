@@ -16,7 +16,7 @@ import public RecipeItem
 import public MoveSpeedX
 
 public function fixRecipe(Recipe recipe, RecipeItem result, int goldCost, int woodCost)
-    recipe.setTooltipExtended(
+    recipe.generateTooltip(
         recipe.tooltipExtended +
         "|cff6d6d6dTotal cost: " +
         (goldCost > 0 ? goldCost.toString() + " gold and " : "") +
@@ -56,6 +56,9 @@ public class Recipe extends RecipeItem
         super.setTooltipExtended(data)
         dummyDef.setTooltipExtended(data)
     
+    override function setTooltipBasic(string data)
+        dummyDef.setTooltipBasic(data)
+    
     /** Always use this function at the end. */
     override function setName(string data)
         super.setName(data)
@@ -64,7 +67,6 @@ public class Recipe extends RecipeItem
             ..setGoldCost(goldCost)
             ..setLumberCost(lumberCost)
             ..setInterfaceIcon(icon)
-            ..setTooltipBasic(tooltipBasic)
         
         setInterfaceIcon(Icons.bTNScrollOfRegeneration)
     

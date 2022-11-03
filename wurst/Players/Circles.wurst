@@ -4,9 +4,9 @@ import AbilityData
 import initlater DrAndDeSpawn
 import initlater Towers
 import initlater DontPlaySmart
-import initlater SummonCourier
 import initlater HeroSelection
 import Reference
+import initlater ItemCreation
 
 public constant MORE_ABILITIES = compiletime(ABIL_ID_GEN.next())
 public constant BACKPACK = compiletime(UNIT_ID_GEN.next())
@@ -21,12 +21,28 @@ let crateMap = new HashMap<unit, LinkedList<item>>()
 let ASK_HELP = compiletime(ABIL_ID_GEN.next())
 let HEAL_TOTEM = compiletime(ABIL_ID_GEN.next())
 let TELEPORT = compiletime(ABIL_ID_GEN.next())
-let SELECT_BACKPACK = compiletime(ABIL_ID_GEN.next())
+public constant SELECT_BACKPACK = compiletime(ABIL_ID_GEN.next())
 let TOWER_RANGE = compiletime(ABIL_ID_GEN.next())
 public constant ZOOM_IN = compiletime(ABIL_ID_GEN.next())
 public constant ZOOM_OUT = compiletime(ABIL_ID_GEN.next())
 let PICK_ITEMS = compiletime(ABIL_ID_GEN.next())
 let DROP_ITEMS = compiletime(ABIL_ID_GEN.next())
+
+/** Some items could be RecipeItems so this function is to consider that.*/
+function unit.pickItems(LinkedList<item> list)
+    for m in this.inventory()
+        let recipe = m.getRecipeItem()
+        if recipe != null
+            let n = recipe.create(ZERO2)
+            if m.getCharges() > 0
+                n.setCharges(m.getCharges())
+            list.add(n)
+            n.setVisible(false)
+            m.remove()
+        else
+            this.removeItem(m)
+            list.add(m)
+            m.setVisible(false)
 
 /** Removes all the items of the hero and couriers of the player and puts them in a crate*/
 public function player.createCrate(bool includeCourier) returns LinkedList<item>
@@ -34,21 +50,21 @@ public function player.createCrate(bool includeCourier) returns LinkedList<item>
 
     let i = this.getNumber()
     if hero[i] != null
-        for m in hero[i].inventory()
-            hero[i].removeItem(m)
-            m.setVisible(false)
-            list.add(m)
+        hero[i].pickItems(list)
     
     if includeCourier
         forUnitsOfPlayer(this, u -> begin
             if u.getTypeId() == COURIER
-                for m in u.inventory()
-                    u.removeItem(m)
-                    m.setVisible(false)
-                    list.add(m)
+                u.pickItems(list)
         end)
 
-    crateMap.put(createUnit(this, CRATE, (THE_DRAENEI.has(this) ? actDrSpawn : actDeSpawn).getCenter()), list)
+    let crate = createUnit(this, CRATE, (THE_DRAENEI.has(this) ? actDrSpawn : actDeSpawn).randomPoint())
+    crateMap.put(crate, list)
+    nullTimer() -> // Giving time to add items
+        if list.isEmpty()
+            crate.kill()
+            crate.remove()
+    
     return list
 
 /** Removes all the crates of the player and their items*/
@@ -60,6 +76,7 @@ public function player.removeCrate()
                 m.remove()
             crateMap.remove(u)
             destroy list
+            u.remove()
     end)
 
 init
@@ -101,7 +118,7 @@ init
             var i = new Reference(0)
             forUnitsInRange(EventData.getAbilityTargetPos(), 300., u -> begin
                 if i.val < 4
-                    if u.isAllyOf(owner) and not u.isType(UNIT_TYPE_STRUCTURE)
+                    if u.isAlive() and u.isAllyOf(owner) and not u.isType(UNIT_TYPE_STRUCTURE)
                         and ((u.getOwner() == DRAENEI and u.getTypeId() != DRAENEI_WORKER) or (u.getOwner() == DEMON and u.getTypeId() != DEMON_ACOLYTE))
 
                         targetHero[u.getIndex()] = h
@@ -115,9 +132,18 @@ init
                 DisplayTextToForce(f, "{0} asked for help to the {1}.".format(owner.getName(), f == THE_DRAENEI ? "the draenei" : "the demons"))
     end)
 
+    // The spellbook is cursed
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST, () -> begin
+        if GetSpellAbilityId() == SELECT_BACKPACK
+            if GetSpellAbilityUnit().getOwner() == localPlayer
+                ForceUICancel()
+    end)
+
     registerSpellEffectEvent(SELECT_BACKPACK, () -> begin
-        let owner = GetSpellAbilityUnit().getOwner()
+        let caster = GetSpellAbilityUnit()
+        let owner = caster.getOwner()
         let i = owner.getNumber()
+        owner.selectSingle(caster)
         backpack[i].setOwner(owner, false)
         owner.selectSingle(backpack[i])
     end)
@@ -132,10 +158,15 @@ init
         let owner = caster.getOwner()
         let i = owner.getNumber()
         let pos = hero[i].getPos()
-        let r = Rect(pos.x - 300., pos.y - 300., pos.x + 300, pos.y + 300)
+        let r = Rect(pos.x - 250., pos.y - 250., pos.x + 250, pos.y + 250)
         forItemsInRect(r, m -> begin
-            if m.getPlayer() == owner
-                backpack[i].addItemHandle(m)
+            if m.isAlive() and m.isVisible()
+                let recipe = m.getRecipeItem()
+                if recipe != null
+                    m.remove()
+                    caster.addItemById(recipe.getNewId())
+                else
+                    caster.addItemHandle(m)
         end)
         r.remove()
     end)
@@ -144,15 +175,20 @@ init
         let caster = GetSpellAbilityUnit()
         let pos = hero[caster.getOwner().getNumber()].getPos()
         for m in caster.inventory()
-            caster.removeItem(m)
-            m.setPos(pos)
+            let recipe = m.getRecipeItem()
+            if recipe != null
+                m.remove()
+                recipe.create(pos)
+            else
+                caster.removeItem(m)
+                m.setPos(pos)
     end)
 
 @compiletime function gen()
     new AbilityDefinitionSpellBook(MORE_ABILITIES)
         ..setItemAbility(false)
-        ..setMinimumSpells(1, 12)
-        ..setMaximumSpells(1, 12)
+        ..setMinimumSpells(1, 11)
+        ..setMaximumSpells(1, 11)
         ..setSharedSpellCooldown(1, false)
         ..setSpellList(1, commaList(ASK_HELP, HEAL_TOTEM, TELEPORT, SELECT_BACKPACK))
         ..setHotkey("D")
@@ -168,11 +204,12 @@ init
         ..setName("Item crate")
 
     new UnitDefinition(BACKPACK, 'ncop')
+        ..setHideMinimapDisplay(true)
         ..setSightRadiusDay(1)
         ..setSightRadiusNight(1)
         ..setSelectionScale(-1.)
         ..setModelFile("dummy.mdl")
-        ..setNormalAbilities(commaList(COURIER_INV, PICK_ITEMS, DROP_ITEMS, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, AbilityIds.invulnerable, AbilityIds.permanentInvisibility))
+        ..setNormalAbilities(commaList(PICK_ITEMS, DROP_ITEMS, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, COURIER_INV, AbilityIds.invulnerable, AbilityIds.permanentInvisibility))
         ..setName("Backpack")
 
     new ChannelAbilityPreset(ASK_HELP, 1, true)
@@ -304,8 +341,6 @@ init
         ..setButtonPositionNormalX(0)
         ..setButtonPositionNormalY(2)
         ..setHotkeyNormal("Z")
-        ..setTooltipTurnOff(1, "[|cffffcc00Z|r] Pick items")
-        ..setTooltipTurnOffExtended(1, "Picks up your nearby items.")
         ..setTooltipNormal(1, "[|cffffcc00Z|r] Pick items")
         ..setTooltipNormalExtended(1, "Picks up your nearby items.")
         ..setName("Pick items")
@@ -316,8 +351,6 @@ init
         ..setButtonPositionNormalX(1)
         ..setButtonPositionNormalY(2)
         ..setHotkeyNormal("X")
-        ..setTooltipTurnOff(1, "[|cffffcc00X|r] Drop items")
-        ..setTooltipTurnOffExtended(1, "Drop the items in the inventory.")
         ..setTooltipNormal(1, "[|cffffcc00X|r] Drop items")
         ..setTooltipNormalExtended(1, "Drop the items in the inventory.")
         ..setName("Drop items")

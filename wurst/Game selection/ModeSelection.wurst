@@ -6,7 +6,6 @@ import initlater Missions
 import GeneratedValues
 
 import TimerDialog
-import LinkedList
 import StringUtils
 import initlater AbilityData
 import UpgradeObjEditing
@@ -143,7 +142,7 @@ function updateHeroMode()
 
 let MODE_SELECTOR = compiletime(UNIT_ID_GEN.next())
 
-public constant modeSelector = createUnit(players[PLAYER_NEUTRAL_AGGRESSIVE], MODE_SELECTOR, modesCenter1)
+public constant modeSelector = createUnit(players[bj_PLAYER_NEUTRAL_VICTIM], MODE_SELECTOR, modesCenter1)
 
 public function actionsSelect()
     maxSelection.pause()
@@ -216,7 +215,7 @@ public function actionsSelect()
     for cb in callbacks
         cb.run()
     
-    modeSelector.setOwner(players[PLAYER_NEUTRAL_AGGRESSIVE], true)
+    modeSelector.setOwner(players[bj_PLAYER_NEUTRAL_VICTIM], true)
 
 let SELECTED = compiletime(UPGD_ID_GEN.next())
 let LIMIT_REACHED = compiletime(UPGD_ID_GEN.next())
