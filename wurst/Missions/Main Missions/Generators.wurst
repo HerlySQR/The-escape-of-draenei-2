@@ -22,6 +22,7 @@ let GENERATOR = compiletime(UNIT_ID_GEN.next())
 
 init
     onReset(true, () -> begin
+        destroyGenerators.enable()
         if generator1 == null
             generator1 = createUnit(DEMON, GENERATOR, generatorPos1, UNIT_FACING)
         if generator2 == null

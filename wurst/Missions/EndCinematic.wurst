@@ -61,9 +61,9 @@ public function draeneiCinematic()
                     forUnitsInRect(Rects.whereTheDemonsAppear, u -> u.issuePointOrderById(Orders.attack, Rects.exitPoint.getCenter()))
                 return 12..seconds()
             end,
-            Cinematic.fadeOutSeq(9.85.seconds()),
+            Cinematic.fadeOutSeq(12..seconds()),
             () -> begin
-                Cinematic.fadeIn(9.85.seconds())
+                Cinematic.fadeIn(12..seconds())
                 return 4.5.seconds()
             end),
         () -> begin
@@ -115,6 +115,7 @@ public function demonsCinematic()
     forDestructablesInRect(Rects.dungeon, d -> begin
         DestructableRestoreLife(d, GetDestructableMaxLife(d), false)
     end)
+
     hero[1]..setPos(Rects.iLost1.getCenter())..setFacing(180..asAngleDegrees())
     hero[2]..setPos(Rects.iLost2.getCenter())..setFacing(180..asAngleDegrees())
     hero[3]..setPos(Rects.iLost3.getCenter())..setFacing(180..asAngleDegrees())
@@ -133,7 +134,9 @@ public function demonsCinematic()
         hero[i].revive(actDrSpawn.getCenter(), false)
     for i = 1 to 8
         createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), UNIT_FACING)
-    createUnit(DEMON, 'nbal', Rects.guard1.getCenter(), UNIT_FACING).issuePointOrderById(Orders.patrol, Rects.guard2.getCenter())
+    createUnit(DEMON, 'nbal', Rects.guard1.getCenter(), UNIT_FACING)
+        ..issuePointOrderById(Orders.patrol, Rects.guard2.getCenter())
+        ..setInvulnerable(true)
     createUnit(DEMON, 'nbal', Rects.guard3.getCenter(), UNIT_FACING)
     createUnit(DEMON, 'nbal', Rects.guard4.getCenter(), UNIT_FACING)
 
@@ -148,9 +151,9 @@ public function demonsCinematic()
                 CameraSetupApplyForceDuration(Cams.demonsWin2, true, 11.00)
                 return 12..seconds()
             end,
-            Cinematic.fadeOutSeq(9.85.seconds()),
+            Cinematic.fadeOutSeq(12..seconds()),
             () -> begin
-                Cinematic.fadeIn(9.85.seconds())
+                Cinematic.fadeIn(12..seconds())
                 return 4.5.seconds()
             end),
         () -> begin

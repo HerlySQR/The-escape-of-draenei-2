@@ -2,7 +2,6 @@ package ThrowAxes
 
 import AbilityData
 
-import LinkedList
 import Fx
 
 public constant THROW_AXES_NL = compiletime(ABIL_ID_GEN.next())

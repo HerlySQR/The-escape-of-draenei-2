@@ -102,40 +102,6 @@ public class Dests
 
 /** The generated regions (rects). */
 public class Rects
-    
-    // Circles of power
-    static constant circle11 = gg_rct_Circle11
-    static constant circle12 = gg_rct_Circle12
-    static constant circle13 = gg_rct_Circle13
-    static constant circle14 = gg_rct_Circle14
-    static constant circle15 = gg_rct_Circle15
-    static constant circle21 = gg_rct_Circle21
-    static constant circle22 = gg_rct_Circle22
-    static constant circle23 = gg_rct_Circle23
-    static constant circle24 = gg_rct_Circle24
-    static constant circle25 = gg_rct_Circle25
-    static constant circle31 = gg_rct_Circle31
-    static constant circle32 = gg_rct_Circle32
-    static constant circle33 = gg_rct_Circle33
-    static constant circle34 = gg_rct_Circle34
-    static constant circle35 = gg_rct_Circle35
-    static constant circle41 = gg_rct_Circle41
-    static constant circle42 = gg_rct_Circle42
-    static constant circle43 = gg_rct_Circle43
-    static constant circle44 = gg_rct_Circle44
-    static constant circle45 = gg_rct_Circle45
-    static constant circle51 = gg_rct_Circle51
-    static constant circle52 = gg_rct_Circle52
-    static constant circle53 = gg_rct_Circle53
-    static constant circle54 = gg_rct_Circle54
-    static constant circle55 = gg_rct_Circle55
-
-    // Items
-    static constant items1 = gg_rct_Items_1
-    static constant items2 = gg_rct_Items_2
-    static constant items3 = gg_rct_Items_3
-    static constant items4 = gg_rct_Items_4
-    static constant items5 = gg_rct_Items_5
 
     // Tp
 

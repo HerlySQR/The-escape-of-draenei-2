@@ -19,6 +19,7 @@ init
         Dests.dungeonDoor1.restoreLife(500., false)
         Dests.dungeonExitDoor1.restoreLife(500., false)
         Dests.dungeonExitDoor2.restoreLife(500., false)
+        destroyDoor.enable()
 
         forDestructablesInRange(Dests.dungeonExitDoor2.getPos(), 256., d -> begin
             if d.getTypeId() == 'YTab'

@@ -3,6 +3,7 @@ package PulseNova
 import AbilityData
 
 import Fx
+import Execute
 
 public constant PULSE_NOVA_NL = compiletime(ABIL_ID_GEN.next())
 public constant PULSE_NOVA_L = compiletime(ABIL_ID_GEN.next())
@@ -25,6 +26,11 @@ let AREA_PER_TICK = compiletime(AREA / MAX_COUNTER_2)
 let PUSH_DIST = compiletime(AREA_PER_TICK + 1.)
 let EXPLOSION = new SoundDefinition(Imports.pulseNova3, false, true)
 
+function explosion(vec2 pos)
+    destroy new Fx(pos, Imports.theHolyBomb)..setScale(1.5)
+    doAfter(0.32) ->
+        EXPLOSION.playOnPoint(pos.toVec3())
+
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
         let data = abilityCond(PULSE_NOVA_NL, PULSE_NOVA_L, PULSE_NOVA_S)
@@ -40,20 +46,22 @@ init
                 m.damage = MAX_DMG_NL[data.lvl]
             else
                 m.damage = MAX_DMG_L[data.lvl]
-            doPeriodicallyCounted(0.27, MAX_COUNTER_1, cb -> begin
+            let cb = doPeriodicallyCounted(0.27, MAX_COUNTER_1, cb -> begin
                 let pos = m.getPos()
                 if pos.distanceTo2d(target) <= 201. or cb.isLast()
-                    destroy new Fx(pos, Imports.theHolyBomb)..setScale(1.5)
                     if not cb.isLast()
                         destroy cb
-                    doAfter(0.32) ->
-                        EXPLOSION.playOnPoint(pos)
+                    explosion(target)
             end)
             m.onFinish(() -> begin
                 let affected = CreateGroup()
                 var damage = m.damage
                 let pos = m.getPos().toVec2()
                 let owner = m.owner
+                try(() -> begin
+                    destroy cb
+                    explosion(target)
+                end)
                 doPeriodicallyCounted(0.01, MAX_COUNTER_2, cb -> begin
                     let counter = MAX_COUNTER_2 - cb.getCount() + 1
                     forUnitsInRange(pos, AREA_PER_TICK * counter, u -> begin
@@ -93,8 +101,8 @@ function ChannelAbilityPreset.general()
         ..setHeroAbility(false)
         ..general()
         // Stats
-        ..addTooltipProperty("Max. damage", lvl -> MAX_DMG_NL[lvl - 1])
-        ..presetManaCost(lvl -> MANA_NL[lvl - 1])
+        ..addTooltipProperty("Max. damage", lvl -> MAX_DMG_NL[lvl-1])
+        ..presetManaCost(lvl -> MANA_NL[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
@@ -103,8 +111,8 @@ function ChannelAbilityPreset.general()
         ..setRequiredLevel(1)
         ..general()
         // Stats
-        ..addTooltipProperty("Max. damage", lvl -> MAX_DMG_L[lvl - 1])
-        ..presetManaCost(lvl -> MANA_L[lvl - 1])
+        ..addTooltipProperty("Max. damage", lvl -> MAX_DMG_L[lvl-1])
+        ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
     

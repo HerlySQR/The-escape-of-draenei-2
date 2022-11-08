@@ -222,8 +222,10 @@ init
                 changePlayers()
                 canPick.remove(swp1)
                 canPick.remove(swp2)
-                swp1.removeCrate()
-                swp2.removeCrate()
+            
+            nullTimer() ->
+                for i = 1 to 10
+                    playerM(i).removeCrate()
             notBooks = false
             whoSelect()
     end)

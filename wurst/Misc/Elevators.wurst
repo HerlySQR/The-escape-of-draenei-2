@@ -125,9 +125,10 @@ init
     onReset(true, () -> begin
         Dests.leverSecret.setInvulnerable(true)
         forDestructablesInRect(Rects.elevatorsSecret, d -> begin
-            elevator(d)
-                ..setHeight(3)
-                ..changeWalls(false, ElevatorWallType.ALL)
+            if d.getTypeId() == 'YTfb'
+                d.restoreLife(9999, false)
+            else
+                elevator(d).setHeight(3)
         end)
     end)
 
@@ -137,7 +138,10 @@ init
             QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The secret route in the dungeon has been open.")
             forDestructablesInRect(Rects.elevatorsSecret, d -> elevator(d).setHeight(1))
             doAfter(0.5) -> 
-                forDestructablesInRect(Rects.elevatorsSecret, d -> elevator(d).changeWalls(true, ElevatorWallType.ALL))
+                forDestructablesInRect(Rects.elevatorsSecret, d -> begin
+                    if d.getTypeId() == 'YTfb'
+                        d.kill()
+                end)
         end)
 
     // Elevator

@@ -25,9 +25,6 @@ import HeroSelection
 
 public int actMission = 0
 
-public fogmodifier array seeDrSpawn
-public fogmodifier array seeDeSpawn
-
 boolean timeIsOver = false
 
 interface MissionClosure
@@ -47,22 +44,17 @@ public function startMission(int mission)
     for cb in callbacks
         cb.run(mission)
 
-init
-    seeDrSpawn[1] = createVision(DRAENEI, Rects.items1, true)..start()
-    seeDrSpawn[2] = createVision(DRAENEI, Rects.items2, true)
-    seeDrSpawn[3] = createVision(DRAENEI, Rects.items3, true)
-    seeDrSpawn[4] = createVision(DRAENEI, Rects.items4, true)
-    seeDeSpawn[1] = createVision(DEMON, Rects.items2, true)..start()
-    seeDeSpawn[2] = createVision(DEMON, Rects.items3, true)..start()
-    seeDeSpawn[3] = createVision(DEMON, Rects.items5, true)..start()
+trigger mainExit = CreateTrigger()
 
+init
+    mainExit
+        ..registerDeathEvent(Dests.mainEntranceDoor)
+        .addAction(function draeneiWin)
+
+init
     onModesSelected(() -> startMission(1))
 
     onReset(false, () -> begin
-        seeDrSpawn[2].stop()
-        seeDrSpawn[3].stop()
-        seeDrSpawn[4].stop()
-        seeDeSpawn[2].start()
         timeIsOver = false
         actMission = 0
     end)
@@ -95,7 +87,6 @@ init
                 pings.disable()
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()
-                seeDrSpawn[2].start()
 
                 if whatMode[1] == VARIOUS_TIMERS
                     doAfter(10., () -> startActTimer(actMission))
@@ -122,13 +113,9 @@ init
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()
 
-                seeDeSpawn[2].stop()
-                seeDrSpawn[4].start()
-
                 actDrSpawn = Rects.respawn4
                 actDeSpawn = Rects.respawn5
 
-                seeDrSpawn[3].start()
                 missions[3].setState(QuestState.COMPLETED)
                 pings.disable()
 
@@ -180,6 +167,7 @@ init
             // Mission 5
             case 5
                 SetDestructableInvulnerable(Dests.mainEntranceDoor, false)
+                mainExit.enable()
                 missions[4].setState(QuestState.COMPLETED)
                 QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
                 QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "The second generator was destroyed.\n\nThe defenses will be deactivated.")
@@ -213,24 +201,17 @@ public function draeneiWin()
     pings.disable()
     
     if theySurrender
-        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
-        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
-    else
         QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DEMONS SURRENDERED|r\nDraenei have won")
         QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DEMONS SURRENDERED|r\nDraenei have won")
+    else
+        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
+        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE MAIN ENTRY WAS DESTROYED|r\nDraenei have won")
 
     for i = 1 to 10
         hero[i].setInvulnerable(true)
     
     doAfter(5.) -> 
         draeneiCinematic()
-
-trigger mainExit = CreateTrigger()
-
-init
-    mainExit
-        ..registerDeathEvent(Dests.mainEntranceDoor)
-        .addAction(function draeneiWin)
 
 // Demons Win
 
@@ -248,11 +229,11 @@ public function demonsWin()
     mainExit.disable()
 
     if theySurrender
-        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_FAILED, "|cffffcc00TIME IS OVER|r\nDemons have won")
-        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00TIME IS OVER|r\nDemons have won")
-    else
         QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_FAILED, "|cffffcc00THE DRAENEI SURRENDERED|r\nDemons have won")
         QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00THE DRAENEI SURRENDERED|r\nDemons have won")
+    else
+        QuestMessageBJ(THE_DRAENEI, bj_QUESTMESSAGE_FAILED, "|cffffcc00TIME IS OVER|r\nDemons have won")
+        QuestMessageBJ(THE_DEMONS, bj_QUESTMESSAGE_COMPLETED, "|cffffcc00TIME IS OVER|r\nDemons have won")
 
     for i = 1 to 10
         hero[i].setInvulnerable(true)

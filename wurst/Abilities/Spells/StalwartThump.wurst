@@ -2,8 +2,6 @@ package StalwartThump
 
 import AbilityData
 
-import DummyCaster
-
 public constant STALWART_THUMP_NL = compiletime(ABIL_ID_GEN.next())
 public constant STALWART_THUMP_L = compiletime(ABIL_ID_GEN.next())
 public constant STALWART_THUMP_S = compiletime(ABIL_ID_GEN.next())

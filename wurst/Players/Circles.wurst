@@ -70,7 +70,7 @@ public function player.createCrate(bool includeCourier) returns LinkedList<item>
 /** Removes all the crates of the player and their items*/
 public function player.removeCrate()
     forUnitsOfPlayer(this, u -> begin
-        if u.getTypeId() == CRATE
+        if u.getTypeId() == CRATE and u.isAlive()
             let list = crateMap.get(u)
             for m in list
                 m.remove()

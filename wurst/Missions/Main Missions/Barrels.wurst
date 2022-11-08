@@ -104,6 +104,7 @@ init
             end)
     end)
     onReset(false, () -> begin
+        placeBarrel.enable()
         goblinShop.show()
         if not generatorAlive
             generatorAlive = true

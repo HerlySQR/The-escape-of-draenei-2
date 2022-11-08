@@ -2,8 +2,6 @@ package AdvancedEngineering
 
 import AbilityData
 
-import LinkedList
-
 public constant ADVANCED_ENGINEERING_NL = compiletime(ABIL_ID_GEN.next())
 public constant ADVANCED_ENGINEERING_L = compiletime(ABIL_ID_GEN.next())
 
