@@ -1,6 +1,6 @@
 package Barrels
 
-import Functions
+import AbilityData
 import PlayerData
 import initlater Missions
 import HeroSelection
@@ -10,15 +10,8 @@ import SummonCourier
 
 import ClosureEvents
 import UnitIndexer
-import SoundUtils
-import Imports
-import ObjectIdGenerator
-import UnitObjEditing
 import ItemObjEditing
 import UnitIds
-import ObjectIds
-import Assets
-import Annotations
 
 import BountyController
 import UnitTransmission
@@ -36,7 +29,7 @@ public unit wallGenerator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.get
 public unit wallGenerator2 = createUnit(DEMON, GENERATOR, Rects.wallGenerator2.getCenter(), UNIT_FACING)
 
 rect place = Rects.barrel1
-int barrelNumber = 1
+int barrelNumber = 0
 effect array barrelEffect
 let earthquake = new SoundDefinition(Sounds.earthquake, false, true)
 
@@ -61,36 +54,30 @@ init
     
     forDestructablesInRect(Rects.DESTROY, d -> d.setInvulnerable(true))
     // Wall generator
+    code moveUp = () -> begin
+        let u = GetEnteringUnit()
+        if THE_DRAENEI.has(u)
+            u.setY(u.getY() + 25.)
+    end
+    code moveDown = () -> begin
+        let u = GetEnteringUnit()
+        if THE_DRAENEI.has(u)
+            u.setY(u.getY() - 25.)
+    end
     powerFieldEnter1
         ..registerRectEnterEventSource(Rects.powerField1)
         ..registerRectEnterEventSource(Rects.powerField3)
-        ..addAction(() -> begin
-            let u = GetEnteringUnit()
-            if THE_DRAENEI.has(u)
-                u.setY(u.getY() + 25.)
-        end)
+        ..addAction(moveUp)
     powerFieldEnter2
         ..registerRectEnterEventSource(Rects.powerField2)
         ..registerRectEnterEventSource(Rects.powerField4)
-        ..addAction(() -> begin
-            let u = GetEnteringUnit()
-            if THE_DRAENEI.has(u)
-                u.setY(u.getY() - 25.)
-        end)
+        ..addAction(moveDown)
     powerFieldEnter3
         ..registerRectEnterEventSource(Rects.powerField5)
-        ..addAction(() -> begin
-            let u = GetEnteringUnit()
-            if THE_DRAENEI.has(u)
-                u.setY(u.getY() + 25.)
-        end)
+        ..addAction(moveUp)
     powerFieldEnter4
         ..registerRectEnterEventSource(Rects.powerField6)
-        ..addAction(() -> begin
-            let u = GetEnteringUnit()
-            if THE_DRAENEI.has(u)
-                u.setY(u.getY() - 25.)
-        end)
+        ..addAction(moveDown)
     onReset(true, () -> begin
         if powerFieldAnimation == null
             powerFieldAnimation = doPeriodically(3., _ -> begin
@@ -104,8 +91,10 @@ init
             end)
     end)
     onReset(false, () -> begin
+        barrelNumber = 0
         placeBarrel.enable()
         goblinShop.show()
+        forDestructablesInRect(Rects.destroyBarrels, d -> d.restoreLife(20., false))
         if not generatorAlive
             generatorAlive = true
             wallGenerator = createUnit(DEMON, GENERATOR, Rects.wallGenerator.getCenter(), UNIT_FACING)
@@ -136,6 +125,7 @@ init
         forDestructablesInRect(Rects.barrel2, d -> d.remove())
         forDestructablesInRect(Rects.barrel3, d -> d.remove())
     end)
+    // Magic wall generator destroyed
     EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
         if EventData.getDyingUnit() == wallGenerator
             generatorAlive = false
@@ -189,6 +179,37 @@ init
                 m.remove()
                 message("error", "Why do you need this?", p)
     end)
+    // Destroy barrel nearby the goblin zapper
+    let t = CreateTrigger()
+    let t2 = CreateTrigger()
+    forDestructablesInRect(Rects.destroyBarrels, d -> begin
+        t.registerDeathEvent(d)
+        t2.registerDeathEvent(d)
+    end)
+    t.addAction(() -> begin
+        let pos = GetTriggerDestructable().getPos()
+        doAfter(0.47) ->
+            forDestructablesInRange(pos, 100., d -> begin
+                if d.isAliveTrick()
+                    d.kill()
+            end)
+    end)
+    t2.addAction(() -> begin
+        let f = CreateForce()
+        let t3 = GetTriggeringTrigger()
+        t3.disable()
+        forUnitsInRect(Rects.destroyBarrels, u -> begin
+            let p = u.getOwner()
+            if p.isIngame()
+                f.add(p)
+        end)
+        doAfter(0.5) ->
+            Transmission.simple(f, goblinShop, null, "Goblin Sapper", null, "Ha Ha, it's too funny destroy the barrels, but it isn't funny to me when I have to replace them.", TTime.SET, 3.50)
+            f.destr()
+            doAfter(5.) ->
+                t3.enable()
+    end)
+        
     // Die with barrel
     EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
         let u = GetDyingUnit()
@@ -222,6 +243,8 @@ init
             let u = GetEnteringUnit()
             u.getItemOfId(BARREL).remove()
             SetDestructableInvulnerable(createDestructable('LTex', place.getCenter(), GetRandomDirectionDeg().asAngleDegrees(), 1., 0), true)
+            barrelNumber++
+            destroyWall()
             switch barrelNumber
                 case 1
                     QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_WARNING, "The first barrel has been placed")
@@ -231,8 +254,6 @@ init
                     place = Rects.barrel3
                 case 3
                     QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_WARNING, "The third barrel has been placed\nThe wall is going to be destroyed")
-                    destroyWall()
-            barrelNumber++
             let i = u.getOwner().getNumber()
             heroWithBarrel[i] = null
             barrelEffect[i].destr()
@@ -240,56 +261,76 @@ init
         end)
     Bounty.set(GENERATOR, 100, 3, 3)
 
+// See wall
+
+fogmodifier array iSeeTheWall
+
+init
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.DESTROY)
+        ..addAction(() -> begin
+            iSeeTheWall[GetEnteringUnit().getIndex()] = createVision(GetEnteringUnit().getOwner(), Rects.DESTROY, true)..start()
+        end)
+    CreateTrigger()
+        ..registerRectLeaveEventSource(Rects.DESTROY)
+        ..addAction(() -> begin
+            iSeeTheWall[GetLeavingUnit().getIndex()]..stop().destr()
+        end)
+
 function destroyWall()
-    if whatMode[1] == VARIOUS_TIMERS
-        stopActTimer()
-    exitCave.enable()
-    let fire1 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel1.getCenter())
-    let fire2 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel2.getCenter())
-    let fire3 = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", Rects.barrel3.getCenter())
-    
-    goblinShop.hide()
-
-    forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
-        if u.hasItemById(BARREL)
-            u.getItemOfId(BARREL).remove()
-    end)
-    forUnitsInRect(Rects.demonTower3, u -> begin
-        if u.getTypeId() == DEMON_TOWER
-            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
-    end)
-
-    actDrSpawn = Rects.respawn3
-    actDeSpawn = Rects.respawn4
-
-    forUnitsInRect(Rects.shops3, u -> begin
-        if u.isType(UNIT_TYPE_STRUCTURE)
-            u.setColor(DRAENEI.getColor())
-    end)
-
+    // Destroy the barrel
+    let r = place
+    let fire = addEffect("Doodads\\Cinematic\\FireRockSmall\\FireRockSmall.mdl", r.getCenter())
     doAfter(3.) -> 
-        // Destroy the barrels
-        forDestructablesInRect(Rects.barrel1, d -> d.kill())
-        forDestructablesInRect(Rects.barrel2, d -> d.kill())
-        forDestructablesInRect(Rects.barrel3, d -> d.kill())
+        forDestructablesInRect(r, d -> d.kill())
+        fire.destr()
+        addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[0]).destroyAfter(3.)
+        addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[1]).destroyAfter(3.)
+        addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[2]).destroyAfter(3.)
         for i = 1 to 11
             CameraSetEQNoiseForPlayer(players[i], 20.)
-        doAfter(0.2) ->
+        doAfter(1.) ->
+            for i = 1 to 11
+                CameraClearNoiseForPlayer(players[i])
+
+    if barrelNumber == 3
+        if whatMode[1] == VARIOUS_TIMERS
+            stopActTimer()
+        exitCave.enable()
+    
+        goblinShop.hide()
+
+        forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
+            if u.hasItemById(BARREL)
+                u.getItemOfId(BARREL).remove()
+        end)
+        forUnitsInRect(Rects.demonTower3, u -> begin
+            if u.getTypeId() == DEMON_TOWER
+                u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+        end)
+
+        actDrSpawn = Rects.respawn3
+        actDeSpawn = Rects.respawn4
+
+        forUnitsInRect(Rects.shops3, u -> begin
+            if u.isType(UNIT_TYPE_STRUCTURE)
+                u.setColor(DRAENEI.getColor())
+        end)
+        doAfter(3.) ->
             wallDestroyed = true
             forDestructablesInRect(Rects.DESTROY, d -> d.kill())
-            fire1.destr()
-            fire2.destr()
-            fire3.destr()
             earthquake.playOnPoint(Rects.DESTROY.getCenter().withZ(0.))
-            doAfter(0.4) ->
+            doAfter(1.) ->
                 addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[0]).destroyAfter(3.)
                 addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[1]).destroyAfter(3.)
                 addEffect("Doodads\\Cinematic\\CavernDust\\CavernDust.mdl", dustPoint[2]).destroyAfter(3.)
-                doAfter(0.35) -> 
+                for i = 1 to 11
+                    CameraSetEQNoiseForPlayer(players[i], 20.)
+                doAfter(1.) ->
                     for i = 1 to 11
                         CameraClearNoiseForPlayer(players[i])
 
-        startMission(3)
+                startMission(3)
 
 @compiletime function gen()
     new ItemDefinition(BARREL, 'skrt')

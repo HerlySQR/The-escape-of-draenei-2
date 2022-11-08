@@ -226,6 +226,7 @@ public class Rects
     static constant placeBarrel2 = gg_rct_PlaceBarrel2
     static constant placeBarrel3 = gg_rct_PlaceBarrel3
     static constant DESTROY = gg_rct_DESTROY
+    static constant destroyBarrels = gg_rct_DestroyBarrels
 
     static constant habitatExit1 = gg_rct_HabitatExit1
     static constant habitatExit2 = gg_rct_HabitatExit2

@@ -2,12 +2,10 @@ package SelectionCircle
 
 import Towers
 import DrAndDeSpawn
-import Circles
 
 import ClosureTimers
 import ClosureForGroups
 import RegisterEvents
-import UnitIndexer
 import OnUnitEnterLeave
 import Orders
 

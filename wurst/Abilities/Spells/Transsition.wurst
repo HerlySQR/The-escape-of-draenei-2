@@ -2,6 +2,7 @@ package Transsition
 
 import AbilityData
 import PseudoWindWalk
+import LastOrder
 
 public constant TRANSSITION_NL = compiletime(ABIL_ID_GEN.next())
 public constant TRANSSITION_L = compiletime(ABIL_ID_GEN.next())
@@ -15,7 +16,7 @@ let DURATION = 7.
 let RANGE = 1000.
 // Not Leveling
 let CD_NL = [16., 11.]
-let MANA_NL = [75, 60]
+let MANA_NL = [60, 50]
 // Leveling
 let CD_L = [19., 16., 13., 11.]
 let MANA_L = [65, 60, 55, 50]
@@ -38,6 +39,7 @@ init
                 ..add(shade.addEffect(Abilities.avengerMissile, "leftfeet"))
                 ..add(shade.addEffect(Abilities.avengerMissile, "rightfeet")))
             casterMap.put(shade, caster)
+            caster.getOwner().select(shade)
     end)
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER, () -> begin
         if GetIssuedOrderId() == Orders.defend and GetOrderedUnit().getTypeId() == TRANSSITION_SHADE
@@ -64,8 +66,10 @@ init
                 if IsUnitSelected(shade, shade.getOwner())
                     shade.getOwner().selectSingle(caster)
                 shade.remove()
+                let order = caster.getLastOrder()
                 caster.setPos(pos)
                 caster.setFacing(face)
+                order.issue()
             else
                 flashEffect(Imports.blinkPurpleTarget, shade.getPos())
                 casterMap.remove(shade)

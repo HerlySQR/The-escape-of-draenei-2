@@ -115,6 +115,8 @@ public function demonsCinematic()
     forDestructablesInRect(Rects.dungeon, d -> begin
         DestructableRestoreLife(d, GetDestructableMaxLife(d), false)
     end)
+    for i = 1 to 10
+        hero[i].revive(actDrSpawn.getCenter(), false)
 
     hero[1]..setPos(Rects.iLost1.getCenter())..setFacing(180..asAngleDegrees())
     hero[2]..setPos(Rects.iLost2.getCenter())..setFacing(180..asAngleDegrees())
@@ -130,8 +132,6 @@ public function demonsCinematic()
         hero[i].pause()
     StopMusic(true)
     PlayMusic("Sound\\Music\\mp3Music\\DarkAgents.mp3")
-    for i = 1 to 10
-        hero[i].revive(actDrSpawn.getCenter(), false)
     for i = 1 to 8
         createUnit(DRAENEI, DRAENEI_WORKER, Rects.whereTheWorkersWere.randomPoint(), UNIT_FACING)
     createUnit(DEMON, 'nbal', Rects.guard1.getCenter(), UNIT_FACING)

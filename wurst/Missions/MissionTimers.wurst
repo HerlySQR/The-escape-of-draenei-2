@@ -27,9 +27,8 @@ timer actMission = CreateTimer()
 timerdialog windowActMission = CreateTimerDialog(actMission)
 
 init
-    nullTimer(() -> begin
+    nullTimer() ->
         windowActMission.setTitle("The demons will win in:")
-    end)
 
 public function startSingleTimer()
     actMission.start(quantityOneTimer, function demonsWin)
