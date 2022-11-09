@@ -27,6 +27,9 @@ function surrender(player p)
             wannaSurrenderDr++
         else if THE_DEMONS.has(p)
             wannaSurrenderDe++
+    else
+        if endSurrender == null
+            return
     
     if endSurrender == null
         endSurrender = doAfter(60., () -> begin

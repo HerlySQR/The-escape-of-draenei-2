@@ -23,8 +23,6 @@ let HEAL_TOTEM = compiletime(ABIL_ID_GEN.next())
 let TELEPORT = compiletime(ABIL_ID_GEN.next())
 public constant SELECT_BACKPACK = compiletime(ABIL_ID_GEN.next())
 let TOWER_RANGE = compiletime(ABIL_ID_GEN.next())
-public constant ZOOM_IN = compiletime(ABIL_ID_GEN.next())
-public constant ZOOM_OUT = compiletime(ABIL_ID_GEN.next())
 let PICK_ITEMS = compiletime(ABIL_ID_GEN.next())
 let DROP_ITEMS = compiletime(ABIL_ID_GEN.next())
 
@@ -97,6 +95,12 @@ init
                 m..setVisible(true)..setPos(pos)
             crateMap.remove(u)
             destroy list
+    end)
+    
+    DamageEvent.addListener(() -> begin
+        if DamageEvent.getTarget().getTypeId() == CRATE
+            if DamageEvent.getSource().isEnemyOf(DamageEvent.getTarget().getOwner())
+                DamageEvent.setAmount(0)
     end)
 
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
@@ -209,7 +213,7 @@ init
         ..setSightRadiusNight(1)
         ..setSelectionScale(-1.)
         ..setModelFile("dummy.mdl")
-        ..setNormalAbilities(commaList(PICK_ITEMS, DROP_ITEMS, ZOOM_IN, ZOOM_OUT, TOWER_RANGE, COURIER_INV, AbilityIds.invulnerable, AbilityIds.permanentInvisibility))
+        ..setNormalAbilities(commaList(PICK_ITEMS, DROP_ITEMS, TOWER_RANGE, AbilityIds.inventory, AbilityIds.invulnerable, AbilityIds.permanentInvisibility))
         ..setName("Backpack")
 
     new ChannelAbilityPreset(ASK_HELP, 1, true)
@@ -275,29 +279,6 @@ init
         ..setTooltipNormalExtended(1, "Teleports the hero to a ally unit.")
         ..setName("Teleport")
         .setEditorSuffix("(Long)")
-
-    new ChannelAbilityPreset(ZOOM_IN, 1, true)
-        ..setHeroAbility(false)
-        ..setArtCaster("")
-        ..setIconNormal(Imports.bTNCrZoomIn)
-        ..setButtonPositionNormalX(1)
-        ..setButtonPositionNormalY(1)
-        ..setHotkeyNormal("S")
-        ..setTooltipNormal(1, "[|cffffcc00S|r] Zoom In")
-        ..setTooltipNormalExtended(1, "Zoom in on the camera view.")
-        ..setName("Zoom In")
-
-    new ChannelAbilityPreset(ZOOM_OUT, 1, true)
-        ..setHeroAbility(false)
-        ..setArtCaster("")
-        ..setIconTurnOff(Imports.bTNCrZoomOut)
-        ..setIconNormal(Imports.bTNCrZoomOut)
-        ..setButtonPositionNormalX(2)
-        ..setButtonPositionNormalY(1)
-        ..setHotkeyNormal("D")
-        ..setTooltipNormal(1, "[|cffffcc00D|r] Zoom Out")
-        ..setTooltipNormalExtended(1, "Zoom out the camera view.")
-        ..setName("Zoom Out")
 
     let NO_IMMO = BUFF_ID_GEN.next()
 

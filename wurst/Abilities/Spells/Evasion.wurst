@@ -23,9 +23,10 @@ function AbilityDefinitionDemonHunterEvasion.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of avoiding an attack."))
         ..presetLevels(2)
         ..setHeroAbility(false)
+        ..presetChancetoEvade(lvl -> CHANCE_NL[lvl-1])
         ..general()
         // Stats
-        ..presetChancetoEvade(lvl -> CHANCE_NL[lvl-1])
+        ..addTooltipProperty("Chance to evade", lvl -> CHANCE_NL[lvl-1].toPercentage())
         // Audiovisual
         // Tooltip
         ..tooltipStopListen()
@@ -36,9 +37,10 @@ function AbilityDefinitionDemonHunterEvasion.general()
         ..presetLevels(4)
         ..setRequiredLevel(1)
         ..setHeroAbility(true)
+        ..presetChancetoEvade(lvl -> CHANCE_L[lvl-1])
         ..general()
         // Stats
-        ..presetChancetoEvade(lvl -> CHANCE_L[lvl-1])
+        ..addTooltipProperty("Chance to evade", lvl -> CHANCE_L[lvl-1].toPercentage())
         // Audiovisual
         // Tooltip
         ..tooltipStopListen()

@@ -40,13 +40,15 @@ function AbilityDefinitionMountainKingThunderClap.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Hit the ground causing damage to nearby enemy land units and slowing their movement speed and their attack rate for " + DURATION.toString(1) + " seconds."))
         ..presetLevels(2)
         ..setHeroAbility(false)
+        ..presetAttackSpeedReduction(lvl -> SLOW_NL[lvl-1])
+        ..presetMovementSpeedReduction(lvl -> SLOW_NL[lvl-1])
         ..general()
         // Stats
         ..presetAOEDamage(lvl -> DMG_NL[lvl-1])
         ..presetAreaofEffect(lvl -> AREA_NL)
         ..presetManaCost(lvl -> MANA_NL)
-        ..presetAttackSpeedReduction(lvl -> SLOW_NL[lvl-1])
-        ..presetMovementSpeedReduction(lvl -> SLOW_NL[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_NL[lvl-1].toPercentage())
+        ..addTooltipProperty("Movement Speed Reduction", lvl -> SLOW_NL[lvl-1].toPercentage())
         // Tooltip
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
@@ -56,13 +58,15 @@ function AbilityDefinitionMountainKingThunderClap.general()
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
+        ..presetAttackSpeedReduction(lvl -> SLOW_L[lvl-1])
+        ..presetMovementSpeedReduction(lvl -> SLOW_L[lvl-1])
         ..general()
         // Stats
         ..presetAOEDamage(lvl -> DMG_L[lvl-1])
         ..presetAreaofEffect(lvl -> AREA_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L[lvl-1])
-        ..presetAttackSpeedReduction(lvl -> SLOW_L[lvl-1])
-        ..presetMovementSpeedReduction(lvl -> SLOW_L[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_L[lvl-1].toPercentage())
+        ..addTooltipProperty("Movement Speed Reduction", lvl -> SLOW_L[lvl-1].toPercentage())
         // Tooltip
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
@@ -80,13 +84,13 @@ function AbilityDefinitionMountainKingThunderClap.general()
         ..presetAttackSpeedReduction(lvl -> lvl < 3 ? SLOW_NL[lvl-1] : SLOW_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
             real value1
-            int value2
+            real value2
             if lvl < 3
                 value1 = DMG_NL[lvl-1]
-                value2 = (SLOW_NL[lvl-1]*100).toInt()
+                value2 = SLOW_NL[lvl-1]
             else
                 value1 = DMG_L[lvl-3]
-                value2 = (SLOW_L[lvl-3]*100).toInt()
-            return "Hit the ground causing {0} damage to nearby enemy land units and slowing their movement speed and their attack rate by {1}% for {2} seconds.".format(value1.toString(0), value2.toString(), DURATION.toString(1))
+                value2 = SLOW_L[lvl-3]
+            return "Hit the ground causing {0} damage to nearby enemy land units and slowing their movement speed and their attack rate by {1} for {2} seconds.".format(value1.toString(0), value2.toPercentage(), DURATION.toString(1))
         end)
         ..setEditorSuffix("(Stealed)")

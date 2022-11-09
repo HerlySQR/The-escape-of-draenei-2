@@ -207,8 +207,6 @@ init
     initSpell(CONSUME_LIFE_AND_MANA)
     initSpell(CURSE)
     initSpell(FAR_SIGHT)
-    initSpell(UNHOLY_AURA)
-    initSpell(VAMPIRIC_AURA)
 
 function ChannelAbilityPreset.general()
     this.presetBaseOrderID(lvl -> "steal")

@@ -8,7 +8,11 @@ import public Assets
 import public ObjectIds
 import public Annotations
 import ClosureEvents
+import HashMap
+import HashList
+import Orders
 
+import Functions
 import public Imports
 import public ItemSpells
 
@@ -80,3 +84,78 @@ public class Recipe extends RecipeItem
                 m.remove()
                 EventData.getTriggerUnit().addItemById(newId)
         end)
+
+let fakeBooks = new HashMap<int, int>()
+let realBooks = new HashList<int>()
+
+public class FakeBook extends ItemDefinition
+    int tomeId
+    ItemDefinition tomeDef
+
+    construct(int origId)
+        super(ITEM_ID_GEN.next(), origId)
+        tomeId = ITEM_ID_GEN.next()
+        tomeDef = new ItemDefinition(tomeId, 'manh')..setAbilities("")
+    
+    override function setInterfaceIcon(string data)
+        super.setInterfaceIcon(data)
+        tomeDef.setInterfaceIcon(data)
+    
+    override function setTooltipBasic(string data)
+        super.setTooltipBasic(data)
+        tomeDef.setTooltipBasic(data)
+    
+    override function setTooltipExtended(string data)
+        super.setTooltipExtended(data)
+        tomeDef.setTooltipExtended(data)
+    
+    override function setGoldCost(int data)
+        super.setGoldCost(data)
+        tomeDef.setGoldCost(data)
+    
+    override function setLumberCost(int data)
+        super.setLumberCost(data)
+        tomeDef.setLumberCost(data)
+    
+    override function setStockStartDelay(int data)
+        //super.setStockStartDelay(data)
+        tomeDef.setStockStartDelay(data)
+    
+    override function setButtonPositionX(int data)
+        //super.setButtonPositionX(data)
+        tomeDef.setButtonPositionX(data)
+    
+    override function setButtonPositionY(int data)
+        //super.setButtonPositionY(data)
+        tomeDef.setButtonPositionY(data)
+    
+    override function setHotkey(string data)
+        //super.setHotkey(data)
+        tomeDef.setHotkey(data)
+    
+    function getDummyItem() returns int
+        return tomeId
+
+    function register()
+        fakeBooks.put(tomeId, newId)
+        realBooks.add(newId)
+
+init
+    EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
+        let m = GetManipulatedItem()
+        let id = m.getTypeId()
+        if fakeBooks.has(id)
+            let u = GetManipulatingUnit()
+            if u.isType(UNIT_TYPE_HERO)
+                u.addItemById(fakeBooks.get(id))
+            else
+                createItem(fakeBooks.get(id), u.getPos())
+            m.remove()
+    end)
+    EventListener.add(EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER, () -> begin
+        if realBooks.has(GetOrderTargetItem().getTypeId())
+            let u = GetOrderedUnit()
+            if not u.isType(UNIT_TYPE_HERO)
+                u.issueTargetOrderById(Orders.attack, u)
+                message("error", "This unit can't use powerups.", u.getOwner())
+    end)

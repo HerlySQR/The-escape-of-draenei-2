@@ -25,10 +25,11 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It gives a chance of multiplying the normal damage of an attack."))
         ..presetLevels(2)
         ..setHeroAbility(false)
+        ..presetChancetoCriticalStrike(lvl -> CHANCE_NL)
         ..general()
         ..setRequirements("")
         // Stats
-        ..presetChancetoCriticalStrike(lvl -> CHANCE_NL)
+        ..addTooltipProperty("Chance to Critical Strike", lvl -> CHANCE_NL.toPercentage())
         ..presetDamageMultiplier(lvl -> DMG_MULT_NL[lvl-1])
         // Audiovisual
         // Tooltip
@@ -40,10 +41,11 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
         ..presetLevels(4)
         ..setRequiredLevel(1)
         ..setHeroAbility(false)
+        ..presetChancetoCriticalStrike(lvl -> CHANCE_L)
         ..general()
         ..setRequirements("")
         // Stats
-        ..presetChancetoCriticalStrike(lvl -> CHANCE_L)
+        ..addTooltipProperty("Chance to Critical Strike", lvl -> CHANCE_L.toPercentage())
         ..presetDamageMultiplier(lvl -> DMG_MULT_L[lvl-1])
         // Audiovisual
         // Tooltip

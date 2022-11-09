@@ -41,10 +41,12 @@ function AbilityDefinitionCripple.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Reduces the movement speed of an enemy unit and its attack rate. \nLasts " + DURATION.toString(0) + " seconds."))
         ..presetLevels(2)
         ..setHeroAbility(false)
-        ..general()
-        // Stats
         ..presetAttackSpeedReduction(lvl -> ATTACK_SPEED_NL[lvl-1])
         ..presetMovementSpeedReduction(lvl -> MOVE_SPEED_NL[lvl-1])
+        ..general()
+        // Stats
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> ATTACK_SPEED_NL[lvl-1].toPercentage())
+        ..addTooltipProperty("Movement Speed Reduction", lvl -> MOVE_SPEED_NL[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_NL)
         ..presetCooldown(lvl -> CD_NL)
         // Audiovisual
@@ -57,10 +59,12 @@ function AbilityDefinitionCripple.general()
         ..presetLevels(4)
         ..setRequiredLevel(1)
         ..setHeroAbility(true)
-        ..general()
-        // Stats
         ..presetAttackSpeedReduction(lvl -> ATTACK_SPEED_L[lvl-1])
         ..presetMovementSpeedReduction(lvl -> MOVE_SPEED_L[lvl-1])
+        ..general()
+        // Stats
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> ATTACK_SPEED_L[lvl-1].toPercentage())
+        ..addTooltipProperty("Movement Speed Reduction", lvl -> MOVE_SPEED_L[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..presetCooldown(lvl -> CD_L[lvl-1])
         // Audiovisual

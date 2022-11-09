@@ -112,9 +112,6 @@ public function demonsCinematic()
         if not (u.isType(UNIT_TYPE_HERO) or u.isType(UNIT_TYPE_STRUCTURE) or u.getOwner() == players[PLAYER_NEUTRAL_PASSIVE])
             u.remove()
     end)
-    forDestructablesInRect(Rects.dungeon, d -> begin
-        DestructableRestoreLife(d, GetDestructableMaxLife(d), false)
-    end)
     for i = 1 to 10
         hero[i].revive(actDrSpawn.getCenter(), false)
 
@@ -139,6 +136,11 @@ public function demonsCinematic()
         ..setInvulnerable(true)
     createUnit(DEMON, 'nbal', Rects.guard3.getCenter(), UNIT_FACING)
     createUnit(DEMON, 'nbal', Rects.guard4.getCenter(), UNIT_FACING)
+
+    Dests.dungeonDoor1.restoreLife(100., false)
+    Dests.dungeonDoor2.restoreLife(100., false)
+    Dests.dungeonDoor3.restoreLife(100., false)
+    Dests.dungeonDoor4.restoreLife(100., false)
 
     FogMaskEnable(false)
     FogEnable(false)
@@ -173,6 +175,10 @@ public function demonsCinematic()
                 StopMusic(true)
                 PlayMusic("music")
                 resetGame()
+                doAfter(9.) -> 
+                    Dests.dungeonDoor2.kill()
+                    Dests.dungeonDoor3.kill()
+                    Dests.dungeonDoor4.kill()
             return 0..seconds()
         end
     )

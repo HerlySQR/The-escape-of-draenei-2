@@ -40,19 +40,6 @@ init
                 ..owner(caster.getOwner())
                 ..delay(9.)
                 ..castPoint(DUMMY_RAIN_OF_FIRE, lvl, Orders.rainoffire, EventData.getSpellTargetPos())
-
-            /*let dummy = DummyRecycler.get(caster.getPos(), caster.getFacingAngle())
-            dummy.setOwner(caster.getOwner(), false)
-            dummy.addAbility(DUMMY_RAIN_OF_FIRE)
-            if data.isNL
-                dummy.setAbilityLevel(DUMMY_RAIN_OF_FIRE, data.lvl + 1)
-            else
-                dummy.setAbilityLevel(DUMMY_RAIN_OF_FIRE, data.lvl + 3)
-            dummy.issuePointOrderById(Orders.rainoffire, EventData.getSpellTargetPos())
-            caster.dummyDamage(dummy, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE)
-            doAfter(9.) ->
-                dummy.removeAbility(DUMMY_RAIN_OF_FIRE)
-                DummyRecycler.recycle(dummy)*/
     end)
 
 function ChannelAbilityPreset.general()

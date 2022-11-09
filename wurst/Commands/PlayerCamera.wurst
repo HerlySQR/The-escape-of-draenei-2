@@ -1,31 +1,14 @@
 package PlayerCamera
 
-import Functions
-import Circles
 import ChatEnter
 
-import RegisterEvents
-
-real array distanceToTarget
-
 init
-    onChatCommand("defcam", (p, _) -> begin
-        distanceToTarget[p.getId()] = 1650.
-    end)
-
-    for i = 0 to bj_MAX_PLAYER_SLOTS
-        distanceToTarget[i] = 1650.
-    // Keeping the camera
-    CreateTimer().startPeriodic(0.125, () -> begin
-        if not inCinematic
-            SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, distanceToTarget[localPlayer.getId()], 0.00)
-    end)
     // Edit the camera
-    registerSpellEffectEvent(ZOOM_IN, () -> begin
-        if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) >= 300.
-            distanceToTarget[GetSpellAbilityUnit().getOwner().getId()] -= 100.
-    end)
-    registerSpellEffectEvent(ZOOM_OUT, () -> begin
-        if GetCameraField(CAMERA_FIELD_TARGET_DISTANCE) <= 3000.
-            distanceToTarget[GetSpellAbilityUnit().getOwner().getId()] += 100.
+    onChatCommand("zoom", (p, extra) -> begin
+        let zoom = extra.toReal()
+        if zoom >= 300. and zoom <= 3000.
+            if p == localPlayer
+                SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, zoom, 1.)
+        else
+            DisplayTextToPlayer(p, 0, 0, "|cffff0000Zoom out of bounds [300, 3000]|r")
     end)

@@ -429,7 +429,7 @@ init
             for _ = 1 to 5
                 createItem(GOLD_COINS.getNewId(), pos)..setUserData(lordOfFireIndex)
                 createItem(LUMBER_BALE.getNewId(), pos)..setUserData(lordOfFireIndex)
-                createItem(BOOK_OF_EXPERIENCE, pos)..setUserData(lordOfFireIndex)
+                createItem(BOOK_OF_EXPERIENCE.getNewId(), pos)..setUserData(lordOfFireIndex)
             dontPickThose.enable()
 
             Transmission.simple(lordOfFire, null, "Lord of Fire", null, "You will pay for that!", TTime.SET, 3.)

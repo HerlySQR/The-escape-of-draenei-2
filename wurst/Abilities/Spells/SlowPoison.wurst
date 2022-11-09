@@ -41,11 +41,13 @@ function AbilityDefinitionSlowPoison.general()
         ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
+        ..presetMovementSpeedFactor(lvl -> SLOW_MOVE_NL[lvl-1])
+        ..presetAttackSpeedFactor(lvl -> SLOW_ATTACK_NL[lvl-1])
         ..general()
         // Stats
         ..presetDamagePerSecond(lvl -> DMG_PER_SEC_NL[lvl-1])
-        ..presetMovementSpeedFactor(lvl -> SLOW_MOVE_NL[lvl-1])
-        ..presetAttackSpeedFactor(lvl -> SLOW_ATTACK_NL[lvl-1])
+        ..addTooltipProperty("Movement Speed Factor", lvl -> SLOW_MOVE_NL[lvl-1].toPercentage())
+        ..addTooltipProperty("Attack Speed Factor", lvl -> SLOW_ATTACK_NL[lvl-1].toPercentage())
         // Audiovisual
         // Tooltip
         ..tooltipStopListen()
@@ -58,11 +60,13 @@ function AbilityDefinitionSlowPoison.general()
         ..presetButtonPosNormal(2, 2)
         ..presetButtonPosResearch(2, 0)
         ..setHeroAbility(false)
+        ..presetMovementSpeedFactor(lvl -> SLOW_MOVE_L[lvl-1])
+        ..presetAttackSpeedFactor(lvl -> SLOW_ATTACK_L[lvl-1])
         ..general()
         // Stats
         ..presetDamagePerSecond(lvl -> DMG_PER_SEC_L[lvl-1])
-        ..presetMovementSpeedFactor(lvl -> SLOW_MOVE_L[lvl-1])
-        ..presetAttackSpeedFactor(lvl -> SLOW_ATTACK_L[lvl-1])
+        ..addTooltipProperty("Movement Speed Factor", lvl -> SLOW_MOVE_L[lvl-1].toPercentage())
+        ..addTooltipProperty("Attack Speed Factor", lvl -> SLOW_ATTACK_L[lvl-1].toPercentage())
         // Audiovisual
         ..setIconResearch(Icons.bTNSlowPoison)
         // Tooltip

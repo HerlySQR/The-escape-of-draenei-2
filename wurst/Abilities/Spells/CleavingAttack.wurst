@@ -28,9 +28,10 @@ function AbilityDefinitionPitLordCleavingAttack.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("The hero hits so hard that a percentage of its attack hits enemies near the attacked primary unit."))
         ..presetLevels(2)
         ..setHeroAbility(false)
+        ..presetDistributedDamageFactor(lvl -> SPLASH_NL[lvl-1])
         ..general()
         // Stats
-        ..presetDistributedDamageFactor(lvl -> SPLASH_NL[lvl-1])
+        ..addTooltipProperty("Distributed Damage Factor", lvl -> SPLASH_NL[lvl-1].toPercentage())
         // Audiovisual
         // Tooltips
         ..tooltipStopListen()
@@ -42,9 +43,10 @@ function AbilityDefinitionPitLordCleavingAttack.general()
         ..setRequiredLevel(1)
         ..setHeroAbility(true)
         ..setIconResearch(Imports.bTNAxeOfAshes)
+        ..presetDistributedDamageFactor(lvl -> SPLASH_L[lvl-1])
         ..general()
         // Stats
-        ..presetDistributedDamageFactor(lvl -> SPLASH_L[lvl-1])
+        ..addTooltipProperty("Distributed Damage Factor", lvl -> SPLASH_L[lvl-1].toPercentage())
         // Audiovisual
         // Tooltips
         ..tooltipStopListen()

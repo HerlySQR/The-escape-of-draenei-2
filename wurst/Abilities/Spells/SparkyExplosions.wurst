@@ -32,14 +32,16 @@ init
             let pos = caster.getPos()
             let facing = caster.getFacingAngle()
             var scale = 1.
+
             real damage
             real size
-            if data.check
+            if data.isNL
                 damage = DMG_NL[data.lvl]
                 size = SIZE_NL[data.lvl]
             else
                 damage = DMG_L[data.lvl]
                 size = SIZE_L[data.lvl]
+            
             var area = size * AREA_RATIO
             doPeriodicallyCounted(0.06, compiletime(N + 1), cb -> begin
                 vec2 newPos

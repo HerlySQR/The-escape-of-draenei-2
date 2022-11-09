@@ -39,9 +39,10 @@ function AbilityDefinitionUnholyFrenzy.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increases the attack rate of a selected unit, but drains hit points per second. \nLasts " + DURATION.toString(0) + " seconds."))
         ..presetLevels(2)
         ..setHeroAbility(false)
+        ..presetAttackSpeedBonus(lvl -> SPEED_NL[lvl-1])
         ..general()
         // Stats
-        ..presetAttackSpeedBonus(lvl -> SPEED_NL[lvl-1])
+        ..addTooltipProperty("Attack Speed Bonus", lvl -> SPEED_NL[lvl-1].toPercentage())
         ..presetDamageperSecond(lvl -> LIFE_DRAIN_NL[lvl-1])
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Tooltip
@@ -52,9 +53,10 @@ function AbilityDefinitionUnholyFrenzy.general()
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
+        ..presetAttackSpeedBonus(lvl -> SPEED_L[lvl-1])
         ..general()
         // Stats
-        ..presetAttackSpeedBonus(lvl -> SPEED_L[lvl-1])
+        ..addTooltipProperty("Attack Speed Bonus", lvl -> SPEED_L[lvl-1].toPercentage())
         ..presetDamageperSecond(lvl -> LIFE_DRAIN_L[lvl-1])
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Tooltip
@@ -71,14 +73,14 @@ function AbilityDefinitionUnholyFrenzy.general()
         ..presetAttackSpeedBonus(lvl -> lvl < 3 ? SPEED_NL[lvl-1] : SPEED_L[lvl-3])
         ..presetDamageperSecond(lvl -> lvl < 3 ? LIFE_DRAIN_NL[lvl-1] : LIFE_DRAIN_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
-            int value1
+            real value1
             real value2
             if lvl < 3
-                value1 = (SPEED_NL[lvl-1]*100).toInt()
+                value1 = SPEED_NL[lvl-1]
                 value2 = LIFE_DRAIN_NL[lvl-1]
             else
-                value1 = (SPEED_L[lvl-3]*100).toInt()
+                value1 = SPEED_L[lvl-3]
                 value2 = LIFE_DRAIN_L[lvl-3]
-            return "Increases the attack rate of a selected unit by {0}%, but drains {1} hit points per second. \nLasts {2} seconds.".format(value1.toString(), value2.toString(0), DURATION.toString(0))
+            return "Increases the attack rate of a selected unit by {0}, but drains {1} hit points per second. \nLasts {2} seconds.".format(value1.toPercentage(), value2.toString(0), DURATION.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")

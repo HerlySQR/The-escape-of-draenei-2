@@ -51,7 +51,7 @@ function AbilityDefinitionAlchemistAcidBomb.general()
         ..setName("Liquid Fire")
         ..presetDurationHero(lvl -> DURATION_ACT)
         ..presetDurationNormal(lvl -> DURATION_ACT)
-        ..addTooltipProperty("Movement Speed Reduction", lvl -> SLOW_MOVE)
+        ..addTooltipProperty("Movement Speed Reduction", lvl -> SLOW_MOVE.toPercentage())
         ..presetCooldown(lvl -> CD)
         // Audiovisual
         ..setMissileSpeed(900)
@@ -81,7 +81,7 @@ function AbilityDefinitionLiquidFire.general()
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         // Stats
         ..addTooltipProperty("Damage per second", lvl -> DMG_ACT_NL[lvl-1])
-        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_NL[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_NL[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_NL)
         // Tooltip
         ..setEditorSuffix("(Active | Not leveling)")
@@ -91,10 +91,11 @@ function AbilityDefinitionLiquidFire.general()
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Throw a volatile liquid that causes buildings to gradually take damage. Buildings that are receiving damage from Liquid Fire cannot be repaired and their attack rate is reduced.\nLasts " + DURATION_PAS.toString(0) + " seconds."))
         ..presetLevels(2)
         ..setHeroAbility(false)
+        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_NL[lvl-1])
         ..general()
         // Stats
         ..presetExtraDamagePerSecond(lvl -> DMG_PAS_NL[lvl-1])
-        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_NL[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_NL[lvl-1].toPercentage())
         // Audiovisual
         // Tooltip
         ..setEditorSuffix("(Pasive | Not leveling)")
@@ -112,7 +113,7 @@ function AbilityDefinitionLiquidFire.general()
         ..addTooltipProperty("Target Type", lvl -> Targettype.UNIT castTo int)
         // Stats
         ..addTooltipProperty("Damage per second", lvl -> DMG_ACT_L[lvl-1])
-        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_L[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_L[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Tooltip
         ..setEditorSuffix("(Active | Leveling)")
@@ -123,10 +124,11 @@ function AbilityDefinitionLiquidFire.general()
         ..presetLevels(4)
         ..setRequiredLevel(1)
         ..setHeroAbility(true)
+        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_L[lvl-1])
         ..general()
         // Stats
         ..presetExtraDamagePerSecond(lvl -> DMG_PAS_L[lvl-1])
-        ..presetAttackSpeedReduction(lvl -> SLOW_ATTACK_L[lvl-1])
+        ..addTooltipProperty("Attack Speed Reduction", lvl -> SLOW_ATTACK_L[lvl-1].toPercentage())
         // Audiovisual
         // Tooltip
         ..setEditorSuffix("(Pasive | Leveling)")
@@ -144,15 +146,15 @@ function AbilityDefinitionLiquidFire.general()
         ..presetAttackSpeedReduction(lvl ->  lvl < 3 ? -SLOW_ATTACK_L[lvl-1] : -SLOW_ATTACK_L[lvl-3])
         ..presetManaCost(lvl ->  lvl < 3 ? MANA_NL : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
-            int value1
+            real value1
             real value2
             if lvl < 3
-                value1 = (SLOW_ATTACK_NL[lvl-1] * 100).toInt()
+                value1 = SLOW_ATTACK_NL[lvl-1]
                 value2 = DMG_ACT_NL[lvl-1]
             else
-                value1 = (SLOW_ATTACK_L[lvl-3] * 100).toInt()
+                value1 = SLOW_ATTACK_L[lvl-3]
                 value2 = DMG_ACT_L[lvl-3]
-            return "Slows the attack speed by {0}% and the move speed by {1}%, and make {2} damage per second to the affected units.\nLasts {3} seconds.".format(value1.toString(), (SLOW_MOVE * 100).toInt().toString(), value2.toString())
+            return "Slows the attack speed by {0} and the move speed by {1}, and make {2} damage per second to the affected units.\nLasts {3} seconds.".format(value1.toPercentage(), SLOW_MOVE.toPercentage(), value2.toString(), DURATION_ACT.toString())
         end)
         ..setEditorSuffix("(Stealed)")
     

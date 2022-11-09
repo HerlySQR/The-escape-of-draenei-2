@@ -175,6 +175,6 @@ public class Imports
     static constant pulseNova = "Sounds\\Pulse Nova.wav"
     static constant pulseNova2 = "Sounds\\Pulse_Nova.wav"
     static constant pulseNova3 = "Sounds\\Pulse_Nuevo.wav"
-    static constant lion = "Sounds\\The Lion Sleeps Tonight (Sound Effect).wav"
+    static constant lion = "Sounds\\The Lion Sleeps Tonight (Sound Effect).mp3"
     static constant wasted = "Sounds\\wasted.wav"
     static constant wtf = "Sounds\\WTF was that.wav"

@@ -99,29 +99,18 @@ init
     end)
 
     new Quest(false)
-        ..setTitle("Gamemodes")
-        ..setDescription("|cff7777aa1. Timers|r\n"
-                       + "\n"
-                       + "|cff0080ff-v|r Every time you the draenei complete a mission a new timer will start, each with their own duration (Mission 1: 10 minutes, Mission 2: 13 minutes, Mission 3: 9 minutes, Mission 4: 10 minutes, Mission 5: 9 minutes) each mode let you to select a percentage to that times.\n"
-                       + "|cff00ff80-s|r: 60% (max. 31 minutes), |cff00ff80-m|r: 80% (max. 41 minutes), |cff00ff80-l|r: 100% (max. 51 minutes), |cff00ff80-h|r: 120% (max. 61 minutes).\n"
-                       + "|cff0080ff-u|r During all the match will be a unique timer that will run even if the draenei complete a mission, each mode is to select the duration of that timer.\n"
-                       + "|cff00ff80-i|r: 25 minutes, |cff00ff80-t|r: 30 minutes, |cff00ff80-s|r: 35 minutes, |cff00ff80-m|r: 40 minutes, |cff00ff80-l|r: 45 minutes, |cff00ff80-h|r: 50 minutes, |cff00ff80-e|r: 55 minutes.\n"
-                       + "\n"
-                       + "|cff7777aa2. Creeps|r\n"
-                       + "\n"
-                       + "|cff0080ff-ca|r: Normal creeps, |cff00ff80-nn|r: No neutral creeps, |cff00ff80-np|r: No creeps of |cffff0000Draenei|r or |cff32cd32Demons|r, |cff00ff80-nc|r: No creeps of any type.\n"
-                       + "\n"
-                       + "|cff7777aa3. Shops|r\n"
-                       + "\n"
-                       + "|cff0080ff-ns|r: Normal items, |cff0080ff-oc|r: There are only consumibles, |cff0080ff-nr|r: There are no recipes.\n"
-                       + "\n"
-                       + "|cff7777aa4. Selection|r\n"
-                       + "\n"
-                       + "|cff0080ff-ds|r: You can only select a hero of your class, |cff0080ff-ap|r: You can select all heros.\n"
-                       + "\n"
-                       + "|cff7777aa5. Heros|r\n"
-                       + "\n"
-                       + "|cff0080ff-lu|r: The heros level up like normally, |cff0080ff-nl|r: The heros don't level up, they have the abilities by default with no need of learn them, they only can get their ultimate power and increase their abilities obtaining a Power Booster.")
+        ..setTitle("Commands")
+        ..setDescription(
+            "\"-clear\" To clear the text messages.\n" +
+            "\"-zoom <Amount>\" To change the zoom of the camera.\n" +
+            "\"-repick\" To change hero.\n" +
+            "\"-notip\" To disable the tips.\n" +
+            "\"-yestip\" To enable the tips.\n" +
+            "\"-switch\" To change with a player from the other team.\n" +
+            "\"-modes\" To see the selected modes.\n" +
+            "\"-surrender\" To lose fast.\n" +
+            "\"-gg <Amount>\" To give gold to the owner of the unit you have selected (You have to pay 50% extra).\n" +
+            "\"-gl <Amount>\" To give lumber to the owner of the unit you have selected (You have to pay 50% extra).")
         ..setIcon("ReplaceableTextures\\WorldEditUI\\Editor-Random-Building.blp")
 
     new Quest(false)

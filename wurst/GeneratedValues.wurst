@@ -44,6 +44,9 @@ public class Dests
     // Doors
 
     static constant dungeonDoor1 = gg_dest_B00E_0020
+    static constant dungeonDoor2 = gg_dest_B00E_0006
+    static constant dungeonDoor3 = gg_dest_B00D_1165
+    static constant dungeonDoor4 = gg_dest_B00D_0037
     static constant dungeonExitDoor1 = gg_dest_B00C_0042
     static constant dungeonExitDoor2 = gg_dest_B00B_1128
     static constant constructionEntranceDoor1 = gate(gg_dest_LTg2_2727)

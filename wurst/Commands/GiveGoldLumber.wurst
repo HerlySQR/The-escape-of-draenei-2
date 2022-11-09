@@ -7,7 +7,7 @@ import ChatEnter
 player array yesGive
 
 function give(player p, string whatType, string chat)
-    let quantity = (chat.subString(4, 11).toReal() * 1.5).toInt()
+    let quantity = (chat.toReal() * 1.5).toInt()
     let state = whatType == "gg" ? PLAYER_STATE_RESOURCE_GOLD : PLAYER_STATE_RESOURCE_LUMBER
     let giveTo = yesGive[p.getId()]
     if giveTo == null

@@ -69,7 +69,7 @@ function AbilityDefinitionHardenedSkin.general()
         ..setHeroAbility(false)
         ..general()
         // Stats
-        ..addTooltipProperty("Damage reflected", lvl -> DMG_REFLECT_NL[lvl - 1])
+        ..addTooltipProperty("Damage reflected", lvl -> DMG_REFLECT_NL[lvl-1].toPercentage())
         ..tooltipStopListen()
         .setEditorSuffix("(Not leveling)")
     
@@ -81,6 +81,6 @@ function AbilityDefinitionHardenedSkin.general()
         ..general()
         ..setIconResearch(Icons.bTNThickFur)
         // Stats
-        ..addTooltipProperty("Damage reflected", lvl -> DMG_REFLECT_L[lvl - 1])
+        ..addTooltipProperty("Damage reflected", lvl -> DMG_REFLECT_L[lvl-1].toPercentage())
         ..tooltipStopListen()
         .setEditorSuffix("(Leveling)")

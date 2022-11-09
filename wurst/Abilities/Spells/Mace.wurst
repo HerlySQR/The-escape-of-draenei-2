@@ -24,7 +24,7 @@ function AbilityDefinitionMountainKingBash.general()
         ..setName("Mace")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
         // Stats
-        ..addTooltipProperty("Chance to Bash", lvl -> CHANCE.toString(0) + "%")
+        ..addTooltipProperty("Chance to Bash", lvl -> CHANCE.toInt().toString() + "%")
 
 @compiletime function gen()
     new AbilityDefinitionMountainKingBash(MACE_NL)

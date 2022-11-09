@@ -39,7 +39,7 @@ function AbilityDefinitionMountainKingThunderClap.general()
 
 @compiletime function gen()
     new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_NL)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + SLOW.toPercentage() + " the nearby enemy units."))
         ..presetLevels(2)
         ..setHeroAbility(false)
         ..general()
@@ -52,7 +52,7 @@ function AbilityDefinitionMountainKingThunderClap.general()
         ..setEditorSuffix("(Not leveling)")
     
     new AbilityDefinitionMountainKingThunderClap(TERRORIZING_HOWL_L)
-        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + (SLOW * 100.).toString(0) + "% the nearby enemy units."))
+        ..registerTooltipGenerator(new AbilityTooltipGenerator("The wolf emits a howl that slows in " + SLOW.toPercentage() + " the nearby enemy units."))
         ..presetLevels(4)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
@@ -84,6 +84,6 @@ function AbilityDefinitionMountainKingThunderClap.general()
             else
                 value1 = DMG_L[lvl-3]
                 value2 = AREA_L[lvl-3]
-            return "The hero emits a howl that slows in {0}% an enemy units in {1} range causing {2} damage.".format((SLOW * 100.).toString(0), value1.toString(0), value2.toString(0))
+            return "The hero emits a howl that slows in {0} an enemy units in {1} range causing {2} damage.".format(SLOW.toPercentage(), value1.toString(0), value2.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")

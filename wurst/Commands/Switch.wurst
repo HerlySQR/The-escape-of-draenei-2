@@ -144,11 +144,6 @@ function changePlayers()
                     m.setPos((THE_DRAENEI.has(swp2) ? actDrSpawn : actDeSpawn).getCenter())
     end)
 
-    // Change the alliances
-    changeAlliance(swp1)
-    changeAlliance(swp2)
-    playersOrder()
-
     let list1 = swp1.createCrate(false)
     let list2 = swp2.createCrate(false)
 
@@ -169,17 +164,27 @@ function changePlayers()
                 list2.add(m2)
     
     // Change the players
-    yesOrYes = true
-    repick(swp1)
-    repick(swp2)
-    yesOrYes = false
+    if whatMode[4] == TRAITOR
+        hero[i1].setPos((THE_DEMONS.has(swp1) ? actDrSpawn : actDeSpawn).getCenter())
+        hero[i2].setPos((THE_DEMONS.has(swp1) ? actDrSpawn : actDeSpawn).getCenter())
+    else
+        yesOrYes = true
+        repick(swp1)
+        repick(swp2)
+        yesOrYes = false
+        swp1.panCameraToTimed((THE_DEMONS.has(swp1) ? Rects.selectorDraenei : Rects.selectorDemon).getCenter(), 0.)
+        swp2.panCameraToTimed((THE_DEMONS.has(swp2) ? Rects.selectorDraenei : Rects.selectorDemon).getCenter(), 0.)
+
     switchMembers(swp1, swp2)
-    swp1.panCameraToTimed(THE_DEMONS.has(swp1) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
-    swp2.panCameraToTimed(THE_DEMONS.has(swp2) ? Rects.selectorDraenei.getCenter() : Rects.selectorDemon.getCenter(), 0.)
 
     // Last details
     swp1.setColor(playerColor[i2], true)
     swp2.setColor(playerColor[i1], true)
+
+    // Change the alliances
+    changeAlliance(swp1)
+    changeAlliance(swp2)
+    playersOrder()
 
     for cb in listeners
         cb.run(swp1, swp2)
@@ -214,7 +219,7 @@ init
     // Interchange teams at the end
     onReset(false, () -> begin
         EnumItemsInRect(bj_mapInitialPlayableArea, null, () -> GetEnumItem().remove())
-        doAfter(17.) ->
+        doAfter(9.) ->
             notBooks = true
             for i = 1 to 5
                 swp1 = playerM(i)

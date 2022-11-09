@@ -11,7 +11,6 @@ import BountyController
 
 public constant COURIER = compiletime(UNIT_ID_GEN.next())
 public constant SUMMON_COURIER_SPELL = compiletime(ABIL_ID_GEN.next())
-public constant COURIER_INV = compiletime(ABIL_ID_GEN.next())
 
 let GO_TO_HERO = compiletime(UNIT_ID_GEN.next())
 let GO_TO_BASE = compiletime(UNIT_ID_GEN.next())
@@ -75,8 +74,6 @@ function UnitDefinition.general()
 
 
 @compiletime function gen()
-    new AbilityDefinitionInventory(COURIER_INV)
-        ..setCanUseItems(1, false)
 
     new UnitDefinition(COURIER, 'nzep')
         ..setUnitClassification("peon")
@@ -88,7 +85,7 @@ function UnitDefinition.general()
         ..setShadowImageCenterY(40.)
         ..setProjectileImpactZ(30.)
         ..setScalingValue(0.5)
-        ..setNormalAbilities(commaList('Apiv', COURIER_INV))
+        ..setNormalAbilities(commaList("Apiv", "AInv"))
         ..setUnitsSold(commaList(GO_TO_HERO, GO_TO_BASE, DROP_ITEMS))
         ..setSpeedBase(522)
         ..setCollisionSize(24.)

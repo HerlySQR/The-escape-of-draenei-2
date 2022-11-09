@@ -12,6 +12,9 @@ import BuffObjEditing
 import HashMap
 import ChannelAbilityPreset
 
+public function real.toPercentage() returns string
+    return (this * 100.).toInt().toString() + "%"
+
 public interface RecursiveClosure
     function call(RecursiveClosure rc)
 
@@ -41,20 +44,6 @@ public constant real INTERVAL = 0.03125
 public boolexpr notFlying = Condition(() -> not GetEnteringUnit().isType(UNIT_TYPE_FLYING) and GetEnteringUnit().ignoreLocust())
 
 public constant angle UNIT_FACING = bj_UNIT_FACING.asAngleDegrees()
-
-// String
-
-public function string.subString(int min, int max) returns string
-    if min > max or max > this.length() or this == "" or this == null
-        return null
-    else
-        return this.substring(IMaxBJ(min, 1) - 1, IMinBJ(max, this.length()))
-
-public function string.subString(int start) returns string
-    return this.subString(start, this.length())
-
-public function string.char(int pos) returns string
-    return this.subString(pos, pos)
 
 // Order group
 

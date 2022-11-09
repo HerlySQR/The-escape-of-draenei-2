@@ -35,12 +35,13 @@ function AbilityDefinitionWindWalk.general()
         ..setHeroAbility(false)
         ..presetDurationHero(lvl -> DURATION_NL[lvl-1])
         ..presetDurationNormal(lvl -> DURATION_NL[lvl-1])
+        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_NL[lvl-1])
         ..general()
         // Stats
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_NL[lvl-1])
         ..addTooltipProperty("Duration", lvl -> DURATION_NL[lvl-1])
-        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_NL[lvl-1])
+        ..addTooltipProperty("Movement Speed Increase", lvl -> SPEED_BOOST_NL[lvl-1].toPercentage())
         ..presetBackstabDamage(lvl -> EXTRA_DMG_NL[lvl-1])
         // Audiovisual
         // Tooltip
@@ -56,12 +57,13 @@ function AbilityDefinitionWindWalk.general()
         ..setRequiredLevel(1)
         ..presetDurationHero(lvl -> DURATION_L[lvl-1])
         ..presetDurationNormal(lvl -> DURATION_L[lvl-1])
+        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_L[lvl-1])
         ..general()
         // Stats
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..addTooltipProperty("Extra damage", lvl -> EXTRA_DMG_L[lvl-1])
         ..addTooltipProperty("Duration", lvl -> DURATION_L[lvl-1])
-        ..presetMovementSpeedIncrease(lvl -> SPEED_BOOST_L[lvl-1])
+        ..addTooltipProperty("Movement Speed Increase", lvl -> SPEED_BOOST_L[lvl-1].toPercentage())
         ..presetBackstabDamage(lvl -> EXTRA_DMG_L[lvl-1])
         // Audiovisual
         // Tooltip
@@ -81,17 +83,17 @@ function AbilityDefinitionWindWalk.general()
         ..presetDurationHero(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
         ..presetDurationNormal(lvl -> lvl < 3 ? DURATION_NL[lvl-1] : DURATION_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
-            int value1
+            real value1
             real value2
             real value3
             if lvl < 3
-                value1 = (SPEED_BOOST_NL[lvl-1]*100).toInt()
+                value1 = SPEED_BOOST_NL[lvl-1]
                 value2 = EXTRA_DMG_NL[lvl-1]
                 value3 = DURATION_NL[lvl-1]
             else
-                value1 = (SPEED_BOOST_L[lvl-3]*100).toInt()
+                value1 = SPEED_BOOST_L[lvl-3]
                 value2 = EXTRA_DMG_L[lvl-3]
                 value3 = DURATION_L[lvl-3]
-            return "It turns invisible the unit and makes it move {0}% faster. If you attack a unit to break the invisibility, the attack will have a {1} damage bonus\nLasts {2} seconds.".format(value1.toString(), value2.toString(0), value3.toString(0))
+            return "It turns invisible the unit and makes it move {0} faster. If you attack a unit to break the invisibility, the attack will have a {1} damage bonus\nLasts {2} seconds.".format(value1.toPercentage(), value2.toString(0), value3.toString(0))
         end)
         ..setEditorSuffix("(Stealed)")

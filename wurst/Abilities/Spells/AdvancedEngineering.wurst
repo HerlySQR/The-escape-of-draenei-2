@@ -22,8 +22,6 @@ let ARMOR_AND_REGEN_INC_L = [1., 1.2, 1.4, 1.6]
 let chargeMap = new HashMap<unit, LinkedList<Charge>>()
 
 class Charge
-    static LinkedList<Charge> instances = new LinkedList<Charge>()
-    static timer t = getTimer()
     unit caster
     int counter
     int spell
@@ -34,42 +32,35 @@ class Charge
         this.spell = spell
         this.regen = regen
         counter = DURATION
-        instances.add(this)
-        if instances.size() == 1
-            t.startPeriodic(1., function callback)
+        doPeriodically(1., cb -> begin
+            counter--
+            // For the regeneration
+            caster.addHP(regen)
+            if counter == 0
+                let actCharges = caster.getAbilityLevel(spell)
+                if actCharges == 1
+                    caster.removeAbility(spell)
+                    destroy chargeMap.get(caster)
+                    chargeMap.remove(caster)
+                else
+                    caster.setAbilityLevel(spell, actCharges - 1)
+                destroy cb
+                destroy this
+        end)
 
     ondestroy
         caster = null
         spell = 0
         regen = 0
         counter = 0
-        instances.remove(this)
-        if instances.size() == 0
-            t.pause()
-
-    static function callback()
-        for ins in instances
-            ins.callbackNS()
-
-    function callbackNS()
-        counter--
-        // For the regeneration
-        caster.addHP(regen)
-        if counter == 0
-            let actCharges = caster.getAbilityLevel(spell)
-            if actCharges == 1
-                caster.removeAbility(spell)
-                destroy chargeMap.get(caster)
-                chargeMap.remove(caster)
-            else
-                caster.setAbilityLevel(spell, actCharges - 1)
-            destroy this
 
 init
+    createUnit(players[1], 'H000', vec2(8000, 8000))..addAbility(ADVANCED_ENGINEERING_NL)..setAbilityLevel(ADVANCED_ENGINEERING_NL, 2)
     DamageEvent.addListener(() -> begin
         if not DamageEvent.isSpell()
             let data = DamageEvent.getTarget().pasAbilityCond(ADVANCED_ENGINEERING_NL, ADVANCED_ENGINEERING_L)
             if data.check
+                
                 int armor
                 int maxCharges
                 real inc
@@ -81,6 +72,7 @@ init
                     armor = AE_ARMOR_L[data.lvl]
                     maxCharges = MAX_CHARGES_L[data.lvl]
                     inc = ARMOR_AND_REGEN_INC_L[data.lvl]
+                
                 let caster = DamageEvent.getTarget()
                 let charges = caster.getAbilityLevel(armor)
                 // Create or get the charges list of the caster

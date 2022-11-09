@@ -357,14 +357,14 @@ function BuildingDefinition.defaultSettings()
     new BuildingDefinition(BOOK_STORE, UnitIds.goblinmerchant)
         ..defaultSettings()
         ..setItemsSold(commaList(
-            BOOK_OF_STRENGTH,
-            BOOK_OF_AGILITY,
-            BOOK_OF_INTELLIGENCE,
-            BOOK_OF_STRENGTH_5,
-            BOOK_OF_AGILITY_5,
-            BOOK_OF_INTELLIGENCE_5,
+            BOOK_OF_STRENGTH.getDummyItem(),
+            BOOK_OF_AGILITY.getDummyItem(),
+            BOOK_OF_INTELLIGENCE.getDummyItem(),
+            BOOK_OF_STRENGTH_5.getDummyItem(),
+            BOOK_OF_AGILITY_5.getDummyItem(),
+            BOOK_OF_INTELLIGENCE_5.getDummyItem(),
             BOOK_OF_RECONVERSION,
-            BOOK_OF_EXPERIENCE
+            BOOK_OF_EXPERIENCE.getDummyItem()
         ))
         ..setModelFile(Buildings.bookOfSummoning)
         ..setIconGameInterface(Icons.bTNBookOfSummoning)

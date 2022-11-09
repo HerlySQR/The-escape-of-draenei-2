@@ -13,6 +13,8 @@ let AREA = 900.
         ..presetLevels(1)
         ..setHeroAbility(false)
         ..tooltipStartListen()
+        ..setButtonPositionNormalX(2)
+        ..setButtonPositionNormalY(1)
         ..setName("Vampiric Aura")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
         // Stats

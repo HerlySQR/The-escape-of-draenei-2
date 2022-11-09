@@ -69,7 +69,7 @@ function ChannelAbilityPreset.general()
     this.presetCastRange(lvl -> RANGE)
     this.presetAreaofEffect(lvl -> AREA)
     this.addTooltipProperty("Duration", lvl -> DURATION)
-    this.addTooltipProperty("Slowness", lvl -> SLOW)
+    this.addTooltipProperty("Slowness", lvl -> SLOW.toPercentage())
     // Audiovisual
     this.presetIcon(Icons.bTNFlare)
     // Tooltip
@@ -103,7 +103,7 @@ function ChannelAbilityPreset.general()
         ..setHotkey("F")
         // Stats
         ..presetManaCost(lvl -> lvl < 2 ? MANA_NL : MANA_L[lvl-2])
-        ..presetTooltipNormalExtended(lvl -> "Throw a fireball that causes {0} damage to an area of {1} to enemy units and slow them a {2}% for {3} seconds.".format((lvl < 2 ? DMG_NL : DMG_L[lvl-2]).toString(0), AREA.toString(0), (SLOW * 100).toString(0), DURATION.toString(0)))
+        ..presetTooltipNormalExtended(lvl -> "Throw a fireball that causes {0} damage to an area of {1} to enemy units and slow them a {2} for {3} seconds.".format((lvl < 2 ? DMG_NL : DMG_L[lvl-2]).toString(0), AREA.toString(0), SLOW.toPercentage(), DURATION.toString(0)))
         ..setEditorSuffix("(Stealed)")
         .setName("Ult Fire Ball")
 

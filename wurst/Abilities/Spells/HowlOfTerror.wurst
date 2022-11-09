@@ -43,7 +43,7 @@ function AbilityDefinitionPitLordHowlofTerror.general()
         ..presetDamageIncrease(lvl -> DMG_DEC_NL[lvl-1])
         ..general()
         ..addTooltipProperty("Defense decrease", lvl -> ARMOR_DEC_NL[lvl-1])
-        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_NL[lvl-1])
+        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_NL[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_NL)
         // Audiovisual
         // Tooltip
@@ -59,7 +59,7 @@ function AbilityDefinitionPitLordHowlofTerror.general()
         ..presetDamageIncrease(lvl -> DMG_DEC_L[lvl-1])
         ..general()
         ..addTooltipProperty("Defense decrease", lvl -> ARMOR_DEC_L[lvl-1])
-        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_L[lvl-1])
+        ..addTooltipProperty("Damage decrease", lvl -> DMG_DEC_L[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Audiovisual
         // Tooltip

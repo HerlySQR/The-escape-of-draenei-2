@@ -46,9 +46,10 @@ function AbilityDefinitionInnerFire.general()
         ..presetLevels(2)
         ..presetButtonPosNormal(2, 2)
         ..setHeroAbility(false)
+        ..presetDamageIncrease(lvl -> DMG_INC_NL[lvl-1])
         ..general()
         ..presetDefenseIncrease(lvl -> ARMOR_INC_NL[lvl-1])
-        ..presetDamageIncrease(lvl -> DMG_INC_NL[lvl-1])
+        ..addTooltipProperty("Damage Increase", lvl -> DMG_INC_NL[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         // Tooltip
         ..tooltipStopListen()
@@ -61,9 +62,10 @@ function AbilityDefinitionInnerFire.general()
         ..presetButtonPosResearch(2, 0)
         ..setHeroAbility(true)
         ..setRequiredLevel(1)
+        ..presetDamageIncrease(lvl -> DMG_INC_L[lvl-1])
         ..general()
         ..presetDefenseIncrease(lvl -> ARMOR_INC_L[lvl-1])
-        ..presetDamageIncrease(lvl -> DMG_INC_L[lvl-1])
+        ..addTooltipProperty("Damage Increase", lvl -> DMG_INC_L[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         // Tooltip
         ..tooltipStopListen()
@@ -80,14 +82,14 @@ function AbilityDefinitionInnerFire.general()
         ..presetDamageIncrease(lvl -> lvl < 3 ? DMG_INC_NL[lvl-1] : DMG_INC_L[lvl-3])
         ..presetManaCost(lvl -> lvl < 3 ? MANA_NL[lvl-1] : MANA_L[lvl-3])
         ..presetTooltipNormalExtended(lvl -> begin
-            int value1
+            real value1
             int value2
             if lvl < 3
-                value1 = (DMG_INC_NL[lvl-1] * 100).toInt()
+                value1 = DMG_INC_NL[lvl-1]
                 value2 = ARMOR_INC_NL[lvl-1]
             else
-                value1 = (DMG_INC_L[lvl-3] * 100).toInt()
+                value1 = DMG_INC_L[lvl-3]
                 value2 = ARMOR_INC_L[lvl-3]
-            return "Increases the damage infringed by the selected friendly unit by {0}% and its armor by {1}.\nLasts {2} seconds.".format(value1.toString(), value2.toString(), DURATION.toString())
+            return "Increases the damage infringed by the selected friendly unit by {0} and its armor by {1}.\nLasts {2} seconds.".format(value1.toPercentage(), value2.toString(), DURATION.toString())
         end)
         ..setEditorSuffix("(Stealed)")

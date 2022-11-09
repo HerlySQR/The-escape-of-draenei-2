@@ -81,7 +81,7 @@ init
                                 howMany++
                     
                     if howMany > 0
-                        whoAssisted = whoAssisted.subString(1, whoAssisted.length() - 1)
+                        whoAssisted = whoAssisted.substring(0, whoAssisted.length() - 1)
                         printTimed(killingMsg + whoAssisted, 4.)
                     else
                         printTimed(killingMsg, 4.)

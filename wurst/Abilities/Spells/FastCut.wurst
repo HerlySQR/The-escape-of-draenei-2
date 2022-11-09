@@ -91,7 +91,7 @@ function ChannelAbilityPreset.general()
         ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_NL[lvl-1])
-        ..addTooltipProperty("Slow", lvl -> SLOW_NL[lvl-1])
+        ..addTooltipProperty("Slow", lvl -> SLOW_NL[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_NL[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
@@ -102,7 +102,7 @@ function ChannelAbilityPreset.general()
         ..general()
         // Stats
         ..addTooltipProperty("Damage", lvl -> DMG_L[lvl-1])
-        ..addTooltipProperty("Slow", lvl -> SLOW_L[lvl-1])
+        ..addTooltipProperty("Slow", lvl -> SLOW_L[lvl-1].toPercentage())
         ..presetManaCost(lvl -> MANA_L[lvl-1])
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
@@ -123,7 +123,7 @@ function ChannelAbilityPreset.general()
             else
                 value1 = DMG_L[lvl - 3]
                 value2 = SLOW_L[lvl - 3]
-            return "The Cacique does a fast cut that causes {0} of damage to units in a max distance of 700 and slows them by {1}%.".format(value1.toString(0), (value2*100).toInt().toString())
+            return "The Cacique does a fast cut that causes {0} of damage to units in a max distance of 700 and slows them by {1}.".format(value1.toString(0), value2.toPercentage())
         end)
         ..setEditorSuffix("(Stealed)")
     

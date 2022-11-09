@@ -13,12 +13,15 @@ let AREA = 900.
         ..registerTooltipGenerator(new AbilityTooltipGenerator("Increase the movement speed of nearby friendly units and the rate of life regeneration."))
         ..presetLevels(1)
         ..setHeroAbility(false)
+        ..presetMovementSpeedIncrease(lvl -> SPEED)
         ..tooltipStartListen()
+        ..setButtonPositionNormalX(2)
+        ..setButtonPositionNormalY(1)
         ..setName("Unholy Aura")
         ..addTooltipProperty("Target Type", lvl -> Targettype.PASSIVE castTo int)
         // Stats
         ..presetLifeRegenerationIncrease(lvl -> LIFE_REGEN)
-        ..presetMovementSpeedIncrease(lvl -> SPEED)
+        ..addTooltipProperty("Movement Speed Increase", lvl -> SPEED.toPercentage())
         ..presetAreaofEffect(lvl -> AREA)
         // Audiovisual
         // Tooltips
