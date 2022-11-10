@@ -1,36 +1,28 @@
 /** The player only will select the revivng hero if don't have a selected unit controlled by him*/
 package HaveAUnitSelected
 
-import RegisterEvents
+import ClosureForGroups
+import Reference
 
-boolean array haveSelected
+function player.hasUnitSelected() returns boolean
+    let amount = new Reference(0)
+    SyncSelections()
+    forUnitsSelected(this, u -> begin
+        if u.isAlive() and (u.getOwner() == this or u.getOwner().getPlayerAlliance(this, ALLIANCE_SHARED_CONTROL))
+            amount.val++
+    end)
+    return amount.into() > 0
 
 init
     // When a hero revives
-    registerPlayerUnitEvent(EVENT_PLAYER_HERO_REVIVE_FINISH, () -> begin
-        let h = GetRevivingUnit()
-        let p = h.getOwner()
-        if not haveSelected[p.getId()]
-            p.selectSingle(h)
-            p.panCamToTimed(h, 0.)
-        else
-            DisplayTextToPlayer(p, 0, 0, "|cff61dbffYour hero has resurrected|r")
-    end)
-    // Selects a unit
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SELECTED, () -> begin
-        let p = GetTriggerPlayer()
-        if GetTriggerUnit().getOwner() == p or GetPlayerAlliance(GetTriggerUnit().getOwner(), p, ALLIANCE_SHARED_CONTROL)
-            haveSelected[p.getId()] = true
-        else
-            haveSelected[p.getId()] = false
-    end)
-    // Deselects a unit
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DESELECTED, () -> begin
-        let p = GetTriggerPlayer()
-        if IsUnitSelected(null, p)
-            haveSelected[p.getId()] = false
-    end)
-    // The selected unit dies
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
-        SelectUnit(GetDyingUnit(), false)
-    end)
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_HERO_REVIVE_FINISH)
+        ..addAction(() -> begin
+            let h = GetRevivingUnit()
+            let p = h.getOwner()
+            if not p.hasUnitSelected()
+                p.selectSingle(h)
+                p.panCamToTimed(h, 0.)
+            else
+                DisplayTextToPlayer(p, 0, 0, "|cff61dbffYour hero has resurrected|r")
+        end)

@@ -1,7 +1,5 @@
 package ChatEnter
 
-import Functions
-
 import HashMap
 
 public interface ChatCommandClosure

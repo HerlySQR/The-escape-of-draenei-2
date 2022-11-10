@@ -55,7 +55,6 @@ class Charge
         counter = 0
 
 init
-    createUnit(players[1], 'H000', vec2(8000, 8000))..addAbility(ADVANCED_ENGINEERING_NL)..setAbilityLevel(ADVANCED_ENGINEERING_NL, 2)
     DamageEvent.addListener(() -> begin
         if not DamageEvent.isSpell()
             let data = DamageEvent.getTarget().pasAbilityCond(ADVANCED_ENGINEERING_NL, ADVANCED_ENGINEERING_L)
