@@ -21,6 +21,7 @@ public function int.courierBanItem()
     bannedItems.add(this)
 
 init
+    // Items that the courier can't pick
     EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
         if EventData.getManipulatingUnit().getTypeId() == COURIER and
             bannedItems.has(EventData.getManipulatedItem().getTypeId())
@@ -35,6 +36,7 @@ init
             EventData.getOrderedUnit().issueTargetOrderById(Orders.attack, EventData.getOrderedUnit())
             message("error", "That would be easy", EventData.getOrderedUnit().getOwner())
     end)
+    // Courier abilities
     EventListener.add(EVENT_PLAYER_UNIT_SELL, () -> begin
         let caster = EventData.getSellingUnit()
         if caster.getTypeId() == COURIER
@@ -52,6 +54,7 @@ init
                     caster.removeItem(m)
             u.remove()
     end)
+    // When killed
     EventListener.add(EVENT_PLAYER_UNIT_DEATH, () -> begin
         let d = EventData.getDyingUnit()
         if d.getTypeId() == COURIER
@@ -74,7 +77,6 @@ function UnitDefinition.general()
 
 
 @compiletime function gen()
-
     new UnitDefinition(COURIER, 'nzep')
         ..setUnitClassification("peon")
         ..setHitPointsMaximumBase(200)
@@ -122,6 +124,7 @@ function UnitDefinition.general()
         ..setName("Drop items")
     
     new AbilityDefinitionFigurineUrsaWarrior(SUMMON_COURIER_SPELL)
+        ..basicItemSpell()
         ..setSummonUnitType1(1, COURIER.toRawCode())
         ..setDurationHero(1, 0)
         ..setDurationNormal(1, 0)

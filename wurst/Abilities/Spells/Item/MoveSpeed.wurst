@@ -2,6 +2,7 @@ package MoveSpeed
 
 import HashMap
 import ClosureEvents
+import ClosureTimers
 
 import MoveSpeedX
 
@@ -24,8 +25,10 @@ function unit.resetSpeeds()
 init
     EventListener e = () -> begin
         let typ = EventData.getManipulatedItem().getTypeId()
-        if addedItems.has(typ)
-            EventData.getManipulatingUnit().resetSpeeds()
+        let u = EventData.getManipulatingUnit()
+        if addedItems.has(typ) and u.isType(UNIT_TYPE_HERO)
+            nullTimer() -> // For some reason the unit still has the item when runs the drop item event
+                u.resetSpeeds()
     end
     EventListener.add(EVENT_PLAYER_UNIT_PICKUP_ITEM, e)
     EventListener.add(EVENT_PLAYER_UNIT_DROP_ITEM, e)

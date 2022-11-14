@@ -63,7 +63,6 @@ init
         ..basicItemSpell()
         ..presetTargetTypes(Targettype.POINT)
         ..setCastRange(1, 99999.)
-        ..setManaCost(1, 0)
         ..setCooldown(1, 12.)
         ..setIconNormal(Imports.bTNWindsBoots)
         ..setName("Impulse")

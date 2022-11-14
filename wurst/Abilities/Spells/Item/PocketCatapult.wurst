@@ -13,6 +13,7 @@ init
 
 @compiletime function gen()
     new AbilityDefinitionFigurineUrsaWarrior(POCKET_CATAPULT_SPELL)
+        ..basicItemSpell()
         ..setSummonUnitType1(1, CATAPULT.toRawCode())
         ..setIconNormal(Icons.bTNCatapult)
         ..setArtTarget(Objects.toonBoom)

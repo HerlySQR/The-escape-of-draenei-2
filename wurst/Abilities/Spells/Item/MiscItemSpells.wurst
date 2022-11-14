@@ -107,6 +107,7 @@ public constant MANA_REPLISH_AREA_TOOLTIP = "When use it, restores {0} mana to n
         ..setDurationNormal(1, INVULNERABILITY_DURATION)
     
     new AbilityDefinitionAntimagicShieldAIxs(ANTIMAGIC_SPELL)
+        ..basicItemSpell()
         ..setDurationHero(1, ANTIMAGIC_DURATION)
         ..setDurationNormal(1, ANTIMAGIC_DURATION)
     
@@ -117,6 +118,7 @@ public constant MANA_REPLISH_AREA_TOOLTIP = "When use it, restores {0} mana to n
         ..setLumberGiven(1, LUMBER_BALE_AMT)
     
     new AbilityDefinitionSilenceItem(SILENCE_SPELL)
+        ..basicItemSpell()
         ..setDurationHero(1, SILENCE_DURATION)
         ..setDurationNormal(1, SILENCE_DURATION)
     
@@ -126,5 +128,6 @@ public constant MANA_REPLISH_AREA_TOOLTIP = "When use it, restores {0} mana to n
         ..setDamageMultiplier(1, CRITICAL_STRIKE_AMT)
     
     new AbilityDefinitionItemManaRestoreAoe(MANA_REPLISH_AREA_SPELL)
+        ..basicItemSpell()
         ..setManaPointsGained(1, MANA_REPLISH_AREA_AMT)
         ..setCooldown(1, MANA_REPLISH_AREA_COOLDOWN)

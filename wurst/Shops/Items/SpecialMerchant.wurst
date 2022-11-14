@@ -187,6 +187,7 @@ public constant BOOTS_OF_SPEED = compiletime(
     new RecipeItem('bspd')
         //..setArmorType(ArmorSoundType.Flesh)
         ..setClassification("Permanent")
+        ..setAbilities("")
         ..setGoldCost(500)
         ..setLumberCost(1)
         ..setStockReplenishInterval(30)
