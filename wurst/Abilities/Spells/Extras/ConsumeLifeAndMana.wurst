@@ -5,11 +5,13 @@ import LifeSteal
 
 public constant CONSUME_LIFE_AND_MANA = compiletime(ABIL_ID_GEN.next())
 
+let TARGETS = "air,enemies,organic,ground"
 let MANA = 100
 let LIFE_STEAL = 50.
 let MANA_STEAL = 30.
 let DURATION = 8.
 let RANGE = 500.
+let MAX_RANGE = 900.
 let CD = 12.
 
 let INTERVAL = 0.03125
@@ -49,6 +51,8 @@ init
                 manaLight.destr()
                 if not cb.isLast()
                     destroy cb
+            if caster.getPos().distanceTo(target.getPos()) > MAX_RANGE
+                caster.issueImmediateOrderById(Orders.stop)
         end)
     end)
 
@@ -57,6 +61,7 @@ init
         ..presetBaseOrderID(lvl -> "drain")
         ..setHeroAbility(false)
         ..setAnimationNames("stand,channel")
+        ..setTargetsAllowed(1, TARGETS)
         ..tooltipStartListen()
         ..setName("Consume life and mana")
         ..presetTargetTypes(Targettype.UNIT)
@@ -67,6 +72,7 @@ init
         ..presetManaCost(lvl -> MANA)
         ..presetCooldown(lvl -> CD)
         ..presetCastRange(lvl -> RANGE)
+        ..addTooltipProperty("Max. range", lvl -> MAX_RANGE)
         // Audiovisual
         ..presetIcon(Icons.bTNDrain)
         // Tooltip

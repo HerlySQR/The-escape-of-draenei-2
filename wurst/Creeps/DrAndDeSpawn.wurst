@@ -154,6 +154,17 @@ init
                     u.remove()
         end)
     end)
+    onModesSelected(() -> begin
+        if whatMode[3] == ONLY_NEUTRAL or whatMode[3] == NO_CREEPS
+            forUnitsOfPlayer(DRAENEI, u -> begin
+                if u.getTypeId() == DRAENEI_WARRIOR[0]
+                    u.remove()
+            end)
+            forUnitsOfPlayer(DEMON, u -> begin
+                if u.getTypeId() == CHAOS_GRUNT[0]
+                    u.remove()
+            end)
+    end)
     // The units spawn
     spawning
         ..registerTimerEvent(30., true)

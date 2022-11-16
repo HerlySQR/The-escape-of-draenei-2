@@ -1,0 +1,28 @@
+package SelectionEvent
+
+import LinkedList
+import RegisterEvents
+
+public interface SelectUnitCallback
+    function run(player p, unit u)
+
+let callbacksS = new LinkedList<SelectUnitCallback>()
+let callbacksD = new LinkedList<SelectUnitCallback>()
+
+public function onUnitSelected(SelectUnitCallback cb)
+    callbacksS.add(cb)
+
+public function onUnitDeselected(SelectUnitCallback cb)
+    callbacksD.add(cb)
+
+public function runSelectionEvent(player p, unit u)
+    for cb in callbacksS
+        cb.run(p, u)
+
+public function runDeselectionEvent(player p, unit u)
+    for cb in callbacksD
+        cb.run(p, u)
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SELECTED, () -> runSelectionEvent(GetTriggerPlayer(), GetTriggerUnit()))
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DESELECTED, () -> runDeselectionEvent(GetTriggerPlayer(), GetTriggerUnit()))

@@ -2,7 +2,6 @@ package HeroSelection
 
 import ClosureTimers
 import ClosureForGroups
-import Camera
 import HashMap
 import Fx
 import Abilities
@@ -15,6 +14,7 @@ import public HeroType
 import initlater MyBoard
 import ArrayList
 import Imports
+import SelectionEvent
 //import ReferenceSystem
 
 public rect actDrSpawn
@@ -22,7 +22,7 @@ public rect actDeSpawn
 
 public force canPick = CreateForce()
 
-public constant heroModel = new HashMap<int, unit>()
+public constant heroModel = new IterableMap<int, unit>()
 
 let seeDraenei = createVision(DEMON, Rects.selectorDraenei, true)
 let seeDemons = createVision(DRAENEI, Rects.selectorDemon, true)
@@ -86,71 +86,63 @@ init
     createVision(DEMON, Rects.selectorDemon, true).start()
         
     // If you select
-    var t = CreateTrigger()
-    for i = 1 to 11
-        t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_SELECTED, null)
-    t..addCondition(Condition(() -> begin
-        return canPick.has(GetTriggerPlayer()) and herosToPick.has(GetTriggerUnit())
-    end))
-     ..addAction(() -> begin
-        let heroSelected = GetTriggerUnit()
-        let playerSelector = GetTriggerPlayer()
-        if not (whatMode[4] == NORMAL_PICK and playerSelector.isEnemyOf(heroSelected.getOwner()))
-            let id = playerSelector.getId()
+    onUnitSelected((playerSelector, heroSelected) -> begin
+        if canPick.has(playerSelector) and herosToPick.has(heroSelected)
+            if not (whatMode[4] == NORMAL_PICK and playerSelector.isEnemyOf(heroSelected.getOwner()))
+                let id = playerSelector.getId()
 
-            if clicks[id] == 2
-                let c = playerSelector.getNumber()
-                let temp = heroSelected.getTypeId()
+                if clicks[id] == 1
+                    let c = playerSelector.getNumber()
+                    let temp = heroSelected.getTypeId()
+                    
+                    hero[c] = createUnit(playerSelector, temp, heroSelected.getPos(), UNIT_FACING)
+                    if whatMode[5] == NOT_LEVELING
+                        SuspendHeroXP(hero[c], true)
+                    gameBoard.setItemIcon(row[c], 0, HeroType.get(hero[c]).getIcon())
+                    /* TODO
+                    if udg_Primera_persona
+                        udg_Unidad_que_sigo[c] = hero[c]
+                        udg_Distancia_al_objetivo[c] = 1024.00*/
+
+                    canPick.remove(playerSelector)
+
+                    vec2 pos
+                    if THE_DRAENEI.has(playerSelector)
+                        pos = actDrSpawn.randomPoint()
+                    else
+                        pos = actDeSpawn.randomPoint()
+                    hero[c].setPos(pos)
+                    if localPlayer == playerSelector
+                        panCameraToTimed(pos, 0.00)
+                    playerSelector.selectSingle(hero[c])
+                    if whatMode[5] == LEVELING
+                        heroSelected.hide()
                 
-                hero[c] = createUnit(playerSelector, temp, heroSelected.getPos(), UNIT_FACING)
-                if whatMode[5] == NOT_LEVELING
-                    SuspendHeroXP(hero[c], true)
-                gameBoard.setItemIcon(row[c], 0, HeroType.get(hero[c]).getIcon())
-                /* TODO
-                if udg_Primera_persona
-                    udg_Unidad_que_sigo[c] = hero[c]
-                    udg_Distancia_al_objetivo[c] = 1024.00*/
-
-                canPick.remove(playerSelector)
-
-                vec2 pos
-                if THE_DRAENEI.has(playerSelector)
-                    pos = actDrSpawn.randomPoint()
+                    nullTimer(() -> runDeselectionEvent(playerSelector, heroSelected))
                 else
-                    pos = actDeSpawn.randomPoint()
-                hero[c].setPos(pos)
-                if localPlayer == playerSelector
-                    panCameraToTimed(pos, 0.00)
-                playerSelector.selectSingle(hero[c])
-                if whatMode[5] == LEVELING
-                    heroSelected.hide()
-            else
-                clicks[id]++
-            
-            if not youSelected[id]
-                youSelected[id] = true
-                arrow[id] = new Fx(heroSelected.getPos(), UNIT_FACING, Abilities.aneuTarget)
-                    ..setPlayerColor(playerSelector.getColor())
-                    ..setZ(240.)
-            
-            doAfter(0.95, () -> begin
-                if clicks[id] > 0
-                    clicks[id]--
-            end)
+                    clicks[id]++
+                
+                if not youSelected[id]
+                    youSelected[id] = true
+                    arrow[id] = new Fx(heroSelected.getPos(), UNIT_FACING, Abilities.aneuTarget)
+                        ..setPlayerColor(playerSelector.getColor())
+                        ..setZ(240.)
+                
+                doAfter(0.95, () -> begin
+                    if clicks[id] > 0
+                        clicks[id]--
+                end)
     end)
 
     // If you deselect
-    t = CreateTrigger()
-    for i = 1 to 11
-        t.registerPlayerUnitEvent(players[i], EVENT_PLAYER_UNIT_DESELECTED, null)
-    t..addCondition(Condition(() -> herosToPick.has(GetTriggerUnit())))
-    ..addAction(() -> begin
-        let id = GetTriggerPlayer().getId()
-        youSelected[id] = false
-        if arrow[id] != null
-            destroy arrow[id]
-            arrow[id] = null
-        clicks[id] = 0
+    onUnitDeselected((p, u) -> begin
+        if herosToPick.has(u)
+            let id = p.getId()
+            youSelected[id] = false
+            if arrow[id] != null
+                destroy arrow[id]
+                arrow[id] = null
+            clicks[id] = 0
     end)
 
 // Distribute the heros

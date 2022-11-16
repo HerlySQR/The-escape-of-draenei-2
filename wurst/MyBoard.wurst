@@ -3,6 +3,7 @@ package MyBoard
 import ClosureTimers
 import Icons
 
+import AddBot
 import public Functions
 import public PlayerData
 import initlater ModeSelection
@@ -23,7 +24,7 @@ init
 
         var pl = 3
         for i = 0 to bj_MAX_PLAYERS
-            if players[i].isIngame()
+            if players[i].isIngame() or players[i].isBot()
                 pl++
         
         gameBoard
@@ -54,52 +55,53 @@ init
             ..setItemValue(0, 4, "Assists")
 
 public function playersOrder()
-    for i = 0 to bj_MAX_PLAYER_SLOTS - 1
-        row[i] = 999
+    nullTimer() ->
+        for i = 0 to bj_MAX_PLAYER_SLOTS - 1
+            row[i] = 999
 
-    var t = 2
-    for i = 1 to 5
-        if playerM(i).isIngame()
-            row[i] = t
-            t++
-            drPlayers++
-            
-    let d = t
-    t++
+        var t = 2
+        for i = 1 to 5
+            if playerM(i).isIngame() or playerM(i).isBot()
+                row[i] = t
+                t++
+                drPlayers++
+                
+        let d = t
+        t++
 
-    for i = 6 to 10
-        if playerM(i).isIngame()
-            row[i] = t
-            t++
-            dePlayers++
-    
-    gameBoard.setRowCount(t)
-    for i = 0 to gameBoard.getRowCount() - 1
-        for j = 0 to gameBoard.getColumnCount() - 1
-            gameBoard.getItem(i, j).setStyle(true, false)
+        for i = 6 to 10
+            if playerM(i).isIngame() or playerM(i).isBot()
+                row[i] = t
+                t++
+                dePlayers++
+        
+        gameBoard.setRowCount(t)
+        for i = 0 to gameBoard.getRowCount() - 1
+            for j = 0 to gameBoard.getColumnCount() - 1
+                gameBoard.getItem(i, j).setStyle(true, false)
 
-    for i = 1 to 10
-        let r = row[i]
-        if r != 999
-            gameBoard
-                ..setItemValue(r, 1, playerName[i])
-                ..setItemValue(r, 2, kills[i].toString())
-                ..setItemValue(r, 3, deaths[i].toString())
-                ..setItemValue(r, 4, assists[i].toString())
-            gameBoard.getItem(r, 0).setStyle(false, true)
-            let g = HeroType.get(hero[i])
-            if g == null
-                gameBoard.setItemIcon(r, 0, Icons.bTNSelectHeroOff)
-            else
-                gameBoard.setItemIcon(r, 0, g.getIcon())
-    
-    gameBoard.getItem(d, 0).setStyle(true, false)
-    gameBoard.getItem(d, 1).setStyle(true, false)
-    gameBoard
-        ..setItemValue(d, 0, ("Dem").color(colorId[12]))
-        ..setItemValue(d, 1, (" ons").color(colorId[12]))
-    for i = 2 to 4
-        gameBoard.setItemValue(d, i, "")
+        for i = 1 to 10
+            let r = row[i]
+            if r != 999
+                gameBoard
+                    ..setItemValue(r, 1, playerName[i])
+                    ..setItemValue(r, 2, kills[i].toString())
+                    ..setItemValue(r, 3, deaths[i].toString())
+                    ..setItemValue(r, 4, assists[i].toString())
+                gameBoard.getItem(r, 0).setStyle(false, true)
+                let g = HeroType.get(hero[i])
+                if g == null
+                    gameBoard.setItemIcon(r, 0, Icons.bTNSelectHeroOff)
+                else
+                    gameBoard.setItemIcon(r, 0, g.getIcon())
+        
+        gameBoard.getItem(d, 0).setStyle(true, false)
+        gameBoard.getItem(d, 1).setStyle(true, false)
+        gameBoard
+            ..setItemValue(d, 0, ("Dem").color(colorId[12]))
+            ..setItemValue(d, 1, (" ons").color(colorId[12]))
+        for i = 2 to 4
+            gameBoard.setItemValue(d, i, "")
 
 // Game time
 var seconds = 0

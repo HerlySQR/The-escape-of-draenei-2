@@ -1,0 +1,35 @@
+package Tutorial
+
+import ChatEnter
+import PlayerData
+import ModeSelection
+
+import ClosureTimers
+
+import UnitTransmission
+
+bool array inTutorial
+
+init
+    onModesSelected(() -> begin
+        doAfter(2.) -> 
+            QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "|cff32cd32HELP:|r type \"-tutorial\" if you don't know how to play.")
+    end)
+    onChatCommand("tutorial", (p, _) -> begin
+        inTutorial[p.getId()] = true
+
+        if THE_DRAENEI.has(p)
+            if p == localPlayer
+                ShowInterface(false, 0.)
+                EnableUserControl(false)
+            
+            new Transmission(p.getForce(), 0)
+                ..addActions(1., () -> begin
+                    p.cameraSetupApply(true, null, 1.)
+                end)
+                ..addEnd(() -> begin
+                    if p == localPlayer
+                        ShowInterface(true, 0.)
+                        EnableUserControl(true)
+                end)
+    end)

@@ -1,0 +1,26 @@
+package AddBot
+
+import ChatEnter
+import initlater MyBoard
+import initlater AFK
+
+public boolean array botActived
+
+public function player.isBot() returns boolean
+    return botActived[this.getId()]
+
+init
+    onChatCommand("addbot", (p, extra) -> begin
+        let id = extra.toInt()
+        if id >= 0 and id < PLAYER_NEUTRAL_AGGRESSIVE
+            if not players[id].isIngame() and not botActived[id]
+                botActived[id] = true
+                players[id].setName("Bot " + extra)
+                print("Added the bot: " + players[id].getName())
+                whoAreHere.add(players[id])
+                playersOrder()
+            else
+                print("This slot is been used")
+        else
+            print("Invalid slot for a bot")
+    end)
