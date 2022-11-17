@@ -397,6 +397,18 @@ public class Rects
     static constant theWarlock = gg_rct_TheWarlock
     static constant theMonster = gg_rct_TheMonster
 
+    // Tutorial
+
+    static constant tutorialDrSpawn = gg_rct_TutorialDrSpawn
+    static constant tutorialDrShops = gg_rct_TutorialDrShops
+    static constant tutorialDrEnemies = gg_rct_TutorialDrEnemies
+
+    static constant tutorialDeSpawn = gg_rct_TutorialDeSpawn
+    static constant tutorialDeShops = gg_rct_TutorialDeShops
+    static constant tutorialDeEnemies = gg_rct_TutorialDeEnemies
+
+    static constant tutorialObjective = gg_rct_TutorialObjective
+
 // Water
 init
     EnumDestructablesInRect(bj_mapInitialPlayableArea, null, () -> begin
@@ -416,3 +428,17 @@ public class Cams
     
     static constant bigRock1 = gg_cam_BigRock1
     static constant bigRock2 = gg_cam_BigRock2
+
+    // Tutorial
+
+    static constant tutorialDr1 = gg_cam_TutorialDr1
+    static constant tutorialDr2 = gg_cam_TutorialDr2
+    static constant tutorialDr3 = gg_cam_TutorialDr3
+    static constant tutorialDr4 = gg_cam_TutorialDr4
+
+    static constant tutorialDe1 = gg_cam_TutorialDe1
+    static constant tutorialDe2 = gg_cam_TutorialDe2
+    static constant tutorialDe3 = gg_cam_TutorialDe3
+    static constant tutorialDe4 = gg_cam_TutorialDe4
+
+    static constant tutorialMissionObjective = gg_cam_TutorialMissionObjective

@@ -47,8 +47,8 @@ init
             ..setTitle("Statistics")
             ..display(false)
             ..setItemValue(0, 0, "")
-            ..setItemValue(1, 0, ("Drae").color(colorId[11]))
-            ..setItemValue(1, 1, (" nei").color(colorId[11]))
+            ..setItemValue(1, 0, ("Drae").color(PLAYER_COLORS[0]))
+            ..setItemValue(1, 1, (" nei").color(PLAYER_COLORS[0]))
             ..setItemValue(0, 1, "Player")
             ..setItemValue(0, 2, "Kills")
             ..setItemValue(0, 3, "Deaths")
@@ -62,29 +62,31 @@ public function playersOrder()
         var t = 2
         for i = 1 to 5
             if playerM(i).isIngame() or playerM(i).isBot()
-                row[i] = t
+                row[playerM(i).getId()] = t
                 t++
-                drPlayers++
+                if not playerM(i).isBot()
+                    drPlayers++
                 
         let d = t
         t++
 
         for i = 6 to 10
             if playerM(i).isIngame() or playerM(i).isBot()
-                row[i] = t
+                row[playerM(i).getId()] = t
                 t++
-                dePlayers++
+                if not playerM(i).isBot()
+                    dePlayers++
         
         gameBoard.setRowCount(t)
         for i = 0 to gameBoard.getRowCount() - 1
             for j = 0 to gameBoard.getColumnCount() - 1
                 gameBoard.getItem(i, j).setStyle(true, false)
 
-        for i = 1 to 10
+        for i = 1 to 11
             let r = row[i]
             if r != 999
                 gameBoard
-                    ..setItemValue(r, 1, playerName[i])
+                    ..setItemValue(r, 1, i.getColoredName())
                     ..setItemValue(r, 2, kills[i].toString())
                     ..setItemValue(r, 3, deaths[i].toString())
                     ..setItemValue(r, 4, assists[i].toString())
@@ -98,8 +100,8 @@ public function playersOrder()
         gameBoard.getItem(d, 0).setStyle(true, false)
         gameBoard.getItem(d, 1).setStyle(true, false)
         gameBoard
-            ..setItemValue(d, 0, ("Dem").color(colorId[12]))
-            ..setItemValue(d, 1, (" ons").color(colorId[12]))
+            ..setItemValue(d, 0, ("Dem").color(PLAYER_COLORS[6]))
+            ..setItemValue(d, 1, (" ons").color(PLAYER_COLORS[6]))
         for i = 2 to 4
             gameBoard.setItemValue(d, i, "")
 

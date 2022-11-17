@@ -172,7 +172,7 @@ init
                         Transmission.simple(p, goblinShop, null, "Goblin Sapper", null, "Hey, you have one in your hand, wait for leaving it.", TTime.SET, 5.50)
                 else
                     QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_ITEMACQUIRED, "Someone got a barrel.")
-                    let i = p.getNumber()
+                    let i = p.getId()
                     barrelEffect[i] = u.addEffect("Models\\TNTBarrel.mdl", "hand")
                     heroWithBarrel[i] = u
             else
@@ -254,7 +254,7 @@ init
                     place = Rects.barrel3
                 case 3
                     QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_WARNING, "The third barrel has been placed\nThe wall is going to be destroyed")
-            let i = u.getOwner().getNumber()
+            let i = u.getOwner().getId()
             heroWithBarrel[i] = null
             barrelEffect[i].destr()
             barrelEffect[i] = null

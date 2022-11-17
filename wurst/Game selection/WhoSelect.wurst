@@ -14,7 +14,7 @@ public function whoSelect()
     for i = 0 to 11
         if players[i].isIngame()
             selector = players[i]
-            DisplayTextToForce(bj_FORCE_ALL_PLAYERS, "Wait "+ playerName[selector.getNumber()] + " select the modes.")
+            DisplayTextToForce(bj_FORCE_ALL_PLAYERS, "Wait "+ selector.getColoredName() + " select the modes.")
 
             if localPlayer == selector
                 ClearTextMessages()

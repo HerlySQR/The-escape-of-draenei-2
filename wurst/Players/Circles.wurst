@@ -46,7 +46,7 @@ function unit.pickItems(LinkedList<item> list)
 public function player.createCrate(bool includeCourier) returns LinkedList<item>
     let list = new LinkedList<item>()
 
-    let i = this.getNumber()
+    let i = this.getId()
     if hero[i] != null
         hero[i].pickItems(list)
     
@@ -78,7 +78,7 @@ public function player.removeCrate()
     end)
 
 init
-    for i = 1 to 10
+    for i = 1 to 11
         backpack[i] = createUnit(players[bj_PLAYER_NEUTRAL_VICTIM], BACKPACK)
 
     // Crate
@@ -117,7 +117,7 @@ init
     registerSpellEffectEvent(ASK_HELP, () -> begin
         let caster = GetSpellAbilityUnit()
         let owner = caster.getOwner()
-        let h = hero[owner.getNumber()]
+        let h = hero[owner.getId()]
         if h.isAlive()
             var i = new Reference(0)
             forUnitsInRange(EventData.getAbilityTargetPos(), 300., u -> begin
@@ -146,7 +146,7 @@ init
     registerSpellEffectEvent(SELECT_BACKPACK, () -> begin
         let caster = GetSpellAbilityUnit()
         let owner = caster.getOwner()
-        let i = owner.getNumber()
+        let i = owner.getId()
         owner.selectSingle(caster)
         backpack[i].setOwner(owner, false)
         owner.selectSingle(backpack[i])
@@ -160,8 +160,7 @@ init
     registerSpellEffectEvent(PICK_ITEMS, () -> begin
         let caster = GetSpellAbilityUnit()
         let owner = caster.getOwner()
-        let i = owner.getNumber()
-        let pos = hero[i].getPos()
+        let pos = hero[owner.getId()].getPos()
         let r = Rect(pos.x - 250., pos.y - 250., pos.x + 250, pos.y + 250)
         forItemsInRect(r, m -> begin
             if m.isAlive() and m.isVisible()
@@ -177,7 +176,7 @@ init
 
     registerSpellEffectEvent(DROP_ITEMS, () -> begin
         let caster = GetSpellAbilityUnit()
-        let pos = hero[caster.getOwner().getNumber()].getPos()
+        let pos = hero[caster.getOwner().getId()].getPos()
         for m in caster.inventory()
             let recipe = m.getRecipeItem()
             if recipe != null

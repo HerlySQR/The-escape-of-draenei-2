@@ -44,7 +44,7 @@ init
             let typ = u.getTypeId()
 
             if typ == GO_TO_HERO
-                let i = u.getOwner().getNumber()
+                let i = u.getOwner().getId()
                 if hero[i].isAlive()
                     caster.issueTargetOrderById(Orders.smart, hero[i])
             else if typ == GO_TO_BASE
@@ -62,10 +62,12 @@ init
             printTimed("{0} killed {1}'s courier".format(p.getName(), d.getOwner().getName()), 10.)
             if THE_DRAENEI.has(p)
                 for i = 1 to 5
-                    new Bounty().run(100, hero[i], playerM(i), hero[i].isAlive(), false)
+                    let h = hero[playerM(i).getId()]
+                    new Bounty().run(100, h, playerM(i), h.isAlive(), false)
             else if THE_DEMONS.has(p)
                 for i = 6 to 10
-                    new Bounty().run(100, hero[i], playerM(i), hero[i].isAlive(), false)
+                    let h = hero[playerM(i).getId()]
+                    new Bounty().run(100, h, playerM(i), h.isAlive(), false)
     end)
 
 function UnitDefinition.general()

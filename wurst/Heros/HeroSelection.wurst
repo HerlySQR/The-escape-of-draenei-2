@@ -92,7 +92,7 @@ init
                 let id = playerSelector.getId()
 
                 if clicks[id] == 1
-                    let c = playerSelector.getNumber()
+                    let c = playerSelector.getId()
                     let temp = heroSelected.getTypeId()
                     
                     hero[c] = createUnit(playerSelector, temp, heroSelected.getPos(), UNIT_FACING)

@@ -116,7 +116,7 @@ init
                             trans.addLine(thePrisoner, null, "Prisoner", null, "What?, What do you want?", TTime.SET, 3., true)
                             trans.addLine(thePrisoner, null, "Prisoner", null, "Didn't you have enough?", TTime.SET, 3., true)
                             trans.addLine(paralized, null, "You", null, "I'm not your enemy, I'm one of the deserters.", TTime.SET, 4.5, true)
-                            if youKilledHim[p.getNumber()]
+                            if youKilledHim[p.getId()]
                                 trans.addLine(thePrisoner, null, "Prisoner", null, "Oh, I already remember you...", TTime.SET, 3., true)
                                 trans.addLine(thePrisoner, null, "Prisoner", null, "Wait, won't you have killed one of ours?", TTime.SET, 4., true)
                                 trans.addLine(paralized, null, "You", null, "No.", TTime.SET, 3., true)
@@ -142,7 +142,7 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
         let u = EventData.getKillingUnit()
         if GetUnitRace(u) == RACE_UNDEAD and THE_DRAENEI.has(u.getOwner()) and GetUnitRace(EventData.getDyingUnit()) == RACE_UNDEAD
-            youKilledHim[u.getOwner().getNumber()] = true
+            youKilledHim[u.getOwner().getId()] = true
     end)
 
     // Accept or not

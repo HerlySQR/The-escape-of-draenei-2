@@ -1,7 +1,6 @@
 package SurgingFury
 
 import AbilityData
-import PlayerData
 
 import UnitIndexer
 
@@ -44,7 +43,7 @@ class SurgingFury
     construct(unit caster, bool isNL)
         this.caster = caster
         instances[caster.getIndex()] = this
-        col = colorId[caster.getOwner().getNumber()]
+        col = caster.getOwner().getColor().toColor().toColorString()
         ttCharges = CreateTextTag()
         ttCharges.setColor(COLOR_WHITE)
         reduce = getTimer()..setData(this castTo int)..startPeriodic(1., function SurgingFury.decrease)

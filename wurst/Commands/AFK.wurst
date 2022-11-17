@@ -11,9 +11,9 @@ int array afkTime
 
 init
     onChatCommand("afk", (p, _) -> begin
-        for i = 1 to 10
+        for i = 1 to 11
             if afkTime[i] >= 30
-                printTimedToPlayer(playerName[i] + " is " + afkTime[i].toString() + " seconds afk.", 10., p)
+                printTimedToPlayer(i.getColoredName() + " is " + afkTime[i].toString() + " seconds afk.", 10., p)
     end)
         
     // To see you are here
@@ -33,23 +33,22 @@ init
             t.registerPlayerEvent(players[i], EVENT_PLAYER_ALLIANCE_CHANGED)
     t.addAction(() -> begin
         let p = GetTriggerPlayer()
-        let i = p.getNumber()
+        let i = p.getId()
         afkTime[i] = 0
         if p.isIngame() and not whoAreHere.has(p)
             whoAreHere.add(p)
             for j = 0 to 4
                 gameBoard.setItemValueColor(row[i], j, COLOR_WHITE)
-            gameBoard.setItemValue(row[i], 1, playerName[i])
+            gameBoard.setItemValue(row[i], 1, p.getColoredName())
     end)
     // Register
     CreateTimer().startPeriodic(1., () -> begin
         for i = 1 to 11
-            let j = players[i].getNumber()
             if players[i].isIngame()
-                afkTime[j]++
-            if afkTime[j] >= 30
+                afkTime[i]++
+            if afkTime[i] >= 30
                 whoAreHere.remove(players[i])
-                gameBoard.setItemValue(row[j], 1, players[i].getName())
+                gameBoard.setItemValue(row[i], 1, players[i].getName())
                 for k = 0 to 4
-                    gameBoard.setItemValueColor(row[j], k, gray)
+                    gameBoard.setItemValueColor(row[i], k, gray)
     end)

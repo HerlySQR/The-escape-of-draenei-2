@@ -59,10 +59,10 @@ init
             switchWindow.setMessage("What player do you want to change with?")
             if THE_DEMONS.has(p)
                 for i = 1 to 5
-                    switchButton[i] = switchWindow.addButton(playerName[i])
+                    switchButton[i] = switchWindow.addButton(playerM(i).getColoredName())
             else
                 for i = 6 to 10
-                    switchButton[i] = switchWindow.addButton(playerName[i])
+                    switchButton[i] = switchWindow.addButton(playerM(i).getColoredName())
             switchWindow.display(p, true)
             whoWantSwitch = p
             switchSuccesful = false
@@ -105,15 +105,11 @@ init
         ..registerDialogEvent(switchWindow)
         ..addAction(() -> begin
             let p = GetTriggerPlayer()
-            var j = 0
+            swp1 = p
             for i = 1 to 10
-                if p.getNumber() == i
-                    swp1 = p
                 if GetClickedButton() == switchButton[i]
                     swp2 = playerM(i)
-                if players[i].isIngame()
-                    j++
-            if j == 1
+            if whoAreHere.count() == 1
                 changePlayers()
                 print("The switch has been succesful.")
                 switchSuccesful = true
@@ -127,8 +123,8 @@ init
         end)
 
 function changePlayers()
-    let i1 = swp1.getNumber()
-    let i2 = swp2.getNumber()
+    let i1 = swp1.getId()
+    let i2 = swp2.getId()
     // Return items to their owners
     forUnitsOfPlayer(swp1, u -> begin
         if u.getTypeId() == BACKPACK or u.getTypeId() == COURIER
@@ -155,7 +151,7 @@ function changePlayers()
                 m1.setVisible(false)
                 expMap.put(m1, hero[i1].getXp())
                 list1.add(m1)
-            if hero[i1] != null
+            if hero[i2] != null
                 let m2 = createItem(EXP_BOOK, ZERO2)
                 m2.setPlayer(swp2, false)
                 m2.setVisible(false)
@@ -177,8 +173,9 @@ function changePlayers()
     switchMembers(swp1, swp2)
 
     // Last details
-    swp1.setColor(playerColor[i2], true)
-    swp2.setColor(playerColor[i1], true)
+    let c = swp1.getColor()
+    swp1.setColor(swp2.getColor(), true)
+    swp2.setColor(c, true)
 
     // Change the alliances
     changeAlliance(swp1)
@@ -228,8 +225,8 @@ init
                 canPick.remove(swp2)
             
             nullTimer() ->
-                for i = 1 to 10
-                    playerM(i).removeCrate()
+                for i = 1 to 11
+                    players[i].removeCrate()
             notBooks = false
             whoSelect()
     end)

@@ -3,12 +3,17 @@ package Tutorial
 import ChatEnter
 import PlayerData
 import ModeSelection
+import GeneratedValues
 
 import ClosureTimers
+import UnitIds
 
 import UnitTransmission
 
 bool array inTutorial
+
+function fogmodifier.destrAfter(real delay)
+    doAfter(delay, () -> this.destr())
 
 init
     onModesSelected(() -> begin
@@ -18,18 +23,72 @@ init
     onChatCommand("tutorial", (p, _) -> begin
         inTutorial[p.getId()] = true
 
-        if THE_DRAENEI.has(p)
+        if p == localPlayer
+            ShowInterface(false, 1.)
+            EnableUserControl(false)
+        
+        TransmissionCallback theEnd = () -> begin
+            inTutorial[p.getId()] = false
             if p == localPlayer
-                ShowInterface(false, 0.)
-                EnableUserControl(false)
-            
+                ResetToGameCamera(1.)
+                ShowInterface(true, 1.)
+                EnableUserControl(true)
+        end
+
+        if THE_DRAENEI.has(p)
             new Transmission(p.getForce(), 0)
-                ..addActions(1., () -> begin
-                    p.cameraSetupApply(true, null, 1.)
-                end)
-                ..addEnd(() -> begin
-                    if p == localPlayer
-                        ShowInterface(true, 0.)
-                        EnableUserControl(true)
-                end)
+                ..addActions(1.)
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "Greetings, I'm glad you're willing to escape from here.", TTime.SET, 4., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDr1, 1.))
+                ..addActions(1.5)
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "First you have to choose the champion you will lead in the combat.", TTime.SET, 5., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDr2, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialDrSpawn.getCenter(), 500., false)..start().destrAfter(6.))
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "If you fell in combat, you will be able to recover at the current checkpoint after a while.", TTime.SET, 6., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDr3, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialDrShops.getCenter(), 500., false)..start().destrAfter(4.))
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "There are several merchants that can sell us useful items.", TTime.SET, 4., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDr4, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialDrEnemies.getCenter(), 500., false)..start().destrAfter(3.5))
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "Be careful, the demons won't let us escape.", TTime.SET, 3.5, true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialMissionObjective, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialObjective.getCenter(), 500., false)..start().destrAfter(5.))
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "Each time we complete an objective we gain more ground and push back the demons.", TTime.SET, 5., true)
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "And our checkpoints will be positioned further forward within the citadel.", TTime.SET, 5., true)
+                ..addActions(() -> p.panCameraToTimed(hero[p.getId()] != null ? hero[p.getId()].getPos() : Rects.selectorDraenei.getCenter(), 0.))
+                ..addLine(UnitIds.draeneiguardian, PLAYER_COLOR_RED, "Draenei", null, "Now that you're ready, let's free our people!", TTime.SET, 3.5, true)
+                ..addEnd(theEnd)
+                ..start()
+        else
+            new Transmission(p.getForce(), 0)
+                ..addActions(1.)
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "Get ready warrior for combat.", TTime.SET, 3., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDe1, 1.))
+                ..addActions(1.5)
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "Choose the champion you will lead.", TTime.SET, 3.5, true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDe2, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialDeSpawn.getCenter(), 500., false)..start().destrAfter(5.))
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "If you fell in combat, you will be recovered at our checkpoint after a while.", TTime.SET, 5., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDe3, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialDeShops.getCenter(), 500., false)..start().destrAfter(4.))
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "There are several merchants that should sell us useful items.", TTime.SET, 4., true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialDe4, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialDeEnemies.getCenter(), 500., false)..start().destrAfter(3.5))
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "Your objective is don't let the draenei escape.", TTime.SET, 3.5, true)
+                ..addActions(() -> p.cameraSetupApply(true, Cams.tutorialMissionObjective, 1.))
+                ..addActions(1.5)
+                ..addActions(() -> createVision(p, Rects.tutorialObjective.getCenter(), 500., false)..start().destrAfter(5.))
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "Each time they complete an objective we lose ground and we are pushed back.", TTime.SET, 5., true)
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "And we have to re-position our checkpoints closer of the exit of the citadel.", TTime.SET, 5., true)
+                ..addActions(() -> p.panCameraToTimed(hero[p.getId()] != null ? hero[p.getId()].getPos() : Rects.selectorDemon.getCenter(), 0.))
+                ..addLine(UnitIds.felguard, PLAYER_COLOR_GREEN, "Demon", null, "Don't fail us or you will suffer the consequences.", TTime.SET, 4., true)
+                ..addEnd(theEnd)
+                ..start()
     end)

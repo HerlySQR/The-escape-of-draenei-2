@@ -21,13 +21,12 @@ init
         ..registerPlayerEvent(players[11], EVENT_PLAYER_LEAVE)
         ..addAction(() -> begin
             let p = GetTriggerPlayer()
-            let temp = p.getNumber()
 
             whoAreHere.remove(p)
-            printTimed(playerName[temp] + " |cffff0000left the game.|r", 10.)
+            printTimed(p.getColoredName() + " |cffff0000left the game.|r", 10.)
 
             p.createCrate(true)
-            hero[temp].remove()
+            hero[p.getId()].remove()
 
             SOUND.play()
             playersOrder()

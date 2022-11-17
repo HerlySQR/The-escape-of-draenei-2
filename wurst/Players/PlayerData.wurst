@@ -48,49 +48,6 @@ init
 public function switchMembers(player p1, player p2)
     let i1 = p1.getNumber()
     let i2 = p2.getNumber()
-
-    let swh = hero[i1]
-    hero[i1] = hero[i2]
-    hero[i2] = swh
-
-    var sw = row[i1]
-    row[i1] = row[i2]
-    row[i2] = sw
-
-    sw = kills[i1]
-    kills[i1] = kills[i2]
-    kills[i2] = sw
-
-    sw = deaths[i1]
-    deaths[i1] = deaths[i2]
-    deaths[i2] = sw
-
-    sw = assists[i1]
-    assists[i1] = assists[i2]
-    assists[i2] = sw
-
-    sw = spree[i1]
-    spree[i1] = spree[i2]
-    spree[i2] = sw
-
-    sw = firstKill[i1]
-    firstKill[i1] = firstKill[i2]
-    firstKill[i2] = sw
-
-    sw = doubleKill[i1]
-    doubleKill[i1] = doubleKill[i2]
-    doubleKill[i2] = sw
-
-    sw = tripleKill[i1]
-    tripleKill[i1] = tripleKill[i2]
-    tripleKill[i2] = sw
-
-    sw = ultraKill[i1]
-    ultraKill[i1] = ultraKill[i2]
-    ultraKill[i2] = sw
-
-    playerName[i1] = colorId[i1] + p2.getName() + "|r"
-    playerName[i2] = colorId[i2] + p1.getName() + "|r"
     
     p1.setNumber(i2)
     p2.setNumber(i1)
@@ -136,8 +93,6 @@ init
     players[9].setNumber(8)
     players[10].setNumber(9)
     players[11].setNumber(10)
-    players[0].setNumber(11)
-    players[6].setNumber(12)
 
     for i = 1 to 10
         kills[i] = 0
@@ -147,53 +102,15 @@ init
 
 // Names and Colors
 
-public string array playerName
-public string array colorId
-public playercolor array playerColor
+public function player.getColoredName() returns string
+    return this.getName().color(this.getColor().toColor())
+
+public function int.getColoredName() returns string
+    return players[this].getColoredName()
 
 init
-    numb[0] = 11
-    numb[6] = 12
-
-    colorId[1] = PLAYER_COLORS[1].toColorString()
-    colorId[2] = PLAYER_COLORS[2].toColorString()
-    colorId[3] = PLAYER_COLORS[3].toColorString()
-    colorId[4] = PLAYER_COLORS[4].toColorString()
-    colorId[5] = PLAYER_COLORS[5].toColorString()
-    colorId[6] = PLAYER_COLORS[7].toColorString()
-    colorId[7] = PLAYER_COLORS[8].toColorString()
-    colorId[8] = PLAYER_COLORS[9].toColorString()
-    colorId[9] = PLAYER_COLORS[10].toColorString()
-    colorId[10] = PLAYER_COLORS[11].toColorString()
-    colorId[11] = PLAYER_COLORS[0].toColorString()
-    colorId[12] = PLAYER_COLORS[6].toColorString()
-
-    playerName[1] = colorId[1] + players[1].getName() + "|r"
-    playerName[2] = colorId[2] + players[2].getName() + "|r"
-    playerName[3] = colorId[3] + players[3].getName() + "|r"
-    playerName[4] = colorId[4] + players[4].getName() + "|r"
-    playerName[5] = colorId[5] + players[5].getName() + "|r"
-    playerName[6] = colorId[6] + players[7].getName() + "|r"
-    playerName[7] = colorId[7] + players[8].getName() + "|r"
-    playerName[8] = colorId[8] + players[9].getName() + "|r"
-    playerName[9] = colorId[9] + players[10].getName() + "|r"
-    playerName[10] = colorId[10] + players[11].getName() + "|r"
-    playerName[11] = colorId[11] + "Draenei" + "|r"
-    playerName[12] = colorId[12] + "Demons" + "|r"
-
     DRAENEI.setName("Draenei")
     DEMON.setName("Demons")
-
-    playerColor[1] = PLAYER_COLOR_BLUE
-    playerColor[2] = PLAYER_COLOR_CYAN
-    playerColor[3] = PLAYER_COLOR_PURPLE
-    playerColor[4] = PLAYER_COLOR_YELLOW
-    playerColor[5] = PLAYER_COLOR_ORANGE
-    playerColor[6] = PLAYER_COLOR_PINK
-    playerColor[7] = PLAYER_COLOR_LIGHT_GRAY
-    playerColor[8] = PLAYER_COLOR_LIGHT_BLUE
-    playerColor[9] = PLAYER_COLOR_AQUA
-    playerColor[10] = PLAYER_COLOR_BROWN
 
     giveGold
         ..registerTimerEvent(0.8, true)

@@ -30,6 +30,13 @@ trigger skyGemRun
 trigger obelisks
 effect mark = null
 
+let bloodGem = createItem(BLOOD_GEM, ZERO2)..setInvulnerable(true)
+    ..setPlayer(players[0], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+let skyGem = createItem(SKY_GEM, ZERO2)..setInvulnerable(true)
+    ..setPlayer(players[10], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+let poisonGem = createItem(POISON_GEM, ZERO2)..setInvulnerable(true)
+    ..setPlayer(players[6], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+
 let theBloodGem = new Fx(Rects.bloodGemObelisk.getCenter(), Imports.gem)
     ..setZ(240.)
     ..setPlayerColor(PLAYER_COLOR_RED)
@@ -75,12 +82,9 @@ init
         if random != null
             destroy random
             random = null
-        createItem(BLOOD_GEM, Rects.bloodGemPlace[GetRandomInt(0, 2)].getCenter())
-            ..setPlayer(players[0], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
-        createItem(SKY_GEM, Rects.skyGemPlace[GetRandomInt(0, 2)].getCenter())
-            ..setPlayer(playerM(9), true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
-        createItem(POISON_GEM, Rects.poisonGemPlace[GetRandomInt(0, 2)].getCenter())
-            ..setPlayer(players[6], true)..setPlayer(players[PLAYER_NEUTRAL_PASSIVE], false)
+        bloodGem..setVisible(true).setPos(Rects.bloodGemPlace[GetRandomInt(0, 2)].getCenter())
+        skyGem..setVisible(true).setPos(Rects.skyGemPlace[GetRandomInt(0, 2)].getCenter())
+        poisonGem..setVisible(true).setPos(Rects.poisonGemPlace[GetRandomInt(0, 2)].getCenter())
     end)
 
     obelisks = CreateTrigger()
@@ -114,8 +118,8 @@ init
         let u = EventData.getTriggerUnit()
         let p = u.getOwner()
         if not whoAre.has(p)
-            let typ = EventData.getOrderTargetItem().getTypeId()
-            if typ == BLOOD_GEM or typ == SKY_GEM or typ == POISON_GEM
+            let m = EventData.getOrderTargetItem()
+            if m == bloodGem or m == skyGem or m == poisonGem
                 message("error", "Why should I do that?", p)
                 u.issueTargetOrderById(Orders.attack, u)
     end)
@@ -124,31 +128,30 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
         let u = EventData.getManipulatingUnit()
         let m = EventData.getManipulatedItem()
-        let typ = m.getTypeId()
-        if ((u.hasItemById(BLOOD_GEM) or u.hasItemById(SKY_GEM)) and typ == POISON_GEM) or
-            ((u.hasItemById(POISON_GEM) or u.hasItemById(SKY_GEM)) and typ == BLOOD_GEM) or
-            ((u.hasItemById(POISON_GEM) or u.hasItemById(BLOOD_GEM)) and typ == SKY_GEM)
+        if ((u.hasItem(bloodGem) or u.hasItem(skyGem)) and m == poisonGem) or
+            ((u.hasItem(poisonGem) or u.hasItem(skyGem)) and m == bloodGem) or
+            ((u.hasItem(poisonGem) or u.hasItem(bloodGem)) and m == skyGem)
 
             QuestMessageBJ(u.getOwner().getForce(), bj_QUESTMESSAGE_WARNING, "The gems are so powerful to carry more than one at a time.")
             u.dropItemPoint(m, u.getPos())
         else
-            if typ == BLOOD_GEM
-                DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " grabbed the |cffb90000Blood Gem|r.")
-            else if typ == SKY_GEM
-                DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " grabbed the |cff00e4ffSky Gem|r.")
-            else if typ == POISON_GEM
-                DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " grabbed the |cff57ff59Poison Gem|r.")
+            if m == bloodGem
+                DisplayTextToPlayer(localPlayer, 0, 0, u.getOwner().getColoredName() + " grabbed the |cffb90000Blood Gem|r.")
+            else if m == skyGem
+                DisplayTextToPlayer(localPlayer, 0, 0, u.getOwner().getColoredName() + " grabbed the |cff00e4ffSky Gem|r.")
+            else if m == poisonGem
+                DisplayTextToPlayer(localPlayer, 0, 0, u.getOwner().getColoredName() + " grabbed the |cff57ff59Poison Gem|r.")
     end)
 
     // Lose the gems
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
         let u = EventData.getManipulatingUnit()
-        if u.hasItemById(BLOOD_GEM)
-            DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " lost the |cffb90000Blood Gem|r.")
-        else if u.hasItemById(SKY_GEM)
-            DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " lost the |cff00e4ffSky Gem|r.")
-        else if u.hasItemById(POISON_GEM)
-            DisplayTextToPlayer(localPlayer, 0, 0, playerName[u.getOwner().getNumber()] + " lost the |cff57ff59Poison Gem|r.")
+        if u.hasItem(bloodGem)
+            DisplayTextToPlayer(localPlayer, 0, 0, u.getOwner().getColoredName() + " lost the |cffb90000Blood Gem|r.")
+        else if u.hasItem(skyGem)
+            DisplayTextToPlayer(localPlayer, 0, 0, u.getOwner().getColoredName() + " lost the |cff00e4ffSky Gem|r.")
+        else if u.hasItem(poisonGem)
+            DisplayTextToPlayer(localPlayer, 0, 0, u.getOwner().getColoredName() + " lost the |cff57ff59Poison Gem|r.")
     end)
 
     // Returning the gems
@@ -156,13 +159,13 @@ init
         ..registerRectEnterEventSource(Rects.gemObelisks)
         ..addAction(() -> begin
             let u = EventData.getEnteringUnit()
-            let blood = u.hasItemById(BLOOD_GEM)
-            let sky = u.hasItemById(SKY_GEM)
-            let poison = u.hasItemById(POISON_GEM)
+            let blood = u.hasItem(bloodGem)
+            let sky = u.hasItem(skyGem)
+            let poison = u.hasItem(poisonGem)
 
             if blood or sky or poison
                 let p = u.getOwner()
-                let i = p.getNumber()
+                let i = p.getId()
 
                 if hero[i].isAlive()
                     hero[i].flashEffect(Abilities.darkPortalTarget, "origin")
@@ -170,24 +173,27 @@ init
                 returnedGems++
 
                 if blood
-                    u.getItemById(BLOOD_GEM).remove()
+                    u.removeItem(bloodGem)
+                    bloodGem.setVisible(false)
                     theBloodGem.getDummy().show()
                     bloodGemBearer.add(p)
-                    DisplayTextToPlayer(localPlayer, 0, 0, playerName[i] + " returned the |cffb90000Blood Gem|r.")
+                    DisplayTextToPlayer(localPlayer, 0, 0, p.getColoredName() + " returned the |cffb90000Blood Gem|r.")
                     doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cffb90000Blood Gem Ability:|r When your hero kills another unit, it heals for 17% of that unit's maximum life."))
                 else if sky
                     skyGemRun.enable()
                     forUnitsOfPlayer(p, u2 -> u2.addBaseSpeed("skygem", 30.))
-                    u.getItemById(SKY_GEM).remove()
+                    u.removeItem(skyGem)
+                    skyGem.setVisible(false)
                     theSkyGem.getDummy().show()
                     skyGemBearer.add(p)
-                    DisplayTextToPlayer(localPlayer, 0, 0, playerName[i] + " returned the |cff00e4ffSky Gem|r.")
+                    DisplayTextToPlayer(localPlayer, 0, 0, p.getColoredName() + " returned the |cff00e4ffSky Gem|r.")
                     doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cff00e4ffSky Gem Ability:|r Your hero will be +30 speed and will have no obstruction in vision."))
                 else if poison
-                    u.getItemById(POISON_GEM).remove()
+                    u.removeItem(poisonGem)
+                    poisonGem.setVisible(false)
                     thePoisonGem.getDummy().show()
                     poisonGemBearer.add(p)
-                    DisplayTextToPlayer(localPlayer, 0, 0, playerName[i] + " returned the |cff57ff59Poison Gem|r.")
+                    DisplayTextToPlayer(localPlayer, 0, 0, p.getColoredName() + " returned the |cff57ff59Poison Gem|r.")
                     doAfter(2., () -> QuestMessageBJ(p.getForce(), bj_QUESTMESSAGE_ITEMACQUIRED, "|cff57ff59Poison Gem Ability:|r When your hero is attacked, whoever attacked will receive a poison effect (20 dps, 20% slow)."))
                 
                 if returnedGems == 3

@@ -15,7 +15,7 @@ init
         for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE - 1
             if botActived[i]
                 let p = players[i]
-                if hero[p.getNumber()] == null
+                if hero[p.getId()] == null
                     canPick.add(p)
 
                     unit hero = null

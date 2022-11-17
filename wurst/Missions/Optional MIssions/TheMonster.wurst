@@ -59,8 +59,9 @@ init
                         finish = 10
                     for i = start to finish
                         playerM(i)..addGold(500)..addLumber(5)
-                        if hero[i].isAlive()
-                            hero[i].flashEffect(Abilities.darkPortalTarget, "origin")
+                        let h = hero[playerM(i).getId()]
+                        if h.isAlive()
+                            h.flashEffect(Abilities.darkPortalTarget, "origin")
                     theMonsterQuest.complete(true)
                 end)
             else
@@ -79,7 +80,7 @@ init
                 createItem(MONSTER_HEAD, pos)
                 createItem('ankh', pos)
 
-                DisplayTextToPlayer(localPlayer, 0, 0, playerName[EventData.getKillingUnit().getOwner().getNumber()] + " was killed |cffffcc00The Monster|r")
+                DisplayTextToPlayer(localPlayer, 0, 0, EventData.getKillingUnit().getOwner().getColoredName() + " was killed |cffffcc00The Monster|r")
 
                 new Bounty()
                     ..setAmount(GetRandomInt(250, 310))
@@ -94,7 +95,7 @@ init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_PICKUP_ITEM, () -> begin
         if EventData.getManipulatedItem().getTypeId() == MONSTER_HEAD
             let p = EventData.getManipulatingUnit().getOwner()
-            DisplayTextToPlayer(localPlayer, 0, 0, colorId[THE_DRAENEI.has(p) ? 11 : 12] + p.getName() + "|r took the |cffffcc00Monster Head|r")
+            DisplayTextToPlayer(localPlayer, 0, 0, (THE_DRAENEI.has(p) ? PLAYER_COLORS[0] : PLAYER_COLORS[6]).toColorString() + p.getName() + "|r took the |cffffcc00Monster Head|r")
     end)
 
 @compiletime function gen()

@@ -34,7 +34,7 @@ public function enableRepick()
     if noRepick == null
         noRepick = DamageEvent.addListener(() -> begin
             if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
-                inCombat[DamageEvent.getTarget().getOwner().getNumber()] = 3
+                inCombat[DamageEvent.getTarget().getOwner().getId()] = 3
         end)
     reduce.enable()
 
@@ -47,7 +47,7 @@ public function disableRepick()
 
 public function repick(player p)
     if canRepick or yesOrYes
-        let i = p.getNumber()
+        let i = p.getId()
         let repick = hero[i]
 
         if repick != null

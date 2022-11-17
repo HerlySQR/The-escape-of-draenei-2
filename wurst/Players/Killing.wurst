@@ -28,17 +28,17 @@ init
 
             player p1 = null
             int k = 0
-            let d = p2.getNumber()
+            let d = p2.getId()
 
             if not noKiller
                 p1 = EventData.getKillingUnit().getOwner()
-                k = p1.getNumber()
+                k = p1.getId()
             
             deaths[d]++
             gameBoard.setItemValue(row[d], 3, deaths[d].toString())
             
             if noKiller
-                print(playerName[d] + " just died")
+                print(d.getColoredName() + " just died")
             else if p1.isEnemyOf(p2)
                 // Killed by an enemy
                 let oldSpree = spree[d]
@@ -58,10 +58,10 @@ init
 
                     if oldSpree >= 3
                         let extra = GetRandomInt(oldSpree * 40, oldSpree * 60)
-                        killingMsg += playerName[k] + " has ended the spree of |cffffcc00" + oldSpree.toString() + "|r of " + playerName[d] + " |cffffcc00(+" + extra.toString() + ")|r"
+                        killingMsg += k.getColoredName() + " has ended the spree of |cffffcc00" + oldSpree.toString() + "|r of " + d.getColoredName() + " |cffffcc00(+" + extra.toString() + ")|r"
                         p1.addGold(extra)
                     else
-                        killingMsg += playerName[k] + " killed " + playerName[d]
+                        killingMsg += k.getColoredName() + " killed " + d.getColoredName()
                     
                     var whoAssisted = ". Assists: "
                     var howMany = 0
@@ -70,7 +70,7 @@ init
                         if i != 6 and p1 != players[i]
                             let aKill = players[i].getNumber()
                             if assistTime[aKill].get(d) > 0
-                                whoAssisted += playerName[aKill] + "/"
+                                whoAssisted += aKill.getColoredName() + "/"
                                 assists[aKill]++
                                 gameBoard.setItemValue(row[aKill], 4, assists[aKill].toString())
                                 if whatMode[3] != ONLY_COMSUMIBLES
@@ -88,7 +88,7 @@ init
                     
                     if p1 != DRAENEI and p1 != DEMON
                         if spree[k] >= 3
-                            printTimed(playerName[k] + " has a spree of |cffffcc00" + spree[k].toString() + "|r", 4.)
+                            printTimed(k.getColoredName() + " has a spree of |cffffcc00" + spree[k].toString() + "|r", 4.)
                         let fk = firstKill[k] <= 0
                         let dk = doubleKill[k] <= 0
                         let tk = tripleKill[k] <= 0
@@ -98,29 +98,29 @@ init
                         else if not fk and dk and tk and uk
                             doubleKill[k] = 10
                             firstKill[k] = 0
-                            printTimed(playerName[k] + " just got a |cff00ffffDouble kill|r!", 4.)
+                            printTimed(k.getColoredName() + " just got a |cff00ffffDouble kill|r!", 4.)
                         else if fk and not dk and tk and uk
                             tripleKill[k] = 10
                             doubleKill[k] = 0
-                            printTimed(playerName[k] + " just got a |cff00ffffTriple kill|r!", 4.)
+                            printTimed(k.getColoredName() + " just got a |cff00ffffTriple kill|r!", 4.)
                         else if fk and dk and not tk and uk
                             ultraKill[k] = 10
                             tripleKill[k] = 0
-                            printTimed(playerName[k] + " just got a |cff00ffffUltra kill|r!", 4.)
+                            printTimed(k.getColoredName() + " just got a |cff00ffffUltra kill|r!", 4.)
                         else if fk and dk and tk and not uk
                             ultraKill[k] = 10
-                            printTimed(playerName[k] + " just got a |cff00ffffRampage|r!", 4.)
+                            printTimed(k.getColoredName() + " just got a |cff00ffffRampage|r!", 4.)
                 else
                     if GetKillingUnit() == theMonster
-                        printTimed(playerName[d] + " was killed by The Monster", 4.)
+                        printTimed(d.getColoredName() + " was killed by The Monster", 4.)
                     else
-                        printTimed(playerName[d] + " was killed by the Neutral Creeps", 4.)
+                        printTimed(d.getColoredName() + " was killed by the Neutral Creeps", 4.)
             else
                 // Killed by an ally
                 if p1 == p2
-                    printTimed(playerName[d] + " has killed himself.", 4.)
+                    printTimed(d.getColoredName() + " has killed himself.", 4.)
                 else
-                    printTimed(playerName[k] + " killed his teammate " + playerName[d], 4.)
+                    printTimed(k.getColoredName() + " killed his teammate " + d.getColoredName(), 4.)
     end)
 
     // Assist time
