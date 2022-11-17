@@ -2,7 +2,6 @@ package AISelectHero
 
 import AddBot
 import HeroSelection
-import PlayerData
 import ModeSelection
 import SelectionEvent
 
@@ -11,27 +10,25 @@ import ClosureTimers
 unit array lastSelected
 
 init
-    doPeriodically(1., cb -> begin
-        for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE - 1
-            if botActived[i]
-                let p = players[i]
-                if hero[p.getId()] == null
-                    canPick.add(p)
+    addBotAction(bot -> begin
+        if hero[bot] == null
+            let p = players[bot]
+            canPick.add(p)
 
-                    unit hero = null
-                    var random = 0
-                    for key in heroModel
-                        if not heroModel.get(key).isHidden()
-                            and (whatMode[4] == TRAITOR or heroModel.get(key).isAllyOf(p))
-                            and random < 25
+            unit hero = null
+            var random = 0
+            for key in heroModel
+                if not heroModel.get(key).isHidden()
+                    and (whatMode[4] == TRAITOR or heroModel.get(key).isAllyOf(p))
+                    and random < 25
 
-                            hero = heroModel.get(key)
-                            random = GetRandomInt(0, 100)
+                    hero = heroModel.get(key)
+                    random = GetRandomInt(0, 100)
 
-                    if hero != null
-                        runDeselectionEvent(p, lastSelected[i])
-                        lastSelected[i] = hero
-                        runSelectionEvent(p, hero)
-                        doAfter(0.25) ->
-                            runSelectionEvent(p, hero)
+            if hero != null
+                runDeselectionEvent(p, lastSelected[bot])
+                lastSelected[bot] = hero
+                runSelectionEvent(p, hero)
+                doAfter(0.25) ->
+                    runSelectionEvent(p, hero)
     end)

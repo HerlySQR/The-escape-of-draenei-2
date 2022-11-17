@@ -1,2 +1,21 @@
 package AIGoToAttack
 
+import AddBot
+import DrAndDeSpawn
+
+import Orders
+
+public bool array canAttack
+bool array isRetreating
+
+init
+    addBotAction(bot -> begin
+        let h = hero[bot]
+        if h.isAlive()
+            if canAttack[bot]
+                if h.getCurrentOrder() != Orders.attack
+                    h.issuePointOrderById(Orders.attack, (THE_DRAENEI.has(players[bot]) ? lastDrAttacker : lastDeAttacker).getPos())
+    end)
+    onBotHeroDie(bot -> begin
+        canAttack[bot] = true
+    end)

@@ -1,0 +1,36 @@
+package AIBuyItems
+
+import AddBot
+import Shops
+
+import ClosureForGroups
+import Reference
+import Orders
+
+bool array wannaBuy
+bool array goShopping
+
+let isShop = Filter(() -> GetFilterUnit().getTypeId() == MERCHANT)
+
+init
+    addBotAction(bot -> begin
+        let h = hero[bot]
+        if h.isAlive()
+            if wannaBuy[bot]
+                wannaBuy[bot] = false
+                let shop = new Reference<unit>(null)
+                forNearestUnit(h.getPos(), 2000., isShop, u -> begin
+                    shop.val = u
+                end)
+                let s = shop.into()
+                if s != null
+                    goShopping[bot] = true
+                    h.issuePointOrderById(Orders.move, s.getPos().polarOffset(s.getFacingAngle() - 45..asAngleDegrees(), 300.))
+            if goShopping[bot]
+                if h.getCurrentOrder() != Orders.move
+                    
+    end)
+
+    onBotHeroAppear(bot -> begin
+        wannaBuy[bot] = true
+    end)

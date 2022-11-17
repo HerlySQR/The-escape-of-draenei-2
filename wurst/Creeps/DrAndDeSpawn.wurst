@@ -19,6 +19,8 @@ import BountyController
 public boolean spawnRun = false
 
 public constant attackers = CreateGroup()
+public unit lastDrAttacker
+public unit lastDeAttacker
 public constant DRAENEI_WARRIOR = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
 public constant DRAENEI_MAGE = [compiletime(UNIT_ID_GEN.next()), compiletime(UNIT_ID_GEN.next())]
 
@@ -95,6 +97,7 @@ function createDr(int id)
     c.issuePointOrderById(Orders.attack, attackPoint1)
     drUnits.add(c)
     attackers.add(c)
+    lastDrAttacker = c
 
 function createDe(int id, vec2 pos, vec2 t)
     if deInMap > 15
@@ -105,6 +108,7 @@ function createDe(int id, vec2 pos, vec2 t)
     c.issuePointOrderById(Orders.attack, t)
     deUnits.add(c)
     attackers.add(c)
+    lastDeAttacker = c
 
 init
     // Create the towers

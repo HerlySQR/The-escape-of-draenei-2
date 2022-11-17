@@ -2,23 +2,86 @@ package AddBot
 
 import ChatEnter
 import initlater MyBoard
+import public PlayerData
 
-public boolean array botActived
+import ClosureTimers
+import LinkedList
+import RegisterEvents
+import OnUnitEnterLeave
+
+public force bots = CreateForce()
 
 public function player.isBot() returns boolean
-    return botActived[this.getId()]
+    return bots.has(this)
+
+public interface BotActions
+    function run(int bot)
+
+let actions = new LinkedList<BotActions>()
+let heroDie = new LinkedList<BotActions>()
+let heroAppear = new LinkedList<BotActions>()
+
+public function addBotAction(BotActions cb)
+    actions.add(cb)
+
+public function onBotHeroDie(BotActions cb)
+    heroDie.add(cb)
+
+public function onBotHeroAppear(BotActions cb)
+    heroAppear.add(cb)
+
+function player.makeAlly()
+    let f = THE_DRAENEI.has(this) ? THE_DRAENEI : THE_DEMONS
+    for i = 0 to PLAYER_NEUTRAL_AGGRESSIVE
+        if f.has(players[i])
+            this.setPlayerAlliance(players[i], ALLIANCE_SHARED_VISION, true)
+            players[i].setPlayerAlliance(this, ALLIANCE_SHARED_VISION, true)
 
 init
     onChatCommand("addbot", (p, extra) -> begin
         let id = extra.toInt()
         if id >= 0 and id < PLAYER_NEUTRAL_AGGRESSIVE
-            if not players[id].isIngame() and not botActived[id] and id != 0 and id != 6
-                botActived[id] = true
+            if not players[id].isIngame() and not bots.has(players[id]) and id != 0 and id != 6
+                bots.add(players[id])
                 players[id].setName("Bot " + extra)
+                players[id].makeAlly()
+                RemoveAllGuardPositions(players[id])
                 print("Added the bot: " + players[id].getName())
                 playersOrder()
             else
                 print("This slot is been used")
         else
             print("Invalid slot for a bot")
+    end)
+
+    doPeriodically(1., _ -> begin
+        bots.forEach(() -> begin
+            let bot = GetEnumPlayer().getId()
+            for cb in actions
+                cb.run(bot)
+        end)
+    end)
+
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_DEATH, () -> begin
+        let d = GetDyingUnit()
+        if d.isType(UNIT_TYPE_HERO) and bots.has(d)
+            let bot = d.getOwner().getId()
+            for cb in heroDie
+                cb.run(bot)
+    end)
+
+    registerPlayerUnitEvent(EVENT_PLAYER_HERO_REVIVE_FINISH, () -> begin
+        let r = GetRevivingUnit()
+        if bots.has(r)
+            let bot = r.getOwner().getId()
+            for cb in heroAppear
+                cb.run(bot)
+    end)
+
+    onEnter(() -> begin
+        let r = getEnterLeaveUnit()
+        if bots.has(r)
+            let bot = r.getOwner().getId()
+            for cb in heroAppear
+                cb.run(bot)
     end)
