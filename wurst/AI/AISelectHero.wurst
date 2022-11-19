@@ -5,8 +5,6 @@ import HeroSelection
 import ModeSelection
 import SelectionEvent
 
-import ClosureTimers
-
 unit array lastSelected
 
 init
@@ -20,7 +18,7 @@ init
             for key in heroModel
                 if not heroModel.get(key).isHidden()
                     and (whatMode[4] == TRAITOR or heroModel.get(key).isAllyOf(p))
-                    and random < 25
+                    and random < 50
 
                     hero = heroModel.get(key)
                     random = GetRandomInt(0, 100)

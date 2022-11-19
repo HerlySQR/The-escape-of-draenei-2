@@ -4,10 +4,12 @@ import ChatEnter
 import initlater MyBoard
 import public PlayerData
 
-import ClosureTimers
+import public ClosureTimers
 import LinkedList
 import RegisterEvents
 import OnUnitEnterLeave
+
+import public MotionSensor
 
 public force bots = CreateForce()
 
@@ -46,7 +48,7 @@ init
                 players[id].setName("Bot " + extra)
                 players[id].makeAlly()
                 RemoveAllGuardPositions(players[id])
-                print("Added the bot: " + players[id].getName())
+                print("Added the bot: " + players[id].getColoredName())
                 playersOrder()
             else
                 print("This slot is been used")
@@ -80,8 +82,9 @@ init
 
     onEnter(() -> begin
         let r = getEnterLeaveUnit()
-        if bots.has(r)
+        if bots.has(r) and r.isType(UNIT_TYPE_HERO)
             let bot = r.getOwner().getId()
             for cb in heroAppear
                 cb.run(bot)
+            MotionSensor.addUnit(r)
     end)

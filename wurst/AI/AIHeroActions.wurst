@@ -1,0 +1,135 @@
+package AIHeroActions
+
+import AddBot
+import DrAndDeSpawn
+import HeroSelection
+import ClosureForGroups
+import Shops
+
+import Orders
+import LastOrder
+
+// States
+bool array stunned
+bool array canAttack
+bool array isAttacking
+bool array isRetreating
+bool array wannaBuy
+bool array goShopping
+
+Order array lastOrders
+
+// Shops
+let merchants = CreateGroup()
+let armsMerchants = CreateGroup()
+let specialMerchants = CreateGroup()
+let recipeMerchants = CreateGroup()
+let bookStores = CreateGroup()
+
+function group.getNearbyShop(unit h) returns unit
+    let pos = h.getPos()
+    var d = REAL_MAX
+    unit shop = null
+
+    for u in this
+        let d2 = pos.distanceToSq(u.getPos())
+        if d2 < d
+            d = d2
+            shop = u
+    
+    return shop
+
+init
+    forUnitsOfPlayer(players[PLAYER_NEUTRAL_PASSIVE], u -> begin
+        switch u.getTypeId()
+            case MERCHANT
+                merchants.add(u)
+            case ARMS_MERCHANT
+                armsMerchants.add(u)
+            case SPECIAL_MERCHANT
+                specialMerchants.add(u)
+            case RECIPES_MERCHANT
+                recipeMerchants.add(u)
+            case BOOK_STORE
+                bookStores.add(u)
+    end)
+    
+    addBotAction(bot -> begin
+        let h = hero[bot]
+        if h.isAlive()
+            // Stunned
+            if h.hasAbility('BPSE') or h.hasAbility('BSTN') or h.isPaused()
+                if not stunned[bot]
+                    stunned[bot] = true
+                    lastOrders[bot] = h.getLastOrder()
+            else
+                if stunned[bot]
+                    stunned[bot] = false
+                    lastOrders[bot].issue()
+            
+            // Buy items
+            if wannaBuy[bot]
+                if not isAttacking[bot] and not goShopping[bot]
+                    let shop = merchants.getNearbyShop(h)
+                    h.issuePointOrderById(Orders.smart, shop.getPos().polarOffset(shop.getFacingAngle() + 45..asAngleDegrees(), 300.))
+                    goShopping[bot] = true
+                    isRetreating[bot] = false
+                    print("Enviado")
+                else
+                    if goShopping[bot]
+                        print("va " + (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart).toString())
+                        if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
+                            goShopping[bot] = false
+                            doAfter(3.) ->
+                                let shop = merchants.getNearbyShop(h)
+                                print(IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h))
+                                print(IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId()))
+                                wannaBuy[bot] = false
+                                canAttack[bot] = true
+                                isRetreating[bot] = h.getHPRatio() < 0.3
+            else
+                if isRetreating[bot]
+                    h.issuePointOrderById(Orders.attack, (THE_DRAENEI.has(h) ? actDrSpawn : actDeSpawn).getCenter())
+            
+            // Attack
+            if canAttack[bot]
+                if not isAttacking[bot] or (not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart) and h.getCurrentOrder() != Orders.attack)
+                    let target = (THE_DRAENEI.has(h) ? drUnits : deUnits).getRandom()
+                    if target != null
+                        h.issuePointOrderById(Orders.attack, target.getPos())
+                        isAttacking[bot] = true
+            if isAttacking[bot]
+                if h.getHPRatio() < 0.3
+                    h.issuePointOrderById(Orders.smart, (THE_DRAENEI.has(h) ? actDrSpawn : actDeSpawn).getCenter())
+                    canAttack[bot] = false
+                    isAttacking[bot] = false
+                    if not isRetreating[bot]
+                        isRetreating[bot] = true
+            if isRetreating[bot]
+                if h.getHPRatio() > 0.8
+                    isRetreating[bot] = false
+                    canAttack[bot] = true
+                else if not h.isMoving()
+                    wannaBuy[bot] = true
+
+    end)
+
+    /*onBotHeroDie(bot -> begin
+        canAttack[bot] = true
+    end)*/
+
+    onBotHeroAppear(bot -> begin
+        wannaBuy[bot] = true
+    end)
+
+/*
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_UNIT_ORDER)
+        ..addAction(() -> begin
+            if GetOrderedUnit().isType(UNIT_TYPE_STRUCTURE)
+                print(HEALING_SALVE.getNewId())
+                print(GetIssuedOrderId().toString())
+                //print(GetOrderedUnit().getName() + " " + GetIssuedOrderId().toString() + " " + GetOrderTargetUnit().getName() + " " + "\n")
+        end)
+*/

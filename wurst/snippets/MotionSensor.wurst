@@ -1,0 +1,139 @@
+package MotionSensor
+
+import LinkedList
+import ClosureTimers
+import ErrorHandling
+import UnitIndexer
+import OnUnitEnterLeave
+import Annotations
+
+/*
+    System based on MotionSensor v1.4.0 by AGD -- https://www.hiveworkshop.com/threads/system-motion-sensor.287219/
+
+    This simple system allows you to check if the current motion
+    a unit is stationary or in motion (This includes triggered
+    motion). You can also use this to get the instantaneous speed
+    of a unit and its direction of motion. This also allows you to
+    detect a change in motion event i.e. when either a unit in
+    motion stops or a stationary unit moves. Furthermore, the system
+    includes many other utilities regarding unit motion.
+*/
+
+//=========================== Configuration ===========================
+
+/**
+    Unit position check interval (Values greater than 0.03
+    causes a bit of inaccuracy in the given instantaneous
+    speed of a unit. As the value lowers, the accuracy
+    increases at the cost of performance.)
+*/
+@configurable constant PERIOD = 0.05
+
+/**
+    Set to true if you want the system to automatically
+    register units upon entering the map. Set to false if
+    you want to manually register units.
+*/
+@configurable constant AUTO_REGISTER_UNITS = false
+
+//======================= End of Configuration ========================
+//   Do not change anything below this line if you're not so sure on   
+//                         what you're doing.                          
+//=====================================================================
+
+public interface MotionCallback
+    function run(unit u)
+
+let startEvent = new LinkedList<MotionCallback>()
+let stopEvent = new LinkedList<MotionCallback>()
+let changeEvent = new LinkedList<MotionCallback>()
+
+public class MotionSensor
+    protected static MotionSensor array owner
+    private unit main
+    protected bool moving
+    protected real speed
+    protected angle direction
+    private vec2 delta
+    private vec2 prev
+    private CallbackPeriodic cb
+
+    /** Registers a unit to the system if is not registered */
+    static function addUnit(unit u)
+        if u == null
+            error("Attempt to register a null unit")
+        
+        let sensor = new MotionSensor()
+
+        owner[u.getIndex()] = sensor
+        sensor.main = u
+
+        sensor.cb = doPeriodically(PERIOD, _ -> begin
+            let prevState = sensor.moving
+            let pos = u.getPos()
+
+            sensor.delta = pos - sensor.prev
+            sensor.prev = pos
+            sensor.speed = sensor.delta.length() / PERIOD
+            sensor.direction = sensor.delta.getAngle()
+            sensor.moving = sensor.speed > 0
+
+            if prevState != sensor.moving
+                if sensor.moving
+                    for cb in startEvent
+                        cb.run(u)
+                else
+                    for cb in stopEvent
+                        cb.run(u)
+                for cb in changeEvent
+                    cb.run(u)
+        end)
+
+        // Initialize prevX and prevY for the newly registered unit to prevent it from causing a motion change event false positive
+        sensor.prev = u.getPos()
+    
+    /** Unregisters a unit to the system if is registered */
+    static function removeUnit(unit u)
+        if u == null
+            error("Attempt to unregister a null unit")
+        
+        let sensor = owner[u.getIndex()]
+        if sensor == null
+            return
+
+        destroy sensor
+    
+    ondestroy
+        owner[main.getIndex()] = null
+        main = null
+        moving = false
+        speed = 0
+        if cb != null
+            destroy cb
+            cb = null
+    
+    function getMain() returns unit
+        return main
+
+    function isMoving() returns bool
+        return moving
+
+    function getSpeed() returns real
+        return speed
+
+    function getDirection() returns angle
+        return direction
+
+public function unit.isMoving() returns bool
+    return MotionSensor.owner[this.getIndex()].isMoving()
+
+public function unit.getSpeed() returns real
+    return MotionSensor.owner[this.getIndex()].getSpeed()
+
+public function unit.getDirection() returns angle
+    return MotionSensor.owner[this.getIndex()].getDirection()
+
+init
+    if AUTO_REGISTER_UNITS
+        onEnter(() -> MotionSensor.addUnit(getEnterLeaveUnit()))
+    onLeave(() -> MotionSensor.removeUnit(getEnterLeaveUnit()))

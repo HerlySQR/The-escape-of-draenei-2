@@ -2,12 +2,12 @@ package Shops
 
 import Functions
 import ItemCreation
-import Merchant
-import SpecialMerchant
-import ArmsMerchant
-import RecipesMerchant
-import SecretMerchant
-import BookStore
+import public Merchant
+import public SpecialMerchant
+import public ArmsMerchant
+import public RecipesMerchant
+import public SecretMerchant
+import public BookStore
 import GeneratedValues
 import PlayerData
 import Reset
@@ -23,7 +23,7 @@ public constant RECIPES_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant SECRET_MERCHANT = compiletime(UNIT_ID_GEN.next())
 public constant BOOK_STORE = compiletime(UNIT_ID_GEN.next())
 
-let secretMerchant = createUnit(players[PLAYER_NEUTRAL_PASSIVE], SECRET_MERCHANT, Rects.secretMerchant.getCenter(), 180..fromDeg())
+public constant secretMerchant = createUnit(players[PLAYER_NEUTRAL_PASSIVE], SECRET_MERCHANT, Rects.secretMerchant.getCenter(), 180..fromDeg())
 
 function addItemToStock(ItemDefinition m, int maxStock)
     AddItemToStock(secretMerchant, (m instanceof Recipe) ? (m castTo Recipe).getDummyItem() : m.getNewId(), 1, maxStock)
@@ -276,8 +276,8 @@ function BuildingDefinition.defaultSettings()
         ..setPropulsionWindowdegrees(30.)
         ..setNormalAbilities(
         commaList(
-            'Ane2',
             AbilityIds.neutralBuildinganyunit,
+            AbilityIds.selectHero,
             AbilityIds.invulnerable,
             AbilityIds.shopSharingAlliedBldg,
             AbilityIds.shopPurchaseItem,

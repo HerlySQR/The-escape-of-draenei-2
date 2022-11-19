@@ -1642,7 +1642,7 @@ init
         ..setAttack1Range(550)
         ..setAttack1Animation(0.4, 0.77)
         ..setAttack1ProjectileArc(0.15)
-        ..setAttack1Damage(55, 6, 5)
+        ..setAttack1Damage(50, 5, 5)
         ..setAttack1DamageFactor(0., 0.)
         ..setAttack1ProjectileArt(Abilities.lavaSpawnMissile)
         ..setAttack1CooldownTime(1.8)
