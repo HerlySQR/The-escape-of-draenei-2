@@ -1,0 +1,391 @@
+package SkillBuild
+
+import HeroType
+import HeroSpells
+
+import LinkedList
+
+public class SkillBuild
+    private LinkedList<int> skills
+    
+    construct(int typ)
+        skills = new LinkedList<int>()
+
+        switch typ
+            case DEMOLISHER.getL()
+                skills.add(
+                    STALWART_THUMP_L,
+                    BOILING_OIL_L,
+                    STALWART_THUMP_L,
+                    ADVANCED_ENGINEERING_L,
+                    STALWART_THUMP_L,
+                    FIRE_BALL_L,
+                    STALWART_THUMP_L,
+                    BOILING_OIL_L,
+                    ADVANCED_ENGINEERING_L,
+                    BOILING_OIL_L,
+                    ADVANCED_ENGINEERING_L,
+                    FIRE_BALL_L,
+                    BOILING_OIL_L,
+                    ADVANCED_ENGINEERING_L)
+            case DARK_ASSASSIN.getL()
+                skills.add(
+                    THROW_AXES_L,
+                    ENSNARE_L,
+                    THROW_AXES_L,
+                    MACE_L,
+                    THROW_AXES_L,
+                    TRACK_L,
+                    THROW_AXES_L,
+                    ENSNARE_L,
+                    MACE_L,
+                    ENSNARE_L,
+                    MACE_L,
+                    TRACK_L,
+                    ENSNARE_L,
+                    MACE_L)
+            case ELDER_SAGE.getL()
+                skills.add(
+                    LIGTHNING_SHOT_L,
+                    STEALTH_L,
+                    LIGTHNING_SHOT_L,
+                    SLOW_POISON_L,
+                    LIGTHNING_SHOT_L,
+                    REENCARNATION_L,
+                    LIGTHNING_SHOT_L,
+                    STEALTH_L,
+                    SLOW_POISON_L,
+                    STEALTH_L,
+                    SLOW_POISON_L,
+                    REENCARNATION_L,
+                    STEALTH_L,
+                    SLOW_POISON_L)
+            case SEER.getL()
+                skills.add(
+                    HOLY_LIGHT_L,
+                    BRILLIANCE_AURA_L,
+                    HOLY_LIGHT_L,
+                    INNER_FIRE_L,
+                    HOLY_LIGHT_L,
+                    PURGE_SOUL_L,
+                    HOLY_LIGHT_L,
+                    BRILLIANCE_AURA_L,
+                    INNER_FIRE_L,
+                    BRILLIANCE_AURA_L,
+                    INNER_FIRE_L,
+                    PURGE_SOUL_L,
+                    BRILLIANCE_AURA_L,
+                    INNER_FIRE_L)
+            case HERALD.getL()
+                skills.add(
+                    FLAME_STRIKE_L,
+                    FIRE_RAY_L,
+                    FLAME_STRIKE_L,
+                    LIQUID_FIRE_ACT_L,
+                    FLAME_STRIKE_L,
+                    BURN_SOUL_L,
+                    FLAME_STRIKE_L,
+                    FIRE_RAY_L,
+                    LIQUID_FIRE_ACT_L,
+                    FIRE_RAY_L,
+                    LIQUID_FIRE_ACT_L,
+                    BURN_SOUL_L,
+                    FIRE_RAY_L,
+                    LIQUID_FIRE_ACT_L)
+            case SALAMANDER.getL()
+                skills.add(
+                    BREATH_OF_FIRE_L,
+                    THUNDER_CLAP_L,
+                    BREATH_OF_FIRE_L,
+                    LIZZARD_SCALES_L,
+                    BREATH_OF_FIRE_L,
+                    FERAL_RAMPAGE_L,
+                    BREATH_OF_FIRE_L,
+                    THUNDER_CLAP_L,
+                    LIZZARD_SCALES_L,
+                    THUNDER_CLAP_L,
+                    LIZZARD_SCALES_L,
+                    FERAL_RAMPAGE_L,
+                    THUNDER_CLAP_L,
+                    LIZZARD_SCALES_L)
+            case SPIRIT_WOLF.getL()
+                skills.add(
+                    TERRORIZING_HOWL_L,
+                    CRITICAL_STRIKE_L,
+                    TERRORIZING_HOWL_L,
+                    TRANSSITION_L,
+                    TERRORIZING_HOWL_L,
+                    WILD_ATTACK_L,
+                    TERRORIZING_HOWL_L,
+                    CRITICAL_STRIKE_L,
+                    TRANSSITION_L,
+                    CRITICAL_STRIKE_L,
+                    TRANSSITION_L,
+                    WILD_ATTACK_L,
+                    CRITICAL_STRIKE_L,
+                    TRANSSITION_L)
+            case ANCHORITE.getL()
+                skills.add(
+                    SUMMON_WATER_ELEMENTAL_L,
+                    EARTHQUAKE_L,
+                    SUMMON_WATER_ELEMENTAL_L,
+                    MANA_FLARE_L,
+                    SUMMON_WATER_ELEMENTAL_L,
+                    MONSOON_L,
+                    SUMMON_WATER_ELEMENTAL_L,
+                    EARTHQUAKE_L,
+                    MANA_FLARE_L,
+                    EARTHQUAKE_L,
+                    MANA_FLARE_L,
+                    MONSOON_L,
+                    EARTHQUAKE_L,
+                    MANA_FLARE_L)
+            case VINDICATOR.getL()
+                skills.add(
+                    THUNDER_STORM_L,
+                    HAMMER_CRUSH_L,
+                    THUNDER_STORM_L,
+                    DEGENERATION_AURA_L,
+                    THUNDER_STORM_L,
+                    STEAL_SPELL_L,
+                    THUNDER_STORM_L,
+                    HAMMER_CRUSH_L,
+                    DEGENERATION_AURA_L,
+                    HAMMER_CRUSH_L,
+                    DEGENERATION_AURA_L,
+                    STEAL_SPELL_L,
+                    HAMMER_CRUSH_L,
+                    DEGENERATION_AURA_L)
+            case ZEALOT.getL()
+                skills.add(
+                    SWORD_DANCE_L,
+                    CHARGE_L,
+                    SWORD_DANCE_L,
+                    CREED_L,
+                    SWORD_DANCE_L,
+                    DISABLE_SPHERE_L,
+                    SWORD_DANCE_L,
+                    CHARGE_L,
+                    CREED_L,
+                    CHARGE_L,
+                    CREED_L,
+                    DISABLE_SPHERE_L,
+                    CHARGE_L,
+                    CREED_L)
+            case PROPHET.getL()
+                skills.add(
+                    PULSE_NOVA_L,
+                    QUELL_L,
+                    PULSE_NOVA_L,
+                    QUELL_L,
+                    PULSE_NOVA_L,
+                    POWER_OF_LIGHT_L,
+                    RETRIBUTION_L,
+                    PULSE_NOVA_L,
+                    RETRIBUTION_L,
+                    QUELL_L,
+                    RETRIBUTION_L,
+                    POWER_OF_LIGHT_L,
+                    QUELL_L,
+                    RETRIBUTION_L)
+            case BLOOD_DEMON.getL()
+                skills.add(
+                    THUNDER_BOLT_L,
+                    BERSERK_L,
+                    THUNDER_BOLT_L,
+                    CRITICAL_STRIKE_L,
+                    BERSERK_L,
+                    GRAND_AVATAR_L,
+                    CRITICAL_STRIKE_L,
+                    THUNDER_BOLT_L,
+                    CRITICAL_STRIKE_L,
+                    BERSERK_L,
+                    CRITICAL_STRIKE_L,
+                    GRAND_AVATAR_L,
+                    BERSERK_L,
+                    THUNDER_BOLT_L)
+            case CACIQUE.getL()
+                skills.add(
+                    FAST_CUT_L,
+                    ESSENCE_OF_CELERITY_L,
+                    FAST_CUT_L,
+                    CLEAVE_ATTACK_L,
+                    ESSENCE_OF_CELERITY_L,
+                    INSTILL_FEAR_L,
+                    CLEAVE_ATTACK_L,
+                    FAST_CUT_L,
+                    CLEAVE_ATTACK_L,
+                    ESSENCE_OF_CELERITY_L,
+                    CLEAVE_ATTACK_L,
+                    INSTILL_FEAR_L,
+                    ESSENCE_OF_CELERITY_L,
+                    FAST_CUT_L)
+            case DARK_SPECTRE.getL()
+                skills.add(
+                    LIGHTNING_SKIRT_L,
+                    INTANGIBILITY_L,
+                    LIGHTNING_SKIRT_L,
+                    DARK_SUMMONING_L,
+                    LIGHTNING_SKIRT_L,
+                    VORTEX_L,
+                    LIGHTNING_SKIRT_L,
+                    INTANGIBILITY_L,
+                    DARK_SUMMONING_L,
+                    INTANGIBILITY_L,
+                    DARK_SUMMONING_L,
+                    VORTEX_L,
+                    INTANGIBILITY_L,
+                    DARK_SUMMONING_L)
+            case DOOM_GUARD.getL()
+                skills.add(
+                    SURGING_FURY_L,
+                    STOMP_L,
+                    SURGING_FURY_L,
+                    DEMONIC_ARMOR_L,
+                    SURGING_FURY_L,
+                    CRYING_SOULS_L,
+                    SURGING_FURY_L,
+                    STOMP_L,
+                    DEMONIC_ARMOR_L,
+                    STOMP_L,
+                    DEMONIC_ARMOR_L,
+                    CRYING_SOULS_L,
+                    STOMP_L,
+                    DEMONIC_ARMOR_L)
+            case ERECT_SORCERER.getL()
+                skills.add(
+                    FINGER_OF_DEATH_L,
+                    UNHOLY_FRENZY_L,
+                    FINGER_OF_DEATH_L,
+                    CRIPPLE_L,
+                    FINGER_OF_DEATH_L,
+                    DEMONIC_RAIN_L,
+                    FINGER_OF_DEATH_L,
+                    UNHOLY_FRENZY_L,
+                    CRIPPLE_L,
+                    UNHOLY_FRENZY_L,
+                    CRIPPLE_L,
+                    DEMONIC_RAIN_L,
+                    UNHOLY_FRENZY_L,
+                    CRIPPLE_L)
+            case INFERNAL_MACHINE.getL()
+                skills.add(
+                    INFERNO_L,
+                    BREATH_OF_FIRE_L,
+                    INFERNO_L,
+                    HARDENED_SKIN_L,
+                    INFERNO_L,
+                    EXPLOSIVE_FLARES_L,
+                    INFERNO_L,
+                    BREATH_OF_FIRE_L,
+                    HARDENED_SKIN_L,
+                    BREATH_OF_FIRE_L,
+                    HARDENED_SKIN_L,
+                    EXPLOSIVE_FLARES_L,
+                    BREATH_OF_FIRE_L,
+                    HARDENED_SKIN_L)
+            case MAIDEN_OF_PAIN.getL()
+                skills.add(
+                    CARRION_SWARM_L,
+                    ESSENCE_OF_CELERITY_L,
+                    CARRION_SWARM_L,
+                    SHADOW_STRIKE_L,
+                    ESSENCE_OF_CELERITY_L,
+                    ILLUSION_L,
+                    SHADOW_STRIKE_L,
+                    CARRION_SWARM_L,
+                    SHADOW_STRIKE_L,
+                    ESSENCE_OF_CELERITY_L,
+                    SHADOW_STRIKE_L,
+                    ILLUSION_L,
+                    ESSENCE_OF_CELERITY_L,
+                    CARRION_SWARM_L)
+            case TEMPTING_MALEFICENT.getL()
+                skills.add(
+                    FAN_OF_KNIVES_L,
+                    DEATH_COIL_L,
+                    FAN_OF_KNIVES_L,
+                    EVASION_L,
+                    DEATH_COIL_L,
+                    SLASH_FURY_L,
+                    EVASION_L,
+                    FAN_OF_KNIVES_L,
+                    EVASION_L,
+                    DEATH_COIL_L,
+                    EVASION_L,
+                    SLASH_FURY_L,
+                    DEATH_COIL_L,
+                    FAN_OF_KNIVES_L)
+            case PIT_LORD.getL()
+                skills.add(
+                    RAIN_OF_FIRE_L,
+                    DARK_BLOOD_L,
+                    RAIN_OF_FIRE_L,
+                    DARK_BLOOD_L,
+                    RAIN_OF_FIRE_L,
+                    RIPLE_L,
+                    HOWL_OF_TERROR_L,
+                    RAIN_OF_FIRE_L,
+                    HOWL_OF_TERROR_L,
+                    DARK_BLOOD_L,
+                    HOWL_OF_TERROR_L,
+                    RIPLE_L,
+                    DARK_BLOOD_L,
+                    HOWL_OF_TERROR_L)
+            case DARK_WIZARD.getL()
+                skills.add(
+                    SPARKY_EXPLOSIONS_L,
+                    PORTAL_L,
+                    SPARKY_EXPLOSIONS_L,
+                    MAGIC_CHAINS_PULL_L,
+                    PORTAL_L,
+                    TOTAL_FREEZE_L,
+                    MAGIC_CHAINS_PULL_L,
+                    SPARKY_EXPLOSIONS_L,
+                    MAGIC_CHAINS_PULL_L,
+                    PORTAL_L,
+                    MAGIC_CHAINS_PULL_L,
+                    TOTAL_FREEZE_L,
+                    PORTAL_L,
+                    SPARKY_EXPLOSIONS_L)
+            case AXEMASTER.getL()
+                skills.add(
+                    WHIRLWIND_L,
+                    FIRE_IMPACT_L,
+                    WHIRLWIND_L,
+                    COMMAND_L,
+                    FIRE_IMPACT_L,
+                    AXE_OF_DESTRUCTION_L,
+                    COMMAND_L,
+                    WHIRLWIND_L,
+                    COMMAND_L,
+                    FIRE_IMPACT_L,
+                    COMMAND_L,
+                    AXE_OF_DESTRUCTION_L,
+                    FIRE_IMPACT_L,
+                    WHIRLWIND_L)
+            case LAVA_ELEMENTAL.getL()
+                skills.add(
+                    FIRE_BLAST_L,
+                    INCINERATE_L,
+                    FIRE_BLAST_L,
+                    SCORCHING_HEAT_L,
+                    INCINERATE_L,
+                    FIRE_STORM_L,
+                    SCORCHING_HEAT_L,
+                    FIRE_BLAST_L,
+                    SCORCHING_HEAT_L,
+                    INCINERATE_L,
+                    SCORCHING_HEAT_L,
+                    FIRE_STORM_L,
+                    INCINERATE_L,
+                    FIRE_BLAST_L)
+        
+        for i = 1 to 5
+            skills.add(ATTRIBUTE_BONUS)
+    
+    function get() returns int
+        return skills.dequeue()
+    
+    ondestroy
+        destroy skills

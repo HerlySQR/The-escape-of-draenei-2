@@ -63,7 +63,8 @@ public class HeroType
     protected HeroDefinition heroL
     private string icon
     private Race r
-    private string abilities = commaList(MORE_ABILITIES.toRawCode(), "AInv")
+    private string normalAbilities = commaList(MORE_ABILITIES.toRawCode(), "AInv")
+    private string heroAbilities = commaList(ATTRIBUTE_BONUS)
 
     construct(int origId)
         MAX++
@@ -371,22 +372,29 @@ public class HeroType
         heroL.setTurnRate(data)
 
     function setExtraAbility(int data)
-        abilities = commaList(abilities, data.toRawCode())
+        normalAbilities = commaList(normalAbilities, data.toRawCode())
     
     function setNormalAbilities(vararg int datas)
         let dataList = new LinkedList<string>()
         for data in datas
             dataList.add(data.toRawCode())
-        heroL.setNormalAbilities(abilities)
-        abilities = commaList(abilities, commaList(dataList))
-        heroNL.setNormalAbilities(abilities)
+        heroL.setNormalAbilities(normalAbilities)
+        normalAbilities = commaList(normalAbilities, commaList(dataList))
+        heroNL.setNormalAbilities(normalAbilities)
     
+    function getNormalAbilities() returns string
+        return normalAbilities
+
     function setHeroAbilities(vararg int datas)
         let dataList = new LinkedList<string>()
         for data in datas
             dataList.add(data.toRawCode())
-        heroL.setHeroAbilities(commaList(dataList))
+        heroAbilities = commaList(heroAbilities, commaList(dataList))
+        heroL.setHeroAbilities(heroAbilities)
         heroNL.setHeroAbilities("")
+    
+    function getHeroAbilities() returns string
+        return heroAbilities
     
     function setCollisionSize(real data)
         heroNL.setCollisionSize(data)

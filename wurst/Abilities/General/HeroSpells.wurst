@@ -1,6 +1,7 @@
 package HeroSpells
 
 import public AdvancedEngineering
+import public AttributeBonus
 import public AxeOfDestruction
 import public Berserk
 import public BoilingOil

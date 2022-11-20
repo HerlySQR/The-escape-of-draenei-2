@@ -38,6 +38,7 @@ public function AbilityDefinition.setHotkey(string data)
     if data == "F"
         this.presetButtonPosNormal(2, 1)
         this.presetButtonPosTurnOff(2, 1)
+        this.presetButtonPosResearch(3, 1)
     else if data == "D"
         this.presetButtonPosNormal(1, 1)
         this.presetButtonPosTurnOff(1, 1)

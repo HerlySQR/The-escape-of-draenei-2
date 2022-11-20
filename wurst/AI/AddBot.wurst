@@ -22,6 +22,7 @@ public interface BotActions
 let actions = new LinkedList<BotActions>()
 let heroDie = new LinkedList<BotActions>()
 let heroAppear = new LinkedList<BotActions>()
+let heroDisappear = new LinkedList<BotActions>()
 
 public function addBotAction(BotActions cb)
     actions.add(cb)
@@ -31,6 +32,9 @@ public function onBotHeroDie(BotActions cb)
 
 public function onBotHeroAppear(BotActions cb)
     heroAppear.add(cb)
+
+public function onBotHeroDisappear(BotActions cb)
+    heroDisappear.add(cb)
 
 function player.makeAlly()
     let f = THE_DRAENEI.has(this) ? THE_DRAENEI : THE_DEMONS
@@ -82,9 +86,19 @@ init
 
     onEnter(() -> begin
         let r = getEnterLeaveUnit()
-        if bots.has(r) and r.isType(UNIT_TYPE_HERO)
-            let bot = r.getOwner().getId()
-            for cb in heroAppear
-                cb.run(bot)
-            MotionSensor.addUnit(r)
+        nullTimer() -> // Wait to set the hero variable
+            if bots.has(r) and r.isType(UNIT_TYPE_HERO)
+                let bot = r.getOwner().getId()
+                for cb in heroAppear
+                    cb.run(bot)
+                MotionSensor.addUnit(r)
+    end)
+
+    onLeave(() -> begin
+        let r = getEnterLeaveUnit()
+        nullTimer() -> // Wait to set the hero variable
+            if bots.has(r) and r.isType(UNIT_TYPE_HERO)
+                let bot = r.getOwner().getId()
+                for cb in heroDisappear
+                    cb.run(bot)
     end)

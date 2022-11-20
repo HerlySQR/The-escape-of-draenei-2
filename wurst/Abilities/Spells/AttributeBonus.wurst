@@ -1,0 +1,18 @@
+package AttributeBonus
+
+import AbilityData
+
+public constant ATTRIBUTE_BONUS = compiletime(ABIL_ID_GEN.next())
+
+@compiletime function gen()
+    new AbilityDefinitionAttributeModifierSkill(ATTRIBUTE_BONUS)
+        ..registerTooltipGenerator(new AbilityTooltipGenerator(Targettype.PASSIVE, "Every level adds +2 to all atributes."))
+        ..presetHideButton(lvl -> true)
+        ..presetLevels(5)
+        ..tooltipStartListen()
+        ..setHotkey("F")
+        ..presetAgilityBonus(lvl -> lvl*2)
+        ..presetStrengthBonus(lvl -> lvl*2)
+        ..presetIntelligenceBonus(lvl -> lvl*2)
+        ..setName("Attribute Bonus")
+        ..tooltipStopListen()

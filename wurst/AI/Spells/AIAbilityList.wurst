@@ -1,0 +1,100 @@
+package AIAbilityList
+
+import AddBot
+import public HeroSpells
+import public ExtraSpells
+import HeroType
+import ModeSelection
+import SkillBuild
+
+import LinkedList
+import HashSet
+import HashMap
+import ObjectIds
+
+let passives = new HashSet<int>()
+
+public function int.isPassiveAbility() returns bool
+    return passives.has(this)
+
+public interface AbilityActions
+    function check(unit caster)
+
+let abilityActions = new HashMap<int, AbilityActions>()
+
+public function setAbilityActions(int spell, AbilityActions cb)
+    abilityActions.put(spell, cb)
+
+/** The inverse of commaList. */
+function string.toAbilityList() returns LinkedList<int>
+    let len = this.length()
+    var start = 0
+    let list = new LinkedList<int>()
+
+    while start < len
+        var index = this.indexOf(",", start)
+        if index == -1
+            index = len + 1
+        
+        list.add(this.substring(start, index).fromRawCode())
+        
+        start = index + 1
+    
+    return list
+
+LinkedList<int> array normalAbilityLists
+LinkedList<int> array heroAbilityLists
+
+SkillBuild array skillBuilds
+
+init
+    addBotAction(bot -> begin
+        let h = hero[bot]
+        if h.isAlive()
+            for spell in normalAbilityLists[bot]
+                let cb = abilityActions.get(spell)
+                if cb != null
+                    cb.check(h)
+            if whatMode[5] == LEVELING
+                for spell in heroAbilityLists[bot]
+                    let cb = abilityActions.get(spell)
+                    if cb != null
+                        cb.check(h)
+                if h.getSkillPoints() > 1
+                    h.selectSkill(skillBuilds[bot].get())
+    end)
+
+    onBotHeroAppear(bot -> begin
+        normalAbilityLists[bot] = HeroType.get(hero[bot]).getNormalAbilities().toAbilityList()
+        heroAbilityLists[bot] = HeroType.get(hero[bot]).getHeroAbilities().toAbilityList()
+
+        if whatMode[5] == LEVELING
+            skillBuilds[bot] = new SkillBuild(hero[bot].getTypeId())
+    end)
+
+    onBotHeroDisappear(bot -> begin
+        destroy normalAbilityLists[bot]
+        normalAbilityLists[bot] = null
+        destroy heroAbilityLists[bot]
+        heroAbilityLists[bot] = null
+        
+        destroy skillBuilds[bot]
+        skillBuilds[bot] = null
+    end)
+
+    passives.add(ADVANCED_ENGINEERING_NL, ADVANCED_ENGINEERING_L)
+    passives.add(BOILING_OIL_NL, BOILING_OIL_L)
+    passives.add(BRILLIANCE_AURA_NL, BRILLIANCE_AURA_L)
+    passives.add(CLEAVE_ATTACK_NL, CLEAVE_ATTACK_L)
+    passives.add(COMMAND_NL, COMMAND_L)
+    passives.add(CRITICAL_STRIKE_NL, CRITICAL_STRIKE_L)
+    passives.add(DARK_BLOOD_NL, DARK_BLOOD_L)
+    passives.add(DEGENERATION_AURA_NL, DEGENERATION_AURA_L)
+    passives.add(DEMONIC_ARMOR_NL, DEMONIC_ARMOR_L)
+    passives.add(EVASION_NL, EVASION_L)
+    passives.add(HARDENED_SKIN_NL, HARDENED_SKIN_L)
+    passives.add(LIQUID_FIRE_PAS_NL, LIQUID_FIRE_PAS_L)
+    passives.add(REENCARNATION_NL, REENCARNATION_L)
+    passives.add(SCORCHING_HEAT_NL, SCORCHING_HEAT_L)
+    passives.add(SLOW_POISON_NL, SLOW_POISON_L)
+    passives.add(UNHOLY_AURA, VAMPIRIC_AURA)
