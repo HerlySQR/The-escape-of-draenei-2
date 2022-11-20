@@ -28,5 +28,6 @@ init
                 lastSelected[bot] = hero
                 runSelectionEvent(p, hero)
                 doAfter(0.25) ->
-                    runSelectionEvent(p, hero)
+                    if not hero.isHidden()
+                        runSelectionEvent(p, hero)
     end)

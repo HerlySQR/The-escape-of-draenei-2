@@ -8,6 +8,7 @@ import Shops
 
 import Orders
 import LastOrder
+import Reference
 
 // States
 bool array stunned
@@ -17,6 +18,7 @@ bool array isRetreating
 bool array wannaBuy
 bool array goShopping
 
+unit array targetUnit
 Order array lastOrders
 
 // Shops
@@ -74,44 +76,52 @@ init
                     h.issuePointOrderById(Orders.smart, shop.getPos().polarOffset(shop.getFacingAngle() + 45..asAngleDegrees(), 300.))
                     goShopping[bot] = true
                     isRetreating[bot] = false
-                    print("Enviado")
                 else
                     if goShopping[bot]
-                        print("va " + (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart).toString())
-                        if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
-                            goShopping[bot] = false
-                            doAfter(3.) ->
-                                let shop = merchants.getNearbyShop(h)
-                                print(IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h))
-                                print(IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId()))
-                                wannaBuy[bot] = false
-                                canAttack[bot] = true
-                                isRetreating[bot] = h.getHPRatio() < 0.3
-            else
-                if isRetreating[bot]
-                    h.issuePointOrderById(Orders.attack, (THE_DRAENEI.has(h) ? actDrSpawn : actDeSpawn).getCenter())
+                        nullTimer() ->
+                            if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
+                                doAfter(3.) ->
+                                    let shop = merchants.getNearbyShop(h)
+                                    print(IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h))
+                                    print(IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId()))
+                                    wannaBuy[bot] = false
+                                    canAttack[bot] = true
+                                    isRetreating[bot] = h.getHPRatio() < 0.3
+                    goShopping[bot] = false
             
             // Attack
             if canAttack[bot]
-                if not isAttacking[bot] or (not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart) and h.getCurrentOrder() != Orders.attack)
+                if not isRetreating[bot]
+                    and (not isAttacking[bot]
+                    or (not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
+                    and h.getCurrentOrder() != Orders.attack))
+
                     let target = (THE_DRAENEI.has(h) ? drUnits : deUnits).getRandom()
                     if target != null
-                        h.issuePointOrderById(Orders.attack, target.getPos())
+                        h.issueTargetOrderById(Orders.patrol, target)
+                        targetUnit[bot] = target
                         isAttacking[bot] = true
             if isAttacking[bot]
-                if h.getHPRatio() < 0.3
-                    h.issuePointOrderById(Orders.smart, (THE_DRAENEI.has(h) ? actDrSpawn : actDeSpawn).getCenter())
+                if h.getHPRatio() < 0.35
                     canAttack[bot] = false
                     isAttacking[bot] = false
-                    if not isRetreating[bot]
-                        isRetreating[bot] = true
+                    isRetreating[bot] = true
+                else
+                    if h.getCurrentOrder() != Orders.attack
+                        let enemy = new Reference<unit>(null)
+                        forUnitsInRange(h.getPos(), 500., u -> begin
+                            if h.isEnemyOf(u.getOwner()) and u.isAlive()
+                                enemy.val = u
+                        end)
+                        if enemy.into() != null
+                            h.issuePointOrderById(Orders.attack, targetUnit[bot].getPos())
             if isRetreating[bot]
+                h.issuePointOrderById(Orders.smart, (THE_DRAENEI.has(h) ? actDrSpawn : actDeSpawn).getCenter())
                 if h.getHPRatio() > 0.8
                     isRetreating[bot] = false
                     canAttack[bot] = true
-                else if not h.isMoving()
+                else if (THE_DRAENEI.has(h) and actDrSpawn.contains(h.getPos())) or actDeSpawn.contains(h.getPos())
                     wannaBuy[bot] = true
-
     end)
 
     /*onBotHeroDie(bot -> begin
