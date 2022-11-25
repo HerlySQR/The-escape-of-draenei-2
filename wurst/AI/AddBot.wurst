@@ -43,22 +43,32 @@ function player.makeAlly()
             this.setPlayerAlliance(players[i], ALLIANCE_SHARED_VISION, true)
             players[i].setPlayerAlliance(this, ALLIANCE_SHARED_VISION, true)
 
+function addBot(player p)
+    bots.add(p)
+    p.setName("Bot " + p.getId().toString())
+    p.makeAlly()
+    RemoveAllGuardPositions(p)
+    playersOrder()
+
 init
     onChatCommand("addbot", (p, extra) -> begin
         let id = extra.toInt()
         if id >= 0 and id < PLAYER_NEUTRAL_AGGRESSIVE
             if not players[id].isIngame() and not bots.has(players[id]) and id != 0 and id != 6
-                bots.add(players[id])
-                players[id].setName("Bot " + extra)
-                players[id].makeAlly()
-                RemoveAllGuardPositions(players[id])
+                addBot(players[id])
                 print("Added the bot: " + players[id].getColoredName())
-                playersOrder()
             else
                 print("This slot is been used")
         else
             print("Invalid slot for a bot")
     end)
+
+    nullTimer() -> 
+        for i = 1 to 5
+            if playerM(i).getController() == MAP_CONTROL_COMPUTER
+                addBot(playerM(i))
+            if playerM(i+5).getController() == MAP_CONTROL_COMPUTER
+                addBot(playerM(i+5))
 
     doPeriodically(1., _ -> begin
         bots.forEach(() -> begin

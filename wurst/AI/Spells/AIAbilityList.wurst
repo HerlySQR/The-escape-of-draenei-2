@@ -60,7 +60,7 @@ init
                     let cb = abilityActions.get(spell)
                     if cb != null
                         cb.check(h)
-                if h.getSkillPoints() > 1
+                if h.getSkillPoints() > 0
                     h.selectSkill(skillBuilds[bot].get())
     end)
 

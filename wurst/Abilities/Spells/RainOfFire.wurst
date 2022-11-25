@@ -109,6 +109,7 @@ function ChannelAbilityPreset.general()
         ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
         ..presetDamagePerSecond(lvl -> lvl < 3 ? DMG_PER_SEC_NL[lvl-1] : DMG_PER_SEC_L[lvl-3])
         ..presetNumberofWaves(lvl -> 5)
+        ..presetMaximumDamageperWave(lvl -> 300.)
         ..presetNumberofShards(lvl -> begin
             int value
             if lvl == 1

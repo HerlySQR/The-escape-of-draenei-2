@@ -255,8 +255,8 @@ init
         ..setIconNormal(Icons.bTNDustOfAppearance)
         ..setButtonPositionNormalX(0)
         ..setButtonPositionNormalY(1)
-        ..setHotkeyNormal("A")
-        ..setTooltipNormal(1, "[|cffffcc00A|r] Select backpack")
+        ..setHotkeyNormal("R")
+        ..setTooltipNormal(1, "[|cffffcc00R|r] Select backpack")
         ..setTooltipNormalExtended(1, "")
         ..setName("Select backpack")
     

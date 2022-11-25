@@ -42,6 +42,7 @@ init
 function AbilityDefinitionAlchemistAcidBomb.general()
     this
         ..setRequirements("")
+        ..presetTargetsAllowed(lvl -> TARGETS_ACT)
         ..presetArmorPenalty(lvl -> 0)
         ..presetCastRange(lvl -> RANGE)
         ..presetBuffs(lvl -> LIQUID_FIRE_BUFF.toRawCode())
@@ -62,6 +63,7 @@ function AbilityDefinitionAlchemistAcidBomb.general()
 function AbilityDefinitionLiquidFire.general()
     this
         ..setRequirements("")
+        ..presetTargetsAllowed(lvl -> TARGETS_PAS)
         ..tooltipStartListen()
         ..setHotkey("F")
         ..setName("Liquid Fire")

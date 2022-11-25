@@ -9,12 +9,14 @@ import Shops
 import Orders
 import LastOrder
 import Reference
+import RegisterEvents
 
 // States
 bool array stunned
 bool array canAttack
 bool array isAttacking
 bool array isRetreating
+bool array isCasting
 bool array wannaBuy
 bool array goShopping
 
@@ -94,7 +96,8 @@ init
                 if not isRetreating[bot]
                     and (not isAttacking[bot]
                     or (not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
-                    and h.getCurrentOrder() != Orders.attack))
+                    and h.getCurrentOrder() != Orders.attack
+                    and not isCasting[bot]))
 
                     let target = (THE_DRAENEI.has(h) ? drUnits : deUnits).getRandom()
                     if target != null
@@ -107,7 +110,7 @@ init
                     isAttacking[bot] = false
                     isRetreating[bot] = true
                 else
-                    if h.getCurrentOrder() != Orders.attack
+                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
                         let enemy = new Reference<unit>(null)
                         forUnitsInRange(h.getPos(), 500., u -> begin
                             if h.isEnemyOf(u.getOwner()) and u.isAlive()
@@ -131,7 +134,18 @@ init
     onBotHeroAppear(bot -> begin
         wannaBuy[bot] = true
     end)
-
+    
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST, () -> begin
+        let p = GetSpellAbilityUnit().getOwner()
+        if p.isBot()
+            isCasting[p.getId()] = true
+    end)
+    
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_ENDCAST, () -> begin
+        let p = GetSpellAbilityUnit().getOwner()
+        if p.isBot()
+            isCasting[p.getId()] = false
+    end)
 /*
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)

@@ -48,7 +48,7 @@ init
                     if whatMode[3] != ONLY_COMSUMIBLES
                         p1.addLumber(GetRandomInt(1, 2))
             
-                    p2.setGold((GetRandomReal(0.75, 0.9) * p1.getGold()).toInt())
+                    p2.setGold((GetRandomReal(0.75, 0.9) * p2.getGold()).toInt())
             
                     spree[k]++
                     kills[k]++

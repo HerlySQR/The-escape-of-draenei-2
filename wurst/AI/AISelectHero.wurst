@@ -7,6 +7,8 @@ import SelectionEvent
 
 unit array lastSelected
 
+// -addbot 
+
 init
     addBotAction(bot -> begin
         if hero[bot] == null
@@ -30,4 +32,13 @@ init
                 doAfter(0.25) ->
                     if not hero.isHidden()
                         runSelectionEvent(p, hero)
+    end)
+
+    // TODO
+    THE_DRAENEI.forEach(() -> begin
+        GetEnumPlayer().setPlayerAlliance(players[1], ALLIANCE_SHARED_CONTROL, true)
+    end)
+
+    THE_DEMONS.forEach(() -> begin
+        GetEnumPlayer().setPlayerAlliance(players[1], ALLIANCE_SHARED_CONTROL, true)
     end)
