@@ -50,7 +50,7 @@ function AbilityDefinitionWindWalk.general()
     
     new AbilityDefinitionWindWalk(STEALTH_L)
         ..registerTooltipGenerator(new AbilityTooltipGenerator("It turns invisible the unit and makes it move faster. If you attack a unit to break the invisibility, the attack will have a damage bonus."))
-        ..presetLevels(2)
+        ..presetLevels(4)
         ..presetButtonPosNormal(2, 2)
         ..presetButtonPosResearch(2, 0)
         ..setHeroAbility(true)

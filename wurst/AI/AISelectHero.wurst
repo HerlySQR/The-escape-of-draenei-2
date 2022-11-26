@@ -20,7 +20,7 @@ init
             for key in heroModel
                 if not heroModel.get(key).isHidden()
                     and (whatMode[4] == TRAITOR or heroModel.get(key).isAllyOf(p))
-                    and random < 50
+                    and random < 75
 
                     hero = heroModel.get(key)
                     random = GetRandomInt(0, 100)

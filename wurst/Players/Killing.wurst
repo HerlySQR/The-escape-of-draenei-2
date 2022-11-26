@@ -69,15 +69,16 @@ init
                     for i = 1 to 11
                         if i != 6 and p1 != players[i]
                             let aKill = players[i].getNumber()
-                            if assistTime[aKill].get(d) > 0
-                                whoAssisted += aKill.getColoredName() + "/"
-                                assists[aKill]++
-                                gameBoard.setItemValue(row[aKill], 4, assists[aKill].toString())
+                            let aDead = players[d].getNumber()
+                            if assistTime[aKill].get(aDead) > 0
+                                whoAssisted += i.getColoredName() + "/"
+                                assists[i]++
+                                gameBoard.setItemValue(row[i], 4, assists[i].toString())
                                 if whatMode[3] != ONLY_COMSUMIBLES
                                     players[i].addLumber(GetRandomInt(0, 1))
-                                new Bounty().run(GetRandomInt(30, 48), hero[aKill], players[i], hero[aKill].isAlive(), false)
+                                new Bounty().run(GetRandomInt(30, 48), hero[i], players[i], hero[i].isAlive(), false)
 
-                                assistTime[aKill].replace(d, 0)
+                                assistTime[aKill].replace(aDead, 0)
                                 howMany++
                     
                     if howMany > 0

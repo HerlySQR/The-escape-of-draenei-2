@@ -113,9 +113,6 @@ init
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()
 
-                actDrSpawn = Rects.respawn4
-                actDeSpawn = Rects.respawn5
-
                 missions[3].setState(QuestState.COMPLETED)
                 pings.disable()
 
@@ -142,6 +139,9 @@ init
             case 4
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()
+
+                actDrSpawn = Rects.respawn4
+                actDeSpawn = Rects.respawn5
                 
                 pings.disable()
 

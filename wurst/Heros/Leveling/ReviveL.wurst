@@ -19,7 +19,7 @@ class Reviver
 
     construct(unit hero)
         this.hero = hero
-        let time = 15.00+5.00*R2I(SquareRoot(GetHeroLevel(hero).toReal()))
+        let time = 20.00+5.00*R2I(SquareRoot(GetHeroLevel(hero).toReal()))
         revive = CreateTimer()..start(time, null)
         clock = CreateTimerDialog(revive)
         clock.setTitle("You revive in: ")
