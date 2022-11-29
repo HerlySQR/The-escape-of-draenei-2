@@ -1,5 +1,6 @@
 package Killing
 
+import AddBot
 import ModeSelection
 import MyBoard
 import ArrayList
@@ -130,7 +131,7 @@ init
         if DamageEvent.getTarget().isType(UNIT_TYPE_HERO)
             let p1 = DamageEvent.getSource().getOwner()
             let p2 = DamageEvent.getTarget().getOwner()
-            if p1.isIngame() and p2.isIngame()
+            if (p1.isIngame() or p1.isBot()) and (p2.isIngame() or p2.isBot())
                 if p1.isEnemyOf(p2)
                     assistTime[p1.getNumber()].replace(p2.getNumber(), 12)
     end)
@@ -139,12 +140,12 @@ init
         if target.isType(UNIT_TYPE_HERO)
             let p1 = source.getOwner()
             let p2 = target.getOwner()
-            if p1.isIngame() and p2.isIngame()
+            if (p1.isIngame() or p1.isBot()) and (p2.isIngame() or p2.isBot())
                 if p1.isEnemyOf(p2)
                     assistTime[p1.getNumber()].replace(p2.getNumber(), 12)
     end)
 
-    doPeriodically(1.00, cb -> begin
+    doPeriodically(1., cb -> begin
         // Reducing assist
         for i = 1 to 5
             for j = 6 to 10
