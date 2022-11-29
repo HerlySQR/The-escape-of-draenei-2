@@ -42,7 +42,7 @@ end)
 function filt() returns boolean
     if GetFilterUnit().getTypeId() != DRAENEI_WORKER
         return false
-    else if GetFilterUnit().getCurrentOrder() == Orders.smart or GetFilterUnit().getCurrentOrder() == 0
+    else if GetFilterUnit().getCurrentOrder() == 0 or GetFilterUnit().getCurrentOrder() == Orders.smart
         return true
     return false
 
@@ -51,7 +51,7 @@ let builderCond = Filter(function filt)
 function filt2() returns boolean
     if GetFilterUnit().getTypeId() != DEMON_ACOLYTE
         return false
-    else if GetFilterUnit().getCurrentOrder() == Orders.smart or GetFilterUnit().getCurrentOrder() == 0
+    else if GetFilterUnit().getCurrentOrder() == 0 or GetFilterUnit().getCurrentOrder() == Orders.smart
         return true
     return false
 
@@ -88,10 +88,8 @@ init
     nullTimer() -> 
         let builders = CreateGroup()
         GroupEnumUnitsOfPlayer(builders, DRAENEI, builderCond)
-        builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[0])
-        new BuildingInstance(towerDraeneiPos[0], DRAENEI_TOWER)
-        builders.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[1])
-        new BuildingInstance(towerDraeneiPos[1], DRAENEI_TOWER)
+        new BuildingInstance(builders.next(), towerDraeneiPos[0], DRAENEI_TOWER)
+        new BuildingInstance(builders.next(), towerDraeneiPos[1], DRAENEI_TOWER)
         builders.destr()
 
         onMission(mission -> begin
@@ -101,25 +99,22 @@ init
                         if u.getTypeId() == DEMON_TOWER
                             u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     end)
-                    forUnitsInRect(Rects.shops2, u -> begin
-                        if u.isType(UNIT_TYPE_STRUCTURE)
-                            u.setColor(DRAENEI.getColor())
-                    end)
 
                     let builders2 = CreateGroup()
                     GroupEnumUnitsOfPlayer(builders2, DRAENEI, builderCond)
-                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[2])
-                    new BuildingInstance(towerDraeneiPos[2], DRAENEI_TOWER)
-                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[3])
-                    new BuildingInstance(towerDraeneiPos[3], DRAENEI_TOWER)
+                    new BuildingInstance(builders2.next(), towerDraeneiPos[2], DRAENEI_TOWER)
+                    new BuildingInstance(builders2.next(), towerDraeneiPos[3], DRAENEI_TOWER)
                     builders2.destr()
+                case 3
+                    forUnitsInRect(Rects.demonTower2, u -> begin
+                        if u.getTypeId() == DEMON_TOWER
+                            u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
+                    end)
                 case 5
                     let builders2 = CreateGroup()
                     GroupEnumUnitsOfPlayer(builders2, DRAENEI, builderCond)
-                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[4])
-                    new BuildingInstance(towerDraeneiPos[4], DRAENEI_TOWER)
-                    builders2.next().issueBuildOrder(DRAENEI_TOWER, towerDraeneiPos[5])
-                    new BuildingInstance(towerDraeneiPos[5], DRAENEI_TOWER)
+                    new BuildingInstance(builders2.next(), towerDraeneiPos[4], DRAENEI_TOWER)
+                    new BuildingInstance(builders2.next(), towerDraeneiPos[5], DRAENEI_TOWER)
                     builders2.destr()
         end)
 
@@ -127,55 +122,48 @@ init
 
 class BuildingInstance
     static LinkedList<BuildingInstance> instances = new LinkedList<BuildingInstance>()
-    static timer t = CreateTimer()
 
+    unit builder
     vec2 point
     int tower
     boolean haveTower
     int count
+    CallbackPeriodic cb
 
-    function checkNS()
-        count--
-        if count == 0 and not haveTower
-            unit newBuilder
-            if tower == DRAENEI_TOWER
-                GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
-                for u in g
-                    if not returnPoint.contains(u.getPos())
-                        u.setPos(returnPoint.randomPoint())
-                        break
-                newBuilder = g.next()
-                g.clear()
-            else
-                GroupEnumUnitsOfPlayer(g, DEMON, acolyteCond)
-                for u in g
-                    u.remove()
-                newBuilder = createUnit(DEMON, DEMON_ACOLYTE, acolyteSpawnPos(point), UNIT_FACING)
-                g.clear()
-            newBuilder.issueBuildOrder(tower, point)
-            count = 60
-        if haveTower
-            destroy this
-
-    static function check()
-        for curr in instances
-            curr.checkNS()
-
-    construct(vec2 point, int tower)
+    construct(unit builder, vec2 point, int tower)
+        this.builder = builder
         this.point = point
         this.tower = tower
+
+        builder.issueBuildOrder(tower, point)
+
         haveTower = false
         count = 60
 
         instances.add(this)
 
-        if instances.size() == 1
-            t.startPeriodic(1., function check)
+        cb = doPeriodically(1., cb -> begin
+            count--
+            if count == 0 and not haveTower
+                unit newBuilder
+                if tower == DRAENEI_TOWER
+                    builder.setPos(returnPoint.randomPoint())
+                    GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
+                    newBuilder = g.next()
+                    g.clear()
+                else
+                    builder.remove()
+                    newBuilder = createUnit(DEMON, DEMON_ACOLYTE, acolyteSpawnPos(point), UNIT_FACING)
+                    g.clear()
+                new BuildingInstance(newBuilder, point, tower)
+                destroy this
+            else if haveTower
+                destroy this
+        end)
 
     ondestroy
         instances.remove(this)
-        if instances.isEmpty()
-            t.pause()
+        destroy cb
 
     static function buildTower()
         let p = GetConstructingStructure().getPos()
@@ -221,13 +209,11 @@ init
             let p = u.getPos()
             if u.getTypeId() == DRAENEI_TOWER
                 GroupEnumUnitsOfPlayer(g, DRAENEI, builderCond)
-                g.next().issueBuildOrder(DRAENEI_TOWER, p)
+                new BuildingInstance(g.next(), p, DRAENEI_TOWER)
                 g.clear()
-                new BuildingInstance(p, DRAENEI_TOWER)
             else
                 doAfter(3.) ->
-                    createUnit(DEMON, DEMON_ACOLYTE, acolyteSpawnPos(p), UNIT_FACING).issueBuildOrder(DEMON_TOWER_DUMMY_ZIGURAT, p)
-                    new BuildingInstance(p, DEMON_TOWER_DUMMY_ZIGURAT)
+                    new BuildingInstance(createUnit(DEMON, DEMON_ACOLYTE, acolyteSpawnPos(p), UNIT_FACING), p, DEMON_TOWER_DUMMY_ZIGURAT)
         end)
     // Tower been constructed
     CreateTrigger()
@@ -236,9 +222,7 @@ init
     // Return draenei
     CreateTrigger()
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_CONSTRUCT_FINISH)
-        ..addCondition(Condition(() -> begin
-            return GetConstructedStructure().getTypeId() == DRAENEI_TOWER
-        end))
+        ..addCondition(Condition(() ->  GetConstructedStructure().getTypeId() == DRAENEI_TOWER))
         ..addAction(() -> begin
             let p = GetTriggerUnit().getPos()
             doAfter(0.2) -> 
@@ -267,7 +251,7 @@ init
                     let r = 680. - u.getLife()
                     u.remove()
                     a.hiddenDestroy()
-                    createUnit(DEMON, DEMON_TOWER, p, UNIT_FACING)..addHP(-r)
+                    createUnit(DEMON, DEMON_TOWER, p, UNIT_FACING).addHP(-r)
         end)
     // Remove acolyte
     CreateTrigger()
@@ -306,7 +290,7 @@ init
     new BuildingDefinition(DRAENEI_TOWER, 'owtw')
         ..setAttack1Range(700)
         ..setAttack1DamageBase(70)
-        ..setAttack1CooldownTime(1.)
+        ..setAttack1CooldownTime(1.5)
         ..setDefenseBase(10)
         ..setGoldCost(0)
         ..setLumberCost(0)
@@ -324,7 +308,7 @@ init
         ..setAttack1Range(700)
         ..setAttack1DamageBase(70)
         ..setAttack1ProjectileArt(Abilities.vengeanceMissile)
-        ..setAttack1CooldownTime(1.)
+        ..setAttack1CooldownTime(1.5)
         ..setDefenseBase(10)
         ..setGoldCost(0)
         ..setLumberCost(0)

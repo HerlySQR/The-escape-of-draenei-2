@@ -84,8 +84,8 @@ init
                             if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
                                 doAfter(3.) ->
                                     let shop = merchants.getNearbyShop(h)
-                                    print(IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h))
-                                    print(IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId()))
+                                    IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h)
+                                    IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId())
                                     wannaBuy[bot] = false
                                     canAttack[bot] = true
                                     isRetreating[bot] = h.getHPRatio() < 0.3
@@ -99,7 +99,7 @@ init
                     and h.getCurrentOrder() != Orders.attack
                     and not isCasting[bot]))
 
-                    let target = (THE_DRAENEI.has(h) ? drUnits : deUnits).getRandom()
+                    let target = THE_DRAENEI.has(h) ? getRandomLastDr() : getRandomLastDe()
                     if target != null
                         h.issueTargetOrderById(Orders.patrol, target)
                         targetUnit[bot] = target

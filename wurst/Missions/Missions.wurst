@@ -84,6 +84,11 @@ init
                         end)
             // Mission 2
             case 2
+                forUnitsInRect(Rects.shops2, u -> begin
+                    if u.isType(UNIT_TYPE_STRUCTURE)
+                        u.setColor(DRAENEI.getColor())
+                end)
+                
                 pings.disable()
                 if whatMode[1] == VARIOUS_TIMERS
                     stopActTimer()

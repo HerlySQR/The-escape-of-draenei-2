@@ -86,7 +86,7 @@ init
             end)
         if powerFieldAnimation2 == null
             powerFieldAnimation2 = doPeriodically(3., _ -> begin
-                for i = 0 to 4
+                for i = 0 to 3
                     Dests.powerField2[i].setAnimation("stand")
             end)
     end)
@@ -109,7 +109,7 @@ init
         if not generatorAlive2
             generatorAlive2 = true
             wallGenerator2 = createUnit(DEMON, GENERATOR, Rects.wallGenerator2.getCenter(), UNIT_FACING)
-            for i = 0 to 4
+            for i = 0 to 3
                 Dests.powerField2[i]
                     ..restoreLife(50., true)
                     ..queueAnimation("stand")
@@ -145,7 +145,7 @@ init
             generatorAlive2 = false
             powerFieldEnter3.disable()
             powerFieldEnter4.disable()
-            for i = 0 to 4
+            for i = 0 to 3
                 Dests.powerField2[i].kill()
             if EventData.getKillingUnit() != null
                 QuestMessageBJ(bj_FORCE_ALL_PLAYERS, bj_QUESTMESSAGE_HINT, "The power field generator of the dungeon was destroyed")
@@ -303,10 +303,6 @@ function destroyWall()
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             if u.hasItemById(BARREL)
                 u.getItemOfId(BARREL).remove()
-        end)
-        forUnitsInRect(Rects.demonTower3, u -> begin
-            if u.getTypeId() == DEMON_TOWER
-                u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
         end)
 
         actDrSpawn = Rects.respawn3

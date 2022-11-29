@@ -8,6 +8,7 @@ import AbilityObjEditing
 import UpgradeObjEditing
 import ObjectIds
 import Abilities
+import LinkedList
 
 import Functions
 import public PlayerData
@@ -17,6 +18,7 @@ import GeneratedValues
 import BountyController
 
 public boolean spawnRun = false
+
 
 public constant attackers = CreateGroup()
 public constant drUnits = CreateGroup()
@@ -47,6 +49,58 @@ public constant deSpw32 = Rects.demonSpawn31.getCenter()
 
 public vec2 array target
 public unit array targetHero
+
+let drAttackWaves = new LinkedList<group>()
+let deAttackWaves = new LinkedList<group>()
+
+public function getRandomLastDr() returns unit
+    let g = drAttackWaves.getFirst()
+    if g != null
+        return g.getRandom()
+    return null
+    
+public function getRandomLastDe() returns unit
+    let g = deAttackWaves.getFirst()
+    if g != null
+        return g.getRandom()
+    return null
+
+function unit.insertToDrWaves()
+    let g = drAttackWaves.peek()
+    if g != null
+        g.add(this)
+
+function unit.insertToDeWaves()
+    let g = deAttackWaves.peek()
+    if g != null
+        g.add(this)
+
+function addNewDrWave()
+    let g = drAttackWaves.peek()
+    if g == null or not g.isEmpty()
+        drAttackWaves.add(CreateGroup())
+
+function addNewDeWave()
+    let g = deAttackWaves.peek()
+    if g == null or not g.isEmpty()
+        deAttackWaves.add(CreateGroup())
+
+init
+    doPeriodically(1., cb -> begin
+        for g in drAttackWaves
+            for u in g
+                if not u.isAlive()
+                    g.remove(u)
+            if g.isEmpty()
+                drAttackWaves.remove(g)
+        for g in deAttackWaves
+            for u in g
+                if not u.isAlive()
+                    g.remove(u)
+            if g.isEmpty()
+                deAttackWaves.remove(g)
+                g.destr()
+    end)
 
 let DUMMY_DAMAGE_UPGRADES = [compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next())]
 let DUMMY_ARMOR_UPGRADES = [compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next()), compiletime(UPGD_ID_GEN.next())]
@@ -94,6 +148,7 @@ function createDr(int id)
     c.issuePointOrderById(Orders.attack, attackPoint1)
     drUnits.add(c)
     attackers.add(c)
+    c.insertToDrWaves()
 
 function createDe(int id, vec2 pos, vec2 t)
     if deInMap > 15
@@ -104,6 +159,7 @@ function createDe(int id, vec2 pos, vec2 t)
     c.issuePointOrderById(Orders.attack, t)
     deUnits.add(c)
     attackers.add(c)
+    c.insertToDeWaves()
 
 init
     // Create the towers
@@ -170,6 +226,8 @@ init
     spawning
         ..registerTimerEvent(30., true)
         .addAction(() -> begin
+            addNewDrWave()
+            addNewDeWave()
             if actMission == 1
                 for _ = 0 to 2
                     createDr(DRAENEI_WARRIOR[0])
@@ -188,6 +246,7 @@ init
                 for _ = 0 to 1
                     createDr(DRAENEI_MAGE[1])
                     createDe(CHAOS_WARLOCK[1], deSpw32, attackPoint4)
+            
         end)
     // Keep the units attack their targets
     attack
@@ -228,12 +287,14 @@ init
                     u.issuePointOrderById(Orders.attack, attackPoint1)
                     attackers.add(u)
                     drUnits.add(u)
+                    u.insertToDrWaves()
             end)
             forUnitsOfPlayer(DEMON, u -> begin
                 if Rects.attackPoint1.contains(u.getPos())
                     u.issuePointOrderById(Orders.attack, drSpw)
                     attackers.add(u)
                     deUnits.add(u)
+                    u.insertToDeWaves()
             end)
         end)
 
@@ -279,14 +340,14 @@ function UnitDefinition.creepGeneral(int i)
     
     new BuildingDefinition(DEATH_TOWER_1, 'ntt1')
         ..towerGeneral()
-        ..setAttack1DamageBase(38)
+        ..setAttack1DamageBase(33)
         ..setAttack1CooldownTime(1.1)
         ..setHitPointsMaximumBase(300)
         ..setNameEditorSuffix("(Level 1)")
     
     new BuildingDefinition(DEATH_TOWER_2, 'ntt1')
         ..towerGeneral()
-        ..setAttack1DamageBase(42)
+        ..setAttack1DamageBase(40)
         ..setAttack1CooldownTime(1.05)
         ..setHitPointsMaximumBase(350)
         ..setNameEditorSuffix("(Level 2)")

@@ -100,8 +100,7 @@ public class Dests
     static constant powerField = [gg_dest_B00J_6607, gg_dest_B00J_6608, gg_dest_B00J_2611, gg_dest_B00J_6606,
                                   gg_dest_B00J_6609, gg_dest_B00J_6611, gg_dest_B00J_6610, gg_dest_B00J_6612,
                                   gg_dest_B00J_6613, gg_dest_B00J_6614]
-    static constant powerField2 = [gg_dest_B00J_1268, gg_dest_B00J_1269, gg_dest_B00J_7109, gg_dest_B00J_7111,
-                                  gg_dest_B00J_7110]
+    static constant powerField2 = [gg_dest_B00J_0359, gg_dest_B00J_7109, gg_dest_B00J_7111, gg_dest_B00J_7110]
 
 /** The generated regions (rects). */
 public class Rects

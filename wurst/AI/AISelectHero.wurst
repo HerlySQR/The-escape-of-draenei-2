@@ -34,11 +34,11 @@ init
                         runSelectionEvent(p, hero)
     end)
 
-    // TODO
+    /* TODO
     THE_DRAENEI.forEach(() -> begin
         GetEnumPlayer().setPlayerAlliance(players[1], ALLIANCE_SHARED_CONTROL, true)
     end)
 
     THE_DEMONS.forEach(() -> begin
         GetEnumPlayer().setPlayerAlliance(players[1], ALLIANCE_SHARED_CONTROL, true)
-    end)
+    end)*/
