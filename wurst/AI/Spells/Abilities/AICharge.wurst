@@ -1,0 +1,28 @@
+package AICharge
+
+import AIAbilityList
+
+import ClosureForGroups
+import Orders
+import LinkedList
+
+let CHARGE_ORDER = Orders.chainlightning
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        if caster.getHPRatio() > 0.5
+            let hp = new LinkedList<unit>()
+            forUnitsInRange(caster.getPos(), 1000., u -> begin
+                if caster.isEnemyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
+                    hp.add(u)
+            end)
+            if not hp.isEmpty()
+                hp.sortWith((u1, u2) -> (u1.getHP() - u2.getHP()).toInt())
+                caster.issueTargetOrderById(CHARGE_ORDER, hp.getFirst())
+            destroy hp
+end
+
+init
+    setAbilityActions(CHARGE_NL, actions)
+    setAbilityActions(CHARGE_L, actions)
+    setAbilityActions(CHARGE_S, actions)

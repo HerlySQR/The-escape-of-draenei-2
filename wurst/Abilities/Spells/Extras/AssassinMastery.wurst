@@ -2,8 +2,6 @@ package AssassinMastery
 
 import AbilityData
 
-import Execute
-
 public constant ASSASSIN_MASTERY = compiletime(ABIL_ID_GEN.next())
 constant ASSASSIN_MASTERY_BUFF = compiletime(BUFF_ID_GEN.next())
 constant DUMMY_EVASION = compiletime(ABIL_ID_GEN.next())
@@ -18,11 +16,14 @@ init
     registerSpellEffectEvent(ASSASSIN_MASTERY, () -> begin
         let caster = GetSpellAbilityUnit()
         caster.addAbility(DUMMY_EVASION)
-        try(() -> destroy cbMap.get(caster))
+        if cbMap.has(caster)
+            destroy cbMap.get(caster)
+            cbMap.remove(caster)
         cbMap.put(caster, doPeriodically(0.1, cb -> begin
             if not caster.hasAbility(ASSASSIN_MASTERY_BUFF)
                 caster.removeAbility(DUMMY_EVASION)
                 destroy cb
+                cbMap.remove(caster)
         end))
     end)
 

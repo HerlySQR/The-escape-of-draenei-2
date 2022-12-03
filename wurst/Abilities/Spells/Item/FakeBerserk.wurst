@@ -2,8 +2,6 @@ package FakeBerserk
 
 import AbilityData
 
-import Execute
-
 public constant FAKE_BERSERK_SPELL = compiletime(ABIL_ID_GEN.next())
 
 let CD = 25.
@@ -23,7 +21,9 @@ init
     registerSpellEffectEvent(FAKE_BERSERK_SPELL, () -> begin
         let caster = GetSpellAbilityUnit()
         caster.addAbility(BERSERK_BUFF)
-        try(() -> destroy timersMap.get(caster))
+        if timersMap.has(caster)
+            destroy timersMap.get(caster)
+            timersMap.remove(caster)
         timersMap.put(caster, doAfter(DURATION, () -> begin
             caster.removeAbility(BERSERK_BUFF)
             timersMap.remove(caster)

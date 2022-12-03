@@ -2,7 +2,6 @@ package Intangibility
 
 import AbilityData
 import PseudoWindWalk
-import Execute
 
 public constant INTANGIBILITY_NL = compiletime(ABIL_ID_GEN.next())
 public constant INTANGIBILITY_L = compiletime(ABIL_ID_GEN.next())
@@ -44,7 +43,9 @@ init
                 duration = DURATION_L[data.lvl]
             
             caster.startWindWalk(INTANGIBILITY_BUFF)
-            try(() -> cbMap.get(caster).stop())
+            if cbMap.has(caster)
+                cbMap.get(caster).stop()
+                cbMap.remove(caster)
             cbMap.put(caster, doPeriodicallyTimed(INTERVAL, duration, cb -> begin
                 if not cb.isLast() and caster.isAlive()
                     forUnitsInRange(caster.getPos(), AREA, u -> begin
@@ -65,6 +66,7 @@ init
                         else
                             affected.remove(u)
                 else
+                    cbMap.remove(caster)
                     affected.destr()
                     destroy cooldowns
                     if not cb.isLast()

@@ -1,0 +1,32 @@
+package AIDarkSummoning
+
+import AIAbilityList
+import PlayerData
+import HeroSelection
+
+import ClosureForGroups
+import Orders
+import LinkedList
+
+let DARK_SUMMONING_ORDER = Orders.inferno
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let hp = new LinkedList<unit>()
+        let pos = (THE_DRAENEI.has(caster) ? actDrSpawn : actDeSpawn).getCenter()
+        forUnitsAll(u -> begin
+            if u.isType(UNIT_TYPE_HERO) and caster.isAllyOf(u.getOwner())
+                and u.getPos().distanceTo(pos) > 2000.
+
+                hp.add(u)
+        end)
+        if not hp.isEmpty()
+            hp.sortWith((u1, u2) -> (u1.getHP() - u2.getHP()).toInt())
+            caster.issuePointOrderById(DARK_SUMMONING_ORDER, hp.peek().getPos())
+        destroy hp
+end
+
+init
+    setAbilityActions(DARK_SUMMONING_NL, actions)
+    setAbilityActions(DARK_SUMMONING_L, actions)
+    setAbilityActions(DARK_SUMMONING_S, actions)

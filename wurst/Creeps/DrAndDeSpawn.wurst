@@ -282,6 +282,7 @@ init
     CreateTrigger()
         ..registerDeathEvent(Dests.dungeonDoor1)
         ..addAction(() -> begin
+            addNewDrWave()
             forUnitsOfPlayer(DRAENEI, u -> begin
                 if u.getTypeId() == DRAENEI_WARRIOR[0]
                     u.issuePointOrderById(Orders.attack, attackPoint1)
@@ -289,6 +290,7 @@ init
                     drUnits.add(u)
                     u.insertToDrWaves()
             end)
+            addNewDeWave()
             forUnitsOfPlayer(DEMON, u -> begin
                 if Rects.attackPoint1.contains(u.getPos())
                     u.issuePointOrderById(Orders.attack, drSpw)
@@ -362,14 +364,14 @@ function UnitDefinition.creepGeneral(int i)
     for i = 0 to 2
         new UnitDefinition(DRAENEI_WARRIOR[i], 'ndrw')
             ..setRace(Race.Orc)
-            ..setHitPointsMaximumBase(400 + i * 50)
+            ..setHitPointsMaximumBase(450 + i * 50)
             ..creepGeneral(i)
 
         new UnitDefinition(CHAOS_GRUNT[i], 'nchg')
             ..setAttack1DamageSidesperDie(2)
             ..setAttack1AttackType(AttackType.Normal)
             ..setRace(Race.Demon)
-            ..setHitPointsMaximumBase(400 + i * 50)
+            ..setHitPointsMaximumBase(450 + i * 50)
             ..creepGeneral(i)
 
         if i != 0
@@ -381,9 +383,9 @@ function UnitDefinition.creepGeneral(int i)
                 ..setRace(Race.Orc)
                 ..setManaInitialAmount(75)
                 ..setManaMaximum(400)
-                ..setHitPointsMaximumBase(250 + i * 50)
+                ..setHitPointsMaximumBase(300 + i * 50)
+                ..setTintingColorRed(100)
                 ..setTintingColorGreen(100)
-                ..setTintingColorBlue(100)
                 ..setScalingValue(1.)
                 ..creepGeneral(i)
                 ..setName("Draenei Mage")
@@ -399,7 +401,7 @@ function UnitDefinition.creepGeneral(int i)
                 ..setRace(Race.Demon)
                 ..setManaInitialAmount(75)
                 ..setManaMaximum(400)
-                ..setHitPointsMaximumBase(250 + i * 50)
+                ..setHitPointsMaximumBase(300 + i * 50)
                 ..creepGeneral(i)
         
         new UpgradeDefinition(DUMMY_DAMAGE_UPGRADES[i], i + 1)

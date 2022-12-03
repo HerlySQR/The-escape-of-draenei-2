@@ -23,6 +23,16 @@ bool array goShopping
 unit array targetUnit
 Order array lastOrders
 
+function int.retreatTemporally(real time)
+    if isAttacking[this]
+        isRetreating[this] = true
+        isAttacking[this] = false
+        let pos = hero[this].getPos()
+        doAfter(time) ->
+            isRetreating[this] = false
+            isAttacking[this] = true
+            hero[this].issuePointOrderById(Orders.attack, pos)
+
 // Shops
 let merchants = CreateGroup()
 let armsMerchants = CreateGroup()
@@ -118,6 +128,20 @@ init
                         end)
                         if enemy.into() != null
                             h.issuePointOrderById(Orders.attack, targetUnit[bot].getPos())
+                    
+                    // Retreat if there are too many enemy heroes
+                    let allyHeroes = new Reference(0)
+                    let enemyHeroes = new Reference(0)
+                    forUnitsInRange(h.getPos(), 900., u -> begin
+                        if u.isType(UNIT_TYPE_HERO) and u.isAlive()
+                            if h.isAllyOf(u.getOwner())
+                                allyHeroes.val++
+                            else
+                                enemyHeroes.val++
+                    end)
+                    if enemyHeroes.into() - allyHeroes.into() > 2
+                        bot.retreatTemporally(3.)
+                        
             if isRetreating[bot]
                 h.issuePointOrderById(Orders.smart, (THE_DRAENEI.has(h) ? actDrSpawn : actDeSpawn).getCenter())
                 if h.getHPRatio() > 0.8

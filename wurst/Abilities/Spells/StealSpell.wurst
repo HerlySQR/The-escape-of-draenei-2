@@ -4,8 +4,6 @@ import AbilityData
 import initlater HeroSpells
 import ExtraSpells
 
-import Execute
-
 public constant STEAL_SPELL_NL = compiletime(ABIL_ID_GEN.next())
 public constant STEAL_SPELL_L = compiletime(ABIL_ID_GEN.next())
 
@@ -90,10 +88,13 @@ init
                             caster.setAbilityLevel(spellNew, level)
                             stealSpell.put(caster, spellNew)
 
-                            try(() -> destroy timerMap.get(caster))
+                            if timerMap.has(caster)
+                                destroy timerMap.get(caster)
+                                timerMap.remove(caster)
                             timerMap.put(caster, doAfter(duration, () -> begin
                                 caster.removeAbility(spellNew)
                                 stealSpell.remove(caster)
+                                timerMap.remove(caster)
                             end))
                 end)
     end)
@@ -104,7 +105,9 @@ init
         if stealSpell.has(u)
             u.removeAbility(stealSpell.get(u))
             stealSpell.remove(u)
-            try(() -> destroy timerMap.get(u))
+            if timerMap.has(u)
+                destroy timerMap.get(u)
+                timerMap.remove(u)
     end)
 
 var total = 1

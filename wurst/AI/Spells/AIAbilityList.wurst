@@ -52,14 +52,16 @@ init
         let h = hero[bot]
         if h.isAlive()
             for spell in normalAbilityLists[bot]
-                let cb = abilityActions.get(spell)
-                if cb != null
-                    cb.check(h)
-            if whatMode[5] == LEVELING
-                for spell in heroAbilityLists[bot]
+                if h.hasAbility(spell)
                     let cb = abilityActions.get(spell)
                     if cb != null
                         cb.check(h)
+            if whatMode[5] == LEVELING
+                for spell in heroAbilityLists[bot]
+                    if h.hasAbility(spell)
+                        let cb = abilityActions.get(spell)
+                        if cb != null
+                            cb.check(h)
                 if h.getSkillPoints() > 0
                     h.selectSkill(skillBuilds[bot].get())
     end)

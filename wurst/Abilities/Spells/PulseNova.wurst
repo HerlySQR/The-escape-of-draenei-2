@@ -3,7 +3,7 @@ package PulseNova
 import AbilityData
 
 import Fx
-import Execute
+import Reference
 
 public constant PULSE_NOVA_NL = compiletime(ABIL_ID_GEN.next())
 public constant PULSE_NOVA_L = compiletime(ABIL_ID_GEN.next())
@@ -46,22 +46,23 @@ init
                 m.damage = MAX_DMG_NL[data.lvl]
             else
                 m.damage = MAX_DMG_L[data.lvl]
-            let cb = doPeriodicallyCounted(0.27, MAX_COUNTER_1, cb -> begin
+            let exploded = new Reference(false)
+            let cb = doPeriodicallyCounted(0.27, MAX_COUNTER_1, cb2 -> begin
                 let pos = m.getPos()
-                if pos.distanceTo2d(target) <= 201. or cb.isLast()
-                    if not cb.isLast()
-                        destroy cb
+                if pos.distanceTo2d(target) <= 201. or cb2.isLast()
+                    if not cb2.isLast()
+                        destroy cb2
                     explosion(target)
+                    exploded.val = true
             end)
             m.onFinish(() -> begin
                 let affected = CreateGroup()
                 var damage = m.damage
                 let pos = m.getPos().toVec2()
                 let owner = m.owner
-                try(() -> begin
+                if not exploded.into()
                     destroy cb
                     explosion(target)
-                end)
                 doPeriodicallyCounted(0.01, MAX_COUNTER_2, cb -> begin
                     let counter = MAX_COUNTER_2 - cb.getCount() + 1
                     forUnitsInRange(pos, AREA_PER_TICK * counter, u -> begin

@@ -185,7 +185,7 @@ function disableTower()
 
 init
     // Create demon defense towers
-    for i = 0 to 7
+    for i = 0 to 9
         createUnit(DEMON, DEMON_TOWER, Rects.demonDefenseTower[i].getCenter(), UNIT_FACING)
     // This towers don't work
     onEnter(function disableTower)
