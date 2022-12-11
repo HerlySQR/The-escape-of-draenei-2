@@ -9,6 +9,7 @@ public constant RAIN_OF_FIRE_S = compiletime(ABIL_ID_GEN.next())
 constant DUMMY_RAIN_OF_FIRE = compiletime(ABIL_ID_GEN.next())
 
 // General
+let targets = "enemies"
 let DURATION = 3.
 let RANGE = 1000.
 let CD = 12.
@@ -106,6 +107,7 @@ function ChannelAbilityPreset.general()
     
     new AbilityDefinitionRainofFire(DUMMY_RAIN_OF_FIRE)
         ..presetLevels(6)
+        ..presetTargetsAllowed(lvl -> targets)
         ..presetDamage(lvl -> lvl < 3 ? DMG_NL[lvl-1] : DMG_L[lvl-3])
         ..presetDamagePerSecond(lvl -> lvl < 3 ? DMG_PER_SEC_NL[lvl-1] : DMG_PER_SEC_L[lvl-3])
         ..presetNumberofWaves(lvl -> 5)

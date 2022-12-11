@@ -2,10 +2,6 @@ package AICharge
 
 import AIAbilityList
 
-import ClosureForGroups
-import Orders
-import LinkedList
-
 let CHARGE_ORDER = Orders.chainlightning
 
 AbilityActions actions = caster -> begin

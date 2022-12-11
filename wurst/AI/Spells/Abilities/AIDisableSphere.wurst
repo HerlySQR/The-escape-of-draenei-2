@@ -2,10 +2,6 @@ package AIDisableSphere
 
 import AIAbilityList
 
-import ClosureForGroups
-import Orders
-import LinkedList
-
 let DISABLE_SPHERE_ORDER = Orders.silence
 
 // TODO

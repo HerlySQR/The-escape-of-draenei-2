@@ -1,0 +1,17 @@
+package AIRainOfFire
+
+import AIAbilityList
+
+let RAIN_OF_FIRE_ORDER = Orders.rainoffire
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 350.)
+        if result.success
+            caster.issuePointOrderById(RAIN_OF_FIRE_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(RAIN_OF_FIRE_NL, actions)
+    setAbilityActions(RAIN_OF_FIRE_L, actions)
+    setAbilityActions(RAIN_OF_FIRE_S, actions)

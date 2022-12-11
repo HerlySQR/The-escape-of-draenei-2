@@ -4,10 +4,6 @@ import AIAbilityList
 import PlayerData
 import HeroSelection
 
-import ClosureForGroups
-import Orders
-import LinkedList
-
 let DARK_SUMMONING_ORDER = Orders.inferno
 
 AbilityActions actions = caster -> begin

@@ -7,10 +7,14 @@ import HeroType
 import ModeSelection
 import SkillBuild
 
-import LinkedList
+import public LinkedList
+import public Orders
 import HashSet
 import HashMap
 import ObjectIds
+import public ClosureForGroups
+import ErrorHandling
+import Reference
 
 let passives = new HashSet<int>()
 
@@ -100,3 +104,100 @@ init
     passives.add(SCORCHING_HEAT_NL, SCORCHING_HEAT_L)
     passives.add(SLOW_POISON_NL, SLOW_POISON_L)
     passives.add(UNHOLY_AURA, VAMPIRIC_AURA)
+
+// Find concentration of units
+
+let E = EULER
+let E_INV = 0.3678794
+let LN_FACTOR = 1.2840254
+let LN_FACTOR_INV = 0.7788008
+
+function ln(real v) returns real
+    var sum = 0.
+    var sign = 1.
+    var r = v
+
+    if r < 0.
+        error("Logarithm of negative number is undefined!")
+    
+    if r < 1.
+        r = 1.0/r
+        sign = -1.0
+    
+    while r >= E
+        r = r*E_INV
+        sum = sum + 1.0
+    
+    while r >= LN_FACTOR
+        r = r*LN_FACTOR_INV
+        sum = sum + 0.25
+
+    return sign*(sum + 0.125*(r - 1.0)*(1 + 9.0/(2.0 + r) + 4.5/(0.5 + r) + 1.0/r))
+
+function mode(LinkedList<real> data) returns real
+    let n = data.size()
+
+    if n == 0
+        return 0
+
+    let intervalNumber = (1 + 3.322 * ln(n.toReal())).round()
+
+    data.sort()
+
+    let minVal = data.getFirst()
+    let range = (minVal - data.peek()).abs()
+    let amplitude = range / intervalNumber
+    
+    real array l // lower limit
+    real array L // upper limit
+    for i = 1 to intervalNumber
+        l[i] = minVal + (i-1)*amplitude
+        L[i] = minVal + i*amplitude
+
+    int array f // frequencies
+    // In this block the thread crashes
+    for i = 1 to intervalNumber
+        for x in data
+            if x.isBetween(l[i], L[i])
+                f[i]++
+                data.remove(x)
+    
+    var maxNumber = INT_MIN
+    var maxF = 0
+    for i = 1 to intervalNumber
+        if f[i] > maxNumber
+            maxNumber = f[i]
+            maxF = i
+    
+    return l[maxF] + ((f[maxF] - f[maxF-1])/((f[maxF] - f[maxF-1]) + (f[maxF] - f[maxF+1]))) * amplitude
+
+public tuple unitConcentrationResult(bool success, vec2 pos)
+
+public function unitConcentration(vec2 pos, real range, player owner, real area) returns unitConcentrationResult
+    let xVals = new LinkedList<real>()
+    let yVals = new LinkedList<real>()
+    unitConcentrationResult result
+
+    forUnitsInRange(pos, range, u -> begin
+        if u.isAlive() and u.isEnemyOf(owner)
+            xVals.add(u.getX())
+            yVals.add(u.getY())
+    end)
+
+    if xVals.size() >= 3
+        let concentration = vec2(mode(xVals), mode(yVals))
+
+        let count = new Reference(0)
+        forUnitsInRange(concentration, area, u -> begin
+            if u.isAlive() and u.isEnemyOf(owner)
+                count.val++
+        end)
+
+        result = count.into() >= 3 ? unitConcentrationResult(true, concentration) : unitConcentrationResult(false, ZERO2)
+    else
+        result = unitConcentrationResult(false, ZERO2)
+
+    destroy xVals
+    destroy yVals
+
+    return result
