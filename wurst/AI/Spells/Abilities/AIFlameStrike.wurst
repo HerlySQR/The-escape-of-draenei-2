@@ -1,0 +1,20 @@
+package AIFlameStrike
+
+import AIAbilityList
+import CheckLandNL
+
+import RegisterEvents
+import EventHelper
+
+init
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_FINISH, () -> begin
+        if abilityCond(FLAME_STRIKE_NL, FLAME_STRIKE_L, FLAME_STRIKE_S).check
+            let owner = EventData.getSpellAbilityUnit().getOwner()
+            let pos = EventData.getAbilityTargetPos()
+            forUnitsInRange(pos, 225., u -> begin
+                if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable()
+                    doAfter(GetRandomReal(0, 0.5)) ->
+                        let uPos = u.getPos()
+                        u.issuePointOrderById(Orders.smart, uPos.moveTowards(pos, uPos.distanceTo(pos) - 225.))
+            end)
+    end)

@@ -1,0 +1,16 @@
+package AIConsumeLifeAndMana
+
+import AIAbilityList
+
+let CONSUME_LIFE_AND_MANA_ORDER = Orders.drain
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        forUnitsInRange(caster.getPos(), 500., u -> begin
+            if u.isAlive() and caster.isEnemyOf(u.getOwner()) and u.getMana() > 0
+                caster.issueTargetOrderById(CONSUME_LIFE_AND_MANA_ORDER, u)
+        end)
+end
+
+init
+    setAbilityActions(CONSUME_LIFE_AND_MANA, actions)

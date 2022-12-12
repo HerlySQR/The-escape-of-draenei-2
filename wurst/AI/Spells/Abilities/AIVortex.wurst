@@ -1,2 +1,24 @@
 package AIVortex
 
+import AIAbilityList
+
+let VORTEX_ORDER = Orders.voodoo
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 350.)
+        if result.success
+            let owner = caster.getOwner()
+            let count = new Reference(0)
+            forUnitsInRange(result.pos, 400., u -> begin
+                if u.isType(UNIT_TYPE_HERO) and u.isEnemyOf(owner) and u.isAlive()
+                    count.val++
+            end)
+            if count.into() >= 2
+                caster.issuePointOrderById(VORTEX_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(VORTEX_NL, actions)
+    setAbilityActions(VORTEX_L, actions)
+    setAbilityActions(VORTEX_S, actions)

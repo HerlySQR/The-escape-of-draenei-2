@@ -1,7 +1,6 @@
 package AIDarkSummoning
 
 import AIAbilityList
-import PlayerData
 import HeroSelection
 
 let DARK_SUMMONING_ORDER = Orders.inferno
