@@ -31,7 +31,7 @@ AbilityActions actions = caster -> begin
                     break
 
         for u in enemies
-            if u.getHPRatio() < 0.5
+            if u.getHPRatio() < 0.8
                 let count = new Reference(0)
                 forUnitsInRange(u.getPos(), 700., u2 -> begin
                     if u2.isAlive() and u2.isEnemyOf(owner) and u != u2

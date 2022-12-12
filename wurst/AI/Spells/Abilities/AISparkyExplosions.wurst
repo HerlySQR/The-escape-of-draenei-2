@@ -2,7 +2,7 @@ package AISparkyExplosions
 
 import AIAbilityList
 
-let RIPPLE_ORDER = Orders.thunderclap
+let SPARKY_EXPLOSIONS_ORDER = Orders.thunderclap
 
 AbilityActions actions = caster -> begin
     if GetRandomInt(0, 10) <= 50
@@ -12,10 +12,10 @@ AbilityActions actions = caster -> begin
                 count.val++
         end)
         if count.val >= 3
-            caster.issueImmediateOrderById(RIPPLE_ORDER)
+            caster.issueImmediateOrderById(SPARKY_EXPLOSIONS_ORDER)
 end
 
 init
-    setAbilityActions(RIPPLE_NL, actions)
-    setAbilityActions(RIPPLE_L, actions)
-    setAbilityActions(RIPPLE_S, actions)
+    setAbilityActions(SPARKY_EXPLOSIONS_NL, actions)
+    setAbilityActions(SPARKY_EXPLOSIONS_L, actions)
+    setAbilityActions(SPARKY_EXPLOSIONS_S, actions)
