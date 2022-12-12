@@ -1,0 +1,19 @@
+package AIQuell
+
+import AIAbilityList
+
+let QUELL_ORDER = Orders.cripple
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let owner = caster.getOwner()
+        forUnitsInRange(caster.getPos(), 800., u -> begin
+            if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable() and u.getHPRatio().isBetween(0.2, 0.999)
+                caster.issueTargetOrderById(QUELL_ORDER, u)
+        end)
+end
+
+init
+    setAbilityActions(QUELL_NL, actions)
+    setAbilityActions(QUELL_L, actions)
+    setAbilityActions(QUELL_S, actions)

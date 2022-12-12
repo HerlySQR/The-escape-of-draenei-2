@@ -2,14 +2,11 @@ package AIBurnSoul
 
 import AIAbilityList
 
-import ClosureForGroups
-import Orders
-
 let BURN_SOUL_ORDER = Orders.fingerofdeath
 
 AbilityActions actions = caster -> begin
     forUnitsInRange(caster.getPos(), 1000., u -> begin
-        if caster.isEnemyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
+        if u.isAlive() and caster.isEnemyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
             if u.getHPRatio() <= 0.5
                 caster.issueTargetOrderById(BURN_SOUL_ORDER, u)
     end)

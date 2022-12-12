@@ -4,18 +4,11 @@ import AIAbilityList
 
 let DISABLE_SPHERE_ORDER = Orders.silence
 
-// TODO
 AbilityActions actions = caster -> begin
     if GetRandomInt(0, 100) <= 50
-        let hp = new LinkedList<unit>()
-        forUnitsInRange(caster.getPos(), 1000., u -> begin
-            if caster.isEnemyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
-                hp.add(u)
-        end)
-        if not hp.isEmpty()
-            hp.sortWith((u1, u2) -> (u1.getHP() - u2.getHP()).toInt())
-            caster.issueTargetOrderById(DISABLE_SPHERE_ORDER, hp.getFirst())
-        destroy hp
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 300.)
+        if result.success
+            caster.issuePointOrderById(DISABLE_SPHERE_ORDER, result.pos)
 end
 
 init

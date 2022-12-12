@@ -60,6 +60,7 @@ init
 
 function ChannelAbilityPreset.general()
     this
+        ..presetBaseOrderID(lvl -> "whirlwind")
         ..presetFollowThroughTime(lvl -> 0.75)
         ..setAnimationNames("attack")
         ..tooltipStartListen()

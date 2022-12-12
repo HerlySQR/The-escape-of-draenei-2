@@ -1,0 +1,17 @@
+package AIExplosiveFlares
+
+import AIAbilityList
+
+let EXPLOSIVE_FLARES_ORDER = Orders.shockwave
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitInCone(caster.getPos(), 1000., caster.getOwner(), 30..asAngleDegrees())
+        if result.success
+            caster.issuePointOrderById(EXPLOSIVE_FLARES_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(EXPLOSIVE_FLARES_NL, actions)
+    setAbilityActions(EXPLOSIVE_FLARES_L, actions)
+    setAbilityActions(EXPLOSIVE_FLARES_S, actions)

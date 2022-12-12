@@ -11,14 +11,15 @@ AbilityActions actions = caster -> begin
         let hp = new LinkedList<unit>()
         let pos = (THE_DRAENEI.has(caster) ? actDrSpawn : actDeSpawn).getCenter()
         forUnitsAll(u -> begin
-            if u.isType(UNIT_TYPE_HERO) and caster.isAllyOf(u.getOwner())
+            if u.isAlive() and u.isType(UNIT_TYPE_HERO) and caster.isAllyOf(u.getOwner())
                 and u.getPos().distanceTo(pos) > 2000.
 
                 hp.add(u)
         end)
         if not hp.isEmpty()
             hp.sortWith((u1, u2) -> (u1.getHP() - u2.getHP()).toInt())
-            caster.issuePointOrderById(DARK_SUMMONING_ORDER, hp.peek().getPos())
+            if hp.peek().getHPRatio() < 0.3
+                caster.issuePointOrderById(DARK_SUMMONING_ORDER, hp.peek().getPos())
         destroy hp
 end
 

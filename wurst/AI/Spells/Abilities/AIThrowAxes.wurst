@@ -1,0 +1,19 @@
+package AIThrowAxes
+
+import AIAbilityList
+
+let THROW_AXES_ORDER = Orders.thunderclap
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitInCone(caster.getPos(), 500., caster.getOwner(), 45..asAngleDegrees())
+        if result.success
+            caster.setFacing(caster.getPos().angleTo(result.pos))
+            doAfter(0.5) ->
+                caster.issueImmediateOrderById(THROW_AXES_ORDER)
+end
+
+init
+    setAbilityActions(THROW_AXES_NL, actions)
+    setAbilityActions(THROW_AXES_L, actions)
+    setAbilityActions(THROW_AXES_S, actions)

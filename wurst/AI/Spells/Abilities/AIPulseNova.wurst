@@ -1,0 +1,17 @@
+package AIPulseNova
+
+import AIAbilityList
+
+let PULSE_NOVA_ORDER = Orders.creepheal
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 350.)
+        if result.success
+            caster.issuePointOrderById(PULSE_NOVA_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(PULSE_NOVA_NL, actions)
+    setAbilityActions(PULSE_NOVA_L, actions)
+    setAbilityActions(PULSE_NOVA_S, actions)

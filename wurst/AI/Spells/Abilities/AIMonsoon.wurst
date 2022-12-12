@@ -1,0 +1,17 @@
+package AIMonsoon
+
+import AIAbilityList
+
+let MONSOON_ORDER = Orders.monsoon
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 400.)
+        if result.success
+            caster.issuePointOrderById(MONSOON_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(RAIN_OF_FIRE_NL, actions)
+    setAbilityActions(RAIN_OF_FIRE_L, actions)
+    setAbilityActions(RAIN_OF_FIRE_S, actions)

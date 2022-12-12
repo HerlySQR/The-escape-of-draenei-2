@@ -1,0 +1,24 @@
+package AIEssenceOfCelerity
+
+import AIAbilityList
+
+let ESSENCE_OF_CELERITY_ORDER = Orders.bloodlust
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let owner = caster.getOwner()
+        let cast = new Reference(false)
+        forUnitsInRange(caster.getPos(), 800., u -> begin
+            if u.isAlive() and u.isType(UNIT_TYPE_HERO) and u.isEnemyOf(owner) and u.getHPRatio() < 0.5
+                cast.val = true
+        end)
+        if not cast.val and caster.getHPRatio() < 0.5
+            cast.val = true
+        if cast.into()
+            caster.issueImmediateOrderById(ESSENCE_OF_CELERITY_ORDER)
+end
+
+init
+    setAbilityActions(ESSENCE_OF_CELERITY_NL, actions)
+    setAbilityActions(ESSENCE_OF_CELERITY_L, actions)
+    setAbilityActions(ESSENCE_OF_CELERITY_S, actions)

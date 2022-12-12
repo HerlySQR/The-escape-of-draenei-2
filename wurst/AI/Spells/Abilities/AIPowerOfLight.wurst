@@ -1,0 +1,24 @@
+package AIPowerOfLight
+
+import AIAbilityList
+
+let POWER_OF_LIGHT_ORDER = Orders.innerfireon
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let hp = new LinkedList<unit>()
+        forUnitsAll(u -> begin
+            if u.isAlive() and u.isType(UNIT_TYPE_HERO) and caster.isAllyOf(u.getOwner())
+                hp.add(u)
+        end)
+        if not hp.isEmpty()
+            hp.sortWith((u1, u2) -> (u1.getHP() - u2.getHP()).toInt())
+            if hp.peek().getHPRatio() < 0.4
+                caster.issueTargetOrderById(POWER_OF_LIGHT_ORDER, hp.peek())
+        destroy hp
+end
+
+init
+    setAbilityActions(POWER_OF_LIGHT_NL, actions)
+    setAbilityActions(POWER_OF_LIGHT_L, actions)
+    setAbilityActions(POWER_OF_LIGHT_S, actions)

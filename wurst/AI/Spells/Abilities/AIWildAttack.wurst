@@ -1,0 +1,18 @@
+package AIWildAttack
+
+import AIAbilityList
+
+let WILD_ATTACK_ORDER = Orders.drain
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 10
+        forUnitsInRange(caster.getPos(), 500., u -> begin
+            if u.isAlive() and caster.isEnemyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
+                caster.issueTargetOrderById(WILD_ATTACK_ORDER, u)
+        end)
+end
+
+init
+    setAbilityActions(WILD_ATTACK_NL, actions)
+    setAbilityActions(WILD_ATTACK_L, actions)
+    setAbilityActions(WILD_ATTACK_S, actions)

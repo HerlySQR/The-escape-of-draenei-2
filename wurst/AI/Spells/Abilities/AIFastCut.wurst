@@ -1,0 +1,17 @@
+package AIFastCut
+
+import AIAbilityList
+
+let FAST_CUT_ORDER = Orders.thunderclap
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitInCone(caster.getPos(), 1000., caster.getOwner(), 15..asAngleDegrees())
+        if result.success
+            caster.issuePointOrderById(FAST_CUT_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(FAST_CUT_NL, actions)
+    setAbilityActions(FAST_CUT_L, actions)
+    setAbilityActions(FAST_CUT_S, actions)

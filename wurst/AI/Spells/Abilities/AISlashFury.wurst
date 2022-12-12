@@ -1,0 +1,17 @@
+package AISlashFury
+
+import AIAbilityList
+
+let SLASH_FURY_ORDER = Orders.chainlightning
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 800.)
+        if result.success
+            caster.issuePointOrderById(SLASH_FURY_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(SLASH_FURY_NL, actions)
+    setAbilityActions(SLASH_FURY_L, actions)
+    setAbilityActions(SLASH_FURY_S, actions)

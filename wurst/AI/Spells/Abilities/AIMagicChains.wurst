@@ -1,0 +1,56 @@
+package AIMagicChains
+
+import AIAbilityList
+
+let MAGIC_CHAINS_PULL_ORDER = Orders.fingerofdeath
+let MAGIC_CHAINS_GRASP_ORDER = Orders.chainlightning
+
+let allies = CreateGroup()
+let enemies = CreateGroup()
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let owner = caster.getOwner()
+        forUnitsInRange(caster.getPos(), 1000., u -> begin
+            if u.isAlive() and u.isType(UNIT_TYPE_HERO)
+                if u.isEnemyOf(owner)
+                    enemies.add(u)
+                else if u.isAllyOf(owner)
+                    allies.add(u)
+        end)
+
+        if caster.getHPRatio() < 0.3
+            for u in allies
+                let count = new Reference(0)
+                forUnitsInRange(u.getPos(), 700., u2 -> begin
+                    if u2.isAlive() and u2.isEnemyOf(owner)
+                        count.val++
+                end)
+                if count.into() < 3
+                    caster.issueTargetOrderById(MAGIC_CHAINS_GRASP_ORDER, u)
+                    break
+
+        for u in enemies
+            if u.getHPRatio() < 0.5
+                let count = new Reference(0)
+                forUnitsInRange(u.getPos(), 700., u2 -> begin
+                    if u2.isAlive() and u2.isEnemyOf(owner) and u != u2
+                        count.val++
+                end)
+                if count.into() < 3
+                    caster.issueTargetOrderById(MAGIC_CHAINS_GRASP_ORDER, u)
+                else
+                    caster.issueTargetOrderById(MAGIC_CHAINS_PULL_ORDER, u)
+                break
+
+        allies.clear()
+        enemies.clear()
+end
+
+init
+    setAbilityActions(MAGIC_CHAINS_PULL_NL, actions)
+    setAbilityActions(MAGIC_CHAINS_PULL_L, actions)
+    setAbilityActions(MAGIC_CHAINS_PULL_S, actions)
+    setAbilityActions(MAGIC_CHAINS_GRASP_NL, actions)
+    setAbilityActions(MAGIC_CHAINS_GRASP_L, actions)
+    setAbilityActions(MAGIC_CHAINS_GRASP_S, actions)

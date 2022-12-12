@@ -1,0 +1,23 @@
+package AIRetribution
+
+import AIAbilityList
+
+let RETRIBUTION_ORDER = Orders.holybolt
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let hp = new LinkedList<unit>()
+        forUnitsInRange(caster.getPos(), 800., u -> begin
+            if u.isAlive() and u.isType(UNIT_TYPE_HERO) and caster.isEnemyOf(u.getOwner()) and not u.isInvulnerable()
+                hp.add(u)
+        end)
+        if not hp.isEmpty()
+            hp.sortWith((u1, u2) -> (u1.getHP() - u2.getHP()).toInt())
+            caster.issueTargetOrderById(RETRIBUTION_ORDER, hp.getFirst())
+        destroy hp
+end
+
+init
+    setAbilityActions(RETRIBUTION_NL, actions)
+    setAbilityActions(RETRIBUTION_L, actions)
+    setAbilityActions(RETRIBUTION_S, actions)

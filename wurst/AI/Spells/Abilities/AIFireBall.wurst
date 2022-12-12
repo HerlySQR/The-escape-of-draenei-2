@@ -1,0 +1,17 @@
+package AIFireBall
+
+import AIAbilityList
+
+let FIRE_BALL_ORDER = Orders.inferno
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 300.)
+        if result.success
+            caster.issuePointOrderById(FIRE_BALL_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(FIRE_BALL_NL, actions)
+    setAbilityActions(FIRE_BALL_L, actions)
+    setAbilityActions(FIRE_BALL_S, actions)

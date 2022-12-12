@@ -16,7 +16,7 @@ bool array stunned
 bool array canAttack
 bool array isAttacking
 bool array isRetreating
-bool array isCasting
+public bool array isCasting
 bool array wannaBuy
 bool array goShopping
 

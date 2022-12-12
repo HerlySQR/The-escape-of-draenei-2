@@ -1,8 +1,7 @@
 package StealSpell
 
 import AbilityData
-import initlater HeroSpells
-import ExtraSpells
+import initlater AIAbilityList
 
 public constant STEAL_SPELL_NL = compiletime(ABIL_ID_GEN.next())
 public constant STEAL_SPELL_L = compiletime(ABIL_ID_GEN.next())
@@ -83,8 +82,10 @@ init
                             let spellOld = stealSpell.get(caster)
                             if spellOld != 0
                                 caster.removeAbility(spellOld)
+                                caster.removeAbilityFromList(spellOld)
                             
                             caster.addAbility(spellNew)
+                            caster.addAbilityToList(spellNew)
                             caster.setAbilityLevel(spellNew, level)
                             stealSpell.put(caster, spellNew)
 
@@ -104,6 +105,7 @@ init
         let u = GetDyingUnit()
         if stealSpell.has(u)
             u.removeAbility(stealSpell.get(u))
+            u.removeAbilityFromList(stealSpell.get(u))
             stealSpell.remove(u)
             if timerMap.has(u)
                 destroy timerMap.get(u)
@@ -183,7 +185,7 @@ init
     initSpell(QUELL_NL, QUELL_L, QUELL_S)
     initSpell(RAIN_OF_FIRE_NL, RAIN_OF_FIRE_L, RAIN_OF_FIRE_S)
     initSpell(RETRIBUTION_NL, RETRIBUTION_L, RETRIBUTION_S)
-    initSpell(RIPLE_NL, RIPLE_L, RIPLE_S)
+    initSpell(RIPPLE_NL, RIPPLE_L, RIPPLE_S)
     initSpell(SHADOW_STRIKE_NL, SHADOW_STRIKE_L, SHADOW_STRIKE_S)
     initSpell(SLASH_FURY_NL, SLASH_FURY_L, SLASH_FURY_S)
     initSpell(SPARKY_EXPLOSIONS_NL, SPARKY_EXPLOSIONS_L, SPARKY_EXPLOSIONS_S)

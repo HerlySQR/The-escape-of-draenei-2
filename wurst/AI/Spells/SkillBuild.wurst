@@ -323,13 +323,13 @@ public class SkillBuild
                     RAIN_OF_FIRE_L,
                     DARK_BLOOD_L,
                     RAIN_OF_FIRE_L,
-                    RIPLE_L,
+                    RIPPLE_L,
                     HOWL_OF_TERROR_L,
                     RAIN_OF_FIRE_L,
                     HOWL_OF_TERROR_L,
                     DARK_BLOOD_L,
                     HOWL_OF_TERROR_L,
-                    RIPLE_L,
+                    RIPPLE_L,
                     DARK_BLOOD_L,
                     HOWL_OF_TERROR_L)
             case DARK_WIZARD.getL()

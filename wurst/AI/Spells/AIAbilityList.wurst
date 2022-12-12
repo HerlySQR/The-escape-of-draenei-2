@@ -1,6 +1,7 @@
 package AIAbilityList
 
-import AddBot
+import public AddBot
+import AIHeroActions
 import public HeroSpells
 import public ExtraSpells
 import HeroType
@@ -14,7 +15,7 @@ import HashMap
 import ObjectIds
 import public ClosureForGroups
 import ErrorHandling
-import Reference
+import public Reference
 
 let passives = new HashSet<int>()
 
@@ -51,10 +52,16 @@ LinkedList<int> array heroAbilityLists
 
 SkillBuild array skillBuilds
 
+public function unit.addAbilityToList(int abil)
+    normalAbilityLists[this.getOwner().getId()].add(abil)
+
+public function unit.removeAbilityFromList(int abil)
+    normalAbilityLists[this.getOwner().getId()].remove(abil)
+
 init
     addBotAction(bot -> begin
         let h = hero[bot]
-        if h.isAlive()
+        if h.isAlive() and not isCasting[bot]
             for spell in normalAbilityLists[bot]
                 if h.hasAbility(spell)
                     let cb = abilityActions.get(spell)
@@ -107,6 +114,16 @@ init
 
 // Find concentration of units
 
+unit attacker
+
+init
+    attacker = createUnit(players[PLAYER_NEUTRAL_AGGRESSIVE], 'hgry')..hide()
+
+public function unit.isInvulnerable() returns bool
+    let result = attacker.issueTargetOrderById(Orders.attackonce, this)
+    attacker.issueImmediateOrderById(Orders.stop)
+    return not result
+
 let E = EULER
 let E_INV = 0.3678794
 let LN_FACTOR = 1.2840254
@@ -155,7 +172,6 @@ function mode(LinkedList<real> data) returns real
         L[i] = minVal + i*amplitude
 
     int array f // frequencies
-    // In this block the thread crashes
     for i = 1 to intervalNumber
         for x in data
             if x.isBetween(l[i], L[i])
@@ -179,7 +195,7 @@ public function unitConcentration(vec2 pos, real range, player owner, real area)
     unitConcentrationResult result
 
     forUnitsInRange(pos, range, u -> begin
-        if u.isAlive() and u.isEnemyOf(owner)
+        if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable()
             xVals.add(u.getX())
             yVals.add(u.getY())
     end)
@@ -189,7 +205,7 @@ public function unitConcentration(vec2 pos, real range, player owner, real area)
 
         let count = new Reference(0)
         forUnitsInRange(concentration, area, u -> begin
-            if u.isAlive() and u.isEnemyOf(owner)
+            if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable()
                 count.val++
         end)
 
@@ -199,5 +215,33 @@ public function unitConcentration(vec2 pos, real range, player owner, real area)
 
     destroy xVals
     destroy yVals
+
+    return result
+
+// Find units in a cone
+
+public function unitInCone(vec2 pos, real range, player owner, angle theta) returns unitConcentrationResult
+    let angles = new LinkedList<real>()
+    unitConcentrationResult result
+
+    forUnitsInRange(pos, range, u -> begin
+        if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable()
+            angles.add(u.getPos().angleTo(pos).radians())
+    end)
+
+    if angles.size() >= 3
+        let cone = mode(angles)
+
+        let count = new Reference(0)
+        forUnitsInRange(pos, range, u -> begin
+            if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable() and cone < (u.getPos().angleTo(pos) - theta).radians().abs()
+                count.val++
+        end)
+
+        result = count.into() >= 3 ? unitConcentrationResult(true, pos.polarOffset(angle(cone), range/2)) : unitConcentrationResult(false, ZERO2)
+    else
+        result = unitConcentrationResult(false, ZERO2)
+
+    destroy angles
 
     return result

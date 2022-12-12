@@ -4,9 +4,9 @@ import AbilityData
 
 import Simulate3dSound
 
-public constant RIPLE_NL = compiletime(ABIL_ID_GEN.next())
-public constant RIPLE_L = compiletime(ABIL_ID_GEN.next())
-public constant RIPLE_S = compiletime(ABIL_ID_GEN.next())
+public constant RIPPLE_NL = compiletime(ABIL_ID_GEN.next())
+public constant RIPPLE_L = compiletime(ABIL_ID_GEN.next())
+public constant RIPPLE_S = compiletime(ABIL_ID_GEN.next())
 
 constant DUMMY_STUN = compiletime(ABIL_ID_GEN.next())
 
@@ -28,7 +28,7 @@ function playSound(string name, vec2 pos)
 
 init
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_EFFECT, () -> begin
-        let data = abilityCond(RIPLE_NL, RIPLE_L, RIPLE_S)
+        let data = abilityCond(RIPPLE_NL, RIPPLE_L, RIPPLE_S)
         if data.check
             real damage
             real duration
@@ -86,7 +86,7 @@ function ChannelAbilityPreset.general()
     this.setAnimationNames("spell,slam")
 
 @compiletime function gen()
-    new ChannelAbilityPreset(RIPLE_NL, 1, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
+    new ChannelAbilityPreset(RIPPLE_NL, 1, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
         ..setHeroAbility(false)
         ..general()
         // Stats
@@ -96,7 +96,7 @@ function ChannelAbilityPreset.general()
         ..tooltipStopListen()
         ..setEditorSuffix("(Not leveling)")
     
-    new ChannelAbilityPreset(RIPLE_L, 2, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
+    new ChannelAbilityPreset(RIPPLE_L, 2, true, new AbilityTooltipGenerator("The Pit Lord with his weapon hits hard the ground to create a crater in his position that pulls and stuns the nearby enemy units and damage them."))
         ..setHeroAbility(true)
         ..setRequiredLevel(6)
         ..setLevelSkipRequirement(6)
@@ -108,7 +108,7 @@ function ChannelAbilityPreset.general()
         ..tooltipStopListen()
         ..setEditorSuffix("(Leveling)")
 
-    new ChannelAbilityPreset(RIPLE_S, 3, true)
+    new ChannelAbilityPreset(RIPPLE_S, 3, true)
         ..setHeroAbility(false)
         ..general()
         ..presetTooltipNormal(lvl -> "[|cffffcc00F|r] Ripple")

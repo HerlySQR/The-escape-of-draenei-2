@@ -1,0 +1,17 @@
+package AIStealSpell
+
+import AIAbilityList
+
+let STEAL_SPELL_ORDER = Orders.chainlightning
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 10
+        forUnitsInRange(caster.getPos(), 1000., u -> begin
+            if u.isAlive() and caster.isEnemyOf(u.getOwner()) and u.isType(UNIT_TYPE_HERO)
+                caster.issueTargetOrderById(STEAL_SPELL_ORDER, u)
+        end)
+end
+
+init
+    setAbilityActions(STEAL_SPELL_NL, actions)
+    setAbilityActions(STEAL_SPELL_L, actions)

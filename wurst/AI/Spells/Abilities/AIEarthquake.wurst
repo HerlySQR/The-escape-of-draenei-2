@@ -1,0 +1,17 @@
+package AIEarthquake
+
+import AIAbilityList
+
+let EARTHQUAKE_ORDER = Orders.inferno
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 100) <= 50
+        let result = unitConcentration(caster.getPos(), 1000., caster.getOwner(), 230.)
+        if result.success
+            caster.issuePointOrderById(EARTHQUAKE_ORDER, result.pos)
+end
+
+init
+    setAbilityActions(EARTHQUAKE_NL, actions)
+    setAbilityActions(EARTHQUAKE_L, actions)
+    setAbilityActions(EARTHQUAKE_S, actions)

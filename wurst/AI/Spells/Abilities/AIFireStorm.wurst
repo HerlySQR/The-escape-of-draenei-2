@@ -1,0 +1,21 @@
+package AIFireStorm
+
+import AIAbilityList
+
+let FIRE_STORM_ORDER = Orders.stampede
+
+AbilityActions actions = caster -> begin
+    if GetRandomInt(0, 10) <= 50
+        let count = new Reference(0)
+        forUnitsInRange(caster.getPos(), 1000., u -> begin
+            if u.isAlive() and caster.isEnemyOf(u.getOwner()) and not u.isInvulnerable()
+                count.val++
+        end)
+        if count.val >= 3
+            caster.issuePointOrderById(FIRE_STORM_ORDER, caster.getPos().polarOffset(angle(GetRandomReal(0, PI2)), 300.))
+end
+
+init
+    setAbilityActions(FIRE_STORM_NL, actions)
+    setAbilityActions(FIRE_STORM_L, actions)
+    setAbilityActions(FIRE_STORM_S, actions)
