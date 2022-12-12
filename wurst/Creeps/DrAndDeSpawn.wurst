@@ -315,7 +315,7 @@ function BuildingDefinition.towerGeneral()
 
 function UnitDefinition.creepGeneral(int i)
     this
-        ..setAttack1DamageBase(17 + 9*i)
+        ..setAttack1DamageBase(12 + 9*i)
         ..setAttack1DamageNumberofDice(2 + i)
         ..setAttack1CooldownTime(1.8 - 0.1 * i)
         ..setDefenseUpgradeBonus(0)
