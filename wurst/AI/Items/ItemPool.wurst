@@ -1,0 +1,22 @@
+package ItemPool
+
+import HashMap
+
+public class ItemPool
+    private int totalWeight = 0
+    private IterableMap<int, int> weights = new IterableMap<int, int>()
+
+    function add(int itemId, int weight)
+        totalWeight += weight
+        weights.put(itemId, totalWeight)
+    
+    function get() returns int
+        let random = GetRandomInt(0, totalWeight)
+        int result = 0
+        for key in weights
+            let weight = weights.get(key)
+            if random >= weight
+                break
+            result = key
+        
+        return result

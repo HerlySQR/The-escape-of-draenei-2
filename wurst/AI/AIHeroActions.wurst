@@ -148,7 +148,7 @@ init
                     isRetreating[bot] = false
                     canAttack[bot] = true
                 else if (THE_DRAENEI.has(h) and actDrSpawn.contains(h.getPos())) or actDeSpawn.contains(h.getPos())
-                    wannaBuy[bot] = true
+                    wannaBuy[bot] = not h.isInventoryFull()
     end)
 
     /*onBotHeroDie(bot -> begin
@@ -156,7 +156,7 @@ init
     end)*/
 
     onBotHeroAppear(bot -> begin
-        wannaBuy[bot] = true
+        wannaBuy[bot] = not hero[bot].isInventoryFull()
     end)
     
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST, () -> begin

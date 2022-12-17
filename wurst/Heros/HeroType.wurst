@@ -1193,7 +1193,7 @@ init
         ..setDeathTimeseconds(2.67)
         ..setScalingValue(1.3)
         ..setPropulsionWindowdegrees(61.)
-        ..setMovementType(MovementType.Float)
+        ..setMovementType(MovementType.Hover)
         ..setSpeedBase(290)
         ..setTurnRate(0.6)
         ..setExtraAbility(BANISH)

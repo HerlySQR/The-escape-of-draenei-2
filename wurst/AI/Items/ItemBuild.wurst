@@ -1,0 +1,75 @@
+package ItemBuild
+
+import ItemPool
+import Shops
+
+import LinkedList
+
+let consummablesPool = new ItemPool()
+    ..add(HEALING_POTION.getNewId(), 100)
+    ..add(HEALING_SALVE.getNewId(), 100)
+    ..add(MANA_POTION.getNewId(), 100)
+    ..add(CLARITY_POTION.getNewId(), 100)
+    ..add(SCROLL_OF_THE_BEAST.getNewId(), 40)
+    ..add(WIND_SCEPTER.getNewId(), 40)
+    ..add(GREATER_HEALING_POTION.getNewId(), 50)
+    ..add(POTION_OF_RESTORATION.getNewId(), 50)
+    ..add(GREATER_MANA_POTION.getNewId(), 50)
+    ..add(GREATER_POTION_OF_RESTORATION.getNewId(), 50)
+    ..add(SCROLL_OF_PROTECTION.getNewId(), 30)
+    ..add(SCROLL_OF_SPEED.getNewId(), 30)
+    ..add(INVULNERAVILITY_POTION.getNewId(), 10)
+    ..add(VAMPIRIC_POTION.getNewId(), 30)
+    ..add(SCROLL_OF_SPEED.getNewId(), 20)
+    ..add(STAFF_OF_NEGATION.getNewId(), 30)
+    ..add(NETHER_POTION.getNewId(), 20)
+    ..add(POWER_BOOSTER.getNewId(), 50)
+    ..add(GOBLIN_LANDMINES.getNewId(), 10)
+    ..add(SHIELD_RUNE.getNewId(), 10)
+    ..add(STONE_GOLEM.getNewId(), 10)
+
+let damageRecipesPool = new ItemPool()
+    ..add(MASK_OF_DEATH.getNewId(), 10)
+    ..add(GLOVES_OF_CORRUPTION.getNewId(), 10)
+    ..add(SHAMANS_CLAWS.getNewId(), 10)
+    ..add(NORTHREND_ARTIFACT.getNewId(), 10)
+    ..add(WAR_HELMET.getNewId(), 10)
+    ..add(FIRE_BLADE.getNewId(), 10)
+    ..add(STAFF_OF_SILENCE.getNewId(), 10)
+
+let defenseRecipesPool = new ItemPool()
+    ..add(SHIELD_OF_HONOR.getNewId(), 10)
+    ..add(RING_OF_REGENERATION_1.getNewId(), 5)
+    ..add(RING_OF_REGENERATION_2.getNewId(), 5)
+    ..add(SHIELD_OF_LORD_OF_DEAD.getNewId(), 10)
+
+let magicRecipesPool = new ItemPool()
+    ..add(SOBI_MASK_1.getNewId(), 5)
+    ..add(SOBI_MASK_2.getNewId(), 5)
+    ..add(RUNIC_BRACERS.getNewId(), 10)
+    ..add(ENERGY_PENDANT.getNewId(), 10)
+    ..add(STAFF_OF_THE_CYCLONES.getNewId(), 10)
+
+let miscRecipesPool = new ItemPool()
+    ..add(RUNIC_BRACERS.getNewId(), 10)
+    ..add(IMPULSE_BOOTS.getNewId(), 10)
+    ..add(POWER_BOOTS.getNewId(), 10)
+
+let miscItemsPool = new ItemPool()
+    ..add(HORN_OF_THE_LEGION.getNewId(), 10)
+    ..add(ACID_STONE.getNewId(), 10)
+
+let noRecipesPool = new ItemPool()
+    ..add(CLAWS_OF_ATTACK_21.getNewId(), 10)
+    ..add(RING_OF_PROTECTION_6.getNewId(), 10)
+    ..add(ORB_OF_CORRUPTION.getNewId(), 10)
+    ..add(ORB_OF_LIGHTNING.getNewId(), 10)
+    ..add(ICE_ORB.getNewId(), 10)
+    ..add(GLOVES_OF_HASTE.getNewId(), 10)
+    ..add(KHADGAR_HEATH_STONE.getNewId(), 10)
+    ..add(MANA_PENDANT.getNewId(), 10)
+    ..add(STORM_DIAMOND.getNewId(), 10)
+
+public class ItemBuild
+    LinkedList<int> recipes
+
