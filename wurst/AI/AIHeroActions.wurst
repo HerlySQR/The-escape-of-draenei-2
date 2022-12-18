@@ -40,16 +40,32 @@ let specialMerchants = CreateGroup()
 let recipeMerchants = CreateGroup()
 let bookStores = CreateGroup()
 
-function group.getNearbyShop(unit h) returns unit
-    let pos = h.getPos()
-    var d = REAL_MAX
+function int.getNearbyShop(unit h) returns unit
+    group g = null
     unit shop = null
+    switch this
+        case MERCHANT
+            g = merchants
+        case ARMS_MERCHANT
+            g = armsMerchants
+        case SPECIAL_MERCHANT
+            g = specialMerchants
+        case RECIPES_MERCHANT
+            g = recipeMerchants
+        case BOOK_STORE
+            g = bookStores
+        case SECRET_MERCHANT
+            shop = secretMerchant
+    
+    if shop == null
+        let pos = h.getPos()
+        var d = REAL_MAX
 
-    for u in this
-        let d2 = pos.distanceToSq(u.getPos())
-        if d2 < d
-            d = d2
-            shop = u
+        for u in g
+            let d2 = pos.distanceToSq(u.getPos())
+            if d2 < d
+                d = d2
+                shop = u
     
     return shop
 
@@ -84,7 +100,7 @@ init
             // Buy items
             if wannaBuy[bot]
                 if not isAttacking[bot] and not goShopping[bot]
-                    let shop = merchants.getNearbyShop(h)
+                    let shop = MERCHANT.getNearbyShop(h)
                     h.issuePointOrderById(Orders.smart, shop.getPos().polarOffset(shop.getFacingAngle() + 45..asAngleDegrees(), 300.))
                     goShopping[bot] = true
                     isRetreating[bot] = false
@@ -93,7 +109,7 @@ init
                         nullTimer() ->
                             if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
                                 doAfter(3.) ->
-                                    let shop = merchants.getNearbyShop(h)
+                                    let shop = MERCHANT.getNearbyShop(h)
                                     IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h)
                                     IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId())
                                     wannaBuy[bot] = false

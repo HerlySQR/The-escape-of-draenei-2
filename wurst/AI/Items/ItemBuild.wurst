@@ -2,8 +2,10 @@ package ItemBuild
 
 import ItemPool
 import Shops
+import ModeSelection
 
 import LinkedList
+import HashMap
 
 let consummablesPool = new ItemPool()
     ..add(HEALING_POTION.getNewId(), 100)
@@ -20,7 +22,6 @@ let consummablesPool = new ItemPool()
     ..add(SCROLL_OF_SPEED.getNewId(), 30)
     ..add(INVULNERAVILITY_POTION.getNewId(), 10)
     ..add(VAMPIRIC_POTION.getNewId(), 30)
-    ..add(SCROLL_OF_SPEED.getNewId(), 20)
     ..add(STAFF_OF_NEGATION.getNewId(), 30)
     ..add(NETHER_POTION.getNewId(), 20)
     ..add(POWER_BOOSTER.getNewId(), 50)
@@ -70,6 +71,111 @@ let noRecipesPool = new ItemPool()
     ..add(MANA_PENDANT.getNewId(), 10)
     ..add(STORM_DIAMOND.getNewId(), 10)
 
-public class ItemBuild
-    LinkedList<int> recipes
+let shopOfTheItem = new HashMap<int, int>()
 
+function LinkedList<int>.addIfDontHave(ItemPool pool)
+    var itm = pool.get()
+    var i = 0
+    while this.has(itm) and i < 10
+        itm = pool.get()
+        i++
+    this.add(itm)
+
+public tuple itemShop(int itm, int shop)
+
+public class ItemBuild
+    private LinkedList<int> recipes
+    private int currentRecipe
+    private LinkedList<int> build
+
+    construct(unit h)
+        build = new LinkedList<int>()
+        switch whatMode[3]
+            case Mode.ALL_ITEMS
+                let isMage = h.getInt(true) > (h.getStr(true) + h.getAgi(true)) / 2
+                if isMage
+                    build.addIfDontHave(magicRecipesPool)
+                    build.addIfDontHave(magicRecipesPool)
+                else
+                    if GetRandomInt(0, 100) < 50
+                        build.addIfDontHave(damageRecipesPool)
+                    else
+                        build.addIfDontHave(magicRecipesPool)
+                
+                if GetRandomInt(0, 100) < 50
+                    build.addIfDontHave(defenseRecipesPool)
+                else
+                    build.addIfDontHave(magicRecipesPool)
+                
+                if GetRandomInt(0, 100) < 50
+                    build.addIfDontHave(defenseRecipesPool)
+                else
+                    build.addIfDontHave(damageRecipesPool)
+            case Mode.NO_RECIPES
+                build.addIfDontHave(noRecipesPool)
+                build.addIfDontHave(noRecipesPool)
+                build.addIfDontHave(noRecipesPool)
+                build.addIfDontHave(noRecipesPool)
+            default
+
+    function get() returns itemShop
+        let random = GetRandomInt(0, 100)
+        int itm
+        if random < 65
+            itm = consummablesPool.get()
+        else
+            if not build.isEmpty()
+                itm = build.getRandomElement()
+                build.remove(itm)
+            else
+                itm = consummablesPool.get()
+        return itemShop(itm, shopOfTheItem.get(itm))
+
+init
+    shopOfTheItem.put(HEALING_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(HEALING_SALVE.getNewId(), MERCHANT)
+    shopOfTheItem.put(MANA_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(CLARITY_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(SCROLL_OF_THE_BEAST.getNewId(), MERCHANT)
+    shopOfTheItem.put(WIND_SCEPTER.getNewId(), MERCHANT)
+    shopOfTheItem.put(GREATER_HEALING_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(POTION_OF_RESTORATION.getNewId(), MERCHANT)
+    shopOfTheItem.put(GREATER_MANA_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(GREATER_POTION_OF_RESTORATION.getNewId(), MERCHANT)
+    shopOfTheItem.put(SCROLL_OF_PROTECTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(SCROLL_OF_SPEED.getNewId(), MERCHANT)
+    shopOfTheItem.put(INVULNERAVILITY_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(VAMPIRIC_POTION.getNewId(), MERCHANT)
+    shopOfTheItem.put(SCROLL_OF_SPEED.getNewId(), MERCHANT)
+
+    shopOfTheItem.put(STAFF_OF_NEGATION.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(GLOVES_OF_HASTE.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(NETHER_POTION.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(GOBLIN_LANDMINES.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(KHADGAR_HEATH_STONE.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(MANA_PENDANT.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(STORM_DIAMOND.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(SUMMON_COURIER.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(GOLD_COINS.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(LUMBER_BALE.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(POWER_BOOSTER.getNewId(), SPECIAL_MERCHANT)
+    shopOfTheItem.put(BOOTS_OF_SPEED.getNewId(), SPECIAL_MERCHANT)
+
+    shopOfTheItem.put(CLAWS_OF_ATTACK_21.getNewId(), ARMS_MERCHANT)
+    shopOfTheItem.put(RING_OF_PROTECTION_6.getNewId(), ARMS_MERCHANT)
+    shopOfTheItem.put(ORB_OF_CORRUPTION.getNewId(), ARMS_MERCHANT)
+    shopOfTheItem.put(ORB_OF_LIGHTNING.getNewId(), ARMS_MERCHANT)
+    shopOfTheItem.put(ICE_ORB.getNewId(), ARMS_MERCHANT)
+
+    shopOfTheItem.put(SHIELD_RUNE.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(STONE_GOLEM.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(CROWN_OF_KINGS.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(HORN_OF_THE_LEGION.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(WAR_HELMET.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(STAFF_OF_THE_CYCLONES.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(ACID_STONE.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(CLOACK_OF_FLAMES.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(TRAP_TOTEM.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(POWER_BOOTS.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(FIRE_BLADE.getNewId(), SECRET_MERCHANT)
+    shopOfTheItem.put(STAFF_OF_SILENCE.getNewId(), SECRET_MERCHANT)
