@@ -7,6 +7,8 @@ import ModeSelection
 import LinkedList
 import HashMap
 
+import RecipeItem
+
 let consummablesPool = new ItemPool()
     ..add(HEALING_POTION.getNewId(), 100)
     ..add(HEALING_SALVE.getNewId(), 100)
@@ -30,48 +32,51 @@ let consummablesPool = new ItemPool()
     ..add(STONE_GOLEM.getNewId(), 10)
 
 let damageRecipesPool = new ItemPool()
-    ..add(MASK_OF_DEATH.getNewId(), 10)
-    ..add(GLOVES_OF_CORRUPTION.getNewId(), 10)
-    ..add(SHAMANS_CLAWS.getNewId(), 10)
-    ..add(NORTHREND_ARTIFACT.getNewId(), 10)
-    ..add(WAR_HELMET.getNewId(), 10)
-    ..add(FIRE_BLADE.getNewId(), 10)
-    ..add(STAFF_OF_SILENCE.getNewId(), 10)
+    ..add(MASK_OF_DEATH castTo int, 10)
+    ..add(WAR_HELMET castTo int, 10)
+    ..add(FIRE_BLADE castTo int, 10)
+    ..add(STAFF_OF_SILENCE castTo int, 10)
+
+let orbRecipesPool = new ItemPool()
+    ..add(GLOVES_OF_CORRUPTION castTo int, 10)
+    ..add(SHAMANS_CLAWS castTo int, 10)
+    ..add(NORTHREND_ARTIFACT castTo int, 10)
 
 let defenseRecipesPool = new ItemPool()
-    ..add(SHIELD_OF_HONOR.getNewId(), 10)
-    ..add(RING_OF_REGENERATION_1.getNewId(), 5)
-    ..add(RING_OF_REGENERATION_2.getNewId(), 5)
-    ..add(SHIELD_OF_LORD_OF_DEAD.getNewId(), 10)
+    ..add(SHIELD_OF_HONOR castTo int, 10)
+    ..add(RING_OF_REGENERATION_1 castTo int, 10)
+    ..add(SHIELD_OF_LORD_OF_DEAD castTo int, 10)
 
 let magicRecipesPool = new ItemPool()
-    ..add(SOBI_MASK_1.getNewId(), 5)
-    ..add(SOBI_MASK_2.getNewId(), 5)
-    ..add(RUNIC_BRACERS.getNewId(), 10)
-    ..add(ENERGY_PENDANT.getNewId(), 10)
-    ..add(STAFF_OF_THE_CYCLONES.getNewId(), 10)
+    ..add(SOBI_MASK_1 castTo int, 10)
+    ..add(RUNIC_BRACERS castTo int, 10)
+    ..add(ENERGY_PENDANT castTo int, 10)
+    ..add(STAFF_OF_THE_CYCLONES castTo int, 10)
 
 let miscRecipesPool = new ItemPool()
-    ..add(RUNIC_BRACERS.getNewId(), 10)
-    ..add(IMPULSE_BOOTS.getNewId(), 10)
-    ..add(POWER_BOOTS.getNewId(), 10)
+    ..add(RUNIC_BRACERS castTo int, 10)
+    ..add(IMPULSE_BOOTS castTo int, 10)
+    ..add(POWER_BOOTS castTo int, 10)
 
 let miscItemsPool = new ItemPool()
-    ..add(HORN_OF_THE_LEGION.getNewId(), 10)
-    ..add(ACID_STONE.getNewId(), 10)
+    ..add(HORN_OF_THE_LEGION castTo int, 10)
+    ..add(ACID_STONE castTo int, 10)
 
 let noRecipesPool = new ItemPool()
     ..add(CLAWS_OF_ATTACK_21.getNewId(), 10)
     ..add(RING_OF_PROTECTION_6.getNewId(), 10)
-    ..add(ORB_OF_CORRUPTION.getNewId(), 10)
-    ..add(ORB_OF_LIGHTNING.getNewId(), 10)
-    ..add(ICE_ORB.getNewId(), 10)
     ..add(GLOVES_OF_HASTE.getNewId(), 10)
     ..add(KHADGAR_HEATH_STONE.getNewId(), 10)
     ..add(MANA_PENDANT.getNewId(), 10)
     ..add(STORM_DIAMOND.getNewId(), 10)
 
+let orbPool = new ItemPool()
+    ..add(ORB_OF_CORRUPTION.getNewId(), 10)
+    ..add(ORB_OF_LIGHTNING.getNewId(), 10)
+    ..add(ICE_ORB.getNewId(), 10)
+
 let shopOfTheItem = new HashMap<int, int>()
+let ingredientsForRecipe = new HashMap<int, LinkedList<int>>()
 
 function LinkedList<int>.addIfDontHave(ItemPool pool)
     var itm = pool.get()
@@ -79,43 +84,59 @@ function LinkedList<int>.addIfDontHave(ItemPool pool)
     while this.has(itm) and i < 10
         itm = pool.get()
         i++
+
     this.add(itm)
 
 public tuple itemShop(int itm, int shop)
 
 public class ItemBuild
-    private LinkedList<int> recipes
-    private int currentRecipe
-    private LinkedList<int> build
+    private int currentItemToBuy = 0
+    private LinkedList<int> build = new LinkedList<int>()
 
     construct(unit h)
-        build = new LinkedList<int>()
         switch whatMode[3]
             case Mode.ALL_ITEMS
+                let recipes = new LinkedList<int>()
                 let isMage = h.getInt(true) > (h.getStr(true) + h.getAgi(true)) / 2
                 if isMage
-                    build.addIfDontHave(magicRecipesPool)
-                    build.addIfDontHave(magicRecipesPool)
+                    recipes.addIfDontHave(magicRecipesPool)
+                    recipes.addIfDontHave(magicRecipesPool)
                 else
                     if GetRandomInt(0, 100) < 50
-                        build.addIfDontHave(damageRecipesPool)
+                        if GetRandomInt(0, 100) < 50
+                            recipes.addIfDontHave(damageRecipesPool)
+                        else
+                            recipes.addIfDontHave(orbRecipesPool)
                     else
-                        build.addIfDontHave(magicRecipesPool)
+                        recipes.addIfDontHave(magicRecipesPool)
                 
                 if GetRandomInt(0, 100) < 50
-                    build.addIfDontHave(defenseRecipesPool)
+                    recipes.addIfDontHave(defenseRecipesPool)
                 else
-                    build.addIfDontHave(magicRecipesPool)
+                    recipes.addIfDontHave(magicRecipesPool)
                 
                 if GetRandomInt(0, 100) < 50
-                    build.addIfDontHave(defenseRecipesPool)
+                    recipes.addIfDontHave(defenseRecipesPool)
                 else
-                    build.addIfDontHave(damageRecipesPool)
+                    recipes.addIfDontHave(damageRecipesPool)
+                
+                for recipe in recipes
+                    for ingredient in ingredientsForRecipe.get(recipe)
+                        if ingredientsForRecipe.has(ingredient)
+                            for ingredient2 in ingredientsForRecipe.get(ingredient)
+                                build.add(ingredient2)
+                        else
+                            build.add(ingredient)
+                
+                destroy recipes
             case Mode.NO_RECIPES
                 build.addIfDontHave(noRecipesPool)
                 build.addIfDontHave(noRecipesPool)
                 build.addIfDontHave(noRecipesPool)
-                build.addIfDontHave(noRecipesPool)
+                if GetRandomInt(0, 100) < 50
+                    build.addIfDontHave(noRecipesPool)
+                else
+                    build.addIfDontHave(orbPool)
             default
 
     function get() returns itemShop
@@ -124,12 +145,25 @@ public class ItemBuild
         if random < 65
             itm = consummablesPool.get()
         else
-            if not build.isEmpty()
+            if not build.isEmpty() and currentItemToBuy == 0
                 itm = build.getRandomElement()
                 build.remove(itm)
+                currentItemToBuy = itm
             else
                 itm = consummablesPool.get()
+
+        if itm == RING_OF_REGENERATION_1.getNewId() and whatMode[5] == Mode.LEVELING
+            itm = RING_OF_REGENERATION_2.getNewId()
+        if itm == SOBI_MASK_1.getNewId() and whatMode[5] == Mode.LEVELING
+            itm = SOBI_MASK_2.getNewId()
+
         return itemShop(itm, shopOfTheItem.get(itm))
+
+    function itemIsBought()
+        currentItemToBuy = 0
+    
+    ondestroy
+        destroy build
 
 init
     shopOfTheItem.put(HEALING_POTION.getNewId(), MERCHANT)
@@ -179,3 +213,131 @@ init
     shopOfTheItem.put(POWER_BOOTS.getNewId(), SECRET_MERCHANT)
     shopOfTheItem.put(FIRE_BLADE.getNewId(), SECRET_MERCHANT)
     shopOfTheItem.put(STAFF_OF_SILENCE.getNewId(), SECRET_MERCHANT)
+
+    ingredientsForRecipe.put(SHIELD_OF_HONOR.getNewId(),
+        asList(
+            CLAWS_OF_ATTACK_12.getNewId(),
+            RING_OF_PROTECTION_2.getNewId(),
+            RING_OF_PROTECTION_6.getNewId(),
+            SHIELD_OF_HONOR_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(RING_OF_REGENERATION_1.getNewId(),
+        asList(
+            HEALING_POTION.getNewId(),
+            HEALING_POTION.getNewId(),
+            HEALING_POTION.getNewId(),
+            RING_OF_REGENERATION_1_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(RING_OF_REGENERATION_2.getNewId(),
+        asList(
+            HEALING_SALVE.getNewId(),
+            HEALING_SALVE.getNewId(),
+            HEALING_SALVE.getNewId(),
+            HEALING_SALVE.getNewId(),
+            RING_OF_REGENERATION_2_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(SOBI_MASK_1.getNewId(),
+        asList(
+            MANA_POTION.getNewId(),
+            MANA_POTION.getNewId(),
+            MANA_POTION.getNewId(),
+            SOBI_MASK_1_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(SOBI_MASK_2.getNewId(),
+        asList(
+            CLARITY_POTION.getNewId(),
+            CLARITY_POTION.getNewId(),
+            CLARITY_POTION.getNewId(),
+            CLARITY_POTION.getNewId(),
+            CLARITY_POTION.getNewId(),
+            SOBI_MASK_2_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(RUNIC_BRACERS.getNewId(),
+        asList(
+            ANTIMAGIC_POTION.getNewId(),
+            RING_OF_REGENERATION_1.getNewId(),
+            RUNIC_BRACERS_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(IMPULSE_BOOTS.getNewId(),
+        asList(
+            BOOTS_OF_SPEED.getNewId(),
+            SCROLL_OF_SPEED.getNewId(),
+            WIND_SCEPTER.getNewId(),
+            IMPULSE_BOOTS_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(ENERGY_PENDANT.getNewId(),
+        asList(
+            MANA_PENDANT.getNewId(),
+            SCROLL_OF_PROTECTION.getNewId(),
+            ENERGY_PENDANT_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(MASK_OF_DEATH.getNewId(),
+        asList(
+            CLAWS_OF_ATTACK_18.getNewId(),
+            RING_OF_PROTECTION_4.getNewId(),
+            VAMPIRIC_POTION.getNewId(),
+            MASK_OF_DEATH_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(SHIELD_OF_LORD_OF_DEAD.getNewId(),
+        asList(
+            KHADGAR_HEATH_STONE.getNewId(),
+            MANA_PENDANT.getNewId(),
+            RING_OF_PROTECTION_3.getNewId(),
+            RING_OF_PROTECTION_4.getNewId(),
+            CLOACK_OF_FLAMES.getNewId(),
+            SHIELD_OF_LORD_OF_DEAD_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(GLOVES_OF_CORRUPTION.getNewId(),
+        asList(
+            ORB_OF_CORRUPTION.getNewId(),
+            CLAWS_OF_ATTACK_15.getNewId(),
+            GLOVES_OF_HASTE.getNewId(),
+            GLOVES_OF_CORRUPTION_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(SHAMANS_CLAWS.getNewId(),
+        asList(
+            ORB_OF_LIGHTNING.getNewId(),
+            CLAWS_OF_ATTACK_15.getNewId(),
+            STORM_DIAMOND.getNewId(),
+            SHAMANS_CLAWS_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(NORTHREND_ARTIFACT.getNewId(),
+        asList(
+            ICE_ORB.getNewId(),
+            CLAWS_OF_ATTACK_15.getNewId(),
+            KHADGAR_HEATH_STONE.getNewId(),
+            NORTHREND_ARTIFACT_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(WAR_HELMET.getNewId(),
+        asList(
+            CROWN_OF_KINGS.getNewId(),
+            WAR_HELMET_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(STAFF_OF_THE_CYCLONES.getNewId(),
+        asList(
+            WIND_SCEPTER.getNewId(),
+            SCROLL_OF_SPEED.getNewId(),
+            SOBI_MASK_1.getNewId(),
+            STAFF_OF_THE_CYCLONES_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(POWER_BOOTS.getNewId(),
+        asList(
+            BOOTS_OF_SPEED.getNewId(),
+            GLOVES_OF_HASTE.getNewId(),
+            CLAWS_OF_ATTACK_12.getNewId(),
+            POWER_BOOTS_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(FIRE_BLADE.getNewId(),
+        asList(
+            CLAWS_OF_ATTACK_12.getNewId(),
+            CLAWS_OF_ATTACK_15.getNewId(),
+            CLAWS_OF_ATTACK_18.getNewId(),
+            CLAWS_OF_ATTACK_21.getNewId(),
+            FIRE_BLADE_RECIPE.getNewId()))
+
+    ingredientsForRecipe.put(STAFF_OF_SILENCE.getNewId(),
+        asList(
+            STAFF_OF_NEGATION.getNewId(),
+            GLOVES_OF_HASTE.getNewId(),
+            CLAWS_OF_ATTACK_12.getNewId(),
+            STAFF_OF_SILENCE_RECIPE.getNewId()))
