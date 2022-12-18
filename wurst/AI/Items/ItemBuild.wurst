@@ -90,6 +90,7 @@ function LinkedList<int>.addIfDontHave(ItemPool pool)
 public tuple itemShop(int itm, int shop)
 
 public class ItemBuild
+    private bool currentItemIsConsummable = false
     private int currentItemToBuy = 0
     private LinkedList<int> build = new LinkedList<int>()
 
@@ -144,13 +145,14 @@ public class ItemBuild
         int itm
         if random < 65
             itm = consummablesPool.get()
+            currentItemIsConsummable = true
         else
             if not build.isEmpty() and currentItemToBuy == 0
                 itm = build.getRandomElement()
-                build.remove(itm)
                 currentItemToBuy = itm
             else
                 itm = consummablesPool.get()
+                currentItemIsConsummable = true
 
         if itm == RING_OF_REGENERATION_1.getNewId() and whatMode[5] == Mode.LEVELING
             itm = RING_OF_REGENERATION_2.getNewId()
@@ -159,8 +161,10 @@ public class ItemBuild
 
         return itemShop(itm, shopOfTheItem.get(itm))
 
-    function itemIsBought()
-        currentItemToBuy = 0
+    function itemWasBought()
+        if not currentItemIsConsummable
+            build.remove(currentItemToBuy)
+            currentItemToBuy = 0
     
     ondestroy
         destroy build

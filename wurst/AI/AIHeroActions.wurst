@@ -5,6 +5,7 @@ import DrAndDeSpawn
 import HeroSelection
 import ClosureForGroups
 import Shops
+import ItemBuild
 
 import Orders
 import LastOrder
@@ -69,6 +70,8 @@ function int.getNearbyShop(unit h) returns unit
     
     return shop
 
+ItemBuild array itemBuilds
+
 init
     forUnitsOfPlayer(players[PLAYER_NEUTRAL_PASSIVE], u -> begin
         switch u.getTypeId()
@@ -100,7 +103,7 @@ init
             // Buy items
             if wannaBuy[bot]
                 if not isAttacking[bot] and not goShopping[bot]
-                    let shop = MERCHANT.getNearbyShop(h)
+                    let shop = itemBuilds[bot].get().shop.getNearbyShop(h)
                     h.issuePointOrderById(Orders.smart, shop.getPos().polarOffset(shop.getFacingAngle() + 45..asAngleDegrees(), 300.))
                     goShopping[bot] = true
                     isRetreating[bot] = false
@@ -109,9 +112,13 @@ init
                         nullTimer() ->
                             if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
                                 doAfter(3.) ->
-                                    let shop = MERCHANT.getNearbyShop(h)
+                                    let data = itemBuilds[bot].get()
+                                    let shop = data.shop.getNearbyShop(h)
                                     IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h)
-                                    IssueNeutralImmediateOrderById(players[bot], shop, HEALING_SALVE.getNewId())
+
+                                    if IssueNeutralImmediateOrderById(players[bot], shop, data.itm)
+                                        itemBuilds[bot].itemWasBought()
+                                    
                                     wannaBuy[bot] = false
                                     canAttack[bot] = true
                                     isRetreating[bot] = h.getHPRatio() < 0.3
@@ -173,6 +180,7 @@ init
 
     onBotHeroAppear(bot -> begin
         wannaBuy[bot] = not hero[bot].isInventoryFull()
+        itemBuilds[bot] = new ItemBuild(hero[bot])
     end)
     
     registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST, () -> begin
