@@ -21,6 +21,7 @@ public interface BotActions
 
 let actions = new LinkedList<BotActions>()
 let heroDie = new LinkedList<BotActions>()
+let heroRevive = new LinkedList<BotActions>()
 let heroAppear = new LinkedList<BotActions>()
 let heroDisappear = new LinkedList<BotActions>()
 
@@ -29,6 +30,9 @@ public function addBotAction(BotActions cb)
 
 public function onBotHeroDie(BotActions cb)
     heroDie.add(cb)
+
+public function onBotHeroRevive(BotActions cb)
+    heroRevive.add(cb)
 
 public function onBotHeroAppear(BotActions cb)
     heroAppear.add(cb)
@@ -90,7 +94,7 @@ init
         let r = GetRevivingUnit()
         if bots.has(r)
             let bot = r.getOwner().getId()
-            for cb in heroAppear
+            for cb in heroRevive
                 cb.run(bot)
     end)
 

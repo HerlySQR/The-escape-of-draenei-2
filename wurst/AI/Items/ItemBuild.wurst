@@ -32,35 +32,35 @@ let consummablesPool = new ItemPool()
     ..add(STONE_GOLEM.getNewId(), 10)
 
 let damageRecipesPool = new ItemPool()
-    ..add(MASK_OF_DEATH castTo int, 10)
-    ..add(WAR_HELMET castTo int, 10)
-    ..add(FIRE_BLADE castTo int, 10)
-    ..add(STAFF_OF_SILENCE castTo int, 10)
+    ..add(MASK_OF_DEATH.getNewId(), 10)
+    ..add(WAR_HELMET.getNewId(), 10)
+    ..add(FIRE_BLADE.getNewId(), 10)
+    ..add(STAFF_OF_SILENCE.getNewId(), 10)
 
 let orbRecipesPool = new ItemPool()
-    ..add(GLOVES_OF_CORRUPTION castTo int, 10)
-    ..add(SHAMANS_CLAWS castTo int, 10)
-    ..add(NORTHREND_ARTIFACT castTo int, 10)
+    ..add(GLOVES_OF_CORRUPTION.getNewId(), 10)
+    ..add(SHAMANS_CLAWS.getNewId(), 10)
+    ..add(NORTHREND_ARTIFACT.getNewId(), 10)
 
 let defenseRecipesPool = new ItemPool()
-    ..add(SHIELD_OF_HONOR castTo int, 10)
-    ..add(RING_OF_REGENERATION_1 castTo int, 10)
-    ..add(SHIELD_OF_LORD_OF_DEAD castTo int, 10)
+    ..add(SHIELD_OF_HONOR.getNewId(), 10)
+    ..add(RING_OF_REGENERATION_1.getNewId(), 10)
+    ..add(SHIELD_OF_LORD_OF_DEAD.getNewId(), 10)
 
 let magicRecipesPool = new ItemPool()
-    ..add(SOBI_MASK_1 castTo int, 10)
-    ..add(RUNIC_BRACERS castTo int, 10)
-    ..add(ENERGY_PENDANT castTo int, 10)
-    ..add(STAFF_OF_THE_CYCLONES castTo int, 10)
+    ..add(SOBI_MASK_1.getNewId(), 10)
+    ..add(RUNIC_BRACERS.getNewId(), 10)
+    ..add(ENERGY_PENDANT.getNewId(), 10)
+    ..add(STAFF_OF_THE_CYCLONES.getNewId(), 10)
 
 let miscRecipesPool = new ItemPool()
-    ..add(RUNIC_BRACERS castTo int, 10)
-    ..add(IMPULSE_BOOTS castTo int, 10)
-    ..add(POWER_BOOTS castTo int, 10)
+    ..add(RUNIC_BRACERS.getNewId(), 10)
+    ..add(IMPULSE_BOOTS.getNewId(), 10)
+    ..add(POWER_BOOTS.getNewId(), 10)
 
 let miscItemsPool = new ItemPool()
-    ..add(HORN_OF_THE_LEGION castTo int, 10)
-    ..add(ACID_STONE castTo int, 10)
+    ..add(HORN_OF_THE_LEGION.getNewId(), 10)
+    ..add(ACID_STONE.getNewId(), 10)
 
 let noRecipesPool = new ItemPool()
     ..add(CLAWS_OF_ATTACK_21.getNewId(), 10)
@@ -78,11 +78,31 @@ let orbPool = new ItemPool()
 let shopOfTheItem = new HashMap<int, int>()
 let ingredientsForRecipe = new HashMap<int, LinkedList<int>>()
 
+function int.getLevelingCounterPart() returns int
+    if whatMode[5] == Mode.LEVELING
+        switch this
+            case HEALING_POTION.getNewId()
+                return HEALING_SALVE.getNewId()
+            case MANA_POTION.getNewId()
+                return CLARITY_POTION.getNewId()
+            case GREATER_HEALING_POTION.getNewId()
+                return POTION_OF_RESTORATION.getNewId()
+            case GREATER_MANA_POTION.getNewId()
+                return GREATER_POTION_OF_RESTORATION.getNewId()
+            case RING_OF_REGENERATION_1.getNewId()
+                return RING_OF_REGENERATION_2.getNewId()
+            case SOBI_MASK_1.getNewId()
+                return SOBI_MASK_2.getNewId()
+            default
+                return this
+    else
+        return this
+
 function LinkedList<int>.addIfDontHave(ItemPool pool)
     var itm = pool.get()
     var i = 0
     while this.has(itm) and i < 10
-        itm = pool.get()
+        itm = pool.get().getLevelingCounterPart()
         i++
 
     this.add(itm)
@@ -123,11 +143,11 @@ public class ItemBuild
                 
                 for recipe in recipes
                     for ingredient in ingredientsForRecipe.get(recipe)
-                        if ingredientsForRecipe.has(ingredient)
-                            for ingredient2 in ingredientsForRecipe.get(ingredient)
-                                build.add(ingredient2)
+                        if ingredientsForRecipe.has(ingredient.getLevelingCounterPart())
+                            for ingredient2 in ingredientsForRecipe.get(ingredient.getLevelingCounterPart())
+                                build.add(ingredient2.getLevelingCounterPart())
                         else
-                            build.add(ingredient)
+                            build.add(ingredient.getLevelingCounterPart())
                 
                 destroy recipes
             case Mode.NO_RECIPES
@@ -144,20 +164,16 @@ public class ItemBuild
         let random = GetRandomInt(0, 100)
         int itm
         if random < 65
-            itm = consummablesPool.get()
+            itm = consummablesPool.get().getLevelingCounterPart()
             currentItemIsConsummable = true
         else
             if not build.isEmpty() and currentItemToBuy == 0
-                itm = build.getRandomElement()
+                itm = build.getRandomElement().getLevelingCounterPart()
                 currentItemToBuy = itm
+                currentItemIsConsummable = false
             else
-                itm = consummablesPool.get()
+                itm = consummablesPool.get().getLevelingCounterPart()
                 currentItemIsConsummable = true
-
-        if itm == RING_OF_REGENERATION_1.getNewId() and whatMode[5] == Mode.LEVELING
-            itm = RING_OF_REGENERATION_2.getNewId()
-        if itm == SOBI_MASK_1.getNewId() and whatMode[5] == Mode.LEVELING
-            itm = SOBI_MASK_2.getNewId()
 
         return itemShop(itm, shopOfTheItem.get(itm))
 
@@ -204,6 +220,19 @@ init
     shopOfTheItem.put(ORB_OF_CORRUPTION.getNewId(), ARMS_MERCHANT)
     shopOfTheItem.put(ORB_OF_LIGHTNING.getNewId(), ARMS_MERCHANT)
     shopOfTheItem.put(ICE_ORB.getNewId(), ARMS_MERCHANT)
+
+    shopOfTheItem.put(SHIELD_OF_HONOR_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(RING_OF_REGENERATION_1_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(RING_OF_REGENERATION_2_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(SOBI_MASK_1_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(SOBI_MASK_2_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(RUNIC_BRACERS_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(IMPULSE_BOOTS_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(ENERGY_PENDANT_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(MASK_OF_DEATH_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(SHIELD_OF_LORD_OF_DEAD_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(SHAMANS_CLAWS_RECIPE.getNewId(), RECIPES_MERCHANT)
+    shopOfTheItem.put(NORTHREND_ARTIFACT_RECIPE.getNewId(), RECIPES_MERCHANT)
 
     shopOfTheItem.put(SHIELD_RUNE.getNewId(), SECRET_MERCHANT)
     shopOfTheItem.put(STONE_GOLEM.getNewId(), SECRET_MERCHANT)

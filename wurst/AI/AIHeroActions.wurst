@@ -178,8 +178,11 @@ init
         canAttack[bot] = true
     end)*/
 
-    onBotHeroAppear(bot -> begin
+    onBotHeroRevive(bot -> begin
         wannaBuy[bot] = not hero[bot].isInventoryFull()
+    end)
+
+    onBotHeroAppear(bot -> begin
         itemBuilds[bot] = new ItemBuild(hero[bot])
     end)
     
