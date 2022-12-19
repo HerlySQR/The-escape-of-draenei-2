@@ -206,6 +206,9 @@ init
 
     onBotHeroRevive(bot -> begin
         wannaBuy[bot] = not hero[bot].isInventoryFull()
+    end)
+
+    onBotHeroDie(bot -> begin
         wannaDoMission[bot] = false
     end)
 

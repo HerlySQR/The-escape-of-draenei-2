@@ -1,49 +1,31 @@
 package AIDungeon
 
-import AddBot
-import AIHeroActions
-import Missions
-
-import DamageEvent
-
-int array attacked
+import AIMissionController
 
 init
     addBotAction(bot -> begin
         if actMission == 1 and wannaDoMission[bot]
             let h = hero[bot]
-            if Dests.dungeonExitDoor1.isAliveTrick()
-                if Dests.dungeonExitDoor1.getPos().distanceTo(h.getPos()) > 300.
+            if THE_DRAENEI.has(h)
+                if Dests.dungeonExitDoor1.isAliveTrick()
                     if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
-                        h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor1.getPos())
+                        if Dests.dungeonExitDoor1.getPos().distanceTo(h.getPos()) > 300.
+                            h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor1.getPos())
+                        else
+                            h.issueTargetOrderById(Orders.attack, Dests.dungeonExitDoor1)
                 else
-                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
-                        h.issueTargetOrderById(Orders.attack, Dests.dungeonExitDoor1)
+                    if Dests.dungeonExitDoor2.isAliveTrick()
+                        if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                            if Dests.dungeonExitDoor2.getPos().distanceTo(h.getPos()) > 300.
+                                h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor2.getPos())
+                            else
+                                h.issueTargetOrderById(Orders.attack, Dests.dungeonExitDoor2)
             else
-                if Dests.dungeonExitDoor2.isAliveTrick()
-                    if Dests.dungeonExitDoor2.getPos().distanceTo(h.getPos()) > 300.
-                        if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
-                            h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor2.getPos())
-                    else
-                        if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
-                            h.issueTargetOrderById(Orders.attack, Dests.dungeonExitDoor2)
-    end)
-
-    // Stop doing the mission if neaby team gets attacked
-    DamageEvent.addListener(() -> begin
-        let target = DamageEvent.getTarget()
-
-        forUnitsInRange(target.getPos(), 700., u -> begin
-            if u.isAlive() and u.isType(UNIT_TYPE_HERO)
-                let owner = u.getOwner()
-                if owner.isBot() and target.isAllyOf(owner)
-                    let i = owner.getId()
-                    if wannaDoMission[i]
-                        attacked[i]++
-                        if attacked[i] > 4
-                            wannaDoMission[i] = false
-                            doAfter(10) -> 
-                                wannaDoMission[i] = true
-        end)
-
+                if wannaInspect[bot]
+                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                        if Dests.dungeonExitDoor1.isAliveTrick()
+                            h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor1.getPos())
+                        else
+                            if Dests.dungeonExitDoor2.isAliveTrick()
+                                h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor2.getPos())
     end)

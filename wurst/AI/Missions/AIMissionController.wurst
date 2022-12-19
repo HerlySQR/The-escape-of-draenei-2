@@ -1,1 +1,66 @@
 package AIMissionController
+
+import public AddBot
+import public AIHeroActions
+import public Missions
+
+import DamageEvent
+
+public constant drDoingMission = CreateGroup()
+
+public bool array wannaInspect
+bool array wannaChase
+int array attacked
+vec2 array lastSeeingDraenei
+CallbackSingle array checkAgain
+
+init
+    // The demons will search for draenei doing the mission or inspect the objective
+    addBotAction(bot -> begin
+        let h = hero[bot]
+        let p = players[bot]
+        if THE_DRAENEI.has(p)
+            if wannaDoMission[bot]
+                drDoingMission.add(h)
+            else
+                drDoingMission.remove(h)
+        else
+            if wannaDoMission[bot]
+                if not wannaChase[bot] and not wannaInspect[bot]
+                    if GetRandomInt(0, 100) < 50
+                        for u in drDoingMission
+                            if IsUnitVisible(u, p)
+                                lastSeeingDraenei[bot] = u.getPos()
+                                wannaChase[bot] = true
+                                break
+                        if not wannaChase[bot]
+                            wannaInspect[bot] = true
+                    else
+                        wannaInspect[bot] = true
+                if wannaChase[bot]
+                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                        h.issuePointOrderById(Orders.attack, lastSeeingDraenei[bot])
+                    if checkAgain[bot] != null
+                        checkAgain[bot] = doAfter(20.) -> 
+                            wannaChase[bot] = false
+                            checkAgain[bot] = null
+    end)
+    // Stop doing the mission if neaby team gets attacked
+    DamageEvent.addListener(() -> begin
+        let target = DamageEvent.getTarget()
+
+        forUnitsInRange(target.getPos(), 700., u -> begin
+            if u.isAlive() and u.isType(UNIT_TYPE_HERO)
+                let owner = u.getOwner()
+                if owner.isBot() and target.isAllyOf(owner)
+                    let i = owner.getId()
+                    if wannaDoMission[i]
+                        attacked[i]++
+                        if attacked[i] > 4
+                            attacked[i] = 0
+                            wannaDoMission[i] = false
+                            doAfter(10) -> 
+                                wannaDoMission[i] = true
+        end)
+
+    end)
