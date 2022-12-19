@@ -10,6 +10,7 @@ public constant STAFF_OF_NEGATION = compiletime(
         ..setClassification("Charged")
         ..setGoldCost(50)
         ..setStockReplenishInterval(30)
+        ..setPerishable(true)
         ..setNumberofCharges(2)
         ..setButtonPositionX(0)
         ..setButtonPositionY(0)

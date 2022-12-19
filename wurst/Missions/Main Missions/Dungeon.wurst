@@ -1,9 +1,9 @@
 package Dungeon
 
 import initlater Missions
-import GeneratedValues
+import public GeneratedValues
 
-import Orders
+import public Orders
 
 public boolean doorDestroyed = false
 public trigger destroyDoor = CreateTrigger()
