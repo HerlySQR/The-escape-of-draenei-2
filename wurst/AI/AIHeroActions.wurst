@@ -111,14 +111,28 @@ init
                     if goShopping[bot]
                         nullTimer() ->
                             if not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
-                                doAfter(3.) ->
-                                    let data = itemBuilds[bot].get()
-                                    let shop = data.shop.getNearbyShop(h)
-                                    IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h)
-
-                                    if IssueNeutralImmediateOrderById(players[bot], shop, data.itm)
-                                        itemBuilds[bot].itemWasBought()
-                                    
+                                let data = itemBuilds[bot].get()
+                                let shop = data.shop.getNearbyShop(h)
+                                let potion = h.getItemById(MANA_POTION.getNewId().getLevelingCounterPart())
+                                if GetRandomInt(0, 100) < 50
+                                    if h.getHPRatio() < 0.7 and potion != null
+                                        h.dropItemTarget(potion, shop)
+                                        doAfter(3.) ->
+                                            IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h)
+                                            IssueNeutralImmediateOrderById(players[bot], shop, HEALING_POTION.getNewId().getLevelingCounterPart())
+                                            wannaBuy[bot] = false
+                                            canAttack[bot] = true
+                                            isRetreating[bot] = h.getHPRatio() < 0.3
+                                    else
+                                        doAfter(3.) ->
+                                            IssueNeutralTargetOrderById(players[bot], shop, Orders.neutralinteract, h)
+                                            if IssueNeutralImmediateOrderById(players[bot], shop, data.itm)
+                                                itemBuilds[bot].itemWasBought()
+                                            
+                                            wannaBuy[bot] = false
+                                            canAttack[bot] = true
+                                            isRetreating[bot] = h.getHPRatio() < 0.3
+                                else
                                     wannaBuy[bot] = false
                                     canAttack[bot] = true
                                     isRetreating[bot] = h.getHPRatio() < 0.3
@@ -184,9 +198,15 @@ init
 
     onBotHeroAppear(bot -> begin
         itemBuilds[bot] = new ItemBuild(hero[bot])
+        wannaBuy[bot] = not hero[bot].isInventoryFull()
+    end)
+
+    onBotHeroDisappear(bot -> begin
+        destroy itemBuilds[bot]
+        itemBuilds[bot] = null
     end)
     
-    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CAST, () -> begin
+    registerPlayerUnitEvent(EVENT_PLAYER_UNIT_SPELL_CHANNEL, () -> begin
         let p = GetSpellAbilityUnit().getOwner()
         if p.isBot()
             isCasting[p.getId()] = true

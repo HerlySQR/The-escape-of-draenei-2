@@ -18,11 +18,11 @@ let TARGETS = "air,ground,enemy,organic,neutral"
 // Not leveling
 let CD_NL = [16., 14.]
 let MANA_NL = [115, 125]
-let DMG_PER_SEC_NL = [35., 55.]
+let DMG_PER_SEC_NL = [25., 45.]
 // Leveling
 let CD_L = [18., 16., 14., 12.]
 let MANA_L = [105, 115, 125, 135]
-let DMG_PER_SEC_L = [30., 45., 60., 75.]
+let DMG_PER_SEC_L = [20., 35., 50., 65.]
 // Internal
 let extraHeight = 50.
 

@@ -10,6 +10,8 @@ AbilityActions actions = caster -> begin
         forUnitsInRange(caster.getPos(), 400., u -> begin
             if u.isAlive() and caster.isEnemyOf(u.getOwner()) and not u.isInvulnerable()
                 count.val++
+                if u.isType(UNIT_TYPE_HERO)
+                    count.val += 2
         end)
         if count.val >= 3
             caster.issueImmediateOrderById(SPARKY_EXPLOSIONS_ORDER)

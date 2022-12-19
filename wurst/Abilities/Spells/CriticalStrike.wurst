@@ -29,7 +29,7 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
         ..general()
         ..setRequirements("")
         // Stats
-        ..addTooltipProperty("Chance to Critical Strike", lvl -> CHANCE_NL.toPercentage())
+        ..addTooltipProperty("Chance to Critical Strike", lvl -> (CHANCE_NL/100).toPercentage())
         ..presetDamageMultiplier(lvl -> DMG_MULT_NL[lvl-1])
         // Audiovisual
         // Tooltip
@@ -45,7 +45,7 @@ function AbilityDefinitionBladeMasterCriticalStrike.general()
         ..general()
         ..setRequirements("")
         // Stats
-        ..addTooltipProperty("Chance to Critical Strike", lvl -> CHANCE_L.toPercentage())
+        ..addTooltipProperty("Chance to Critical Strike", lvl -> (CHANCE_L/100).toPercentage())
         ..presetDamageMultiplier(lvl -> DMG_MULT_L[lvl-1])
         // Audiovisual
         // Tooltip

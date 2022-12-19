@@ -21,6 +21,7 @@ let extraHeight2 = vec3(0., 0., 110.)
 init
     registerSpellEffectEvent(CONSUME_LIFE_AND_MANA, () -> begin
         let caster = GetSpellAbilityUnit()
+        let owner = caster.getOwner()
         let target = GetSpellTargetUnit()
         let eff1 = caster.addEffect(Abilities.drainCaster, "overhead")
         let eff2 = caster.addEffect(Abilities.manaDrainCaster, "overhead")
@@ -51,7 +52,7 @@ init
                 manaLight.destr()
                 if not cb.isLast()
                     destroy cb
-            if caster.getPos().distanceTo(target.getPos()) > MAX_RANGE
+            if caster.getPos().distanceTo(target.getPos()) > MAX_RANGE or not IsUnitVisible(target, owner)
                 caster.issueImmediateOrderById(Orders.stop)
         end)
     end)

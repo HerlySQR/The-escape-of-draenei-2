@@ -106,7 +106,7 @@ init
                     new BuildingInstance(builders2.next(), towerDraeneiPos[3], DRAENEI_TOWER)
                     builders2.destr()
                 case 3
-                    forUnitsInRect(Rects.demonTower2, u -> begin
+                    forUnitsInRect(Rects.demonTower3, u -> begin
                         if u.getTypeId() == DEMON_TOWER
                             u.setOwner(players[PLAYER_NEUTRAL_PASSIVE], false)
                     end)
@@ -277,14 +277,14 @@ init
         ..setAttacksEnabled(0)
         ..setFoodCost(0)
         ..setRace(Race.Orc)
-        ..setNormalAbilities(AbilityIds.magicImmunityCreep.toRawCode())
+        ..setNormalAbilities(commaList(AbilityIds.magicImmunityCreep, AbilityIds.invulnerable))
         ..setStructuresBuilt(DRAENEI_TOWER.toRawCode())
 
     new UnitDefinition(DEMON_ACOLYTE, 'uaco')
         ..setAttacksEnabled(0)
         ..setFoodCost(0)
         ..setRace(Race.Undead)
-        ..setNormalAbilities(AbilityIds.magicImmunityCreep.toRawCode())
+        ..setNormalAbilities(commaList(AbilityIds.magicImmunityCreep, AbilityIds.invulnerable))
         ..setStructuresBuilt(DEMON_TOWER_DUMMY_ZIGURAT.toRawCode())
     
     new BuildingDefinition(DRAENEI_TOWER, 'owtw')

@@ -57,12 +57,12 @@ init
     code moveUp = () -> begin
         let u = GetEnteringUnit()
         if THE_DRAENEI.has(u)
-            u.setY(u.getY() + 25.)
+            u.setY(u.getY() + 50.)
     end
     code moveDown = () -> begin
         let u = GetEnteringUnit()
         if THE_DRAENEI.has(u)
-            u.setY(u.getY() - 25.)
+            u.setY(u.getY() - 50.)
     end
     powerFieldEnter1
         ..registerRectEnterEventSource(Rects.powerField1)

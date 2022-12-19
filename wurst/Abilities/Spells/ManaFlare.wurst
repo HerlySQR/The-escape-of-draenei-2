@@ -65,5 +65,6 @@ function AbilityDefinitionAuraBrilliancecreep.general()
     
     new BuffDefinition(MANA_FLARE_BUFF, 'BOae')
         ..setIcon(Icons.bTNManaFlare)
-        ..setName(1, "Mana Flare")
-        ..setTooltipNormalExtended(1, "This unit could be affected by Mana Flare if casts a spell")
+        ..setName("Mana Flare")
+        ..setTooltipNormal("Mana Flare")
+        ..setTooltipNormalExtended("This unit could be affected by Mana Flare if casts a spell")

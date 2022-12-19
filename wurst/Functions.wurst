@@ -11,6 +11,7 @@ import TimerUtils
 import BuffObjEditing
 import HashMap
 import ChannelAbilityPreset
+import LinkedList
 
 public function real.toPercentage() returns string
     return (this * 100.).toInt().toString() + "%"
@@ -550,7 +551,8 @@ public function fadeIn(string fadetype, real duration)
 interface BuffRemoved
     function run()
 
-HashMap<int, real> array durationMaps
+HashMap<int, CallbackCounted> array cbMaps
+IterableMap<int, LinkedList<BuffRemoved>> array brMaps
 
 /** Adds a buff to a unit*/
 public function unit.addBuff(buffTuple whatbuff)
@@ -563,42 +565,61 @@ public function unit.addBuff(buffTuple whatbuff, real duration)
 /** Adds a buff to a unit for an specific duration and do actions when is removed */
 public function unit.addBuff(buffTuple whatbuff, real duration, BuffRemoved br)
     let i = this.getIndex()
-    if durationMaps[i] == null
-        durationMaps[i] = new HashMap<int, real>()
-    if not durationMaps[i].has(whatbuff.buffId)
-        this.addAbility(whatbuff.abilId)
-        doPeriodically(INTERVAL, cb -> begin
-            let remain = durationMaps[i].get(whatbuff.buffId) - INTERVAL
-            if remain > 0. and this.isAlive()
-                durationMaps[i].put(whatbuff.buffId, remain)
-            else
-                if br != null
-                    br.run()
-                    destroy br
-                if this.isAlive()
-                    this.removeAbility(whatbuff.abilId)
-                    this.removeAbility(whatbuff.buffId)
-                durationMaps[i].remove(whatbuff.buffId)
-                destroy cb
-        end)
+
+    if cbMaps[i] == null
+        cbMaps[i] = new HashMap<int, CallbackCounted>()
+    if cbMaps[i].has(whatbuff.buffId)
+        destroy cbMaps[i].get(whatbuff.buffId)
+
+    if brMaps[i] == null
+        brMaps[i] = new IterableMap<int, LinkedList<BuffRemoved>>()
+    var list = brMaps[i].get(whatbuff.buffId)
+    if list == null
+        list = new LinkedList<BuffRemoved>()
+        brMaps[i].put(whatbuff.buffId, list)
+    if br != null
+        list.add(br)
+
+    this.addAbility(whatbuff.abilId)
+
     // If the unit already has the buff, just refresh the duration
     // (I'm not sure if is preferable use the max between the new duration
     // and the remaining or just use the remaining)
-    durationMaps[i].put(whatbuff.buffId, duration)
+    cbMaps[i].put(whatbuff.buffId, doPeriodicallyTimed(INTERVAL, duration, cb -> begin
+        if not this.isAlive() or not cbMaps[i].has(whatbuff.buffId) or cb.isLast()
+            let list2 = brMaps[i].get(whatbuff.buffId)
+            while not list2.isEmpty()
+                let br2 = list2.dequeue()
+                br2.run()
+                destroy br2
+            this.removeBuff(whatbuff)
+            if not cb.isLast()
+                destroy cb
+    end))
 
 /** Removes a buff from a unit */
 public function unit.removeBuff(buffTuple whatbuff)
     if this.hasAbility(whatbuff.buffId)
         let i = this.getIndex()
-        if durationMaps[i] != null
-            durationMaps[i].put(whatbuff.buffId, 0.)
+        if cbMaps[i] != null
+            if this.isAlive()
+                this.removeAbility(whatbuff.abilId)
+                this.removeAbility(whatbuff.buffId)
+            cbMaps[i].remove(whatbuff.buffId)
 
 init
     onUnitDeindex(() -> begin
         let i = getIndexingUnit().getIndex()
-        if durationMaps[i] != null
-            destroy durationMaps[i]
-            durationMaps[i] = null
+        if cbMaps[i] != null
+            cbMaps[i].flush()
+            doAfter(INTERVAL) ->
+                destroy cbMaps[i]
+                cbMaps[i] = null
+                if brMaps[i] != null
+                    for key in brMaps[i]
+                        destroy brMaps[i].get(key)
+                    destroy brMaps[i]
+                    brMaps[i] = null
     end)
 
 // Terrain deformation

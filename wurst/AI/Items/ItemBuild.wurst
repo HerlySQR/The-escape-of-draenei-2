@@ -10,16 +10,12 @@ import HashMap
 import RecipeItem
 
 let consummablesPool = new ItemPool()
-    ..add(HEALING_POTION.getNewId(), 100)
-    ..add(HEALING_SALVE.getNewId(), 100)
-    ..add(MANA_POTION.getNewId(), 100)
-    ..add(CLARITY_POTION.getNewId(), 100)
+    ..add(HEALING_POTION.getNewId(), 200)
+    ..add(MANA_POTION.getNewId(), 200)
     ..add(SCROLL_OF_THE_BEAST.getNewId(), 40)
     ..add(WIND_SCEPTER.getNewId(), 40)
-    ..add(GREATER_HEALING_POTION.getNewId(), 50)
-    ..add(POTION_OF_RESTORATION.getNewId(), 50)
-    ..add(GREATER_MANA_POTION.getNewId(), 50)
-    ..add(GREATER_POTION_OF_RESTORATION.getNewId(), 50)
+    ..add(GREATER_HEALING_POTION.getNewId(), 100)
+    ..add(GREATER_MANA_POTION.getNewId(), 100)
     ..add(SCROLL_OF_PROTECTION.getNewId(), 30)
     ..add(SCROLL_OF_SPEED.getNewId(), 30)
     ..add(INVULNERAVILITY_POTION.getNewId(), 10)
@@ -78,7 +74,7 @@ let orbPool = new ItemPool()
 let shopOfTheItem = new HashMap<int, int>()
 let ingredientsForRecipe = new HashMap<int, LinkedList<int>>()
 
-function int.getLevelingCounterPart() returns int
+public function int.getLevelingCounterPart() returns int
     if whatMode[5] == Mode.LEVELING
         switch this
             case HEALING_POTION.getNewId()
