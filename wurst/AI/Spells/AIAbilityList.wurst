@@ -195,7 +195,7 @@ public function unitConcentration(vec2 pos, real range, player owner, real area)
     unitConcentrationResult result
 
     forUnitsInRange(pos, range, u -> begin
-        if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable()
+        if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable() and not u.getOwner() == players[PLAYER_NEUTRAL_AGGRESSIVE]
             xVals.add(u.getX())
             yVals.add(u.getY())
     end)
@@ -205,7 +205,7 @@ public function unitConcentration(vec2 pos, real range, player owner, real area)
 
         let count = new Reference(0)
         forUnitsInRange(concentration, area, u -> begin
-            if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable()
+            if u.isAlive() and u.isEnemyOf(owner) and not u.isInvulnerable() and not u.getOwner() == players[PLAYER_NEUTRAL_AGGRESSIVE]
                 count.val++
         end)
 

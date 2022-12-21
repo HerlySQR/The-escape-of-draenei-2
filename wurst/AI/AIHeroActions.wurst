@@ -7,10 +7,11 @@ import Shops
 import ItemBuild
 import Missions
 
-import Orders
 import LastOrder
 import Reference
 import RegisterEvents
+
+let SPELLBOOK_ORDER = Orders.raisedead
 
 // States
 bool array stunned
@@ -20,6 +21,7 @@ bool array isRetreating
 public bool array isCasting
 bool array wannaBuy
 bool array goShopping
+bool array couldntTp
 public bool array wannaDoMission
 
 int array chancesToDoTheMission
@@ -77,7 +79,7 @@ ItemBuild array itemBuilds
 
 init
     for i = 1 to 5
-        chancesToDoTheMission[i] = (100/(1 + EULER.pow(i.toReal()))).round()
+        chancesToDoTheMission[i] = (100/(1 + 100*EULER.pow(-i.toReal()))).round()
 
     forUnitsOfPlayer(players[PLAYER_NEUTRAL_PASSIVE], u -> begin
         switch u.getTypeId()
@@ -128,6 +130,7 @@ init
                                             IssueNeutralImmediateOrderById(players[bot], shop, HEALING_POTION.getNewId().getLevelingCounterPart())
                                             wannaBuy[bot] = false
                                             canAttack[bot] = true
+                                            couldntTp[bot] = false
                                             isRetreating[bot] = h.getHPRatio() < 0.3
                                     else
                                         doAfter(3.) ->
@@ -137,6 +140,7 @@ init
                                             
                                             wannaBuy[bot] = false
                                             canAttack[bot] = true
+                                            couldntTp[bot] = false
                                             isRetreating[bot] = h.getHPRatio() < 0.3
                                 else
                                     wannaBuy[bot] = false
@@ -147,25 +151,39 @@ init
             // Attack or do the mission (when the mission is higher, the chances to do it increases)
             if canAttack[bot]
                 if not isRetreating[bot]
-                    and ((not isAttacking[bot] and not wannaDoMission[bot])
+                    and ((not isAttacking[bot])
                     or (not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
                     and h.getCurrentOrder() != Orders.attack
                     and not isCasting[bot]))
 
-                    if GetRandomInt(0, 100) < chancesToDoTheMission[actMission]
-                        wannaDoMission[bot] = true
-                    else
-                        let target = THE_DRAENEI.has(h) ? getRandomLastDr() : getRandomLastDe()
-                        if target != null
+                    let target = THE_DRAENEI.has(h) ? getRandomLastDr() : getRandomLastDe()
+                    if target != null
+                        if target.getPos().distanceTo(h.getPos()) > 2000. and not couldntTp[bot]
+                            couldntTp[bot] = false
+                            if not isCasting[bot]
+                                isCasting[bot] = true
+                                doAfter(0.27) ->
+                                    couldntTp[bot] = not h.issuePointOrderById(Orders.massteleport, (THE_DRAENEI.has(h) ? getRandomLastDr() : getRandomLastDe()).getPos())
+                        else
                             h.issueTargetOrderById(Orders.patrol, target)
                             targetUnit[bot] = target
                             isAttacking[bot] = true
 
+            if isAttacking[bot] and GetRandomInt(0, 100) < chancesToDoTheMission[actMission]
+                isAttacking[bot] = false
+                wannaDoMission[bot] = true
+            
             if wannaDoMission[bot]
                 if h.getHPRatio() < 0.35
                     canAttack[bot] = false
                     wannaDoMission[bot] = false
                     isRetreating[bot] = true
+                if not h.isMoving()
+                    doAfter(1.) ->
+                        if not h.isMoving()
+                            wannaDoMission[bot] = false
+                            if canAttack[bot]
+                                isAttacking[bot] = true
 
             if isAttacking[bot]
                 if h.getHPRatio() < 0.35
@@ -200,12 +218,14 @@ init
                 if h.getHPRatio() > 0.8
                     isRetreating[bot] = false
                     canAttack[bot] = true
+                    couldntTp[bot] = false
                 else if (THE_DRAENEI.has(h) and actDrSpawn.contains(h.getPos())) or actDeSpawn.contains(h.getPos())
                     wannaBuy[bot] = not h.isInventoryFull()
     end)
 
     onBotHeroRevive(bot -> begin
         wannaBuy[bot] = not hero[bot].isInventoryFull()
+        couldntTp[bot] = false
     end)
 
     onBotHeroDie(bot -> begin
@@ -233,3 +253,12 @@ init
         if p.isBot()
             isCasting[p.getId()] = false
     end)
+/*
+    CreateTrigger()
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_UNIT_ORDER)
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
+        ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
+        ..addAction(() -> begin
+            print(GetUnitName(GetOrderedUnit()))
+            print(GetIssuedOrderId())
+        end)*/

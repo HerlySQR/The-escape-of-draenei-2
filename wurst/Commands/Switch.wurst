@@ -125,6 +125,7 @@ init
 function changePlayers()
     let i1 = swp1.getId()
     let i2 = swp2.getId()
+
     // Return items to their owners
     forUnitsOfPlayer(swp1, u -> begin
         if u.getTypeId() == BACKPACK or u.getTypeId() == COURIER
@@ -167,6 +168,8 @@ function changePlayers()
         repick(swp1)
         repick(swp2)
         yesOrYes = false
+        swp1.moveCrates((THE_DEMONS.has(swp1) ? actDrSpawn : actDeSpawn).randomPoint())
+        swp2.moveCrates((THE_DEMONS.has(swp2) ? actDrSpawn : actDeSpawn).randomPoint())
         swp1.panCameraToTimed((THE_DEMONS.has(swp1) ? Rects.selectorDraenei : Rects.selectorDemon).getCenter(), 0.)
         swp2.panCameraToTimed((THE_DEMONS.has(swp2) ? Rects.selectorDraenei : Rects.selectorDemon).getCenter(), 0.)
 
@@ -180,6 +183,7 @@ function changePlayers()
     // Change the alliances
     changeAlliance(swp1)
     changeAlliance(swp2)
+
     playersOrder()
 
     for cb in listeners

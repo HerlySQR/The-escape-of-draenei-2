@@ -77,6 +77,13 @@ public function player.removeCrate()
             u.remove()
     end)
 
+/** Moves all the crates of the player to a specific point*/
+public function player.moveCrates(vec2 pos)
+    forUnitsOfPlayer(this, u -> begin
+        if u.getTypeId() == CRATE and u.isAlive()
+            u.setPos(pos)
+    end)
+
 init
     for i = 1 to 11
         backpack[i] = createUnit(players[bj_PLAYER_NEUTRAL_VICTIM], BACKPACK)
@@ -189,6 +196,7 @@ init
 
 @compiletime function gen()
     new AbilityDefinitionSpellBook(MORE_ABILITIES)
+        ..setBaseOrderID(1, "raisedead")
         ..setItemAbility(false)
         ..setMinimumSpells(1, 11)
         ..setMaximumSpells(1, 11)
