@@ -8,6 +8,9 @@ import initlater HeroSelection
 import Reference
 import initlater ItemCreation
 
+import OnUnitEnterLeave
+import ChatEnter
+
 public constant MORE_ABILITIES = compiletime(ABIL_ID_GEN.next())
 public constant BACKPACK = compiletime(UNIT_ID_GEN.next())
 
@@ -193,6 +196,20 @@ init
                 caster.removeItem(m)
                 m.setPos(pos)
     end)
+
+    /*onEnter(() -> begin
+        getEnterLeaveUnit().addAbility(TELEPORT)
+    end)
+
+    onChatCommand("tp", (p, extra) -> begin
+        print(p.getName()) // This only prints my name
+        forUnitsOfPlayer(p, u -> begin
+            forUnitsInRange(u.getPos(), 500., u2 -> begin
+                if u != u2
+                    u.issuePointOrderById(Orders.massteleport, u2.getPos())
+            end)
+        end)
+    end)*/
 
 @compiletime function gen()
     new AbilityDefinitionSpellBook(MORE_ABILITIES)

@@ -158,7 +158,7 @@ init
 
                     let target = THE_DRAENEI.has(h) ? getRandomLastDr() : getRandomLastDe()
                     if target != null
-                        if target.getPos().distanceTo(h.getPos()) > 2000. and not couldntTp[bot]
+                        if target.getPos().distanceTo(h.getPos()) > 4000. and not couldntTp[bot]
                             couldntTp[bot] = false
                             if not isCasting[bot]
                                 isCasting[bot] = true
@@ -259,6 +259,5 @@ init
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
         ..registerAnyUnitEvent(EVENT_PLAYER_UNIT_ISSUED_ORDER)
         ..addAction(() -> begin
-            print(GetUnitName(GetOrderedUnit()))
-            print(GetIssuedOrderId())
+            print(GetUnitName(GetOrderedUnit()) + " " + GetIssuedOrderId().toString())
         end)*/
