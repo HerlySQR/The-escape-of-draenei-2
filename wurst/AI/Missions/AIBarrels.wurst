@@ -1,0 +1,53 @@
+package AIBarrels
+
+import AIMissionController
+
+init
+    addBotAction(bot -> begin
+        if actMission == 2 and wannaDoMission[bot]
+            let h = hero[bot]
+            if THE_DRAENEI.has(h)
+                if heroWithBarrel[bot] != h
+                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                        if goblinShop.getPos().distanceTo(h.getPos()) > 300.
+                            h.issuePointOrderById(Orders.attack, goblinShop.getPos())
+                        else
+                            IssueNeutralTargetOrderById(players[bot], goblinShop, Orders.neutralinteract, h)
+                            IssueNeutralImmediateOrderById(players[bot], goblinShop, BARREL)
+                else
+                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                        h.issuePointOrderById(Orders.attack, Rects.DESTROY.getCenter())
+            else
+                if wannaInspect[bot]
+                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                        var defendWall = false
+
+                        for u in drDoingMission
+                            if u.hasItemById(BARREL)
+                                defendWall = true
+                                break
+                        
+                        h.issuePointOrderById(Orders.attack, (defendWall ? Rects.lookTheGoblin : Rects.DESTROY).getCenter())
+    end)
+
+    let cond = Condition(() -> actMission == 2)
+
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.missionObjective21)
+        ..registerRectEnterEventSource(Rects.missionObjective22)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let p = GetEnteringUnit().getOwner()
+            if THE_DRAENEI.has(p) and not p.isBot()
+                drDoingMission.add(GetEnteringUnit())
+        end)
+
+    CreateTrigger()
+        ..registerRectLeaveEventSource(Rects.missionObjective21)
+        ..registerRectLeaveEventSource(Rects.missionObjective22)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let p = GetLeavingUnit().getOwner()
+            if THE_DRAENEI.has(p) and not p.isBot()
+                drDoingMission.remove(GetLeavingUnit())
+        end)

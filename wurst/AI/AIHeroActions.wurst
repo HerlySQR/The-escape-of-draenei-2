@@ -26,17 +26,24 @@ public bool array wannaDoMission
 
 int array chancesToDoTheMission
 
+function thereAreAttackWaves() returns bool
+    return whatMode[2] == YES_CREEPS or whatMode[2] == ONLY_DE_AND_DR
+
 unit array targetUnit
 Order array lastOrders
 
 function int.retreatTemporally(real time)
-    if isAttacking[this]
+    if isAttacking[this] or wannaDoMission[this]
+        let attacking = isAttacking[this]
+        let mission = wannaDoMission[this]
         isRetreating[this] = true
         isAttacking[this] = false
+        wannaDoMission[this] = false
         let pos = hero[this].getPos()
         doAfter(time) ->
             isRetreating[this] = false
-            isAttacking[this] = true
+            isAttacking[this] = attacking
+            wannaDoMission[this] = mission
             hero[this].issuePointOrderById(Orders.attack, pos)
 
 // Shops
@@ -150,7 +157,8 @@ init
             
             // Attack or do the mission (when the mission is higher, the chances to do it increases)
             if canAttack[bot]
-                if not isRetreating[bot]
+                if thereAreAttackWaves()
+                    and not isRetreating[bot]
                     and ((not isAttacking[bot])
                     or (not (h.getCurrentOrder() == Orders.move or h.getCurrentOrder() == Orders.smart)
                     and h.getCurrentOrder() != Orders.attack
@@ -158,6 +166,7 @@ init
 
                     let target = THE_DRAENEI.has(h) ? getRandomLastDr() : getRandomLastDe()
                     if target != null
+                        // Tp to the wave if they are too far
                         if target.getPos().distanceTo(h.getPos()) > 4000. and not couldntTp[bot]
                             couldntTp[bot] = false
                             if not isCasting[bot]
@@ -169,38 +178,38 @@ init
                             targetUnit[bot] = target
                             isAttacking[bot] = true
 
-            if isAttacking[bot] and GetRandomInt(0, 100) < chancesToDoTheMission[actMission]
+            if not thereAreAttackWaves()
+                or (isAttacking[bot] and GetRandomInt(0, 100) < chancesToDoTheMission[actMission])
+
                 isAttacking[bot] = false
                 wannaDoMission[bot] = true
             
             if wannaDoMission[bot]
-                if h.getHPRatio() < 0.35
-                    canAttack[bot] = false
-                    wannaDoMission[bot] = false
-                    isRetreating[bot] = true
                 if not h.isMoving()
                     doAfter(1.) ->
                         if not h.isMoving()
                             wannaDoMission[bot] = false
                             if canAttack[bot]
-                                isAttacking[bot] = true
+                                isAttacking[bot] = thereAreAttackWaves()
 
-            if isAttacking[bot]
+            if isAttacking[bot] or wannaDoMission[bot]
                 if h.getHPRatio() < 0.35
                     canAttack[bot] = false
                     isAttacking[bot] = false
+                    wannaDoMission[bot] = false
                     isRetreating[bot] = true
                 else
-                    if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
-                        let enemy = new Reference<unit>(null)
-                        forUnitsInRange(h.getPos(), 500., u -> begin
-                            if h.isEnemyOf(u.getOwner()) and u.isAlive()
-                                enemy.val = u
-                        end)
-                        if enemy.into() != null
-                            h.issuePointOrderById(Orders.attack, targetUnit[bot].getPos())
+                    if not wannaDoMission[bot]
+                        if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
+                            let enemy = new Reference<unit>(null)
+                            forUnitsInRange(h.getPos(), 500., u -> begin
+                                if h.isEnemyOf(u.getOwner()) and u.isAlive()
+                                    enemy.val = u
+                            end)
+                            if enemy.into() != null
+                                h.issuePointOrderById(Orders.attack, targetUnit[bot].getPos())
                     
-                    // Retreat if there are too many enemy heroes
+                    // Retreat if there are too many enemy heroes or towers
                     let allyHeroes = new Reference(0)
                     let enemyHeroes = new Reference(0)
                     forUnitsInRange(h.getPos(), 900., u -> begin

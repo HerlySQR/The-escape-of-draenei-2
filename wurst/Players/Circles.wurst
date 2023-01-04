@@ -7,9 +7,9 @@ import initlater DontPlaySmart
 import initlater HeroSelection
 import Reference
 import initlater ItemCreation
+import initlater AddBot
 
 import OnUnitEnterLeave
-import ChatEnter
 
 public constant MORE_ABILITIES = compiletime(ABIL_ID_GEN.next())
 public constant BACKPACK = compiletime(UNIT_ID_GEN.next())
@@ -197,26 +197,23 @@ init
                 m.setPos(pos)
     end)
 
-    /*onEnter(() -> begin
-        getEnterLeaveUnit().addAbility(TELEPORT)
+    onEnter(() -> begin
+        let u = getEnterLeaveUnit()
+        if u.getOwner().isBot()
+            if u.hasAbility(MORE_ABILITIES)
+                u.removeAbility(MORE_ABILITIES)
+                u.addAbility(ASK_HELP)
+                u.addAbility(HEAL_TOTEM)
+                u.addAbility(TELEPORT)
+                u.addAbility(SELECT_BACKPACK)
     end)
-
-    onChatCommand("tp", (p, extra) -> begin
-        print(p.getName()) // This only prints my name
-        forUnitsOfPlayer(p, u -> begin
-            forUnitsInRange(u.getPos(), 500., u2 -> begin
-                if u != u2
-                    u.issuePointOrderById(Orders.massteleport, u2.getPos())
-            end)
-        end)
-    end)*/
 
 @compiletime function gen()
     new AbilityDefinitionSpellBook(MORE_ABILITIES)
         ..setBaseOrderID(1, "raisedead")
         ..setItemAbility(false)
-        ..setMinimumSpells(1, 11)
-        ..setMaximumSpells(1, 11)
+        ..setMinimumSpells(1, 4)
+        ..setMaximumSpells(1, 4)
         ..setSharedSpellCooldown(1, false)
         ..setSpellList(1, commaList(ASK_HELP, HEAL_TOTEM, TELEPORT, SELECT_BACKPACK))
         ..setHotkey("D")

@@ -5,7 +5,6 @@ import PlayerData
 import initlater Missions
 import HeroSelection
 import Towers
-import GeneratedValues
 import SummonCourier
 
 import ClosureEvents
@@ -40,7 +39,7 @@ let dustPoint = [
 ]
 
 let GOBLIN_SHOP = compiletime(UNIT_ID_GEN.next())
-let goblinShop = createUnit(players[PLAYER_NEUTRAL_PASSIVE], GOBLIN_SHOP, Rects.lookTheGoblin.getCenter(), UNIT_FACING)
+public unit goblinShop = createUnit(players[PLAYER_NEUTRAL_PASSIVE], GOBLIN_SHOP, Rects.lookTheGoblin.getCenter(), UNIT_FACING)
 
 let powerFieldEnter1 = CreateTrigger()
 let powerFieldEnter2 = CreateTrigger()
@@ -215,7 +214,7 @@ init
         let u = GetDyingUnit()
         if u.hasItemById(BARREL)
             u.getItemOfId(BARREL).remove()
-            for i = 1 to 5
+            for i = 1 to 11
                 if u == heroWithBarrel[i]
                     barrelEffect[i].destr()
                     heroWithBarrel[i] = null
@@ -225,7 +224,7 @@ init
     onUnitDeindex(() -> begin
         if getIndexingUnit().isType(UNIT_TYPE_HERO)
             let u = getIndexingUnit()
-            for i = 1 to 5
+            for i = 1 to 11
                 if u == heroWithBarrel[i]
                     barrelEffect[i].destr()
                     heroWithBarrel[i] = null
@@ -299,6 +298,12 @@ function destroyWall()
         exitCave.enable()
     
         goblinShop.hide()
+
+        for i = 1 to 11
+            if heroWithBarrel[i] != null
+                heroWithBarrel[i].getItemOfId(BARREL).remove()
+                barrelEffect[i].destr()
+                heroWithBarrel[i] = null
 
         forUnitsInRect(bj_mapInitialPlayableArea, u -> begin
             if u.hasItemById(BARREL)

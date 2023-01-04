@@ -1,7 +1,6 @@
 package DrAndDeSpawn
 
 import public UnitIndexer
-import Orders
 import DamageEvent
 import ObjectIdGenerator
 import AbilityObjEditing
@@ -13,9 +12,9 @@ import LinkedList
 import Functions
 import public PlayerData
 import initlater Missions
-import GeneratedValues
 
 import BountyController
+import MotionSensor
 
 public boolean spawnRun = false
 
@@ -118,7 +117,6 @@ DamageListener theyAreCowards = null
 
 public function startSpawn()
     spawning.enable()
-    attack.enable()
     // If a creep wanna go back for taking damage from an ally
     if theyAreCowards == null
         theyAreCowards = DamageEvent.addListener(() -> begin
@@ -132,7 +130,6 @@ public function startSpawn()
 
 public function stopSpawn()
     spawning.disable()
-    attack.disable()
     if theyAreCowards != null
         destroy theyAreCowards
         theyAreCowards = null
@@ -149,6 +146,7 @@ function createDr(int id)
     drUnits.add(c)
     attackers.add(c)
     c.insertToDrWaves()
+    MotionSensor.addUnit(c)
 
 function createDe(int id, vec2 pos, vec2 t)
     if deInMap > 15
@@ -160,6 +158,7 @@ function createDe(int id, vec2 pos, vec2 t)
     deUnits.add(c)
     attackers.add(c)
     c.insertToDeWaves()
+    MotionSensor.addUnit(c)
 
 init
     // Create the towers
@@ -210,9 +209,10 @@ init
             if id == DEATH_TOWER_1 or id == DEATH_TOWER_2 or id == DEATH_TOWER_3
                 u.remove()
         end)
+        attack.disable()
     end)
     onModesSelected(() -> begin
-        if whatMode[3] == ONLY_NEUTRAL or whatMode[3] == NO_CREEPS
+        if whatMode[2] == ONLY_NEUTRAL or whatMode[2] == NO_CREEPS
             forUnitsOfPlayer(DRAENEI, u -> begin
                 if u.getTypeId() == DRAENEI_WARRIOR[0]
                     u.remove()
@@ -221,6 +221,8 @@ init
                 if u.getTypeId() == CHAOS_GRUNT[0]
                     u.remove()
             end)
+        else
+            attack.enable()
     end)
     // The units spawn
     spawning
@@ -257,7 +259,7 @@ init
                 if not u.isAlive()
                     attackers.remove(u)
                     targetHero[i] = null
-                else if u.getCurrentOrder() != Orders.attack or theyGo.has(u)
+                else if u.getCurrentOrder() != Orders.attack or theyGo.has(u) or not u.isMoving()
                     if targetHero[i] != null and targetHero[i].isAlive()
                         u.issuePointOrderById(Orders.attack, targetHero[i].getPos())
                     else
@@ -286,17 +288,21 @@ init
             forUnitsOfPlayer(DRAENEI, u -> begin
                 if u.getTypeId() == DRAENEI_WARRIOR[0]
                     u.issuePointOrderById(Orders.attack, attackPoint1)
+                    target[u.getIndex()] = attackPoint1
                     attackers.add(u)
                     drUnits.add(u)
                     u.insertToDrWaves()
+                    MotionSensor.addUnit(u)
             end)
             addNewDeWave()
             forUnitsOfPlayer(DEMON, u -> begin
                 if Rects.attackPoint1.contains(u.getPos())
                     u.issuePointOrderById(Orders.attack, drSpw)
+                    target[u.getIndex()] = drSpw
                     attackers.add(u)
                     deUnits.add(u)
                     u.insertToDeWaves()
+                    MotionSensor.addUnit(u)
             end)
         end)
 

@@ -3,10 +3,9 @@ package AIMissionController
 import public AddBot
 import public AIHeroActions
 import public Missions
+import public EventHelper
 
 import DamageEvent
-
-import MotionSensor
 
 public constant drDoingMission = CreateGroup()
 
@@ -33,12 +32,17 @@ init
                 else
                     if not wannaChase[bot] and not wannaInspect[bot]
                         for u in drDoingMission
-                            if IsUnitVisible(u, p)
+                            if IsUnitVisible(u, p) or GetRandomInt(0, 100) < 20 
                                 lastSeeingDraenei[bot] = u.getPos()
                                 wannaChase[bot] = true
                                 break
                         if not wannaChase[bot]
                             wannaInspect[bot] = true
+                    if wannaInspect[bot]
+                        if checkAgain[bot] != null
+                            checkAgain[bot] = doAfter(40.) -> 
+                                wannaInspect[bot] = false
+                                checkAgain[bot] = null
                     if wannaChase[bot]
                         if h.getCurrentOrder() != Orders.attack and not isCasting[bot]
                             h.issuePointOrderById(Orders.attack, lastSeeingDraenei[bot])
@@ -66,3 +70,5 @@ init
         end)
 
     end)
+
+    onMission(_ -> drDoingMission.clear())

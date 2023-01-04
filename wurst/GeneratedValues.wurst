@@ -220,6 +220,8 @@ public class Rects
     // Missions
 
     static constant justHidePls = gg_rct_JustHidePls
+    static constant missionObjective11 = gg_rct_MissionObjective11
+    static constant missionObjective12 = gg_rct_MissionObjective12
 
     static constant barrel1 = gg_rct_Barrel1
     static constant barrel2 = gg_rct_Barrel2
@@ -230,6 +232,8 @@ public class Rects
     static constant placeBarrel3 = gg_rct_PlaceBarrel3
     static constant DESTROY = gg_rct_DESTROY
     static constant destroyBarrels = gg_rct_DestroyBarrels
+    static constant missionObjective21 = gg_rct_MissionObjective21
+    static constant missionObjective22 = gg_rct_MissionObjective22
 
     static constant habitatExit1 = gg_rct_HabitatExit1
     static constant habitatExit2 = gg_rct_HabitatExit2

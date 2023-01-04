@@ -29,3 +29,25 @@ init
                             if Dests.dungeonExitDoor2.isAliveTrick()
                                 h.issuePointOrderById(Orders.attack, Dests.dungeonExitDoor2.getPos())
     end)
+
+    let cond = Condition(() -> actMission == 1)
+
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.missionObjective11)
+        ..registerRectEnterEventSource(Rects.missionObjective12)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let p = GetEnteringUnit().getOwner()
+            if THE_DRAENEI.has(p) and not p.isBot()
+                drDoingMission.add(GetEnteringUnit())
+        end)
+
+    CreateTrigger()
+        ..registerRectLeaveEventSource(Rects.missionObjective11)
+        ..registerRectLeaveEventSource(Rects.missionObjective12)
+        ..addCondition(cond)
+        ..addAction(() -> begin
+            let p = GetLeavingUnit().getOwner()
+            if THE_DRAENEI.has(p) and not p.isBot()
+                drDoingMission.remove(GetLeavingUnit())
+        end)
