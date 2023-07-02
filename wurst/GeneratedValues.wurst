@@ -237,6 +237,8 @@ public class Rects
 
     static constant habitatExit1 = gg_rct_HabitatExit1
     static constant habitatExit2 = gg_rct_HabitatExit2
+    static constant missionObjective3 = gg_rct_MissionObjective3
+    static constant habitatDefensePoint = gg_rct_HabitatDefensePoint
 
     // Misc
 
@@ -412,6 +414,12 @@ public class Rects
     static constant tutorialDeEnemies = gg_rct_TutorialDeEnemies
 
     static constant tutorialObjective = gg_rct_TutorialObjective
+
+    // AI
+
+    static constant habitatPoint = [gg_rct_HabitatPoint0, gg_rct_HabitatPoint1, gg_rct_HabitatPoint2, gg_rct_HabitatPoint3, gg_rct_HabitatPoint4,
+                                    gg_rct_HabitatPoint5, gg_rct_HabitatPoint6, gg_rct_HabitatPoint7, gg_rct_HabitatPoint8, gg_rct_HabitatPoint9,
+                                    gg_rct_HabitatPoint10, gg_rct_HabitatPoint11, gg_rct_HabitatPoint12, gg_rct_HabitatPoint13, gg_rct_HabitatPoint14]
 
 // Water
 init

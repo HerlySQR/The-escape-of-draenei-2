@@ -10,9 +10,9 @@ import DamageEvent
 public constant drDoingMission = CreateGroup()
 
 public bool array wannaInspect
-bool array wannaChase
+public bool array wannaChase
 int array attacked
-vec2 array lastSeeingDraenei
+public vec2 array lastSeeingDraenei
 CallbackSingle array checkAgain
 
 init
@@ -72,3 +72,17 @@ init
     end)
 
     onMission(_ -> drDoingMission.clear())
+
+public function trigger.onEnter()
+    this.addAction(() -> begin
+        let p = GetEnteringUnit().getOwner()
+        if THE_DRAENEI.has(p) and not p.isBot()
+            drDoingMission.add(GetEnteringUnit())
+    end)
+
+public function trigger.onLeave()
+    this.addAction(() -> begin
+        let p = GetLeavingUnit().getOwner()
+        if THE_DRAENEI.has(p) and not p.isBot()
+            drDoingMission.remove(GetLeavingUnit())
+    end)

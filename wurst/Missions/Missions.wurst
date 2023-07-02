@@ -19,7 +19,6 @@ import DrAndDeSpawn
 import NeutralSpawn
 import Towers
 import Surrender
-import GeneratedValues
 import public Reset
 import HeroSelection
 

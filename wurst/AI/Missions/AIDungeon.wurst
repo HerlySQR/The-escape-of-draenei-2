@@ -36,18 +36,10 @@ init
         ..registerRectEnterEventSource(Rects.missionObjective11)
         ..registerRectEnterEventSource(Rects.missionObjective12)
         ..addCondition(cond)
-        ..addAction(() -> begin
-            let p = GetEnteringUnit().getOwner()
-            if THE_DRAENEI.has(p) and not p.isBot()
-                drDoingMission.add(GetEnteringUnit())
-        end)
+        ..onEnter()
 
     CreateTrigger()
         ..registerRectLeaveEventSource(Rects.missionObjective11)
         ..registerRectLeaveEventSource(Rects.missionObjective12)
         ..addCondition(cond)
-        ..addAction(() -> begin
-            let p = GetLeavingUnit().getOwner()
-            if THE_DRAENEI.has(p) and not p.isBot()
-                drDoingMission.remove(GetLeavingUnit())
-        end)
+        ..onLeave()

@@ -1,0 +1,305 @@
+package Graph
+
+import HashMap
+import LinkedList
+import ClosureTimers
+
+function LinkedList<real>.getMin() returns real
+    var min = REAL_MAX
+    for t in this
+        if t < min
+            min = t
+    return min
+
+public class Graph<T>
+    private var vertexCount = 0
+    private let adjMatrix = new IterableMap<int, IterableMap<int, real>>()
+    private let vertices = new LinkedList<T>()
+
+    function addEdge(T val1, T val2, real weight, bool oneDir)
+        if not vertices.has(val1)
+            vertices.add(val1)
+            vertexCount++
+        if not vertices.has(val2)
+            vertices.add(val2)
+            vertexCount++
+        
+        let i = vertices.indexOf(val1)
+        let j = vertices.indexOf(val2)
+
+        if not adjMatrix.has(i)
+            adjMatrix.put(i, new IterableMap<int, real>())
+        
+        adjMatrix.get(i).put(j, weight)
+        if not oneDir
+            if not adjMatrix.has(j)
+                adjMatrix.put(j, new IterableMap<int, real>())
+            
+            adjMatrix.get(j).put(i, weight)
+    
+    function addEdge(T val1, T val2, real weight)
+        addEdge(val1, val2, weight, false)
+    
+    function addEdge(T val1, T val2)
+        addEdge(val1, val2, 1)
+    
+    function removeEdge(T val1, T val2, bool oneDir)
+        if not vertices.has(val1) or not vertices.has(val2)
+            return
+        
+        let i = vertices.indexOf(val1)
+        var j = vertices.indexOf(val2)
+
+        let map = adjMatrix.get(i)
+        let map2 = adjMatrix.get(j)
+
+        if map.has(j)
+            map.remove(j)
+
+        if not oneDir
+            if map2.has(i)
+                map2.remove(i)
+        
+        if map.size() == 0 and map2.size() == 0
+            destroy map
+            destroy map2
+            adjMatrix.remove(i)
+            vertices.removeAt(i)
+
+            adjMatrix.remove(j)
+            if i < j
+                j--
+            vertices.removeAt(j)
+    
+    function removeEdge(T val1, T val2)
+        removeEdge(val1, val2, false)
+
+    /** Returns a list (that is destroyed afterwards) that contains the vertices that are in the
+     *  shortest path between the two given vertices, without considering the weights.*/
+    function getShortestPath(T val1, T val2) returns LinkedList<T>
+        let path = new LinkedList<T>()
+
+        if vertices.has(val1) and vertices.has(val2)
+            let i = vertices.indexOf(val1)
+            let j = vertices.indexOf(val2)
+
+            var index = i
+            int array predecessor
+            let traversalQueue = new LinkedList<int>()
+            bool array visited
+
+            traversalQueue.enqueue(i)
+            visited[i] = true
+            predecessor[i] = -1
+            
+            while not traversalQueue.isEmpty() and index != j
+                index = traversalQueue.dequeue()
+                // Update the pathLength for each unvisited vertex adjacent to the vertex at the current index.
+                for k = 0 to vertexCount - 1
+                    if adjMatrix.get(index).has(k) and not visited[k]
+                        predecessor[k] = index
+                        traversalQueue.add(k)
+                        visited[k] = true
+            
+            if index == j // path must have been found
+                path.enqueue(vertices.get(index))
+                while true
+                    index = predecessor[index]
+                    path.enqueue(vertices.get(index))
+                    if index == i
+                        break
+            
+            destroy traversalQueue
+
+        nullTimer(() -> destroy path)
+        return path
+
+    /** Returns a list (that is destroyed afterwards) that contains the vertices that are in the
+     *  shortest path between the two given vertices, considering the weights.*/
+    function getShortestWeightedPath(T val1, T val2) returns LinkedList<T>
+        let path = new LinkedList<T>()
+
+        if vertices.has(val1) and vertices.has(val2)
+            let i = vertices.indexOf(val1)
+            let j = vertices.indexOf(val2)
+
+            var index = i
+            int array predecessor
+            let traversalHeap = new LinkedList<real>()
+            bool array visited
+            real array pathWeight
+
+            for k = 0 to vertexCount - 1
+                pathWeight[k] = REAL_MAX
+
+            pathWeight[i] = 0
+            predecessor[i] = -1
+            visited[i] = true
+
+            // Update the pathWeight for each vertex except the startVertex. Notice that all
+            // vertices not adjacent to the startVertex will have a pathWeight of infinity
+            // for now.
+
+            for k = 0 to vertexCount - 1
+                if not visited[k]
+                    pathWeight[k] = pathWeight[i] + (adjMatrix.get(i).has(k) ? adjMatrix.get(i).get(k) : REAL_MAX)
+                    predecessor[k] = i
+                    traversalHeap.add(pathWeight[k])
+
+            var noPath = false
+            while true
+                let weight = traversalHeap.getMin()
+                if weight == REAL_MAX
+                    noPath = true
+                    break
+                else
+                    for k = 0 to vertexCount - 1
+                        if pathWeight[k] == weight and not visited[k]
+                            var ready = false
+                            for v = 0 to vertexCount - 1
+                                if adjMatrix.get(k).has(v) and visited[v]
+                                    index = k
+                                    ready = true
+                                    break
+                            if ready
+                                break
+                    
+                    visited[index] = true
+
+                traversalHeap.clear()
+                // Update the pathWeight for each vertex that has has not been visited and is
+                // adjacent to the last vertex that was visited. Also, add each unvisited vertex
+                // to the heap.
+                for k = 0 to vertexCount - 1
+                    if not visited[k]
+                        if adjMatrix.get(index).has(k) and (pathWeight[index] + adjMatrix.get(index).get(k)) < pathWeight[k]
+                            pathWeight[k] = pathWeight[index] + adjMatrix.get(index).get(k)
+                            predecessor[k] = index
+                        traversalHeap.add(pathWeight[k])
+                
+                if traversalHeap.isEmpty() or visited[j]
+                    break
+            
+            if not noPath
+                index = j
+                path.enqueue(vertices.get(index))
+                while true
+                    index = predecessor[index]
+                    path.enqueue(vertices.get(index))
+                    if index == i
+                        break
+            
+            destroy traversalHeap
+
+        nullTimer(() -> destroy path)
+        return path
+
+    function toString() returns string
+        if vertexCount == 0
+            return "Graph is empty"
+        
+        var result = "Vertex Values"
+                   + "\n-------------\n"
+                   + "index\tvalue\n\n"
+        
+        for i = 0 to vertexCount - 1
+            result += i.toString() + "\t" + (vertices.get(i) castTo int).toString() + "\n"
+        
+        result += "\n"
+
+        result += "\nAdjacency Matrix\n"
+                + "----------------\n"
+                + "index\t"
+        
+        for i = 0 to vertexCount - 1
+            result += i.toString()
+            if i < vertexCount - 1
+                result += "\t"
+        
+        result += "\n"
+
+        for i = 0 to vertexCount - 1
+            result += i.toString() + "\t"
+
+            for j = 0 to vertexCount - 1
+                result += adjMatrix.get(i).get(j).toString()
+                if j < vertexCount - 1
+                    result += "\t"
+
+            result += "\n"
+
+        return result
+
+    ondestroy
+        for k in adjMatrix
+            destroy adjMatrix.get(k)
+        destroy adjMatrix
+        destroy vertices
+
+@test
+function testGraph()
+    let graph = new Graph<int>
+
+    graph.addEdge(1, 2)
+    graph.addEdge(1, 5)
+    graph.addEdge(2, 5, 2.)
+    graph.addEdge(2, 3)
+    graph.addEdge(3, 4)
+    graph.addEdge(4, 5)
+    graph.addEdge(4, 6)
+
+    print("Shortest path between 1 and 4")
+    for i in graph.getShortestPath(1, 4)
+        print(i.toString())
+    
+    print("\n")
+
+    graph.removeEdge(1, 5)
+
+    print("Shortest path between 1 and 4, without 1 and 5 being connected")
+    for i in graph.getShortestPath(1, 4)
+        print(i.toString())
+
+    print("\n")
+
+    print("Shortest path between 1 and 4, without 1 and 5 being connected and considering the weights")
+    for i in graph.getShortestWeightedPath(1, 4)
+        print(i.toString())
+
+    print("\n")
+    print(graph.toString())
+
+@test
+function testNetwork()
+    let graph = new Graph<string>()
+
+    graph.addEdge("Coruña", "Vigo", 171)
+    graph.addEdge("Coruña", "Valladolid", 455)
+    graph.addEdge("Vigo", "Valladolid", 356)
+    graph.addEdge("Bilbao", "Valladolid", 280)
+    graph.addEdge("Madrid", "Valladolid", 193)
+    graph.addEdge("Bilbao", "Oviedo", 304)
+    graph.addEdge("Bilbao", "Madrid", 395)
+    graph.addEdge("Bilbao", "Zaragoza", 324)
+    graph.addEdge("Madrid", "Zaragoza", 325)
+    graph.addEdge("Barcelona", "Zaragoza", 296)
+    graph.addEdge("Barcelona", "Gerona", 100)
+    graph.addEdge("Barcelona", "Valencia", 349)
+    graph.addEdge("Valencia", "Albacete", 191)
+    graph.addEdge("Murcia", "Valencia", 241)
+    graph.addEdge("Murcia", "Albacete", 150)
+    graph.addEdge("Murcia", "Granada", 278)
+    graph.addEdge("Jaén", "Granada", 99)
+    graph.addEdge("Sevilla", "Granada", 256)
+    graph.addEdge("Sevilla", "Cadiz", 125)
+    graph.addEdge("Sevilla", "Jaén", 242)
+    graph.addEdge("Madrid", "Jaén", 335)
+    graph.addEdge("Madrid", "Bajadoz", 403)
+
+    for i in graph.getShortestWeightedPath("Valladolid", "Barcelona")
+        print(i)
+    
+    print("\n")
+
+    for i in graph.getShortestWeightedPath("Coruña", "Gerona")
+        print(i)

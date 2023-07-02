@@ -1,0 +1,34 @@
+package AIUseElevator
+
+import ClosureTimers
+import Orders
+
+function vec2.getCliffLevel() returns int
+    return GetTerrainCliffLevel(this.x, this.y)
+
+public function unit.useElevator(elevator e, rect r)
+    this.issuePointOrderById(Orders.smart, r.getCenter())
+
+    let uCliff = this.getPos().getCliffLevel()
+    let eCliff = e.elevatable.getPos().getCliffLevel()
+
+    doPeriodically(0.1, cb -> begin
+        if r.contains(this.getPos())
+            this.issueImmediateOrderById(Orders.holdposition)
+            doPeriodically(0.1, cb2 -> begin
+                if (eCliff + e.getHeight() - 1) == uCliff
+                    this.issuePointOrderById(Orders.smart, e.elevatable.getPos())
+                    doAfter(1., () -> begin
+                        let face = this.getFacingAngle()
+                        this.issueImmediateOrderById(Orders.holdposition)
+                        doPeriodically(0.1, cb3 -> begin
+                            if e.getHeight() == 1
+                                this.issuePointOrderById(Orders.attack, this.getPos().polarOffset(face, 300.))
+                                destroy cb3
+                        end)
+                    end)
+                destroy cb2
+            end)
+            destroy cb
+    end)
+        

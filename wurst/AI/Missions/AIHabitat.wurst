@@ -1,0 +1,92 @@
+package AIHabitat
+
+import AIMissionController
+import AIUseElevator
+
+import Graph
+
+let habitatPath = new Graph<int>()
+vec2 array habitatPoints
+
+constant NUMBER_OF_POINTS = 15
+constant BOT_POINT = NUMBER_OF_POINTS
+constant TARGET_POINT = BOT_POINT + 1
+constant NECESSARY_DIST = 500.
+constant DOOR_POINT = 12
+
+function unit.addToGraph(int point)
+    let pos = this.getPos()
+    for i = 0 to NUMBER_OF_POINTS - 1
+        let dist = pos.distanceTo(habitatPoints[i])
+        if dist <= NECESSARY_DIST
+            habitatPath.addEdge(point, i, dist)
+
+function removeFromGraph(int point)
+    for i = 0 to NUMBER_OF_POINTS - 1
+        habitatPath.removeEdge(point, i)
+
+init
+    for i = 0 to NUMBER_OF_POINTS - 1
+        habitatPoints[i] = Rects.habitatPoint[i].getCenter()
+
+    habitatPath.addEdge(0, 1, habitatPoints[0].distanceTo(habitatPoints[1]))
+    habitatPath.addEdge(1, 2, habitatPoints[1].distanceTo(habitatPoints[2]))
+    habitatPath.addEdge(2, 3, habitatPoints[2].distanceTo(habitatPoints[3]))
+    habitatPath.addEdge(3, 4, habitatPoints[3].distanceTo(habitatPoints[4]))
+
+    addBotAction(bot -> begin
+        if actMission == 3 and wannaDoMission[bot]
+            let h = hero[bot]
+            let pos = h.getPos()
+
+            let distanceToTheDoor = pos.distanceTo(Dests.habitatDoor.killable.getPos())
+            let distanceToTheElevator = pos.distanceTo(Dests.elevatorHabitat2.elevatable.getPos())
+            
+            if THE_DRAENEI.has(h)
+                forDestructablesInRange(pos, 300, d -> begin
+                    if d.getTypeId() == 'B002'
+                        h.issueTargetOrderById(Orders.attack, d)
+                end)
+
+                if distanceToTheDoor < distanceToTheElevator
+                    if distanceToTheDoor < 300
+                        if Dests.habitatDoor.killable.isAliveTrick()
+                            h.issueTargetOrderById(Orders.attack,
+                                pos.distanceToSq(Dests.leverHabitat1.getPos()) < pos.distanceToSq(Dests.leverHabitat2.getPos()) ?
+                                Dests.leverHabitat1 : Dests.leverHabitat2)
+                        else
+                            h.issuePointOrderById(Orders.smart, Dests.elevatorHabitat2.elevatable.getPos())
+                else
+                    if distanceToTheElevator < 300
+                        h.useElevator(Dests.elevatorHabitat2, Rects.elevatorHabitat2)
+            else
+                if wannaInspect[bot]
+
+                else if wannaChase[bot]
+                    let distanceToDraenei = pos.distanceTo(lastSeeingDraenei[bot])
+
+                    if distanceToTheDoor < distanceToTheElevator
+                        if distanceToTheDoor < 300
+                            if Dests.habitatDoor.killable.isAliveTrick()
+                                h.issueTargetOrderById(Orders.attack,
+                                    pos.distanceToSq(Dests.leverHabitat1.getPos()) < pos.distanceToSq(Dests.leverHabitat2.getPos()) ?
+                                    Dests.leverHabitat1 : Dests.leverHabitat2)
+                            else
+                                h.issuePointOrderById(Orders.smart, Dests.elevatorHabitat1.elevatable.getPos())
+                    else
+                        if distanceToTheElevator < 300
+                            h.useElevator(Dests.elevatorHabitat1, Rects.elevatorHabitat1)
+
+    end)
+
+    let cond = Condition(() -> actMission == 3)
+
+    CreateTrigger()
+        ..registerRectEnterEventSource(Rects.missionObjective3)
+        ..addCondition(cond)
+        ..onEnter()
+
+    CreateTrigger()
+        ..registerRectLeaveEventSource(Rects.missionObjective3)
+        ..addCondition(cond)
+        ..onLeave()
